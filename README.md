@@ -1,2 +1,6 @@
-# 38_TransitCoders
-Order Dispatch &amp; Delivery Tracking System – Project repository for design, development, and documentation
+# Order Dispatch & Delivery Tracking System
+
+Team Name: Transit Coders  
+Team Number: 38
+
+This repository contains all code and documentation for the Full Stack Development project.
