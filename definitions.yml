@@ -1,0 +1,321 @@
+Merchant:
+  definition: A business entity that creates delivery orders and hands over packages for shipment.
+  aliases:
+    - Seller
+    - Vendor
+  examples:
+    - "The merchant created a new order for pickup."
+
+Customer:
+  definition: A person who receives delivered packages and can track their order progress.
+  aliases:
+    - Recipient
+    - Buyer
+  examples:
+    - "The customer tracked the order using the tracking ID."
+
+Order:
+  definition: A delivery request containing package, pickup, and destination information.
+  aliases:
+    - Delivery Order
+    - Shipment Order
+  examples:
+    - "Order #123 was dispatched to a delivery partner."
+
+Hub:
+  definition: A centralized facility where packages are collected, sorted, and assigned to delivery partners.
+  aliases:
+    - Warehouse
+    - Dark Store
+  examples:
+    - "The hub assigned the order to an available rider."
+
+Package:
+  definition: A physical item that is transported from the merchant to the customer.
+  aliases:
+    - Parcel
+    - Shipment
+  examples:
+    - "The package was picked up from the hub."
+
+Delivery Partner:
+  definition: A field worker responsible for picking up packages from hubs and delivering them to customers.
+  aliases:
+    - Rider
+    - Driver
+    - Courier
+  examples:
+    - "The delivery partner accepted the assigned order."
+
+Dispatch:
+  definition: The process of assigning orders to delivery partners based on availability and location.
+  aliases:
+    - Assignment
+    - Order Allocation
+  examples:
+    - "Dispatch was triggered once the order was ready."
+
+Order Status:
+  definition: The current stage of an order such as Created, Dispatched, PickedUp, OutForDelivery, Delivered, or Failed.
+  aliases:
+    - Shipment Status
+  examples:
+    - "The order status changed to Out For Delivery."
+
+Delivery Schedule:
+  definition: The planned time window during which a package is expected to be delivered.
+  aliases:
+    - Delivery Slot
+  examples:
+    - "The delivery schedule was updated to tomorrow morning."
+
+Estimated Time Of Arrival:
+  definition: The predicted time at which the package is expected to reach the customer.
+  aliases:
+    - ETA
+  examples:
+    - "The ETA for the order is 6 PM."
+
+Proof Of Delivery:
+  definition: Confirmation collected by the delivery partner indicating successful delivery, such as OTP, signature, or photo.
+  aliases:
+    - POD
+  examples:
+    - "The rider uploaded proof of delivery after completion."
+
+Exception:
+  definition: An abnormal situation that prevents successful delivery, such as customer unavailable or incorrect address.
+  aliases:
+    - Delivery Issue
+    - Delivery Failure
+  examples:
+    - "An exception was raised due to customer unavailability."
+
+Return:
+  definition: The process of sending an undelivered package back to the hub or merchant.
+  aliases:
+    - Return Shipment
+  examples:
+    - "The package was marked for return to the hub."
+
+Hub Manager:
+  definition: A supervisor responsible for overseeing hub operations, dispatch decisions, and exception handling.
+  aliases:
+    - Hub Supervisor
+    - Operations Manager
+  examples:
+    - "The hub manager reassigned the delayed order."
+
+Report:
+  definition: A summarized view of operational data such as orders, delivery partners, and hub performance over a period of time.
+  aliases:
+    - Performance Report
+    - Analytics Report
+  examples:
+    - "The admin generated a daily delivery report."
+
+Monitoring:
+  definition: Real-time observation of active orders, delivery partners, hubs, and exceptions.
+  aliases:
+    - Operations Monitoring
+    - Live Tracking
+  examples:
+    - "Monitoring showed an increase in delayed orders."
+
+Bill:
+  definition: A financial document generated after order confirmation showing payable amount before payment.
+  aliases:
+    - Draft Invoice
+  examples:
+    - "The system generates a bill of ₹1500."
+
+Inventory Item:
+  definition: A product tracked by the store for stock availability.
+  aliases:
+    - Stock Item
+    - Product Unit
+  examples:
+    - "The inventory item 'Red T-Shirt' has 50 units in stock."
+
+Payment:
+  definition: The transfer of money from customer to merchant for a completed order.
+  aliases:
+    - Transaction
+  examples:
+    - "The payment was completed successfully."
+
+Delivery Zone:
+  definition: A geographical area used to group orders and assign nearby delivery partners.
+  aliases:
+    - Service Area
+  examples:
+    - "The order was assigned based on delivery zone."
+
+Order History:
+  definition: A chronological record of all status changes and actions performed on an order.
+  aliases:
+    - Shipment History
+  examples:
+    - "The admin reviewed the order history to investigate delays."
+
+Assignment Queue:
+  definition: A waiting list of orders that are yet to be assigned to delivery partners.
+  aliases:
+    - Dispatch Queue
+  examples:
+    - "New orders entered the assignment queue."
+
+Delivery Route:
+  definition: The planned path followed by a delivery partner to complete assigned deliveries.
+  aliases:
+    - Route Plan
+  examples:
+    - "The delivery route was optimized to reduce travel time."
+
+Rider Availability:
+  definition: The current working status of delivery partners indicating whether they can accept new orders.
+  aliases:
+    - Partner Availability
+  examples:
+    - "Low rider availability caused delivery delays."
+
+Freelance Delivery Partner:
+  definition: An on-demand delivery partner activated during peak demand or hub overload.
+  aliases:
+    - Standby Rider
+    - On-Demand Partner
+  examples:
+    - "Freelance delivery partners were notified during peak hours."
+
+Hub Overload:
+  definition: A condition where a hub receives more orders than it can process within expected time.
+  aliases:
+    - Capacity Overflow
+  examples:
+    - "Hub overload triggered redistribution of orders."
+
+Priority Order:
+  definition: An order marked for faster processing due to urgency or service level agreements.
+  aliases:
+    - Express Order
+  examples:
+    - "Priority orders were dispatched first."
+
+Manual Override:
+  definition: An action performed by the hub manager or admin to bypass automated dispatch decisions.
+  aliases:
+    - Admin Intervention
+  examples:
+    - "Manual override was used to reassign delayed deliveries."
+
+Escalation:
+  definition: The process of forwarding unresolved delivery issues to higher operational authority.
+  aliases:
+    - Issue Escalation
+  examples:
+    - "Repeated failures resulted in escalation to operations."
+
+Audit Log:
+  definition: A secure record of administrative and operational actions for accountability.
+  aliases:
+    - Activity Log
+  examples:
+    - "Audit logs captured changes made by the admin."
+
+Access Role:
+  definition: A permission group that defines what actions a system user is allowed to perform.
+  aliases:
+    - User Role
+  examples:
+    - "The hub manager was assigned an access role."
+
+Security Policy:
+  definition: A set of rules governing authentication, authorization, and system usage.
+  aliases:
+    - Access Policy
+  examples:
+    - "Security policies enforce password complexity."
+
+Service Level Agreement:
+  definition: A delivery performance commitment defining acceptable delivery timelines.
+  aliases:
+    - SLA
+  examples:
+    - "The system tracks SLA compliance for each order."
+
+Customer Support Ticket:
+  definition: A formal request created to resolve customer complaints or delivery issues.
+  aliases:
+    - Support Case
+  examples:
+    - "A customer support ticket was opened for damaged goods."
+
+Feedback Rating:
+  definition: A numeric score provided by customers after delivery to evaluate service quality.
+  aliases:
+    - Service Rating
+  examples:
+    - "The delivery partner received a 5-star feedback rating."
+
+Purchase Order:
+  definition: A formal order issued to a vendor specifying quantity, price, and delivery timeline for goods.
+  aliases:
+    - PO
+  examples:
+    - "The merchant raised a purchase order for 100 units of material."
+
+Lorry Receipt:
+  definition: A transport document issued by the transporter confirming that goods have been handed over for shipment.
+  aliases:
+    - LR
+    - Consignment Note
+  examples:
+    - "The driver shared the lorry receipt after collecting the shipment."
+
+Full Load:
+  definition: A shipment mode where the entire truck capacity is used for a single customer’s material.
+  aliases:
+    - Full Truck Load
+  examples:
+    - "The customer opted for full load delivery due to large quantity."
+
+Part Load:
+  definition: A shipment mode where a truck carries materials for multiple customers and destinations.
+  aliases:
+    - Partial Load
+    - Less Than Truck Load
+  examples:
+    - "Small orders were combined using part load transportation."
+
+E-way Bill:
+  definition: A mandatory GST document required for movement of goods across locations.
+  aliases:
+    - Electronic Way Bill
+  examples:
+    - "The system generated an e-way bill before dispatch."
+
+Goods Received Note:
+  definition: A confirmation document indicating that materials have been successfully received at the destination site.
+  examples:
+    - "The warehouse created a GRN after unloading the truck."
+
+
+Delivery Challan:
+  definition: A temporary document used for internal transfer or redirected movement of goods.
+  examples:
+    - "A delivery challan was issued for moving stock between hubs."
+
+Third-party Inspection:
+  definition: Government or certified external verification of material quality before dispatch.
+  aliases:
+    - External Inspection
+    - Quality Verification
+  examples:
+    - "Third-party inspection was completed before shipment approval."
+
+Bank Guarantee:
+  definition: A financial security provided by a bank to safeguard advance payments made to vendors.
+  aliases:
+    - Financial Guarantee
+  examples:
+    - "The vendor submitted a bank guarantee against the advance amount."
