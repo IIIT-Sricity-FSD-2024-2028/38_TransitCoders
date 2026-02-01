@@ -14,16 +14,20 @@
     Nature of work: Managerial & Operational
 
 ## Domain Context and Terminology
-- How would you describe the overall purpose of this problem statement in your daily work?
+**How would you describe the overall purpose of this problem statement in your daily work?**
+
 In day-to-day operations, this problem statement represents the need to track, control, and coordinate material movement from manufacturers to project sites while ensuring compliance, cost control, and timely delivery.
 
-- What are the primary goals or outcomes of this problem statement?
-Ensure materials reach project sites within committed timelines
-Reduce dependency on manual phone-based tracking
-Maintain compliance with GST and transportation regulations
-Minimize delivery delays, penalties, and material loss
+**What are the primary goals or outcomes of this problem statement?**
 
-- List key terms used by the domain expert and their meanings (Copy these to definition.yml)
+- Ensure materials reach project sites within committed timelines
+- Reduce dependency on manual phone-based tracking
+- Maintain compliance with GST and transportation regulations
+- Minimize delivery delays, penalties, and material loss
+
+
+**List key terms used by the domain expert and their meanings (Copy these to definition.yml) :**
+
 
 | Term                      | Meaning as explained by the expert                                                |
 | ------------------------- | --------------------------------------------------------------------------------- |
@@ -40,7 +44,8 @@ Minimize delivery delays, penalties, and material loss
 
 
 ## Actors and Responsibilities
-- Identify the different roles involved and what they do in practice.
+
+**Identify the different roles involved and what they do in practice :**
 
 | Actor / Role                        | Responsibilities                                          |
 | ----------------------------------- | --------------------------------------------------------- |
