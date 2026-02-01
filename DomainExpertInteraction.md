@@ -26,7 +26,7 @@ In day-to-day operations, this problem statement represents the need to track, c
 - Minimize delivery delays, penalties, and material loss
 
 
-**List key terms used by the domain expert and their meanings (Copy these to definition.yml) :**
+**Key terms used by the domain expert and their meanings :**
 
 
 | Term                      | Meaning as explained by the expert                                                |
@@ -45,7 +45,7 @@ In day-to-day operations, this problem statement represents the need to track, c
 
 ## Actors and Responsibilities
 
-**Identify the different roles involved and what they do in practice :**
+**Different roles involved and what they do in practice :**
 
 | Actor / Role                        | Responsibilities                                          |
 | ----------------------------------- | --------------------------------------------------------- |
@@ -61,8 +61,10 @@ In day-to-day operations, this problem statement represents the need to track, c
 ## Core workflows
 Description of at least 2-3 real workflows as explained by the domain expert
 
-Workflow 1: Order to Dispatch (B2B Procurement)
+**Workflow 1: Order to Dispatch (B2B Procurement)**
+
 Trigger: Customer finalizes vendor and issues purchase order
+
 Steps:
 1) Price and technical evaluation of vendors
 2) Purchase order issued with delivery timeline
@@ -71,8 +73,10 @@ Steps:
 5) Third-party inspection conducted
 Outcome: Goods approved and ready for dispatch
 
-Workflow 2: Transportation & Tracking
+**Workflow 2: Transportation & Tracking**
+
 Trigger: Dispatch approval after inspection and payment
+
 Steps:
 1) Transporter assigned manually based on availability
 2) Material weighed (weight/volume based)
@@ -81,8 +85,10 @@ Steps:
 5) Tracking done via calls and limited GPS access
 Outcome: Goods reach destination hub or site
 
-Workflow 3: Delivery Confirmation & Closure
+**Workflow 3: Delivery Confirmation & Closure**
+
 Trigger: Truck reaches destination site
+
 Steps:
 1) Physical verification of quantity and damage
 2) GRN issued
@@ -93,22 +99,23 @@ Outcome: Order closed successfully or rescheduled if damaged
 ## Rules, Constraints, and Exceptions
 Document rules that govern how the domain operates.
 
-Mandatory Rules / Policies:
+**Mandatory Rules / Policies:**
+
 - E-way bill must match GST-registered destination
 - Goods cannot be unloaded at unregistered locations
 - Inspection approval required before dispatch
 
-Constraints / Limitations:
+**Constraints / Limitations:**
 - Tracking is mostly manual
 - Transporter systems are not integrated
 - Real-time GPS visibility is limited
 
-Common Exceptions / Edge Cases:
+**Common Exceptions / Edge Cases:**
 - Delivery delays in part-load shipments
 - Border delays causing GST penalties
 - Change of delivery location after dispatch
 
-Situations Where Things Go Wrong:
+**Situations Where Things Go Wrong:**
 - Driver gives incorrect location updates
 - Vehicle breakdowns or delays near state borders
 - Damage during transit requiring insurance claims
@@ -121,16 +128,16 @@ Situations Where Things Go Wrong:
 - Manual coordination between multiple parties
 
 ## Assumptions & Clarifications
-Confirmed Assumptions:
+**Confirmed Assumptions:**
 - Dispatch and transporter assignment are mostly manual
 - B2B logistics timelines are flexible compared to e-commerce
 - Insurance is critical for high-value shipments
 
-Corrected Assumptions:
+**Corrected Assumptions:**
 - Real-time tracking is not universally available
 - Drivers cannot always be relied on for accurate updates
 
-Open Questions (for future work):
+**Open Questions (for future work):**
 - How to integrate transporter GPS systems
 - Adoption challenges of new software by drivers
 - Feasibility of automated compliance alerts
