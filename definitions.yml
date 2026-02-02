@@ -146,8 +146,6 @@ Payment:
 
 Delivery Zone:
   definition: A geographical area used to group orders and assign nearby delivery partners.
-  aliases:
-    - Service Area
   examples:
     - "The order was assigned based on delivery zone."
 
@@ -179,11 +177,10 @@ Rider Availability:
   examples:
     - "Low rider availability caused delivery delays."
 
-Freelance Delivery Partner:
+Local Delivery Partner:
   definition: An on-demand delivery partner activated during peak demand or hub overload.
   aliases:
-    - Standby Rider
-    - On-Demand Partner
+    - Freelance Rider
   examples:
     - "Freelance delivery partners were notified during peak hours."
 
@@ -224,8 +221,6 @@ Audit Log:
 
 Access Role:
   definition: A permission group that defines what actions a system user is allowed to perform.
-  aliases:
-    - User Role
   examples:
     - "The hub manager was assigned an access role."
 
@@ -283,7 +278,6 @@ Part Load:
   definition: A shipment mode where a truck carries materials for multiple customers and destinations.
   aliases:
     - Partial Load
-    - Less Than Truck Load
   examples:
     - "Small orders were combined using part load transportation."
 
@@ -298,7 +292,6 @@ Goods Received Note:
   definition: A confirmation document indicating that materials have been successfully received at the destination site.
   examples:
     - "The warehouse created a GRN after unloading the truck."
-
 
 Delivery Challan:
   definition: A temporary document used for internal transfer or redirected movement of goods.
