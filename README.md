@@ -1,118 +1,80 @@
-# Order Dispatch & Delivery Tracking System
+# Order Dispatch & Delivery Tracking Platform
 
-## Problem Statement
+## Project Overview
 
-Logistics and delivery operations involve multiple roles such as merchants, hub managers, delivery agents, customers, and administrators. In many real-world scenarios, these processes are handled manually or across disconnected systems, leading to delays, lack of transparency, and operational inefficiencies.
-
-The objective of this project is to study real-world dispatch and delivery workflows and design a system that models these processes clearly. The system focuses on order management, dispatch operations, delivery execution, shipment tracking, exception handling, and system administration.
-
-This repository represents the Sprint-0 work, which includes understanding the domain, identifying actors, and defining core use cases and workflows.
+This project is a centralized logistics management system designed to streamline the workflow between merchants, warehouse hubs, and delivery personnel. The platform focuses on automating order dispatching and providing real-time tracking for end customers.
 
 ---
 
-## Objectives
+## Problem Statement
 
-- Understand real-world logistics workflows and terminology  
-- Identify key actors and their responsibilities  
-- Model end-to-end workflows from order creation to delivery  
-- Capture business rules, constraints, and exception scenarios  
-- Provide a foundation for system design and implementation  
+Traditional logistics often suffer from fragmented communication and manual dispatching errors. This platform addresses the lack of real-time visibility in the delivery chain by digitizing the lifecycle of an order from "Merchant Creation" to "Last-Mile Delivery," ensuring transparency and efficiency for all stakeholders.
 
 ---
 
 ## Identified Actors
 
-- *Merchant* – Creates and manages delivery orders  
-- *Hub Manager* – Controls dispatch and operational activities  
-- *Delivery Agent* – Executes deliveries and updates shipment status  
-- *Customer* – Tracks shipments and provides feedback  
-- *Admin* – Manages system configuration and security  
+- *Merchant*        – Creates and manages delivery orders  
+- *Hub Manager*     – Controls dispatch and operational activities  
+- *Delivery Agent*  – Executes deliveries and updates shipment status  
+- *Customer*        – Tracks shipments and provides feedback  
+- *Admin*           – Manages system configuration and security  
 
 ---
 
-## Core Use Cases and Features
+# Planned Features – Actor wise
 
-### 1. Order Management (Merchant)
+## Merchant 
 
-Handles creation and management of delivery orders.
+- Create single or bulk shipment orders  
+- Enter product and package details  
+- Calculate delivery price and ETA  
+- Schedule pickups  
+- Generate barcode / QR code for shipments  
+- Track shipment status end-to-end  
+- Cancel shipment before dispatch  
+- View order history and submit reviews  
 
-- Create new order  
-- Edit or cancel order  
+---
+
+## Hub Manager
+
+- Track shipments within the hub  
+- Monitor inter-hub shipment movement  
+- Manually override routing decisions  
+- Assign or reassign delivery agents  
+- Contact drivers and other hubs  
+- Update shipment status and details  
+- Organize hub operations  
+
+---
+
+## Delivery Agent 
+
+- View assigned deliveries (worklist)  
+- Scan barcode / QR to fetch shipment details  
+- Update delivery status (delivered, failed, delayed)  
+- Report mishaps or delivery issues  
+- Upload Proof of Delivery (POD)  
+- View delivery history  
+- Local Delivery Partner
+
+---
+
+## Customer
+
+### Sending
+- Calculate shipment price  
 - Schedule pickup  
-- Enter shipment details  
-- Generate tracking ID  
-- View order history  
+- Track shipment  
+
+### Receiving
+- Track delivery status in real time  
+- Receive delivery notifications  
 
 ---
 
-### 2. Dispatch & Assignment Management (Hub Manager)
-
-Controls dispatch operations and assignment of delivery agents.
-
-- View pending orders  
-- Assign delivery agent  
-- Transfer order to another hub  
-- Update shipment details  
-
----
-
-### 3. Delivery Execution (Delivery Agent)
-
-Performs physical delivery and updates system status.
-
-- View assigned deliveries  
-- Scan tracking code  
-- Update delivery status (In Transit / Delivered / Failed)  
-- Upload proof of delivery  
-
----
-
-### 4. Exception & Return Handling (Delivery Agent, Hub Manager)
-
-Manages non-normal delivery scenarios.
-
-- Report delivery issues  
-- Handle failed delivery  
-- Reschedule delivery  
-- Process return shipments  
-
----
-
-### 5. Shipment Tracking & Notification (Customer, Merchant)
-
-Provides visibility and communication about shipment progress.
-
-- Track shipment using tracking ID  
-- View delivery status  
-- Receive notifications  
-- Confirm delivery  
-
----
-
-### 6. Feedback & Complaint Management (Customer, Hub Manager)
-
-Handles customer feedback and service complaints.
-
-- Raise complaints  
-- Submit feedback  
-- Review and resolve complaints  
-
----
-
-### 7. Reporting & Monitoring (Hub Manager, Admin)
-
-Supports operational and performance monitoring.
-
-- Generate operational reports  
-- View dashboards  
-- Monitor delivery success and failure  
-- Audit activities  
-
----
-
-### 8. System Administration & Security (Admin)
-
-Controls system configuration and access.
+## Admin
 
 - Manage users and roles  
 - Configure business rules  
@@ -122,51 +84,10 @@ Controls system configuration and access.
 
 ---
 
-## Actor to Use Case Mapping
+## Team Members
 
-*Merchant*
-- Order Management  
-- Shipment Tracking & Notification  
-
-*Hub Manager*
-- Dispatch & Assignment Management  
-- Exception & Return Handling  
-- Feedback & Complaint Management  
-- Reporting & Monitoring  
-
-*Delivery Agent*
-- Delivery Execution  
-- Exception & Return Handling  
-
-*Customer*
-- Shipment Tracking & Notification  
-- Feedback & Complaint Management  
-
-*Admin*
-- System Administration & Security  
-- Reporting & Monitoring  
-
----
-
-## Project Scope (Sprint-0)
-
-This sprint focuses on:
-
-- Domain understanding  
-- Actor identification  
-- Use case definition  
-- Activity and sequence diagram modeling  
-- Domain expert interaction documentation  
-
-The project does not focus on UI design or technology selection in this stage.  
-It emphasizes clarity of workflows, responsibilities, and system behavior.
-
----
-
-## Notes
-
-- This project is based on real-world logistics and dispatch workflows.  
-- The goal is to model how work is actually performed in practice.  
-- The system design will be refined in later sprints based on feedback and validation.
-
----
+- Vinod Katevarapu
+- Jay Suriya R
+- Mohammad Shazil A M
+- Shreesaanth R
+- Prasanna Raja R
