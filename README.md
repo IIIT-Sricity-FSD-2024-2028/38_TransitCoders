@@ -14,11 +14,11 @@ Traditional logistics often suffer from fragmented communication and manual disp
 
 ## Identified Actors
 
-- *Merchant*        – Creates and manages delivery orders  
-- *Hub Manager*     – Controls dispatch and operational activities  
-- *Delivery Agent*  – Executes deliveries and updates shipment status  
-- *Customer*        – Tracks shipments and provides feedback  
-- *Admin*           – Manages system configuration and security  
+- `Merchant`        – Creates and manages delivery orders  
+- `Hub Manager`     – Controls dispatch and operational activities  
+- `Delivery Agent`  – Executes deliveries and updates shipment status  
+- `Customer`        – Tracks shipments and provides feedback  
+- `Admin`           – Manages system configuration and security  
 
 ---
 
