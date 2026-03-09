@@ -1,0 +1,869 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1053pt" height="1347pt" viewBox="0.00 0.00 1053.00 1347.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(36 1311.46)">
+<title>ER</title>
+<polygon fill="white" stroke="none" points="-36,36 -36,-1311.46 1017.3,-1311.46 1017.3,36 -36,36"/>
+<!-- users -->
+<g id="node1" class="node">
+<title>users</title>
+<polygon fill="#d6eaf8" stroke="none" points="618.47,-900.22 618.47,-922.22 684.04,-922.22 684.04,-900.22 618.47,-900.22"/>
+<polygon fill="none" stroke="black" points="618.47,-900.22 618.47,-922.22 684.04,-922.22 684.04,-900.22 618.47,-900.22"/>
+<text xml:space="preserve" text-anchor="start" x="637.35" y="-909.22" font-family="Arial" font-weight="bold" font-size="10.00">Users</text>
+<polygon fill="none" stroke="black" points="618.47,-878.22 618.47,-900.22 684.04,-900.22 684.04,-878.22 618.47,-878.22"/>
+<text xml:space="preserve" text-anchor="start" x="623.47" y="-887.22" font-family="Arial" text-decoration="underline" font-size="10.00">user_id (PK)</text>
+<polygon fill="none" stroke="black" points="618.47,-856.22 618.47,-878.22 684.04,-878.22 684.04,-856.22 618.47,-856.22"/>
+<text xml:space="preserve" text-anchor="start" x="623.47" y="-864.22" font-family="Arial" font-size="10.00">name</text>
+<polygon fill="none" stroke="black" points="618.47,-834.22 618.47,-856.22 684.04,-856.22 684.04,-834.22 618.47,-834.22"/>
+<text xml:space="preserve" text-anchor="start" x="623.47" y="-842.22" font-family="Arial" font-size="10.00">email</text>
+<polygon fill="none" stroke="black" points="618.47,-812.22 618.47,-834.22 684.04,-834.22 684.04,-812.22 618.47,-812.22"/>
+<text xml:space="preserve" text-anchor="start" x="623.47" y="-820.22" font-family="Arial" font-size="10.00">phone</text>
+<polygon fill="none" stroke="black" points="618.47,-790.22 618.47,-812.22 684.04,-812.22 684.04,-790.22 618.47,-790.22"/>
+<text xml:space="preserve" text-anchor="start" x="623.47" y="-798.22" font-family="Arial" font-size="10.00">password</text>
+<polygon fill="none" stroke="black" points="618.47,-768.22 618.47,-790.22 684.04,-790.22 684.04,-768.22 618.47,-768.22"/>
+<text xml:space="preserve" text-anchor="start" x="623.47" y="-776.22" font-family="Arial" font-size="10.00">role</text>
+<polygon fill="none" stroke="black" points="618.47,-746.22 618.47,-768.22 684.04,-768.22 684.04,-746.22 618.47,-746.22"/>
+<text xml:space="preserve" text-anchor="start" x="623.47" y="-754.22" font-family="Arial" font-size="10.00">status</text>
+<polygon fill="none" stroke="black" points="618.47,-724.22 618.47,-746.22 684.04,-746.22 684.04,-724.22 618.47,-724.22"/>
+<text xml:space="preserve" text-anchor="start" x="623.47" y="-732.22" font-family="Arial" font-size="10.00">created_at</text>
+</g>
+<!-- rel_has_login -->
+<g id="node20" class="node">
+<title>rel_has_login</title>
+<polygon fill="#fadbd8" stroke="black" points="939.49,-735.84 897.69,-717.84 939.49,-699.84 981.3,-717.84 939.49,-735.84"/>
+<text xml:space="preserve" text-anchor="middle" x="939.49" y="-714.84" font-family="Arial" font-size="10.00">has_login</text>
+</g>
+<!-- users&#45;&#45;rel_has_login -->
+<g id="edge1" class="edge">
+<title>users--rel_has_login</title>
+<path fill="none" stroke="#555555" d="M684.04,-811.24C742.91,-789.71 865.16,-745.01 916.26,-726.33"/>
+<text xml:space="preserve" text-anchor="middle" x="698.16" y="-794.07" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_has_address -->
+<g id="node21" class="node">
+<title>rel_has_address</title>
+<polygon fill="#fadbd8" stroke="black" points="794.66,-820.2 740.78,-802.2 794.66,-784.2 848.54,-802.2 794.66,-820.2"/>
+<text xml:space="preserve" text-anchor="middle" x="794.66" y="-799.2" font-family="Arial" font-size="10.00">has_address</text>
+</g>
+<!-- users&#45;&#45;rel_has_address -->
+<g id="edge3" class="edge">
+<title>users--rel_has_address</title>
+<path fill="none" stroke="#555555" d="M683.79,-818.45C705.28,-815.3 733.53,-811.16 756.14,-807.85"/>
+<text xml:space="preserve" text-anchor="middle" x="700.5" y="-804.46" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_places_order -->
+<g id="node22" class="node">
+<title>rel_places_order</title>
+<polygon fill="#fadbd8" stroke="black" points="572.02,-715.28 517.03,-684.08 572.02,-652.88 627,-684.08 572.02,-715.28"/>
+<text xml:space="preserve" text-anchor="middle" x="572.02" y="-687.08" font-family="Arial" font-size="10.00">places</text>
+<text xml:space="preserve" text-anchor="middle" x="572.02" y="-675.08" font-family="Arial" font-size="10.00">(customer)</text>
+</g>
+<!-- users&#45;&#45;rel_places_order -->
+<g id="edge5" class="edge">
+<title>users--rel_places_order</title>
+<path fill="none" stroke="#555555" d="M618.57,-765.82C607.06,-745.61 594.74,-723.98 585.67,-708.05"/>
+<text xml:space="preserve" text-anchor="middle" x="602.25" y="-751.25" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_receives_order -->
+<g id="node23" class="node">
+<title>rel_receives_order</title>
+<polygon fill="#fadbd8" stroke="black" points="542.15,-570.05 486.6,-538.85 542.15,-507.65 597.69,-538.85 542.15,-570.05"/>
+<text xml:space="preserve" text-anchor="middle" x="542.15" y="-541.85" font-family="Arial" font-size="10.00">receives</text>
+<text xml:space="preserve" text-anchor="middle" x="542.15" y="-529.85" font-family="Arial" font-size="10.00">(merchant)</text>
+</g>
+<!-- users&#45;&#45;rel_receives_order -->
+<g id="edge7" class="edge">
+<title>users--rel_receives_order</title>
+<path fill="none" stroke="#555555" d="M618.52,-737.9C595.8,-678.68 567.03,-603.69 552.12,-564.84"/>
+<text xml:space="preserve" text-anchor="middle" x="604.13" y="-721.01" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_manages -->
+<g id="node25" class="node">
+<title>rel_manages</title>
+<polygon fill="#fadbd8" stroke="black" points="475.44,-1085.29 422.11,-1054.09 475.44,-1022.89 528.77,-1054.09 475.44,-1085.29"/>
+<text xml:space="preserve" text-anchor="middle" x="475.44" y="-1057.09" font-family="Arial" font-size="10.00">manages</text>
+<text xml:space="preserve" text-anchor="middle" x="475.44" y="-1045.09" font-family="Arial" font-size="10.00">(manager)</text>
+</g>
+<!-- users&#45;&#45;rel_manages -->
+<g id="edge11" class="edge">
+<title>users--rel_manages</title>
+<path fill="none" stroke="#555555" d="M618.6,-866.11C581.06,-915.4 520.92,-994.37 492.01,-1032.33"/>
+<text xml:space="preserve" text-anchor="middle" x="614.34" y="-882.65" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_requests_pickup -->
+<g id="node32" class="node">
+<title>rel_requests_pickup</title>
+<polygon fill="#fadbd8" stroke="black" points="787.17,-461.06 749.09,-443.06 787.17,-425.06 825.25,-443.06 787.17,-461.06"/>
+<text xml:space="preserve" text-anchor="middle" x="787.17" y="-440.06" font-family="Arial" font-size="10.00">requests</text>
+</g>
+<!-- users&#45;&#45;rel_requests_pickup -->
+<g id="edge25" class="edge">
+<title>users--rel_requests_pickup</title>
+<path fill="none" stroke="#555555" d="M683.98,-731.68C716.97,-639.41 765.27,-504.31 781.57,-458.73"/>
+<text xml:space="preserve" text-anchor="middle" x="682.12" y="-708.77" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_delivers -->
+<g id="node34" class="node">
+<title>rel_delivers</title>
+<polygon fill="#fadbd8" stroke="black" points="509.2,-868.6 467.54,-837.4 509.2,-806.2 550.85,-837.4 509.2,-868.6"/>
+<text xml:space="preserve" text-anchor="middle" x="509.2" y="-840.4" font-family="Arial" font-size="10.00">delivers</text>
+<text xml:space="preserve" text-anchor="middle" x="509.2" y="-828.4" font-family="Arial" font-size="10.00">(agent)</text>
+</g>
+<!-- users&#45;&#45;rel_delivers -->
+<g id="edge29" class="edge">
+<title>users--rel_delivers</title>
+<path fill="none" stroke="#555555" d="M618.66,-826.48C597.2,-828.62 569.04,-831.43 546.66,-833.66"/>
+<text xml:space="preserve" text-anchor="middle" x="601.47" y="-833.69" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_owns_vehicle -->
+<g id="node36" class="node">
+<title>rel_owns_vehicle</title>
+<polygon fill="#fadbd8" stroke="black" points="754.32,-1009.05 727.32,-991.05 754.32,-973.05 781.32,-991.05 754.32,-1009.05"/>
+<text xml:space="preserve" text-anchor="middle" x="754.32" y="-988.05" font-family="Arial" font-size="10.00">owns</text>
+</g>
+<!-- users&#45;&#45;rel_owns_vehicle -->
+<g id="edge33" class="edge">
+<title>users--rel_owns_vehicle</title>
+<path fill="none" stroke="#555555" d="M683.87,-876.32C705.81,-912.05 733.06,-956.42 746.32,-978.02"/>
+<text xml:space="preserve" text-anchor="middle" x="700.55" y="-884.35" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_files_complaint -->
+<g id="node40" class="node">
+<title>rel_files_complaint</title>
+<polygon fill="#fadbd8" stroke="black" points="691.32,-703.32 630.01,-685.32 691.32,-667.32 752.63,-685.32 691.32,-703.32"/>
+<text xml:space="preserve" text-anchor="middle" x="691.32" y="-682.32" font-family="Arial" font-size="10.00">files_complaint</text>
+</g>
+<!-- users&#45;&#45;rel_files_complaint -->
+<g id="edge41" class="edge">
+<title>users--rel_files_complaint</title>
+<path fill="none" stroke="#555555" d="M679.95,-724.47C682.36,-716.18 684.56,-708.6 686.37,-702.37"/>
+<text xml:space="preserve" text-anchor="middle" x="676.89" y="-701.71" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_gives_feedback -->
+<g id="node42" class="node">
+<title>rel_gives_feedback</title>
+<polygon fill="#fadbd8" stroke="black" points="803.61,-631.12 739.5,-613.12 803.61,-595.12 867.71,-613.12 803.61,-631.12"/>
+<text xml:space="preserve" text-anchor="middle" x="803.61" y="-610.12" font-family="Arial" font-size="10.00">gives_feedback</text>
+</g>
+<!-- users&#45;&#45;rel_gives_feedback -->
+<g id="edge45" class="edge">
+<title>users--rel_gives_feedback</title>
+<path fill="none" stroke="#555555" d="M683.94,-778.15C718.21,-730.89 770.15,-659.26 792.61,-628.28"/>
+<text xml:space="preserve" text-anchor="middle" x="687.74" y="-755.52" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_notified -->
+<g id="node44" class="node">
+<title>rel_notified</title>
+<polygon fill="#fadbd8" stroke="black" points="596.97,-981.73 563.99,-963.73 596.97,-945.73 629.94,-963.73 596.97,-981.73"/>
+<text xml:space="preserve" text-anchor="middle" x="596.97" y="-960.73" font-family="Arial" font-size="10.00">notified</text>
+</g>
+<!-- users&#45;&#45;rel_notified -->
+<g id="edge49" class="edge">
+<title>users--rel_notified</title>
+<path fill="none" stroke="#555555" d="M618.58,-907.79C612.47,-923.6 606.75,-938.4 602.73,-948.8"/>
+<text xml:space="preserve" text-anchor="middle" x="619.93" y="-924.75" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- login_history -->
+<g id="node2" class="node">
+<title>login_history</title>
+<polygon fill="#d6eaf8" stroke="none" points="902.8,-564.93 902.8,-586.93 977.24,-586.93 977.24,-564.93 902.8,-564.93"/>
+<polygon fill="none" stroke="black" points="902.8,-564.93 902.8,-586.93 977.24,-586.93 977.24,-564.93 902.8,-564.93"/>
+<text xml:space="preserve" text-anchor="start" x="907.8" y="-573.93" font-family="Arial" font-weight="bold" font-size="10.00">Login History</text>
+<polygon fill="none" stroke="black" points="902.8,-542.93 902.8,-564.93 977.24,-564.93 977.24,-542.93 902.8,-542.93"/>
+<text xml:space="preserve" text-anchor="start" x="907.8" y="-551.93" font-family="Arial" text-decoration="underline" font-size="10.00">login_id (PK)</text>
+<polygon fill="none" stroke="black" points="902.8,-520.93 902.8,-542.93 977.24,-542.93 977.24,-520.93 902.8,-520.93"/>
+<text xml:space="preserve" text-anchor="start" x="907.8" y="-528.93" font-family="Arial" font-size="10.00">user_id (FK)</text>
+<polygon fill="none" stroke="black" points="902.8,-498.93 902.8,-520.93 977.24,-520.93 977.24,-498.93 902.8,-498.93"/>
+<text xml:space="preserve" text-anchor="start" x="907.8" y="-506.93" font-family="Arial" font-size="10.00">login_time</text>
+<polygon fill="none" stroke="black" points="902.8,-476.93 902.8,-498.93 977.24,-498.93 977.24,-476.93 902.8,-476.93"/>
+<text xml:space="preserve" text-anchor="start" x="907.8" y="-484.93" font-family="Arial" font-size="10.00">logout_time</text>
+<polygon fill="none" stroke="black" points="902.8,-454.93 902.8,-476.93 977.24,-476.93 977.24,-454.93 902.8,-454.93"/>
+<text xml:space="preserve" text-anchor="start" x="907.8" y="-462.93" font-family="Arial" font-size="10.00">ip_address</text>
+</g>
+<!-- address -->
+<g id="node3" class="node">
+<title>address</title>
+<polygon fill="#d6eaf8" stroke="none" points="892.15,-1004.56 892.15,-1026.56 973.85,-1026.56 973.85,-1004.56 892.15,-1004.56"/>
+<polygon fill="none" stroke="black" points="892.15,-1004.56 892.15,-1026.56 973.85,-1026.56 973.85,-1004.56 892.15,-1004.56"/>
+<text xml:space="preserve" text-anchor="start" x="912.99" y="-1013.56" font-family="Arial" font-weight="bold" font-size="10.00">Address</text>
+<polygon fill="none" stroke="black" points="892.15,-982.56 892.15,-1004.56 973.85,-1004.56 973.85,-982.56 892.15,-982.56"/>
+<text xml:space="preserve" text-anchor="start" x="897.15" y="-991.56" font-family="Arial" text-decoration="underline" font-size="10.00">address_id (PK)</text>
+<polygon fill="none" stroke="black" points="892.15,-960.56 892.15,-982.56 973.85,-982.56 973.85,-960.56 892.15,-960.56"/>
+<text xml:space="preserve" text-anchor="start" x="897.15" y="-968.56" font-family="Arial" font-size="10.00">user_id (FK)</text>
+<polygon fill="none" stroke="black" points="892.15,-938.56 892.15,-960.56 973.85,-960.56 973.85,-938.56 892.15,-938.56"/>
+<text xml:space="preserve" text-anchor="start" x="897.15" y="-946.56" font-family="Arial" font-size="10.00">street</text>
+<polygon fill="none" stroke="black" points="892.15,-916.56 892.15,-938.56 973.85,-938.56 973.85,-916.56 892.15,-916.56"/>
+<text xml:space="preserve" text-anchor="start" x="897.15" y="-924.56" font-family="Arial" font-size="10.00">city</text>
+<polygon fill="none" stroke="black" points="892.15,-894.56 892.15,-916.56 973.85,-916.56 973.85,-894.56 892.15,-894.56"/>
+<text xml:space="preserve" text-anchor="start" x="897.15" y="-902.56" font-family="Arial" font-size="10.00">state</text>
+<polygon fill="none" stroke="black" points="892.15,-872.56 892.15,-894.56 973.85,-894.56 973.85,-872.56 892.15,-872.56"/>
+<text xml:space="preserve" text-anchor="start" x="897.15" y="-880.56" font-family="Arial" font-size="10.00">postal_code</text>
+<polygon fill="none" stroke="black" points="892.15,-850.56 892.15,-872.56 973.85,-872.56 973.85,-850.56 892.15,-850.56"/>
+<text xml:space="preserve" text-anchor="start" x="897.15" y="-858.56" font-family="Arial" font-size="10.00">latitude</text>
+<polygon fill="none" stroke="black" points="892.15,-828.56 892.15,-850.56 973.85,-850.56 973.85,-828.56 892.15,-828.56"/>
+<text xml:space="preserve" text-anchor="start" x="897.15" y="-836.56" font-family="Arial" font-size="10.00">longitude</text>
+</g>
+<!-- orders -->
+<g id="node4" class="node">
+<title>orders</title>
+<polygon fill="#d6eaf8" stroke="none" points="375.23,-510.25 375.23,-532.25 462.48,-532.25 462.48,-510.25 375.23,-510.25"/>
+<polygon fill="none" stroke="black" points="375.23,-510.25 375.23,-532.25 462.48,-532.25 462.48,-510.25 375.23,-510.25"/>
+<text xml:space="preserve" text-anchor="start" x="402.46" y="-519.25" font-family="Arial" font-weight="bold" font-size="10.00">Orders</text>
+<polygon fill="none" stroke="black" points="375.23,-488.25 375.23,-510.25 462.48,-510.25 462.48,-488.25 375.23,-488.25"/>
+<text xml:space="preserve" text-anchor="start" x="380.23" y="-497.25" font-family="Arial" text-decoration="underline" font-size="10.00">order_id (PK)</text>
+<polygon fill="none" stroke="black" points="375.23,-466.25 375.23,-488.25 462.48,-488.25 462.48,-466.25 375.23,-466.25"/>
+<text xml:space="preserve" text-anchor="start" x="380.23" y="-474.25" font-family="Arial" font-size="10.00">customer_id (FK)</text>
+<polygon fill="none" stroke="black" points="375.23,-444.25 375.23,-466.25 462.48,-466.25 462.48,-444.25 375.23,-444.25"/>
+<text xml:space="preserve" text-anchor="start" x="380.23" y="-452.25" font-family="Arial" font-size="10.00">merchant_id (FK)</text>
+<polygon fill="none" stroke="black" points="375.23,-422.25 375.23,-444.25 462.48,-444.25 462.48,-422.25 375.23,-422.25"/>
+<text xml:space="preserve" text-anchor="start" x="380.23" y="-430.25" font-family="Arial" font-size="10.00">order_date</text>
+<polygon fill="none" stroke="black" points="375.23,-400.25 375.23,-422.25 462.48,-422.25 462.48,-400.25 375.23,-400.25"/>
+<text xml:space="preserve" text-anchor="start" x="380.23" y="-408.25" font-family="Arial" font-size="10.00">order_status</text>
+</g>
+<!-- rel_contains -->
+<g id="node24" class="node">
+<title>rel_contains</title>
+<polygon fill="#fadbd8" stroke="black" points="396.99,-279.94 359.84,-261.94 396.99,-243.94 434.15,-261.94 396.99,-279.94"/>
+<text xml:space="preserve" text-anchor="middle" x="396.99" y="-258.94" font-family="Arial" font-size="10.00">contains</text>
+</g>
+<!-- orders&#45;&#45;rel_contains -->
+<g id="edge9" class="edge">
+<title>orders--rel_contains</title>
+<path fill="none" stroke="#555555" d="M411.82,-400.48C407.27,-358.02 401.7,-305.91 398.85,-279.33"/>
+<text xml:space="preserve" text-anchor="middle" x="401.48" y="-380.36" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_ships -->
+<g id="node26" class="node">
+<title>rel_ships</title>
+<polygon fill="#fadbd8" stroke="black" points="299.45,-565.82 272.45,-547.82 299.45,-529.82 326.45,-547.82 299.45,-565.82"/>
+<text xml:space="preserve" text-anchor="middle" x="299.45" y="-544.82" font-family="Arial" font-size="10.00">ships</text>
+</g>
+<!-- orders&#45;&#45;rel_ships -->
+<g id="edge13" class="edge">
+<title>orders--rel_ships</title>
+<path fill="none" stroke="#555555" d="M375.41,-495.93C353.4,-510.96 328.21,-528.17 313.08,-538.51"/>
+<text xml:space="preserve" text-anchor="middle" x="365.21" y="-510.13" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_has_ord_hist -->
+<g id="node30" class="node">
+<title>rel_has_ord_hist</title>
+<polygon fill="#fadbd8" stroke="black" points="572.88,-266.57 524.11,-248.57 572.88,-230.57 621.64,-248.57 572.88,-266.57"/>
+<text xml:space="preserve" text-anchor="middle" x="572.88" y="-245.57" font-family="Arial" font-size="10.00">has_history</text>
+</g>
+<!-- orders&#45;&#45;rel_has_ord_hist -->
+<g id="edge21" class="edge">
+<title>orders--rel_has_ord_hist</title>
+<path fill="none" stroke="#555555" d="M462.37,-404.74C496.89,-355.96 542.55,-291.43 562.65,-263.03"/>
+<text xml:space="preserve" text-anchor="middle" x="465.94" y="-382.06" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_has_pickup -->
+<g id="node31" class="node">
+<title>rel_has_pickup</title>
+<polygon fill="#fadbd8" stroke="black" points="751.86,-284.91 703.55,-266.91 751.86,-248.91 800.16,-266.91 751.86,-284.91"/>
+<text xml:space="preserve" text-anchor="middle" x="751.86" y="-263.91" font-family="Arial" font-size="10.00">has_pickup</text>
+</g>
+<!-- orders&#45;&#45;rel_has_pickup -->
+<g id="edge23" class="edge">
+<title>orders--rel_has_pickup</title>
+<path fill="none" stroke="#555555" d="M462.39,-440.19C535.73,-396.29 680.99,-309.34 732.88,-278.27"/>
+<text xml:space="preserve" text-anchor="middle" x="473.6" y="-420.63" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_assigned_for -->
+<g id="node33" class="node">
+<title>rel_assigned_for</title>
+<polygon fill="#fadbd8" stroke="black" points="426.04,-609.01 372.15,-591.01 426.04,-573.01 479.92,-591.01 426.04,-609.01"/>
+<text xml:space="preserve" text-anchor="middle" x="426.04" y="-588.01" font-family="Arial" font-size="10.00">assigned_for</text>
+</g>
+<!-- orders&#45;&#45;rel_assigned_for -->
+<g id="edge27" class="edge">
+<title>orders--rel_assigned_for</title>
+<path fill="none" stroke="#555555" d="M422.64,-531.92C423.51,-547.06 424.36,-561.95 425,-572.99"/>
+<text xml:space="preserve" text-anchor="middle" x="432.12" y="-546.53" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_has_complaint -->
+<g id="node41" class="node">
+<title>rel_has_complaint</title>
+<polygon fill="#fadbd8" stroke="black" points="506.76,-405.15 446.84,-387.15 506.76,-369.15 566.68,-387.15 506.76,-405.15"/>
+<text xml:space="preserve" text-anchor="middle" x="506.76" y="-384.15" font-family="Arial" font-size="10.00">has_complaint</text>
+</g>
+<!-- orders&#45;&#45;rel_has_complaint -->
+<g id="edge43" class="edge">
+<title>orders--rel_has_complaint</title>
+<path fill="none" stroke="#555555" d="M462.29,-427.16C472.85,-417.67 483.44,-408.13 491.64,-400.76"/>
+<text xml:space="preserve" text-anchor="middle" x="470.11" y="-405.76" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_has_feedback -->
+<g id="node43" class="node">
+<title>rel_has_feedback</title>
+<polygon fill="#fadbd8" stroke="black" points="642.05,-419.17 583.98,-401.17 642.05,-383.17 700.12,-401.17 642.05,-419.17"/>
+<text xml:space="preserve" text-anchor="middle" x="642.05" y="-398.17" font-family="Arial" font-size="10.00">has_feedback</text>
+</g>
+<!-- orders&#45;&#45;rel_has_feedback -->
+<g id="edge47" class="edge">
+<title>orders--rel_has_feedback</title>
+<path fill="none" stroke="#555555" d="M462.42,-453.55C506.31,-440.75 572.92,-421.33 611.49,-410.08"/>
+<text xml:space="preserve" text-anchor="middle" x="477.46" y="-437.36" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_has_barcode -->
+<g id="node46" class="node">
+<title>rel_has_barcode</title>
+<polygon fill="#fadbd8" stroke="black" points="313.07,-414.24 258.72,-396.24 313.07,-378.24 367.43,-396.24 313.07,-414.24"/>
+<text xml:space="preserve" text-anchor="middle" x="313.07" y="-393.24" font-family="Arial" font-size="10.00">has_barcode</text>
+</g>
+<!-- orders&#45;&#45;rel_has_barcode -->
+<g id="edge53" class="edge">
+<title>orders--rel_has_barcode</title>
+<path fill="none" stroke="#555555" d="M375.52,-437.57C360.23,-427.45 343.84,-416.6 331.69,-408.56"/>
+<text xml:space="preserve" text-anchor="middle" x="355.74" y="-431.62" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- packages -->
+<g id="node5" class="node">
+<title>packages</title>
+<polygon fill="#d6eaf8" stroke="none" points="438.18,-154 438.18,-176 522.11,-176 522.11,-154 438.18,-154"/>
+<polygon fill="none" stroke="black" points="438.18,-154 438.18,-176 522.11,-176 522.11,-154 438.18,-154"/>
+<text xml:space="preserve" text-anchor="start" x="457.07" y="-163" font-family="Arial" font-weight="bold" font-size="10.00">Packages</text>
+<polygon fill="none" stroke="black" points="438.18,-132 438.18,-154 522.11,-154 522.11,-132 438.18,-132"/>
+<text xml:space="preserve" text-anchor="start" x="443.18" y="-141" font-family="Arial" text-decoration="underline" font-size="10.00">package_id (PK)</text>
+<polygon fill="none" stroke="black" points="438.18,-110 438.18,-132 522.11,-132 522.11,-110 438.18,-110"/>
+<text xml:space="preserve" text-anchor="start" x="443.18" y="-118" font-family="Arial" font-size="10.00">order_id (FK)</text>
+<polygon fill="none" stroke="black" points="438.18,-88 438.18,-110 522.11,-110 522.11,-88 438.18,-88"/>
+<text xml:space="preserve" text-anchor="start" x="443.18" y="-96" font-family="Arial" font-size="10.00">weight</text>
+<polygon fill="none" stroke="black" points="438.18,-66 438.18,-88 522.11,-88 522.11,-66 438.18,-66"/>
+<text xml:space="preserve" text-anchor="start" x="443.18" y="-74" font-family="Arial" font-size="10.00">length</text>
+<polygon fill="none" stroke="black" points="438.18,-44 438.18,-66 522.11,-66 522.11,-44 438.18,-44"/>
+<text xml:space="preserve" text-anchor="start" x="443.18" y="-52" font-family="Arial" font-size="10.00">width</text>
+<polygon fill="none" stroke="black" points="438.18,-22 438.18,-44 522.11,-44 522.11,-22 438.18,-22"/>
+<text xml:space="preserve" text-anchor="start" x="443.18" y="-30" font-family="Arial" font-size="10.00">height</text>
+<polygon fill="none" stroke="black" points="438.18,0 438.18,-22 522.11,-22 522.11,0 438.18,0"/>
+<text xml:space="preserve" text-anchor="start" x="443.18" y="-8" font-family="Arial" font-size="10.00">description</text>
+</g>
+<!-- hubs -->
+<g id="node6" class="node">
+<title>hubs</title>
+<polygon fill="#d6eaf8" stroke="none" points="338.89,-957.78 338.89,-979.78 423.92,-979.78 423.92,-957.78 338.89,-957.78"/>
+<polygon fill="none" stroke="black" points="338.89,-957.78 338.89,-979.78 423.92,-979.78 423.92,-957.78 338.89,-957.78"/>
+<text xml:space="preserve" text-anchor="start" x="368.9" y="-966.78" font-family="Arial" font-weight="bold" font-size="10.00">Hubs</text>
+<polygon fill="none" stroke="black" points="338.89,-935.78 338.89,-957.78 423.92,-957.78 423.92,-935.78 338.89,-935.78"/>
+<text xml:space="preserve" text-anchor="start" x="343.89" y="-944.78" font-family="Arial" text-decoration="underline" font-size="10.00">hub_id (PK)</text>
+<polygon fill="none" stroke="black" points="338.89,-913.78 338.89,-935.78 423.92,-935.78 423.92,-913.78 338.89,-913.78"/>
+<text xml:space="preserve" text-anchor="start" x="343.89" y="-921.78" font-family="Arial" font-size="10.00">manager_id (FK)</text>
+<polygon fill="none" stroke="black" points="338.89,-891.78 338.89,-913.78 423.92,-913.78 423.92,-891.78 338.89,-891.78"/>
+<text xml:space="preserve" text-anchor="start" x="343.89" y="-899.78" font-family="Arial" font-size="10.00">hub_name</text>
+<polygon fill="none" stroke="black" points="338.89,-869.78 338.89,-891.78 423.92,-891.78 423.92,-869.78 338.89,-869.78"/>
+<text xml:space="preserve" text-anchor="start" x="343.89" y="-877.78" font-family="Arial" font-size="10.00">location</text>
+</g>
+<!-- rel_origin -->
+<g id="node27" class="node">
+<title>rel_origin</title>
+<polygon fill="#fadbd8" stroke="black" points="317.63,-702.26 272.57,-684.26 317.63,-666.26 362.69,-684.26 317.63,-702.26"/>
+<text xml:space="preserve" text-anchor="middle" x="317.63" y="-681.26" font-family="Arial" font-size="10.00">origin_hub</text>
+</g>
+<!-- hubs&#45;&#45;rel_origin -->
+<g id="edge15" class="edge">
+<title>hubs--rel_origin</title>
+<path fill="none" stroke="#555555" d="M366.85,-869.9C352.4,-815.41 331.14,-735.2 322.03,-700.85"/>
+<text xml:space="preserve" text-anchor="middle" x="354.04" y="-851.55" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_destination -->
+<g id="node28" class="node">
+<title>rel_destination</title>
+<polygon fill="#fadbd8" stroke="black" points="183.6,-669.28 143.19,-651.28 183.6,-633.28 224.02,-651.28 183.6,-669.28"/>
+<text xml:space="preserve" text-anchor="middle" x="183.6" y="-648.28" font-family="Arial" font-size="10.00">dest_hub</text>
+</g>
+<!-- hubs&#45;&#45;rel_destination -->
+<g id="edge17" class="edge">
+<title>hubs--rel_destination</title>
+<path fill="none" stroke="#555555" d="M341.85,-870.09C295.18,-805.55 220.52,-702.32 193.65,-665.17"/>
+<text xml:space="preserve" text-anchor="middle" x="324.38" y="-857.36" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_assigned_at -->
+<g id="node35" class="node">
+<title>rel_assigned_at</title>
+<polygon fill="#fadbd8" stroke="black" points="371.01,-810.97 319.91,-792.97 371.01,-774.97 422.11,-792.97 371.01,-810.97"/>
+<text xml:space="preserve" text-anchor="middle" x="371.01" y="-789.97" font-family="Arial" font-size="10.00">assigned_at</text>
+</g>
+<!-- hubs&#45;&#45;rel_assigned_at -->
+<g id="edge31" class="edge">
+<title>hubs--rel_assigned_at</title>
+<path fill="none" stroke="#555555" d="M377.09,-870.03C375.41,-848.81 373.62,-826 372.41,-810.75"/>
+<text xml:space="preserve" text-anchor="middle" x="367.24" y="-849.62" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_transfer_from -->
+<g id="node38" class="node">
+<title>rel_transfer_from</title>
+<polygon fill="#fadbd8" stroke="black" points="217.37,-845.73 176.04,-827.73 217.37,-809.73 258.7,-827.73 217.37,-845.73"/>
+<text xml:space="preserve" text-anchor="middle" x="217.37" y="-824.73" font-family="Arial" font-size="10.00">from_hub</text>
+</g>
+<!-- hubs&#45;&#45;rel_transfer_from -->
+<g id="edge37" class="edge">
+<title>hubs--rel_transfer_from</title>
+<path fill="none" stroke="#555555" d="M339.16,-899.79C305.56,-879.91 260.2,-853.07 235.41,-838.4"/>
+<text xml:space="preserve" text-anchor="middle" x="319.26" y="-894.83" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_transfer_to -->
+<g id="node39" class="node">
+<title>rel_transfer_to</title>
+<polygon fill="#fadbd8" stroke="black" points="244.69,-1030.22 213.1,-1012.22 244.69,-994.22 276.28,-1012.22 244.69,-1030.22"/>
+<text xml:space="preserve" text-anchor="middle" x="244.69" y="-1009.22" font-family="Arial" font-size="10.00">to_hub</text>
+</g>
+<!-- hubs&#45;&#45;rel_transfer_to -->
+<g id="edge39" class="edge">
+<title>hubs--rel_transfer_to</title>
+<path fill="none" stroke="#555555" d="M338.9,-951.97C311.93,-969.21 278.67,-990.48 259.75,-1002.58"/>
+<text xml:space="preserve" text-anchor="middle" x="328.18" y="-965.85" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_has_perf -->
+<g id="node47" class="node">
+<title>rel_has_perf</title>
+<polygon fill="#fadbd8" stroke="black" points="352.69,-1194.14 281.62,-1176.14 352.69,-1158.14 423.77,-1176.14 352.69,-1194.14"/>
+<text xml:space="preserve" text-anchor="middle" x="352.69" y="-1173.14" font-family="Arial" font-size="10.00">has_performance</text>
+</g>
+<!-- hubs&#45;&#45;rel_has_perf -->
+<g id="edge55" class="edge">
+<title>hubs--rel_has_perf</title>
+<path fill="none" stroke="#555555" d="M375.14,-979.63C368.67,-1036.26 358.95,-1121.36 354.75,-1158.15"/>
+<text xml:space="preserve" text-anchor="middle" x="381.48" y="-995.6" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- shipments -->
+<g id="node7" class="node">
+<title>shipments</title>
+<polygon fill="#d6eaf8" stroke="none" points="126.29,-522.39 126.29,-544.39 229.12,-544.39 229.12,-522.39 126.29,-522.39"/>
+<polygon fill="none" stroke="black" points="126.29,-522.39 126.29,-544.39 229.12,-544.39 229.12,-522.39 126.29,-522.39"/>
+<text xml:space="preserve" text-anchor="start" x="152.15" y="-531.39" font-family="Arial" font-weight="bold" font-size="10.00">Shipments</text>
+<polygon fill="none" stroke="black" points="126.29,-500.39 126.29,-522.39 229.12,-522.39 229.12,-500.39 126.29,-500.39"/>
+<text xml:space="preserve" text-anchor="start" x="131.29" y="-509.39" font-family="Arial" text-decoration="underline" font-size="10.00">shipment_id (PK)</text>
+<polygon fill="none" stroke="black" points="126.29,-478.39 126.29,-500.39 229.12,-500.39 229.12,-478.39 126.29,-478.39"/>
+<text xml:space="preserve" text-anchor="start" x="131.29" y="-486.39" font-family="Arial" font-size="10.00">order_id (FK)</text>
+<polygon fill="none" stroke="black" points="126.29,-456.39 126.29,-478.39 229.12,-478.39 229.12,-456.39 126.29,-456.39"/>
+<text xml:space="preserve" text-anchor="start" x="131.29" y="-464.39" font-family="Arial" font-size="10.00">origin_hub (FK)</text>
+<polygon fill="none" stroke="black" points="126.29,-434.39 126.29,-456.39 229.12,-456.39 229.12,-434.39 126.29,-434.39"/>
+<text xml:space="preserve" text-anchor="start" x="131.29" y="-442.39" font-family="Arial" font-size="10.00">destination_hub (FK)</text>
+<polygon fill="none" stroke="black" points="126.29,-412.39 126.29,-434.39 229.12,-434.39 229.12,-412.39 126.29,-412.39"/>
+<text xml:space="preserve" text-anchor="start" x="131.29" y="-420.39" font-family="Arial" font-size="10.00">shipment_date</text>
+<polygon fill="none" stroke="black" points="126.29,-390.39 126.29,-412.39 229.12,-412.39 229.12,-390.39 126.29,-390.39"/>
+<text xml:space="preserve" text-anchor="start" x="131.29" y="-398.39" font-family="Arial" font-size="10.00">estimated_delivery</text>
+</g>
+<!-- rel_has_ship_status -->
+<g id="node29" class="node">
+<title>rel_has_ship_status</title>
+<polygon fill="#fadbd8" stroke="black" points="212.07,-291.85 165.62,-273.85 212.07,-255.85 258.51,-273.85 212.07,-291.85"/>
+<text xml:space="preserve" text-anchor="middle" x="212.07" y="-270.85" font-family="Arial" font-size="10.00">has_status</text>
+</g>
+<!-- shipments&#45;&#45;rel_has_ship_status -->
+<g id="edge19" class="edge">
+<title>shipments--rel_has_ship_status</title>
+<path fill="none" stroke="#555555" d="M191.34,-390.62C197.86,-353.9 205.09,-313.15 209.06,-290.82"/>
+<text xml:space="preserve" text-anchor="middle" x="186.18" y="-368.3" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_transfers -->
+<g id="node37" class="node">
+<title>rel_transfers</title>
+<polygon fill="#fadbd8" stroke="black" points="45.56,-768.14 7.03,-750.14 45.56,-732.14 84.1,-750.14 45.56,-768.14"/>
+<text xml:space="preserve" text-anchor="middle" x="45.56" y="-747.14" font-family="Arial" font-size="10.00">transfers</text>
+</g>
+<!-- shipments&#45;&#45;rel_transfers -->
+<g id="edge35" class="edge">
+<title>shipments--rel_transfers</title>
+<path fill="none" stroke="#555555" d="M141.77,-544.28C110.97,-610.18 69.05,-699.88 52.6,-735.08"/>
+<text xml:space="preserve" text-anchor="middle" x="141.75" y="-561.28" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- rel_tracked -->
+<g id="node45" class="node">
+<title>rel_tracked</title>
+<polygon fill="#fadbd8" stroke="black" points="37.87,-573.47 4.44,-555.47 37.87,-537.47 71.3,-555.47 37.87,-573.47"/>
+<text xml:space="preserve" text-anchor="middle" x="37.87" y="-552.47" font-family="Arial" font-size="10.00">tracked</text>
+</g>
+<!-- shipments&#45;&#45;rel_tracked -->
+<g id="edge51" class="edge">
+<title>shipments--rel_tracked</title>
+<path fill="none" stroke="#555555" d="M126.43,-499.69C100.71,-515.89 71.35,-534.38 53.73,-545.48"/>
+<text xml:space="preserve" text-anchor="middle" x="115.6" y="-513.5" font-family="Arial" font-size="10.00">1</text>
+</g>
+<!-- shipment_status -->
+<g id="node8" class="node">
+<title>shipment_status</title>
+<polygon fill="#d6eaf8" stroke="none" points="21.29,-145.34 21.29,-167.34 110.18,-167.34 110.18,-145.34 21.29,-145.34"/>
+<polygon fill="none" stroke="black" points="21.29,-145.34 21.29,-167.34 110.18,-167.34 110.18,-145.34 21.29,-145.34"/>
+<text xml:space="preserve" text-anchor="start" x="26.29" y="-154.34" font-family="Arial" font-weight="bold" font-size="10.00">Shipment Status</text>
+<polygon fill="none" stroke="black" points="21.29,-123.34 21.29,-145.34 110.18,-145.34 110.18,-123.34 21.29,-123.34"/>
+<text xml:space="preserve" text-anchor="start" x="26.29" y="-132.34" font-family="Arial" text-decoration="underline" font-size="10.00">status_id (PK)</text>
+<polygon fill="none" stroke="black" points="21.29,-101.34 21.29,-123.34 110.18,-123.34 110.18,-101.34 21.29,-101.34"/>
+<text xml:space="preserve" text-anchor="start" x="26.29" y="-109.34" font-family="Arial" font-size="10.00">shipment_id (FK)</text>
+<polygon fill="none" stroke="black" points="21.29,-79.34 21.29,-101.34 110.18,-101.34 110.18,-79.34 21.29,-79.34"/>
+<text xml:space="preserve" text-anchor="start" x="26.29" y="-87.34" font-family="Arial" font-size="10.00">status</text>
+<polygon fill="none" stroke="black" points="21.29,-57.34 21.29,-79.34 110.18,-79.34 110.18,-57.34 21.29,-57.34"/>
+<text xml:space="preserve" text-anchor="start" x="26.29" y="-65.34" font-family="Arial" font-size="10.00">updated_at</text>
+</g>
+<!-- order_history -->
+<g id="node9" class="node">
+<title>order_history</title>
+<polygon fill="#d6eaf8" stroke="none" points="647.84,-120.67 647.84,-142.67 723.42,-142.67 723.42,-120.67 647.84,-120.67"/>
+<polygon fill="none" stroke="black" points="647.84,-120.67 647.84,-142.67 723.42,-142.67 723.42,-120.67 647.84,-120.67"/>
+<text xml:space="preserve" text-anchor="start" x="653.4" y="-129.67" font-family="Arial" font-weight="bold" font-size="10.00">Order History</text>
+<polygon fill="none" stroke="black" points="647.84,-98.67 647.84,-120.67 723.42,-120.67 723.42,-98.67 647.84,-98.67"/>
+<text xml:space="preserve" text-anchor="start" x="652.84" y="-107.67" font-family="Arial" text-decoration="underline" font-size="10.00">history_id (PK)</text>
+<polygon fill="none" stroke="black" points="647.84,-76.67 647.84,-98.67 723.42,-98.67 723.42,-76.67 647.84,-76.67"/>
+<text xml:space="preserve" text-anchor="start" x="652.84" y="-84.67" font-family="Arial" font-size="10.00">order_id (FK)</text>
+<polygon fill="none" stroke="black" points="647.84,-54.67 647.84,-76.67 723.42,-76.67 723.42,-54.67 647.84,-54.67"/>
+<text xml:space="preserve" text-anchor="start" x="652.84" y="-62.67" font-family="Arial" font-size="10.00">status</text>
+<polygon fill="none" stroke="black" points="647.84,-32.67 647.84,-54.67 723.42,-54.67 723.42,-32.67 647.84,-32.67"/>
+<text xml:space="preserve" text-anchor="start" x="652.84" y="-40.67" font-family="Arial" font-size="10.00">updated_at</text>
+</g>
+<!-- pickup_details -->
+<g id="node10" class="node">
+<title>pickup_details</title>
+<polygon fill="#d6eaf8" stroke="none" points="860.33,-161.1 860.33,-183.1 953.15,-183.1 953.15,-161.1 860.33,-161.1"/>
+<polygon fill="none" stroke="black" points="860.33,-161.1 860.33,-183.1 953.15,-183.1 953.15,-161.1 860.33,-161.1"/>
+<text xml:space="preserve" text-anchor="start" x="872.56" y="-170.1" font-family="Arial" font-weight="bold" font-size="10.00">Pickup Details</text>
+<polygon fill="none" stroke="black" points="860.33,-139.1 860.33,-161.1 953.15,-161.1 953.15,-139.1 860.33,-139.1"/>
+<text xml:space="preserve" text-anchor="start" x="865.33" y="-148.1" font-family="Arial" text-decoration="underline" font-size="10.00">pickup_id (PK)</text>
+<polygon fill="none" stroke="black" points="860.33,-117.1 860.33,-139.1 953.15,-139.1 953.15,-117.1 860.33,-117.1"/>
+<text xml:space="preserve" text-anchor="start" x="865.33" y="-125.1" font-family="Arial" font-size="10.00">order_id (FK)</text>
+<polygon fill="none" stroke="black" points="860.33,-95.1 860.33,-117.1 953.15,-117.1 953.15,-95.1 860.33,-95.1"/>
+<text xml:space="preserve" text-anchor="start" x="865.33" y="-103.1" font-family="Arial" font-size="10.00">requested_by (FK)</text>
+<polygon fill="none" stroke="black" points="860.33,-73.1 860.33,-95.1 953.15,-95.1 953.15,-73.1 860.33,-73.1"/>
+<text xml:space="preserve" text-anchor="start" x="865.33" y="-81.1" font-family="Arial" font-size="10.00">pickup_time</text>
+<polygon fill="none" stroke="black" points="860.33,-51.1 860.33,-73.1 953.15,-73.1 953.15,-51.1 860.33,-51.1"/>
+<text xml:space="preserve" text-anchor="start" x="865.33" y="-59.1" font-family="Arial" font-size="10.00">pickup_status</text>
+<polygon fill="none" stroke="black" points="860.33,-29.1 860.33,-51.1 953.15,-51.1 953.15,-29.1 860.33,-29.1"/>
+<text xml:space="preserve" text-anchor="start" x="865.33" y="-37.1" font-family="Arial" font-size="10.00">pickup_type</text>
+</g>
+<!-- delivery_assign -->
+<g id="node11" class="node">
+<title>delivery_assign</title>
+<polygon fill="#d6eaf8" stroke="none" points="406.61,-756.51 406.61,-778.51 515.54,-778.51 515.54,-756.51 406.61,-756.51"/>
+<polygon fill="none" stroke="black" points="406.61,-756.51 406.61,-778.51 515.54,-778.51 515.54,-756.51 406.61,-756.51"/>
+<text xml:space="preserve" text-anchor="start" x="411.61" y="-765.51" font-family="Arial" font-weight="bold" font-size="10.00">Delivery Assignment</text>
+<polygon fill="none" stroke="black" points="406.61,-734.51 406.61,-756.51 515.54,-756.51 515.54,-734.51 406.61,-734.51"/>
+<text xml:space="preserve" text-anchor="start" x="411.61" y="-743.51" font-family="Arial" text-decoration="underline" font-size="10.00">assignment_id (PK)</text>
+<polygon fill="none" stroke="black" points="406.61,-712.51 406.61,-734.51 515.54,-734.51 515.54,-712.51 406.61,-712.51"/>
+<text xml:space="preserve" text-anchor="start" x="411.61" y="-720.51" font-family="Arial" font-size="10.00">order_id (FK)</text>
+<polygon fill="none" stroke="black" points="406.61,-690.51 406.61,-712.51 515.54,-712.51 515.54,-690.51 406.61,-690.51"/>
+<text xml:space="preserve" text-anchor="start" x="411.61" y="-698.51" font-family="Arial" font-size="10.00">agent_id (FK)</text>
+<polygon fill="none" stroke="black" points="406.61,-668.51 406.61,-690.51 515.54,-690.51 515.54,-668.51 406.61,-668.51"/>
+<text xml:space="preserve" text-anchor="start" x="411.61" y="-676.51" font-family="Arial" font-size="10.00">hub_id (FK)</text>
+<polygon fill="none" stroke="black" points="406.61,-646.51 406.61,-668.51 515.54,-668.51 515.54,-646.51 406.61,-646.51"/>
+<text xml:space="preserve" text-anchor="start" x="411.61" y="-654.51" font-family="Arial" font-size="10.00">assigned_time</text>
+<polygon fill="none" stroke="black" points="406.61,-624.51 406.61,-646.51 515.54,-646.51 515.54,-624.51 406.61,-624.51"/>
+<text xml:space="preserve" text-anchor="start" x="411.61" y="-632.51" font-family="Arial" font-size="10.00">status</text>
+</g>
+<!-- vehicle -->
+<g id="node12" class="node">
+<title>vehicle</title>
+<polygon fill="#d6eaf8" stroke="none" points="854.1,-1193.92 854.1,-1215.92 934.69,-1215.92 934.69,-1193.92 854.1,-1193.92"/>
+<polygon fill="none" stroke="black" points="854.1,-1193.92 854.1,-1215.92 934.69,-1215.92 934.69,-1193.92 854.1,-1193.92"/>
+<text xml:space="preserve" text-anchor="start" x="876.89" y="-1202.92" font-family="Arial" font-weight="bold" font-size="10.00">Vehicle</text>
+<polygon fill="none" stroke="black" points="854.1,-1171.92 854.1,-1193.92 934.69,-1193.92 934.69,-1171.92 854.1,-1171.92"/>
+<text xml:space="preserve" text-anchor="start" x="859.1" y="-1180.92" font-family="Arial" text-decoration="underline" font-size="10.00">vehicle_id (PK)</text>
+<polygon fill="none" stroke="black" points="854.1,-1149.92 854.1,-1171.92 934.69,-1171.92 934.69,-1149.92 854.1,-1149.92"/>
+<text xml:space="preserve" text-anchor="start" x="859.1" y="-1157.92" font-family="Arial" font-size="10.00">agent_id (FK)</text>
+<polygon fill="none" stroke="black" points="854.1,-1127.92 854.1,-1149.92 934.69,-1149.92 934.69,-1127.92 854.1,-1127.92"/>
+<text xml:space="preserve" text-anchor="start" x="859.1" y="-1135.92" font-family="Arial" font-size="10.00">vehicle_type</text>
+<polygon fill="none" stroke="black" points="854.1,-1105.92 854.1,-1127.92 934.69,-1127.92 934.69,-1105.92 854.1,-1105.92"/>
+<text xml:space="preserve" text-anchor="start" x="859.1" y="-1113.92" font-family="Arial" font-size="10.00">vehicle_number</text>
+<polygon fill="none" stroke="black" points="854.1,-1083.92 854.1,-1105.92 934.69,-1105.92 934.69,-1083.92 854.1,-1083.92"/>
+<text xml:space="preserve" text-anchor="start" x="859.1" y="-1091.92" font-family="Arial" font-size="10.00">capacity</text>
+</g>
+<!-- hub_transfer -->
+<g id="node13" class="node">
+<title>hub_transfer</title>
+<polygon fill="#d6eaf8" stroke="none" points="10.84,-998.64 10.84,-1020.64 96.98,-1020.64 96.98,-998.64 10.84,-998.64"/>
+<polygon fill="none" stroke="black" points="10.84,-998.64 10.84,-1020.64 96.98,-1020.64 96.98,-998.64 10.84,-998.64"/>
+<text xml:space="preserve" text-anchor="start" x="22.79" y="-1007.64" font-family="Arial" font-weight="bold" font-size="10.00">Hub Transfer</text>
+<polygon fill="none" stroke="black" points="10.84,-976.64 10.84,-998.64 96.98,-998.64 96.98,-976.64 10.84,-976.64"/>
+<text xml:space="preserve" text-anchor="start" x="15.84" y="-985.64" font-family="Arial" text-decoration="underline" font-size="10.00">transfer_id (PK)</text>
+<polygon fill="none" stroke="black" points="10.84,-954.64 10.84,-976.64 96.98,-976.64 96.98,-954.64 10.84,-954.64"/>
+<text xml:space="preserve" text-anchor="start" x="15.84" y="-962.64" font-family="Arial" font-size="10.00">shipment_id (FK)</text>
+<polygon fill="none" stroke="black" points="10.84,-932.64 10.84,-954.64 96.98,-954.64 96.98,-932.64 10.84,-932.64"/>
+<text xml:space="preserve" text-anchor="start" x="15.84" y="-940.64" font-family="Arial" font-size="10.00">from_hub (FK)</text>
+<polygon fill="none" stroke="black" points="10.84,-910.64 10.84,-932.64 96.98,-932.64 96.98,-910.64 10.84,-910.64"/>
+<text xml:space="preserve" text-anchor="start" x="15.84" y="-918.64" font-family="Arial" font-size="10.00">to_hub (FK)</text>
+<polygon fill="none" stroke="black" points="10.84,-888.64 10.84,-910.64 96.98,-910.64 96.98,-888.64 10.84,-888.64"/>
+<text xml:space="preserve" text-anchor="start" x="15.84" y="-896.64" font-family="Arial" font-size="10.00">transfer_time</text>
+<polygon fill="none" stroke="black" points="10.84,-866.64 10.84,-888.64 96.98,-888.64 96.98,-866.64 10.84,-866.64"/>
+<text xml:space="preserve" text-anchor="start" x="15.84" y="-874.64" font-family="Arial" font-size="10.00">status</text>
+</g>
+<!-- complaints -->
+<g id="node14" class="node">
+<title>complaints</title>
+<polygon fill="#d6eaf8" stroke="none" points="622.06,-600.48 622.06,-622.48 710.98,-622.48 710.98,-600.48 622.06,-600.48"/>
+<polygon fill="none" stroke="black" points="622.06,-600.48 622.06,-622.48 710.98,-622.48 710.98,-600.48 622.06,-600.48"/>
+<text xml:space="preserve" text-anchor="start" x="639.3" y="-609.48" font-family="Arial" font-weight="bold" font-size="10.00">Complaints</text>
+<polygon fill="none" stroke="black" points="622.06,-578.48 622.06,-600.48 710.98,-600.48 710.98,-578.48 622.06,-578.48"/>
+<text xml:space="preserve" text-anchor="start" x="627.06" y="-587.48" font-family="Arial" text-decoration="underline" font-size="10.00">complaint_id (PK)</text>
+<polygon fill="none" stroke="black" points="622.06,-556.48 622.06,-578.48 710.98,-578.48 710.98,-556.48 622.06,-556.48"/>
+<text xml:space="preserve" text-anchor="start" x="627.06" y="-564.48" font-family="Arial" font-size="10.00">user_id (FK)</text>
+<polygon fill="none" stroke="black" points="622.06,-534.48 622.06,-556.48 710.98,-556.48 710.98,-534.48 622.06,-534.48"/>
+<text xml:space="preserve" text-anchor="start" x="627.06" y="-542.48" font-family="Arial" font-size="10.00">order_id (FK)</text>
+<polygon fill="none" stroke="black" points="622.06,-512.48 622.06,-534.48 710.98,-534.48 710.98,-512.48 622.06,-512.48"/>
+<text xml:space="preserve" text-anchor="start" x="627.06" y="-520.48" font-family="Arial" font-size="10.00">description</text>
+<polygon fill="none" stroke="black" points="622.06,-490.48 622.06,-512.48 710.98,-512.48 710.98,-490.48 622.06,-490.48"/>
+<text xml:space="preserve" text-anchor="start" x="627.06" y="-498.48" font-family="Arial" font-size="10.00">status</text>
+<polygon fill="none" stroke="black" points="622.06,-468.48 622.06,-490.48 710.98,-490.48 710.98,-468.48 622.06,-468.48"/>
+<text xml:space="preserve" text-anchor="start" x="627.06" y="-476.48" font-family="Arial" font-size="10.00">created_at</text>
+</g>
+<!-- feedback -->
+<g id="node15" class="node">
+<title>feedback</title>
+<polygon fill="#d6eaf8" stroke="none" points="887.29,-376.6 887.29,-398.6 974,-398.6 974,-376.6 887.29,-376.6"/>
+<polygon fill="none" stroke="black" points="887.29,-376.6 887.29,-398.6 974,-398.6 974,-376.6 887.29,-376.6"/>
+<text xml:space="preserve" text-anchor="start" x="907.58" y="-385.6" font-family="Arial" font-weight="bold" font-size="10.00">Feedback</text>
+<polygon fill="none" stroke="black" points="887.29,-354.6 887.29,-376.6 974,-376.6 974,-354.6 887.29,-354.6"/>
+<text xml:space="preserve" text-anchor="start" x="892.29" y="-363.6" font-family="Arial" text-decoration="underline" font-size="10.00">feedback_id (PK)</text>
+<polygon fill="none" stroke="black" points="887.29,-332.6 887.29,-354.6 974,-354.6 974,-332.6 887.29,-332.6"/>
+<text xml:space="preserve" text-anchor="start" x="892.29" y="-340.6" font-family="Arial" font-size="10.00">user_id (FK)</text>
+<polygon fill="none" stroke="black" points="887.29,-310.6 887.29,-332.6 974,-332.6 974,-310.6 887.29,-310.6"/>
+<text xml:space="preserve" text-anchor="start" x="892.29" y="-318.6" font-family="Arial" font-size="10.00">order_id (FK)</text>
+<polygon fill="none" stroke="black" points="887.29,-288.6 887.29,-310.6 974,-310.6 974,-288.6 887.29,-288.6"/>
+<text xml:space="preserve" text-anchor="start" x="892.29" y="-296.6" font-family="Arial" font-size="10.00">rating</text>
+<polygon fill="none" stroke="black" points="887.29,-266.6 887.29,-288.6 974,-288.6 974,-266.6 887.29,-266.6"/>
+<text xml:space="preserve" text-anchor="start" x="892.29" y="-274.6" font-family="Arial" font-size="10.00">comments</text>
+<polygon fill="none" stroke="black" points="887.29,-244.6 887.29,-266.6 974,-266.6 974,-244.6 887.29,-244.6"/>
+<text xml:space="preserve" text-anchor="start" x="892.29" y="-252.6" font-family="Arial" font-size="10.00">created_at</text>
+</g>
+<!-- notifications -->
+<g id="node16" class="node">
+<title>notifications</title>
+<polygon fill="#d6eaf8" stroke="none" points="588.03,-1212.29 588.03,-1234.29 681.96,-1234.29 681.96,-1212.29 588.03,-1212.29"/>
+<polygon fill="none" stroke="black" points="588.03,-1212.29 588.03,-1234.29 681.96,-1234.29 681.96,-1212.29 588.03,-1212.29"/>
+<text xml:space="preserve" text-anchor="start" x="604.71" y="-1221.29" font-family="Arial" font-weight="bold" font-size="10.00">Notifications</text>
+<polygon fill="none" stroke="black" points="588.03,-1190.29 588.03,-1212.29 681.96,-1212.29 681.96,-1190.29 588.03,-1190.29"/>
+<text xml:space="preserve" text-anchor="start" x="593.03" y="-1199.29" font-family="Arial" text-decoration="underline" font-size="10.00">notification_id (PK)</text>
+<polygon fill="none" stroke="black" points="588.03,-1168.29 588.03,-1190.29 681.96,-1190.29 681.96,-1168.29 588.03,-1168.29"/>
+<text xml:space="preserve" text-anchor="start" x="593.03" y="-1176.29" font-family="Arial" font-size="10.00">user_id (FK)</text>
+<polygon fill="none" stroke="black" points="588.03,-1146.29 588.03,-1168.29 681.96,-1168.29 681.96,-1146.29 588.03,-1146.29"/>
+<text xml:space="preserve" text-anchor="start" x="593.03" y="-1154.29" font-family="Arial" font-size="10.00">message</text>
+<polygon fill="none" stroke="black" points="588.03,-1124.29 588.03,-1146.29 681.96,-1146.29 681.96,-1124.29 588.03,-1124.29"/>
+<text xml:space="preserve" text-anchor="start" x="593.03" y="-1132.29" font-family="Arial" font-size="10.00">status</text>
+<polygon fill="none" stroke="black" points="588.03,-1102.29 588.03,-1124.29 681.96,-1124.29 681.96,-1102.29 588.03,-1102.29"/>
+<text xml:space="preserve" text-anchor="start" x="593.03" y="-1110.29" font-family="Arial" font-size="10.00">created_at</text>
+</g>
+<!-- tracking -->
+<g id="node17" class="node">
+<title>tracking</title>
+<polygon fill="#d6eaf8" stroke="none" points="0,-398.48 0,-420.48 86.14,-420.48 86.14,-398.48 0,-398.48"/>
+<polygon fill="none" stroke="black" points="0,-398.48 0,-420.48 86.14,-420.48 86.14,-398.48 0,-398.48"/>
+<text xml:space="preserve" text-anchor="start" x="22.23" y="-407.48" font-family="Arial" font-weight="bold" font-size="10.00">Tracking</text>
+<polygon fill="none" stroke="black" points="0,-376.48 0,-398.48 86.14,-398.48 86.14,-376.48 0,-376.48"/>
+<text xml:space="preserve" text-anchor="start" x="5" y="-385.48" font-family="Arial" text-decoration="underline" font-size="10.00">tracking_id (PK)</text>
+<polygon fill="none" stroke="black" points="0,-354.48 0,-376.48 86.14,-376.48 86.14,-354.48 0,-354.48"/>
+<text xml:space="preserve" text-anchor="start" x="5" y="-362.48" font-family="Arial" font-size="10.00">shipment_id (FK)</text>
+<polygon fill="none" stroke="black" points="0,-332.48 0,-354.48 86.14,-354.48 86.14,-332.48 0,-332.48"/>
+<text xml:space="preserve" text-anchor="start" x="5" y="-340.48" font-family="Arial" font-size="10.00">location</text>
+<polygon fill="none" stroke="black" points="0,-310.48 0,-332.48 86.14,-332.48 86.14,-310.48 0,-310.48"/>
+<text xml:space="preserve" text-anchor="start" x="5" y="-318.48" font-family="Arial" font-size="10.00">latitude</text>
+<polygon fill="none" stroke="black" points="0,-288.48 0,-310.48 86.14,-310.48 86.14,-288.48 0,-288.48"/>
+<text xml:space="preserve" text-anchor="start" x="5" y="-296.48" font-family="Arial" font-size="10.00">longitude</text>
+<polygon fill="none" stroke="black" points="0,-266.48 0,-288.48 86.14,-288.48 86.14,-266.48 0,-266.48"/>
+<text xml:space="preserve" text-anchor="start" x="5" y="-274.48" font-family="Arial" font-size="10.00">tracked_at</text>
+</g>
+<!-- barcode -->
+<g id="node18" class="node">
+<title>barcode</title>
+<polygon fill="#d6eaf8" stroke="none" points="239.47,-124.82 239.47,-146.82 321.73,-146.82 321.73,-124.82 239.47,-124.82"/>
+<polygon fill="none" stroke="black" points="239.47,-124.82 239.47,-146.82 321.73,-146.82 321.73,-124.82 239.47,-124.82"/>
+<text xml:space="preserve" text-anchor="start" x="260.59" y="-133.82" font-family="Arial" font-weight="bold" font-size="10.00">Barcode</text>
+<polygon fill="none" stroke="black" points="239.47,-102.82 239.47,-124.82 321.73,-124.82 321.73,-102.82 239.47,-102.82"/>
+<text xml:space="preserve" text-anchor="start" x="244.47" y="-111.82" font-family="Arial" text-decoration="underline" font-size="10.00">barcode_id (PK)</text>
+<polygon fill="none" stroke="black" points="239.47,-80.82 239.47,-102.82 321.73,-102.82 321.73,-80.82 239.47,-80.82"/>
+<text xml:space="preserve" text-anchor="start" x="244.47" y="-88.82" font-family="Arial" font-size="10.00">order_id (FK)</text>
+<polygon fill="none" stroke="black" points="239.47,-58.82 239.47,-80.82 321.73,-80.82 321.73,-58.82 239.47,-58.82"/>
+<text xml:space="preserve" text-anchor="start" x="244.47" y="-66.82" font-family="Arial" font-size="10.00">barcode_value</text>
+<polygon fill="none" stroke="black" points="239.47,-36.82 239.47,-58.82 321.73,-58.82 321.73,-36.82 239.47,-36.82"/>
+<text xml:space="preserve" text-anchor="start" x="244.47" y="-44.82" font-family="Arial" font-size="10.00">created_at</text>
+</g>
+<!-- hub_performance -->
+<g id="node19" class="node">
+<title>hub_performance</title>
+<polygon fill="#d6eaf8" stroke="none" points="34.06,-1253.46 34.06,-1275.46 138.56,-1275.46 138.56,-1253.46 34.06,-1253.46"/>
+<polygon fill="none" stroke="black" points="34.06,-1253.46 34.06,-1275.46 138.56,-1275.46 138.56,-1253.46 34.06,-1253.46"/>
+<text xml:space="preserve" text-anchor="start" x="44.63" y="-1262.46" font-family="Arial" font-weight="bold" font-size="10.00">Hub Performance</text>
+<polygon fill="none" stroke="black" points="34.06,-1231.46 34.06,-1253.46 138.56,-1253.46 138.56,-1231.46 34.06,-1231.46"/>
+<text xml:space="preserve" text-anchor="start" x="39.06" y="-1240.46" font-family="Arial" text-decoration="underline" font-size="10.00">performance_id (PK)</text>
+<polygon fill="none" stroke="black" points="34.06,-1209.46 34.06,-1231.46 138.56,-1231.46 138.56,-1209.46 34.06,-1209.46"/>
+<text xml:space="preserve" text-anchor="start" x="39.06" y="-1217.46" font-family="Arial" font-size="10.00">hub_id (FK)</text>
+<polygon fill="none" stroke="black" points="34.06,-1187.46 34.06,-1209.46 138.56,-1209.46 138.56,-1187.46 34.06,-1187.46"/>
+<text xml:space="preserve" text-anchor="start" x="39.06" y="-1195.46" font-family="Arial" font-size="10.00">report_date</text>
+<polygon fill="none" stroke="black" points="34.06,-1165.46 34.06,-1187.46 138.56,-1187.46 138.56,-1165.46 34.06,-1165.46"/>
+<text xml:space="preserve" text-anchor="start" x="39.06" y="-1173.46" font-family="Arial" font-size="10.00">total_shipments</text>
+<polygon fill="none" stroke="black" points="34.06,-1143.46 34.06,-1165.46 138.56,-1165.46 138.56,-1143.46 34.06,-1143.46"/>
+<text xml:space="preserve" text-anchor="start" x="39.06" y="-1151.46" font-family="Arial" font-size="10.00">delivered_shipments</text>
+<polygon fill="none" stroke="black" points="34.06,-1121.46 34.06,-1143.46 138.56,-1143.46 138.56,-1121.46 34.06,-1121.46"/>
+<text xml:space="preserve" text-anchor="start" x="39.06" y="-1129.46" font-family="Arial" font-size="10.00">delayed_shipments</text>
+<polygon fill="none" stroke="black" points="34.06,-1099.46 34.06,-1121.46 138.56,-1121.46 138.56,-1099.46 34.06,-1099.46"/>
+<text xml:space="preserve" text-anchor="start" x="39.06" y="-1107.46" font-family="Arial" font-size="10.00">returned_shipments</text>
+<polygon fill="none" stroke="black" points="34.06,-1077.46 34.06,-1099.46 138.56,-1099.46 138.56,-1077.46 34.06,-1077.46"/>
+<text xml:space="preserve" text-anchor="start" x="39.06" y="-1085.46" font-family="Arial" font-size="10.00">avg_processing_time</text>
+<polygon fill="none" stroke="black" points="34.06,-1055.46 34.06,-1077.46 138.56,-1077.46 138.56,-1055.46 34.06,-1055.46"/>
+<text xml:space="preserve" text-anchor="start" x="39.06" y="-1063.46" font-family="Arial" font-size="10.00">performance_score</text>
+<polygon fill="none" stroke="black" points="34.06,-1033.46 34.06,-1055.46 138.56,-1055.46 138.56,-1033.46 34.06,-1033.46"/>
+<text xml:space="preserve" text-anchor="start" x="39.06" y="-1041.46" font-family="Arial" font-size="10.00">created_at</text>
+</g>
+<!-- rel_has_login&#45;&#45;login_history -->
+<g id="edge2" class="edge">
+<title>rel_has_login--login_history</title>
+<path fill="none" stroke="#555555" d="M939.54,-699.67C939.61,-674.15 939.74,-626.37 939.85,-586.63"/>
+<text xml:space="preserve" text-anchor="middle" x="948.25" y="-601.78" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_has_address&#45;&#45;address -->
+<g id="edge4" class="edge">
+<title>rel_has_address--address</title>
+<path fill="none" stroke="#555555" d="M809.46,-815.62C829.05,-833.37 864.35,-865.35 892.21,-890.6"/>
+<text xml:space="preserve" text-anchor="middle" x="873.1" y="-881.69" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_places_order&#45;&#45;orders -->
+<g id="edge6" class="edge">
+<title>rel_places_order--orders</title>
+<path fill="none" stroke="#555555" d="M556.2,-661.58C534.27,-630.39 493.77,-572.79 462.41,-528.19"/>
+<text xml:space="preserve" text-anchor="middle" x="479.75" y="-535.16" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_receives_order&#45;&#45;orders -->
+<g id="edge8" class="edge">
+<title>rel_receives_order--orders</title>
+<path fill="none" stroke="#555555" d="M514.79,-522.73C499.32,-513.63 479.63,-502.04 462.12,-491.73"/>
+<text xml:space="preserve" text-anchor="middle" x="482.03" y="-490.64" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_contains&#45;&#45;packages -->
+<g id="edge10" class="edge">
+<title>rel_contains--packages</title>
+<path fill="none" stroke="#555555" d="M404.08,-247.11C411.86,-230.85 425,-203.36 438.19,-175.78"/>
+<text xml:space="preserve" text-anchor="middle" x="437.99" y="-192.77" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_manages&#45;&#45;hubs -->
+<g id="edge12" class="edge">
+<title>rel_manages--hubs</title>
+<path fill="none" stroke="#555555" d="M459.27,-1031.86C448.77,-1017.42 434.59,-997.92 421.21,-979.52"/>
+<text xml:space="preserve" text-anchor="middle" x="438.71" y="-986.21" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_ships&#45;&#45;shipments -->
+<g id="edge14" class="edge">
+<title>rel_ships--shipments</title>
+<path fill="none" stroke="#555555" d="M285.48,-538.59C271.62,-529.43 249.51,-514.83 228.92,-501.23"/>
+<text xml:space="preserve" text-anchor="middle" x="248.7" y="-501.17" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_origin&#45;&#45;shipments -->
+<g id="edge16" class="edge">
+<title>rel_origin--shipments</title>
+<path fill="none" stroke="#555555" d="M308.23,-669.69C291.84,-644.29 256.95,-590.21 227.36,-544.35"/>
+<text xml:space="preserve" text-anchor="middle" x="244.29" y="-552" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_destination&#45;&#45;shipments -->
+<g id="edge18" class="edge">
+<title>rel_destination--shipments</title>
+<path fill="none" stroke="#555555" d="M183.03,-633.31C182.36,-612.53 181.22,-576.93 180.16,-544.03"/>
+<text xml:space="preserve" text-anchor="middle" x="189.19" y="-558.88" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_has_ship_status&#45;&#45;shipment_status -->
+<g id="edge20" class="edge">
+<title>rel_has_ship_status--shipment_status</title>
+<path fill="none" stroke="#555555" d="M199.84,-260.36C180.27,-238.75 140.93,-195.34 109.9,-161.09"/>
+<text xml:space="preserve" text-anchor="middle" x="128.33" y="-165.84" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_has_ord_hist&#45;&#45;order_history -->
+<g id="edge22" class="edge">
+<title>rel_has_ord_hist--order_history</title>
+<path fill="none" stroke="#555555" d="M583.08,-234.01C597.61,-213.27 625.02,-174.15 647.86,-141.57"/>
+<text xml:space="preserve" text-anchor="middle" x="644.38" y="-158.26" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_has_pickup&#45;&#45;pickup_details -->
+<g id="edge24" class="edge">
+<title>rel_has_pickup--pickup_details</title>
+<path fill="none" stroke="#555555" d="M764.8,-253.48C785.59,-231.89 827.44,-188.43 860.34,-154.28"/>
+<text xml:space="preserve" text-anchor="middle" x="853.85" y="-170.2" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_requests_pickup&#45;&#45;pickup_details -->
+<g id="edge26" class="edge">
+<title>rel_requests_pickup--pickup_details</title>
+<path fill="none" stroke="#555555" d="M792.77,-427.26C807.99,-384.39 850.82,-263.69 879.42,-183.09"/>
+<text xml:space="preserve" text-anchor="middle" x="881.32" y="-200" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_assigned_for&#45;&#45;delivery_assign -->
+<g id="edge28" class="edge">
+<title>rel_assigned_for--delivery_assign</title>
+<path fill="none" stroke="#555555" d="M431.21,-607.31C432.81,-612.35 434.68,-618.28 436.71,-624.66"/>
+<text xml:space="preserve" text-anchor="middle" x="423.17" y="-606.93" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_delivers&#45;&#45;delivery_assign -->
+<g id="edge30" class="edge">
+<title>rel_delivers--delivery_assign</title>
+<path fill="none" stroke="#555555" d="M500.37,-812.48C496.87,-802.59 492.64,-790.65 488.27,-778.3"/>
+<text xml:space="preserve" text-anchor="middle" x="502.29" y="-789.57" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_assigned_at&#45;&#45;delivery_assign -->
+<g id="edge32" class="edge">
+<title>rel_assigned_at--delivery_assign</title>
+<path fill="none" stroke="#555555" d="M384.3,-779.48C390.57,-773.12 398.49,-765.06 406.87,-756.56"/>
+<text xml:space="preserve" text-anchor="middle" x="400.17" y="-772.41" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_owns_vehicle&#45;&#45;vehicle -->
+<g id="edge34" class="edge">
+<title>rel_owns_vehicle--vehicle</title>
+<path fill="none" stroke="#555555" d="M764.62,-1002.73C783.26,-1023.87 823.5,-1069.51 854.27,-1104.41"/>
+<text xml:space="preserve" text-anchor="middle" x="835.94" y="-1093.4" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_transfers&#45;&#45;hub_transfer -->
+<g id="edge36" class="edge">
+<title>rel_transfers--hub_transfer</title>
+<path fill="none" stroke="#555555" d="M46.33,-767.99C47.31,-790.54 49.04,-830.78 50.61,-867.06"/>
+<text xml:space="preserve" text-anchor="middle" x="41.38" y="-846.31" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_transfer_from&#45;&#45;hub_transfer -->
+<g id="edge38" class="edge">
+<title>rel_transfer_from--hub_transfer</title>
+<path fill="none" stroke="#555555" d="M201.4,-839.06C177.38,-856.09 131.11,-888.89 96.78,-913.24"/>
+<text xml:space="preserve" text-anchor="middle" x="106.67" y="-892.86" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_transfer_to&#45;&#45;hub_transfer -->
+<g id="edge40" class="edge">
+<title>rel_transfer_to--hub_transfer</title>
+<path fill="none" stroke="#555555" d="M224.99,-1005.14C194.91,-994.32 136.79,-973.43 96.7,-959.02"/>
+<text xml:space="preserve" text-anchor="middle" x="116.62" y="-954.2" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_files_complaint&#45;&#45;complaints -->
+<g id="edge42" class="edge">
+<title>rel_files_complaint--complaints</title>
+<path fill="none" stroke="#555555" d="M688.23,-667.89C686.13,-656.03 683.18,-639.42 680.14,-622.26"/>
+<text xml:space="preserve" text-anchor="middle" x="691.63" y="-635.63" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_has_complaint&#45;&#45;complaints -->
+<g id="edge44" class="edge">
+<title>rel_has_complaint--complaints</title>
+<path fill="none" stroke="#555555" d="M520.94,-401.2C543.47,-423.53 588.36,-468.02 622.38,-501.73"/>
+<text xml:space="preserve" text-anchor="middle" x="603.55" y="-491.98" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_gives_feedback&#45;&#45;feedback -->
+<g id="edge46" class="edge">
+<title>rel_gives_feedback--feedback</title>
+<path fill="none" stroke="#555555" d="M810.62,-597.03C826.79,-559.91 867.6,-466.26 897.15,-398.45"/>
+<text xml:space="preserve" text-anchor="middle" x="897.66" y="-415.44" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_has_feedback&#45;&#45;feedback -->
+<g id="edge48" class="edge">
+<title>rel_has_feedback--feedback</title>
+<path fill="none" stroke="#555555" d="M673.48,-392.51C725.35,-378.21 828.92,-349.65 887.56,-333.48"/>
+<text xml:space="preserve" text-anchor="middle" x="872.33" y="-343.44" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_notified&#45;&#45;notifications -->
+<g id="edge50" class="edge">
+<title>rel_notified--notifications</title>
+<path fill="none" stroke="#555555" d="M600.08,-980.47C604.99,-1006.9 614.81,-1059.71 622.78,-1102.61"/>
+<text xml:space="preserve" text-anchor="middle" x="611.16" y="-1083.34" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_tracked&#45;&#45;tracking -->
+<g id="edge52" class="edge">
+<title>rel_tracked--tracking</title>
+<path fill="none" stroke="#555555" d="M38.31,-537.4C38.95,-511.57 40.15,-462.53 41.19,-420.23"/>
+<text xml:space="preserve" text-anchor="middle" x="49.19" y="-435.56" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_has_barcode&#45;&#45;barcode -->
+<g id="edge54" class="edge">
+<title>rel_has_barcode--barcode</title>
+<path fill="none" stroke="#555555" d="M311.19,-378.56C306.46,-334.21 293.93,-216.8 286.46,-146.74"/>
+<text xml:space="preserve" text-anchor="middle" x="296.78" y="-160.86" font-family="Arial" font-size="10.00">N</text>
+</g>
+<!-- rel_has_perf&#45;&#45;hub_performance -->
+<g id="edge56" class="edge">
+<title>rel_has_perf--hub_performance</title>
+<path fill="none" stroke="#555555" d="M297.5,-1171.65C250.72,-1167.84 184.11,-1162.42 138.27,-1158.69"/>
+<text xml:space="preserve" text-anchor="middle" x="157.02" y="-1148.73" font-family="Arial" font-size="10.00">N</text>
+</g>
+</g>
+</svg>
