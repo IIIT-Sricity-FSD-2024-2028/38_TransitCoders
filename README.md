@@ -84,6 +84,12 @@ Traditional logistics often suffer from fragmented communication and manual disp
 
 ---
 
+## Figma Design
+
+- https://www.figma.com/design/o6Ei1pGX1NXx7uaERlQahx/final-workflows?node-id=0-1&t=JNJgz5QKfOAEENl1-1
+
+---
+
 ## Team Members
 
 - Vinod Katevarapu
