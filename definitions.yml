@@ -1,5 +1,5 @@
 Merchant:
-  definition: A business entity that creates delivery orders and hands over packages for shipment.
+  definition: An individual or business that requests delivery services by creating orders and providing packages for shipment to customers.
   aliases:
     - Seller
     - Vendor
@@ -14,30 +14,6 @@ Customer:
   examples:
     - "The customer tracked the order using the tracking ID."
 
-Order:
-  definition: A delivery request containing package, pickup, and destination information.
-  aliases:
-    - Delivery Order
-    - Shipment Order
-  examples:
-    - "Order #123 was dispatched to a delivery partner."
-
-Hub:
-  definition: A centralized facility where packages are collected, sorted, and assigned to delivery partners.
-  aliases:
-    - Warehouse
-    - Dark Store
-  examples:
-    - "The hub assigned the order to an available rider."
-
-Package:
-  definition: A physical item that is transported from the merchant to the customer.
-  aliases:
-    - Parcel
-    - Shipment
-  examples:
-    - "The package was picked up from the hub."
-
 Delivery Partner:
   definition: A field worker responsible for picking up packages from hubs and delivering them to customers.
   aliases:
@@ -47,13 +23,35 @@ Delivery Partner:
   examples:
     - "The delivery partner accepted the assigned order."
 
-Dispatch:
-  definition: The process of assigning orders to delivery partners based on availability and location.
+Local Delivery Partner:
+  definition: A temporary or third-party delivery partner assigned to assist with deliveries during peak demand, high workload, or special requirements.
   aliases:
-    - Assignment
-    - Order Allocation
+    - Freelance Rider
   examples:
-    - "Dispatch was triggered once the order was ready."
+    - "Freelance delivery partners were notified during peak hours."
+
+Hub Manager:
+  definition: A system user role responsible for managing hub operations and handling delivery-related decisions.
+  aliases:
+    - Hub Supervisor
+    - Operations Manager
+  examples:
+    - "The hub manager reassigned the delayed order."
+
+Order:
+  definition: An order is a delivery request that contains package details, pickup and delivery information, customer details, and its current status.
+  aliases:
+    - Delivery Order
+    - Shipment Order
+  examples:
+    - "Order #123 was dispatched to a delivery partner."
+
+Priority Order:
+  definition: An order marked for faster processing due to urgency or service level agreements.
+  aliases:
+    - Express Order
+  examples:
+    - "Priority orders were dispatched first."
 
 Order Status:
   definition: The current stage of an order such as Created, Dispatched, PickedUp, OutForDelivery, Delivered, or Failed.
@@ -61,6 +59,21 @@ Order Status:
     - Shipment Status
   examples:
     - "The order status changed to Out For Delivery."
+
+Order History:
+  definition: A chronological record of all status changes and actions performed on an order.
+  aliases:
+    - Shipment History
+  examples:
+    - "The admin reviewed the order history to investigate delays."
+
+Package:
+  definition: A package is the physical goods being transported from one location to another.
+  aliases:
+    - Parcel
+    - Shipment
+  examples:
+    - "The package was picked up from the hub."
 
 Delivery Schedule:
   definition: The planned time window during which a package is expected to be delivered.
@@ -84,7 +97,7 @@ Proof Of Delivery:
     - "The rider uploaded proof of delivery after completion."
 
 Exception:
-  definition: An abnormal situation that prevents successful delivery, such as customer unavailable or incorrect address.
+  definition: Any issue or unusual situation that affects the normal delivery process, such as delays, address problems, or customer unavailability.
   aliases:
     - Delivery Issue
     - Delivery Failure
@@ -92,69 +105,27 @@ Exception:
     - "An exception was raised due to customer unavailability."
 
 Return:
-  definition: The process of sending an undelivered package back to the hub or merchant.
+  definition: The process of sending a package back to the hub or merchant due to failed delivery, customer rejection, or other delivery issues.
   aliases:
     - Return Shipment
   examples:
     - "The package was marked for return to the hub."
 
-Hub Manager:
-  definition: A supervisor responsible for overseeing hub operations, dispatch decisions, and exception handling.
+Hub:
+  definition: A physical location where packages are received, sorted, stored temporarily, and sent out for delivery
   aliases:
-    - Hub Supervisor
-    - Operations Manager
+    - Warehouse
+    - Dark Store
   examples:
-    - "The hub manager reassigned the delayed order."
+    - "The hub assigned the order to an available rider."
 
-Report:
-  definition: A summarized view of operational data such as orders, delivery partners, and hub performance over a period of time.
+Dispatch:
+  definition: Dispatch is the process of assigning orders to delivery partners using system rules such as availability, location, and priority.
   aliases:
-    - Performance Report
-    - Analytics Report
+    - Assignment
+    - Order Allocation
   examples:
-    - "The admin generated a daily delivery report."
-
-Monitoring:
-  definition: Real-time observation of active orders, delivery partners, hubs, and exceptions.
-  aliases:
-    - Operations Monitoring
-    - Live Tracking
-  examples:
-    - "Monitoring showed an increase in delayed orders."
-
-Bill:
-  definition: A financial document generated after order confirmation showing payable amount before payment.
-  aliases:
-    - Draft Invoice
-  examples:
-    - "The system generates a bill of ₹1500."
-
-Inventory Item:
-  definition: A product tracked by the store for stock availability.
-  aliases:
-    - Stock Item
-    - Product Unit
-  examples:
-    - "The inventory item 'Red T-Shirt' has 50 units in stock."
-
-Payment:
-  definition: The transfer of money from customer to merchant for a completed order.
-  aliases:
-    - Transaction
-  examples:
-    - "The payment was completed successfully."
-
-Delivery Zone:
-  definition: A geographical area used to group orders and assign nearby delivery partners.
-  examples:
-    - "The order was assigned based on delivery zone."
-
-Order History:
-  definition: A chronological record of all status changes and actions performed on an order.
-  aliases:
-    - Shipment History
-  examples:
-    - "The admin reviewed the order history to investigate delays."
+    - "Dispatch was triggered once the order was ready."
 
 Assignment Queue:
   definition: A waiting list of orders that are yet to be assigned to delivery partners.
@@ -177,12 +148,10 @@ Rider Availability:
   examples:
     - "Low rider availability caused delivery delays."
 
-Local Delivery Partner:
-  definition: An on-demand delivery partner activated during peak demand or hub overload.
-  aliases:
-    - Freelance Rider
+Delivery Zone:
+  definition: A delivery zone is a defined geographic area used to manage delivery assignments, pricing, and service coverage.
   examples:
-    - "Freelance delivery partners were notified during peak hours."
+    - "The order was assigned based on delivery zone."
 
 Hub Overload:
   definition: A condition where a hub receives more orders than it can process within expected time.
@@ -190,13 +159,6 @@ Hub Overload:
     - Capacity Overflow
   examples:
     - "Hub overload triggered redistribution of orders."
-
-Priority Order:
-  definition: An order marked for faster processing due to urgency or service level agreements.
-  aliases:
-    - Express Order
-  examples:
-    - "Priority orders were dispatched first."
 
 Manual Override:
   definition: An action performed by the hub manager or admin to bypass automated dispatch decisions.
@@ -212,24 +174,27 @@ Escalation:
   examples:
     - "Repeated failures resulted in escalation to operations."
 
-Audit Log:
-  definition: A secure record of administrative and operational actions for accountability.
+Monitoring:
+  definition: The system feature that allows real-time tracking and supervision of orders, delivery partners, and hub activities.
   aliases:
-    - Activity Log
+    - Operations Monitoring
+    - Live Tracking
   examples:
-    - "Audit logs captured changes made by the admin."
+    - "Monitoring showed an increase in delayed orders."
 
-Access Role:
-  definition: A permission group that defines what actions a system user is allowed to perform.
-  examples:
-    - "The hub manager was assigned an access role."
-
-Security Policy:
-  definition: A set of rules governing authentication, authorization, and system usage.
+Bill:
+  definition: A document that shows the total charges for delivery services, generated by the system for payment or settlement.
   aliases:
-    - Access Policy
+    - Draft Invoice
   examples:
-    - "Security policies enforce password complexity."
+    - "The system generates a bill of ₹1500."
+
+Payment:
+  definition: The transfer of money from customer to merchant for a completed order.
+  aliases:
+    - Transaction
+  examples:
+    - "The payment was completed successfully."
 
 Service Level Agreement:
   definition: A delivery performance commitment defining acceptable delivery timelines.
@@ -252,12 +217,38 @@ Feedback Rating:
   examples:
     - "The delivery partner received a 5-star feedback rating."
 
+Report:
+  definition: A summarized view of operational data such as orders, delivery partners, and hub performance over a period of time.
+  aliases:
+    - Performance Report
+    - Analytics Report
+  examples:
+    - "The admin generated a daily delivery report."
+
+Inventory Item:
+  definition: An inventory item is a product or material stored at a warehouse.
+  aliases:
+    - Stock Item
+    - Product Unit
+  examples:
+    - "The inventory item 'Red T-Shirt' has 50 units in stock."
+
 Purchase Order:
   definition: A formal order issued to a vendor specifying quantity, price, and delivery timeline for goods.
   aliases:
     - PO
   examples:
     - "The merchant raised a purchase order for 100 units of material."
+
+Goods Received Note:
+  definition: A confirmation document indicating that materials have been successfully received at the destination site.
+  examples:
+    - "The warehouse created a GRN after unloading the truck."
+
+Delivery Challan:
+  definition: A temporary document used for internal transfer or redirected movement of goods.
+  examples:
+    - "A delivery challan was issued for moving stock between hubs."
 
 Lorry Receipt:
   definition: A transport document issued by the transporter confirming that goods have been handed over for shipment.
@@ -282,21 +273,11 @@ Part Load:
     - "Small orders were combined using part load transportation."
 
 E-way Bill:
-  definition: A mandatory GST document required for movement of goods across locations.
+  definition: A GST-required electronic document needed for transporting goods above a specified value limit within or across states.
   aliases:
     - Electronic Way Bill
   examples:
     - "The system generated an e-way bill before dispatch."
-
-Goods Received Note:
-  definition: A confirmation document indicating that materials have been successfully received at the destination site.
-  examples:
-    - "The warehouse created a GRN after unloading the truck."
-
-Delivery Challan:
-  definition: A temporary document used for internal transfer or redirected movement of goods.
-  examples:
-    - "A delivery challan was issued for moving stock between hubs."
 
 Third-party Inspection:
   definition: Government or certified external verification of material quality before dispatch.
@@ -312,3 +293,22 @@ Bank Guarantee:
     - Financial Guarantee
   examples:
     - "The vendor submitted a bank guarantee against the advance amount."
+
+Access Role:
+  definition: A permission group that defines what actions a system user is allowed to perform.
+  examples:
+    - "The hub manager was assigned an access role."
+
+Security Policy:
+  definition: A set of rules governing authentication, authorization, and system usage.
+  aliases:
+    - Access Policy
+  examples:
+    - "Security policies enforce password complexity."
+
+Audit Log:
+  definition: A secure record of administrative and operational actions for accountability.
+  aliases:
+    - Activity Log
+  examples:
+    - "Audit logs captured changes made by the admin."
