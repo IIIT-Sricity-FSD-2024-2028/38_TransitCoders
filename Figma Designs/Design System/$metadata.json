@@ -1,0 +1,14 @@
+{
+  "tokenSetOrder": [
+    "Primitives/Mode 1",
+    "Style tokens/Light",
+    "Style tokens/Dark",
+    "Semantic Colours/Light",
+    "Semantic Colours/Dark",
+    "Sizing Tokens/Mode 1",
+    "component tokens-SML/Small",
+    "component tokens-SML/Medium",
+    "component tokens-SML/Large",
+    "Component Tokens -/Mode 1"
+  ]
+}

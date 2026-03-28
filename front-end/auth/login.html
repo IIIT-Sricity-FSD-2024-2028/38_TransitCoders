@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | SwiftTrack Logistics</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Global Styles & Auth Specific Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <!-- Left Side: Branding -->
+        <div class="auth-left">
+            <div class="auth-overlay"></div>
+            <img src="../images/8909ed036f3f557c70b2bae33ee6710332e09133.png" alt="SwiftTrack Logistics" class="auth-left-img">
+            
+            <div class="auth-left-content">
+                <a href="../index.html" class="auth-logo">
+                    <span class="dot"></span>
+                    Swift<span style="color: #ff5c02;">Track</span>
+                </a>
+                
+                <div class="auth-promo">
+                    <h2>Streamline Your<br>Delivery Operations</h2>
+                    <p>Track shipments in real-time, manage dispatches, and optimize your logistics workflow with our powerful platform.</p>
+                </div>
+                
+                <div class="auth-social-proof">
+                    <div class="avatars">
+                        <div class="avatar-circle">RA</div>
+                        <div class="avatar-circle">PS</div>
+                        <div class="avatar-circle">VK</div>
+                    </div>
+                    <span class="proof-text">Trusted by 2,000+ logistics teams</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Side: Sign In Form -->
+        <div class="auth-right">
+            <div class="auth-form-box">
+                <div class="auth-header">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                        <div>
+                            <h1>Welcome back</h1>
+                            <p>Sign in to your account to continue</p>
+                        </div>
+                        <div class="theme-switch" role="button" aria-label="Toggle dark mode" style="margin-top: 8px;">
+                            <i class="fa-solid fa-sun icon-light"></i>
+                            <i class="fa-solid fa-moon icon-dark" style="display:none;"></i>
+                            <span>Light</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" class="form-input" placeholder="name@company.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox"> Remember me
+                        </label>
+                        <a href="#" class="forgot-link">Forgot password?</a>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn">Sign In</button>
+                    
+                    <div class="divider">or</div>
+                    
+                    <button type="button" class="google-btn">
+                        <img src="https://www.google.com/favicon.ico" width="20" height="20" alt="Google icon">
+                        Sign in with Google
+                    </button>
+                    
+                    <div class="auth-footer">
+                        Don't have an account? <a href="register.html">Sign up</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Module Script -->
+    <script src="../js/auth.js"></script>
+</body>
+</html>

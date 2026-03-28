@@ -1,0 +1,202 @@
+/**
+ * SwiftTrack Design System & Global Styles
+ * Based on Figma Tokens
+ */
+
+:root {
+    /* Primitives - Colours */
+    --clr-green-50: #f0fdf4;
+    --clr-green-100: #dcfce7;
+    --clr-green-300: #86efac;
+    --clr-green-500: #16a34a;
+    --clr-green-700: #166534;
+
+    --clr-blue-50: #f0f9ff;
+    --clr-blue-100: #e0f2fe;
+    --clr-blue-300: #7dd3fc;
+    --clr-blue-500: #0284c7;
+    --clr-blue-700: #075985;
+
+    --clr-amber-50: #fefce8;
+    --clr-amber-100: #fef9c3;
+    --clr-amber-300: #fde047;
+    --clr-amber-500: #ead308;
+    --clr-amber-700: #a16207;
+
+    --clr-orange-50: #fff7ed;
+    --clr-orange-100: #ffedd5;
+    --clr-orange-300: #fdba74;
+    --clr-orange-500: #f97316;
+    --clr-orange-600: #ff5c02;
+    --clr-orange-700: #c2410c;
+
+    --clr-red-50: #fef2f2;
+    --clr-red-100: #fee2e2;
+    --clr-red-300: #fca5a5;
+    --clr-red-500: #dc2626;
+    --clr-red-700: #991b1b;
+
+    --clr-neutral-50: #ffffff;
+    --clr-neutral-100: #f3f4f6;
+    --clr-neutral-200: #e8e8e8;
+    --clr-neutral-300: #d1d5db;
+    --clr-neutral-400: #9ca3af;
+    --clr-neutral-500: #6b7280;
+    --clr-neutral-700: #374151;
+    --clr-neutral-800: #1f2937;
+    --clr-neutral-900: #111827;
+
+    /* Semantic - Light Mode (Default) */
+    --surface-default: var(--clr-neutral-50);
+    --surface-subtle: var(--clr-neutral-100);
+    --surface-brand: var(--clr-orange-500);
+    --surface-brand-subtle: var(--clr-orange-50);
+
+    --text-title: var(--clr-neutral-900);
+    --text-body: var(--clr-neutral-700);
+    --text-subtitle: var(--clr-neutral-500);
+    --text-on-brand: var(--clr-neutral-50);
+    --text-brand: var(--clr-orange-600);
+
+    --border-default: var(--clr-neutral-200);
+    --border-strong: var(--clr-neutral-400);
+
+    /* Radius */
+    --radius-xs: 2px;
+    --radius-s: 6px;
+    --radius-m: 8px;
+    --radius-l: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
+    --radius-round: 999px;
+
+    /* Shadow */
+    --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0px 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0px 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --shadow-premium: 0px 12px 30px 1px rgba(0, 0, 0, 0.13);
+}
+
+/* Dark Mode Tokens */
+body.dark {
+    --surface-default: #030712;
+    --surface-subtle: #111827;
+    --text-title: #f8fafc;
+    --text-body: #e8e8e8;
+    --text-subtitle: #9ca3af;
+    --border-default: #1f2937;
+    --border-strong: #4b5563;
+    
+    background-color: var(--surface-subtle);
+}
+
+/* Base Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', 'Inter', sans-serif;
+    background-color: var(--surface-subtle);
+    color: var(--text-body);
+    line-height: 1.5;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+    color: var(--text-title);
+    font-weight: 700;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+ul {
+    list-style: none;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+    font-family: inherit;
+}
+
+/* Layout Container */
+.container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+/* Buttons */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: var(--radius-m);
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background: var(--surface-brand);
+    color: var(--text-on-brand);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+    background: var(--clr-orange-600);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-secondary {
+    background: var(--surface-default);
+    color: var(--text-title);
+    border: 1px solid var(--border-default);
+}
+
+.btn-secondary:hover {
+    background: var(--surface-subtle);
+}
+
+/* Card Glassmorphism */
+.glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-xl);
+}
+
+/* Animations */
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.animate-reveal {
+    animation: slideUp 0.6s ease forwards;
+}
