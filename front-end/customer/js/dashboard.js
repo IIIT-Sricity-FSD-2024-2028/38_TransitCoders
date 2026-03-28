@@ -28,7 +28,7 @@ function initDashboard() {
     });
 
     // Handle Theme Toggle
-    const themeToggle = document.querySelector('.theme-switch');
+    const themeToggle = document.querySelector('.theme-switch-wrapper');
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
             toggleTheme();
@@ -134,6 +134,7 @@ function initTheme() {
     } else {
         document.body.classList.remove('dark');
     }
+    updateDashboardThemeIcons();
 }
 
 function toggleTheme() {
