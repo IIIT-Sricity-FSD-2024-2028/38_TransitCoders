@@ -62,20 +62,20 @@
 
         .pin-codes {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             margin-top: 16px;
         }
 
         .pin-digit {
             flex: 1;
-            height: 64px;
-            background: #f0f2f5;
+            height: 56px;
+            background: rgba(255, 107, 43, 0.04);
             border: 2px solid var(--clr-orange-500);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 800;
             color: var(--clr-orange-500);
         }
@@ -146,8 +146,8 @@
         .timeline-item::before {
             content: '';
             position: absolute;
-            left: 7px;
-            top: 20px;
+            left: 7px; /* (16px dot / 2) - (2px line / 2) = 7px */
+            top: 24px;
             bottom: -24px;
             width: 2px;
             background: var(--border-default);
@@ -160,9 +160,13 @@
         .timeline-dot {
             width: 16px;
             height: 16px;
+            min-width: 16px;
             border-radius: 50%;
             z-index: 2;
-            margin-top: 4px;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .dot-fill { background: var(--clr-orange-500); border: 2px solid var(--clr-orange-500); }
@@ -411,16 +415,16 @@
                             <h2 style="font-size: 14px;">Recent History</h2>
                             <a href="#" class="view-all-link">View All</a>
                         </div>
-                        <div class="activity-item" style="padding: 10px 0;">
-                            <span style="font-size: 12px; font-weight: 500;">TC-2026-9012</span>
+                        <div class="activity-item">
+                            <span style="font-size: 12px; font-weight: 600;">TC-2026-9012</span>
                             <span class="status-badge status-pending">PENDING</span>
                         </div>
-                        <div class="activity-item" style="padding: 10px 0;">
-                            <span style="font-size: 12px; font-weight: 500;">TC-2026-2490</span>
+                        <div class="activity-item">
+                            <span style="font-size: 12px; font-weight: 600;">TC-2026-2490</span>
                             <span class="status-badge status-delivered">DELIVERED</span>
                         </div>
-                        <div class="activity-item" style="padding: 10px 0;">
-                            <span style="font-size: 12px; font-weight: 500;">TC-2026-1188</span>
+                        <div class="activity-item">
+                            <span style="font-size: 12px; font-weight: 600;">TC-2026-1188</span>
                             <span class="status-badge status-delivered">DELIVERED</span>
                         </div>
                     </div>
