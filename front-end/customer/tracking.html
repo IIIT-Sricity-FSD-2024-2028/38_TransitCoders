@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking | SwiftTrack Customer</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <style>
+        .tracking-layout {
+            display: flex;
+            height: 764px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--surface-default);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .map-area {
+            flex: 1;
+            background: linear-gradient(158deg, #e8f0e4 0%, #d4e4ce 50%, #e8f0e4 100%);
+            position: relative;
+            background-image: url('../assets/map-bg.png'); /* Fallback to image if available */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .map-overlay-pin {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            background: var(--surface-default);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            width: 300px;
+            z-index: 10;
+        }
+
+        .pin-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .pin-icon {
+            background: rgba(255, 107, 43, 0.08);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--clr-orange-500);
+        }
+
+        .pin-codes {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .pin-digit {
+            flex: 1;
+            height: 64px;
+            background: #f0f2f5;
+            border: 2px solid var(--clr-orange-500);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--clr-orange-500);
+        }
+
+        .right-panel {
+            width: 320px;
+            background: var(--surface-default);
+            border-left: 1px solid var(--border-default);
+            padding: 28px 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .driver-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .driver-avatar {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 107, 43, 0.08);
+            border: 2px solid var(--clr-orange-500);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--clr-orange-500);
+            font-weight: 700;
+        }
+
+        .driver-actions {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            background: #f0f2f5;
+            border: 1px solid var(--border-default);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-title);
+        }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            position: relative;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 16px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 20px;
+            bottom: -24px;
+            width: 2px;
+            background: var(--border-default);
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            z-index: 2;
+            margin-top: 4px;
+        }
+
+        .dot-fill { background: var(--clr-orange-500); border: 2px solid var(--clr-orange-500); }
+        .dot-outline { background: var(--surface-default); border: 2px solid var(--clr-orange-500); }
+        .dot-inactive { background: var(--surface-default); border: 2px solid var(--clr-neutral-400); }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .timeline-header h4 {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .timeline-header .time {
+            font-size: 11px;
+            color: var(--text-subtitle);
+        }
+
+        .speed-overlay {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: var(--surface-default);
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            gap: 24px;
+            z-index: 10;
+        }
+
+        .map-marker {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translate(-50%, -50%);
+        }
+
+        .marker-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 3px solid #f0f2f5;
+        }
+
+        .marker-label {
+            background: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+            white-space: nowrap;
+            margin-top: 6px;
+            color: #1a1f36;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-box">
+                    <i class="fas fa-truck-fast text-white"></i>
+                </div>
+                <div class="logo-info">
+                    <div class="logo-text">
+                        <span class="logo-swift">Swift</span><span class="logo-track">Track</span>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="tracking.html" class="nav-link active">
+                    <i class="fas fa-location-dot"></i>
+                    <span>Tracking</span>
+                </a>
+                <a href="orders.html" class="nav-link">
+                    <i class="fas fa-box"></i>
+                    <span>My Orders</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar-initials">AP</div>
+                    <div class="user-info">
+                        <span class="name">Ajay Prakash</span>
+                        <span class="role">Customer</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="header-meta">
+                    <h1>Track Shipment</h1>
+                    <p>Welcome back! track you shipment swiftly.</p>
+                </div>
+                <div class="header-actions">
+                    <div class="theme-switch-wrapper">
+                        <i class="fas fa-sun icon-light"></i>
+                        <i class="fas fa-moon icon-dark"></i>
+                        <span class="theme-status">Light</span>
+                    </div>
+                    <i class="fas fa-bell notification-bell"></i>
+                    <div class="avatar-initials" style="width: 32px; height: 32px; font-size: 12px;">AP</div>
+                </div>
+            </header>
+
+            <!-- Tracking Layout -->
+            <div class="tracking-layout animate-reveal">
+                <!-- Map Area -->
+                <div class="map-area">
+                    <!-- Speed/Distance Controls -->
+                    <div class="speed-overlay">
+                        <div class="hero-stat-item">
+                            <span class="label">CURRENT SPEED</span>
+                            <div class="value">60 <span class="unit">km/h</span></div>
+                        </div>
+                        <div class="hero-stat-item">
+                            <span class="label">DISTANCE LEFT</span>
+                            <div class="value text-brand">340 <span class="unit">km</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Map Markers -->
+                    <div class="map-marker" style="top: 28%; left: 13%;">
+                        <div class="marker-dot" style="background: #9ca3af;"></div>
+                        <div class="marker-label">Mumbai Central - Departure</div>
+                    </div>
+                    <div class="map-marker" style="top: 46%; left: 32%;">
+                        <div class="marker-dot" style="background: #ff6b2b;"></div>
+                        <div class="marker-label">Hubli Checkpoint - In Transit</div>
+                    </div>
+                    <div class="map-marker" style="top: 76%; left: 52%;">
+                        <div class="marker-dot" style="background: #22c55e;"></div>
+                        <div class="marker-label">Bangalore Port - Arrival</div>
+                    </div>
+
+                    <!-- Zoom Controls -->
+                    <div style="position: absolute; top: 20px; left: 24px; display: flex; flex-direction: column; gap: 2px;">
+                        <button class="action-btn" style="border-radius: 6px 6px 0 0;"><i class="fas fa-plus"></i></button>
+                        <button class="action-btn" style="border-radius: 0 0 6px 6px;"><i class="fas fa-minus"></i></button>
+                    </div>
+
+                    <!-- PIN Overlay -->
+                    <div class="map-overlay-pin">
+                        <div class="pin-header">
+                            <div class="pin-icon"><i class="fas fa-key"></i></div>
+                            <span style="font-weight: 700; font-size: 15px;">PIN</span>
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-subtitle);">Share code with agent on arrival.</p>
+                        <div class="pin-codes">
+                            <div class="pin-digit">4</div>
+                            <div class="pin-digit">0</div>
+                            <div class="pin-digit">9</div>
+                            <div class="pin-digit">7</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side Info Panel -->
+                <aside class="right-panel">
+                    <!-- Driver Info -->
+                    <div class="driver-card">
+                        <div class="driver-avatar">JM</div>
+                        <div class="driver-info">
+                            <span class="name">James Maxwell</span>
+                            <span class="role">Cargo Truck HD320</span>
+                        </div>
+                        <div class="driver-actions">
+                            <button class="action-btn"><i class="fas fa-phone"></i></button>
+                            <button class="action-btn"><i class="fas fa-message"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="font-size: 15px; font-weight: 800;">Order: #AD345JK</h3>
+                            <span class="status-badge status-delivered" style="background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid #86efac;">ON TIME</span>
+                        </div>
+                        
+                        <!-- Timeline -->
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-dot dot-fill"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Mumbai Hub</h4>
+                                        <span class="time">10:30 AM</span>
+                                    </div>
+                                    <p style="font-size: 11px; color: var(--text-subtitle);">Dispatched from primary sorting.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-dot dot-outline"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4 style="color: var(--clr-orange-500);">Hubli Checkpoint, KA</h4>
+                                        <span class="time">08:45 AM</span>
+                                    </div>
+                                    <p style="font-size: 11px; color: var(--text-subtitle);">Currently in transit to destination.</p>
+                                </div>
+                            </div>
+
+                            <div class="timeline-item">
+                                <div class="timeline-dot dot-inactive"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Bangalore Port</h4>
+                                        <span class="time">Expected 10th</span>
+                                    </div>
+                                    <p style="font-size: 11px; color: var(--text-subtitle);">Awaiting delivery drop-off.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent History -->
+                    <div style="border-top: 1px solid var(--border-default); padding-top: 20px;">
+                        <div class="section-header">
+                            <h2 style="font-size: 14px;">Recent History</h2>
+                            <a href="#" class="view-all-link">View All</a>
+                        </div>
+                        <div class="activity-item" style="padding: 10px 0;">
+                            <span style="font-size: 12px; font-weight: 500;">TC-2026-9012</span>
+                            <span class="status-badge status-pending">PENDING</span>
+                        </div>
+                        <div class="activity-item" style="padding: 10px 0;">
+                            <span style="font-size: 12px; font-weight: 500;">TC-2026-2490</span>
+                            <span class="status-badge status-delivered">DELIVERED</span>
+                        </div>
+                        <div class="activity-item" style="padding: 10px 0;">
+                            <span style="font-size: 12px; font-weight: 500;">TC-2026-1188</span>
+                            <span class="status-badge status-delivered">DELIVERED</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div style="display: flex; gap: 60px; justify-content: center; margin-top: 20px;">
+                <button class="btn btn-primary" style="border-radius: 50px;">Complaint</button>
+                <button class="btn btn-primary" style="border-radius: 50px;">Feedback</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="footer-copyright">
+            © 2026 SwiftTrack. All rights reserved.
+        </div>
+        <div class="social-links">
+            <i class="fab fa-github"></i>
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-linkedin"></i>
+            <i class="fab fa-twitter"></i>
+        </div>
+    </footer>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

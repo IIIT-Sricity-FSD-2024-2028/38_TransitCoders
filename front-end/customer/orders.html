@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders | SwiftTrack Customer</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <style>
+        .search-filter-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-input-wrapper {
+            background: #f5f6f8;
+            border: 1px solid var(--border-default);
+            padding: 11px 17px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 280px;
+        }
+
+        .search-input-wrapper input {
+            background: transparent;
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 13px;
+        }
+
+        .action-menu-btn {
+            color: var(--clr-neutral-400);
+            cursor: pointer;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-box">
+                    <i class="fas fa-truck-fast text-white"></i>
+                </div>
+                <div class="logo-info">
+                    <div class="logo-text">
+                        <span class="logo-swift">Swift</span><span class="logo-track">Track</span>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="tracking.html" class="nav-link">
+                    <i class="fas fa-location-dot"></i>
+                    <span>Tracking</span>
+                </a>
+                <a href="orders.html" class="nav-link active">
+                    <i class="fas fa-box"></i>
+                    <span>My Orders</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar-initials">AP</div>
+                    <div class="user-info">
+                        <span class="name">Ajay Prakash</span>
+                        <span class="role">Customer</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="header-meta">
+                    <h1>My Orders</h1>
+                    <p>Track and manage all your shipments</p>
+                </div>
+                
+                <div class="header-actions">
+                    <div class="search-filter-bar">
+                        <div class="search-input-wrapper">
+                            <i class="fas fa-search" style="color:#9ca3af;"></i>
+                            <input type="text" placeholder="Search orders...">
+                        </div>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-filter" style="margin-right: 8px;"></i> Filter
+                        </button>
+                    </div>
+                    
+                    <div class="theme-switch-wrapper">
+                        <i class="fas fa-sun icon-light"></i>
+                        <i class="fas fa-moon icon-dark"></i>
+                        <span class="theme-status">Light</span>
+                    </div>
+                    <i class="fas fa-bell notification-bell"></i>
+                    <div class="avatar-initials" style="width: 32px; height: 32px; font-size: 12px;">AP</div>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <section class="stats-grid animate-reveal">
+                <div class="stat-card">
+                    <span class="stat-label">Total Orders</span>
+                    <div class="stat-value text-brand">24</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">In Transit</span>
+                    <div class="stat-value" style="color: #3b82f6;">3</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Delivered</span>
+                    <div class="stat-value" style="color: #22c55e;">18</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Pending</span>
+                    <div class="stat-value" style="color: #f59e0b;">3</div>
+                </div>
+            </section>
+
+            <!-- Orders Table -->
+            <section class="table-container animate-reveal" style="animation-delay: 0.2s;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Route</th>
+                            <th>Status</th>
+                            <th>Driver</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight: 700;">#AD345JK</td>
+                            <td>Mar 5, 2026</td>
+                            <td>
+                                <div style="font-weight: 500;">Mumbai Central</div>
+                                <div style="font-size: 11px; color: var(--text-subtitle);">to Bangalore Port</div>
+                            </td>
+                            <td>
+                                <span class="status-badge status-in-transit">IN TRANSIT</span>
+                            </td>
+                            <td>James Maxwell</td>
+                            <td><span class="action-menu-btn">⋮</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700;">#TC-2026-9012</td>
+                            <td>Mar 3, 2026</td>
+                            <td>
+                                <div style="font-weight: 500;">Delhi Hub</div>
+                                <div style="font-size: 11px; color: var(--text-subtitle);">to Chennai Port</div>
+                            </td>
+                            <td>
+                                <span class="status-badge status-pending">PENDING</span>
+                            </td>
+                            <td>Ravi Kumar</td>
+                            <td><span class="action-menu-btn">⋮</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700;">#TC-2026-2490</td>
+                            <td>Feb 28, 2026</td>
+                            <td>
+                                <div style="font-weight: 500;">Pune Warehouse</div>
+                                <div style="font-size: 11px; color: var(--text-subtitle);">to Hyderabad Depot</div>
+                            </td>
+                            <td>
+                                <span class="status-badge status-delivered">DELIVERED</span>
+                            </td>
+                            <td>Anil Sharma</td>
+                            <td><span class="action-menu-btn">⋮</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700;">#TC-2026-1188</td>
+                            <td>Feb 25, 2026</td>
+                            <td>
+                                <div style="font-weight: 500;">Kolkata Hub</div>
+                                <div style="font-size: 11px; color: var(--text-subtitle);">to Ahmedabad Port</div>
+                            </td>
+                            <td>
+                                <span class="status-badge status-delivered">DELIVERED</span>
+                            </td>
+                            <td>Suresh Patel</td>
+                            <td><span class="action-menu-btn">⋮</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700;">#TC-2026-0845</td>
+                            <td>Feb 20, 2026</td>
+                            <td>
+                                <div style="font-weight: 500;">Jaipur Depot</div>
+                                <div style="font-size: 11px; color: var(--text-subtitle);">to Lucknow Hub</div>
+                            </td>
+                            <td>
+                                <span class="status-badge status-delivered">DELIVERED</span>
+                            </td>
+                            <td>Mohan Das</td>
+                            <td><span class="action-menu-btn">⋮</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700;">#TC-2026-0622</td>
+                            <td>Feb 15, 2026</td>
+                            <td>
+                                <div style="font-weight: 500;">Bangalore Port</div>
+                                <div style="font-size: 11px; color: var(--text-subtitle);">to Kochi Warehouse</div>
+                            </td>
+                            <td>
+                                <span class="status-badge status-cancelled">CANCELLED</span>
+                            </td>
+                            <td>Vijay Nair</td>
+                            <td><span class="action-menu-btn">⋮</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="footer-copyright">
+            © 2026 SwiftTrack. All rights reserved.
+        </div>
+        <div class="social-links">
+            <i class="fab fa-github"></i>
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-linkedin"></i>
+            <i class="fab fa-twitter"></i>
+        </div>
+    </footer>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

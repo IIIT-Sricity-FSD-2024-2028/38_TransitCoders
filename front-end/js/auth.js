@@ -47,6 +47,10 @@ async function handleLogin(form) {
             showToast('Login successful!', 'success');
             localStorage.setItem('user', JSON.stringify({ email, role: 'admin' }));
             setTimeout(() => window.location.href = '../index.html', 1500);
+        } else if (email === 'customer@swifttrack.com' && password === 'password') {
+            showToast('Login successful!', 'success');
+            localStorage.setItem('user', JSON.stringify({ email, role: 'customer' }));
+            setTimeout(() => window.location.href = '../customer/dashboard.html', 1500);
         } else {
             showToast('Invalid credentials', 'error');
         }
