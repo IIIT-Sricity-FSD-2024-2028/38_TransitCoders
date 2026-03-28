@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | SwiftTrack Customer</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-box">
+                    <i class="fas fa-truck-fast text-white"></i>
+                </div>
+                <div class="logo-info">
+                    <div class="logo-text">
+                        <span class="logo-swift">Swift</span><span class="logo-track">Track</span>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="tracking.html" class="nav-link">
+                    <i class="fas fa-location-dot"></i>
+                    <span>Tracking</span>
+                </a>
+                <a href="orders.html" class="nav-link">
+                    <i class="fas fa-box"></i>
+                    <span>My Orders</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar-initials">AP</div>
+                    <div class="user-info">
+                        <span class="name">Ajay Prakash</span>
+                        <span class="role">Customer</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="header-meta">
+                    <h1>Dashboard</h1>
+                    <p>Welcome back! Here's an overview of your shipments.</p>
+                </div>
+                <div class="header-actions">
+                    <div class="theme-switch-wrapper">
+                        <i class="fas fa-sun icon-light"></i>
+                        <i class="fas fa-moon icon-dark"></i>
+                        <span class="theme-status">Light</span>
+                    </div>
+                    <i class="fas fa-bell notification-bell"></i>
+                    <div class="avatar-initials" style="width: 32px; height: 32px; font-size: 12px;">AP</div>
+                </div>
+            </header>
+
+            <!-- Live Tracking Hero -->
+            <section class="tracking-hero animate-reveal">
+                <div class="hero-status-tag">
+                    <i></i>
+                    LIVE TRACKING
+                </div>
+                <h2 class="hero-title">Order #AD345JK</h2>
+                <p class="hero-route">Mumbai Central → Bangalore Port</p>
+                
+                <div class="hero-stats">
+                    <div class="hero-stat-item">
+                        <span class="label">SPEED</span>
+                        <div class="value">60 <span class="unit">km/h</span></div>
+                    </div>
+                    <div class="hero-stat-item">
+                        <span class="label">DISTANCE</span>
+                        <div class="value text-brand">340 <span class="unit">km</span></div>
+                    </div>
+                    <div class="hero-stat-item">
+                        <span class="label">ETA</span>
+                        <div class="value">Mar 10</div>
+                    </div>
+                </div>
+
+                <div class="tracking-progress-container">
+                    <div class="progress-labels">
+                        <span>Mumbai</span>
+                        <span>Hubli</span>
+                        <span>Bangalore</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 32px;">
+                    <a href="tracking.html" class="btn btn-primary" style="border-radius: 50px; padding: 12px 32px;">
+                        Track Now <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="activity-section animate-reveal" style="animation-delay: 0.2s;">
+                <div class="section-header">
+                    <h2>Recent Activity</h2>
+                    <a href="#" class="view-all-link">View All</a>
+                </div>
+                
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-content">
+                            <div class="dot dot-orange"></div>
+                            <div class="activity-details">
+                                <h4>Hubli Checkpoint, KA</h4>
+                                <p>Currently in transit to destination</p>
+                            </div>
+                        </div>
+                        <span class="activity-time">08:45 AM</span>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-content">
+                            <div class="dot dot-orange"></div>
+                            <div class="activity-details">
+                                <h4>Mumbai Hub</h4>
+                                <p>Dispatched from primary sorting</p>
+                            </div>
+                        </div>
+                        <span class="activity-time">10:30 AM</span>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-content">
+                            <div class="dot dot-white"></div>
+                            <div class="activity-details">
+                                <h4>Order #TC-2026-9012 Created</h4>
+                                <p>New shipment from Delhi Hub to Chennai Port</p>
+                            </div>
+                        </div>
+                        <span class="activity-time">Yesterday</span>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-content">
+                            <div class="dot dot-green"></div>
+                            <div class="activity-details">
+                                <h4>Order #TC-2026-2490 Delivered</h4>
+                                <p>Successfully delivered to Hyderabad Depot</p>
+                            </div>
+                        </div>
+                        <span class="activity-time">Mar 2</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer Integration -->
+    <footer class="dashboard-footer">
+        <div class="footer-copyright">
+            © 2026 SwiftTrack. All rights reserved.
+        </div>
+        <div class="social-links">
+            <i class="fab fa-github"></i>
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-linkedin"></i>
+            <i class="fab fa-twitter"></i>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
