@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Shipment | SwiftTrack Merchant</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../customer/css/dashboard.css">
+    <link rel="stylesheet" href="css/merchant.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-box">
+                    <i class="fas fa-truck-fast text-white"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-swift">Swift</span><span class="logo-track">Track</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-grid-2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="create-shipment.html" class="nav-link active">
+                    <i class="fas fa-plus"></i>
+                    <span>Create Shipment</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-box-open"></i>
+                    <span>Shipments</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-location-arrow"></i>
+                    <span>Tracker</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-chart-simple"></i>
+                    <span>Analytics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar-initials">V</div>
+                    <div class="user-info">
+                        <span class="name merchant-name">Vinod</span>
+                        <span class="role">Merchant</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="header-meta">
+                    <h1 id="page-title">Pickup Details</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="theme-switch" role="button">
+                        <i class="fas fa-sun icon-light"></i>
+                        <i class="fas fa-moon icon-dark" style="display:none;"></i>
+                        <span>Light</span>
+                    </div>
+                    <div class="search-bar" style="background: #f1f5f9; padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 8px; border: 1px solid #e2e8f0;">
+                        <i class="fas fa-search" style="color: #64748b;"></i>
+                        <input type="text" placeholder="Search" style="border: none; background: transparent; outline: none; font-size: 13px; color: #1e293b;">
+                    </div>
+                    <i class="fas fa-bell notification-bell"></i>
+                    <i class="fas fa-comment-dots" style="color: #64748b; font-size: 20px;"></i>
+                    <i class="fas fa-plus-circle" style="color: #64748b; font-size: 20px;"></i>
+                    <img src="https://ui-avatars.com/api/?name=Vinod&background=ff5c02&color=fff" style="width: 32px; height: 32px; border-radius: 50%;" alt="Vinod">
+                </div>
+            </header>
+
+            <!-- Step Progress Bar -->
+            <div class="steps-container animate-reveal">
+                <div class="step-item active" data-step="1">
+                    <div class="step-icon"><i class="fas fa-check"></i></div>
+                    <span>Pickup Details</span>
+                </div>
+                <div class="step-item" data-step="2">
+                    <div class="step-icon">2</div>
+                    <span>Receiver Details</span>
+                </div>
+                <div class="step-item" data-step="3">
+                    <div class="step-icon">3</div>
+                    <span>Package Details</span>
+                </div>
+                <div class="step-item" data-step="4">
+                    <div class="step-icon">4</div>
+                    <span>Schedule Details</span>
+                </div>
+                <div class="step-item" data-step="5">
+                    <div class="step-icon">5</div>
+                    <span>Order Summary</span>
+                </div>
+                <div class="step-item" data-step="6">
+                    <div class="step-icon">6</div>
+                    <span>Tracking ID</span>
+                </div>
+            </div>
+
+            <!-- Form Wizard Card -->
+            <div class="form-wizard-card animate-reveal">
+                
+                <!-- Step 1: Pickup Details -->
+                <div class="step-pane active" data-step="1">
+                    <h2>Pickup Details</h2>
+                    <div class="divider"></div>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Merchant Name</label>
+                            <input type="text" id="merchant-name" class="form-control" value="Vinod" readonly>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Contact Number</label>
+                            <input type="text" id="merchant-contact" class="form-control" value="9053902714" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Email Address</label>
+                            <input type="email" id="merchant-email" class="form-control" value="xyz@outlook.com" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Pickup Location</label>
+                            <input type="text" id="pickup-location" class="form-control" value="Warehouse" required>
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" id="pickup-city" class="form-control" value="Chennai" required>
+                        </div>
+                        <div class="form-group">
+                            <label>State</label>
+                            <input type="text" id="pickup-state" class="form-control" value="Tamil Nadu" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Country</label>
+                            <input type="text" id="pickup-country" class="form-control" value="India" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Pincode</label>
+                            <input type="text" id="pickup-pin" class="form-control" value="600028" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Receiver Details -->
+                <div class="step-pane" data-step="2">
+                    <h2>Receiver Details</h2>
+                    <div class="divider"></div>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Receiver Name</label>
+                            <input type="text" id="receiver-name" class="form-control" placeholder="Recipient full name" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Phone No</label>
+                            <input type="text" id="receiver-phone" class="form-control" placeholder="Primary contact number" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Email Address</label>
+                            <input type="email" id="receiver-email" class="form-control" placeholder="Email for notifications" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Address</label>
+                            <textarea id="receiver-address" class="form-control" rows="2" placeholder="Street address, Apartment, etc." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" id="receiver-city" class="form-control" placeholder="City" required>
+                        </div>
+                        <div class="form-group">
+                            <label>State</label>
+                            <input type="text" id="receiver-state" class="form-control" placeholder="State" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Country</label>
+                            <input type="text" id="receiver-country" class="form-control" value="India" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Pincode</label>
+                            <input type="text" id="receiver-pin" class="form-control" placeholder="Pincode" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Package Details -->
+                <div class="step-pane" data-step="3">
+                    <h2>Package Details</h2>
+                    <div class="divider"></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Length (cm)</label>
+                            <input type="number" id="pkg-length" class="form-control" placeholder="e.g. 10" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Breadth (cm)</label>
+                            <input type="number" id="pkg-breadth" class="form-control" placeholder="e.g. 20" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Height (cm)</label>
+                            <input type="number" id="pkg-height" class="form-control" placeholder="e.g. 15" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Volume</label>
+                            <input type="text" id="pkg-volume" class="form-control" readonly style="background: #f8fafc;">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Weight (Kg)</label>
+                            <input type="number" id="pkg-weight" class="form-control" placeholder="Weight in kilograms" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Product Type</label>
+                            <select id="pkg-type" class="form-control" required>
+                                <option value="" disabled selected>Select category</option>
+                                <option value="standard">Standard Parcel</option>
+                                <option value="fragile">Fragile Item</option>
+                                <option value="documents">Documents</option>
+                                <option value="hazardous">Hazardous Materials</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Product Description</label>
+                            <textarea id="pkg-desc" class="form-control" rows="3" placeholder="Briefly describe what's inside the package"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Schedule Details -->
+                <div class="step-pane" data-step="4">
+                    <h2>Schedule Details</h2>
+                    <div class="divider"></div>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Pickup Date</label>
+                            <input type="date" id="pickup-date" class="form-control" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Preferred Pickup Window</label>
+                            <select id="pickup-window" class="form-control" required>
+                                <option value="9am-12pm">Morning (9 AM - 12 PM)</option>
+                                <option value="12pm-3pm">Afternoon (12 PM - 3 PM)</option>
+                                <option value="3pm-6pm">Evening (3 PM - 6 PM)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Order Summary -->
+                <div class="step-pane" data-step="5">
+                    <h2>Order Summary</h2>
+                    <div class="divider"></div>
+                    <div class="summary-box" style="background: #f8fafc; padding: 24px; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                        <p style="text-align: center; color: #64748b; font-size: 14px;">Please review all the information before confirming the shipment.</p>
+                        <!-- In a real app, this would be populated with JS -->
+                        <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                            <div>
+                                <h4 style="font-size: 12px; color: #ff5c02; text-transform: uppercase;">Origin</h4>
+                                <p style="font-size: 15px; font-weight: 600;">Vinod's Warehouse, Chennai</p>
+                            </div>
+                            <div>
+                                <h4 style="font-size: 12px; color: #ff5c02; text-transform: uppercase;">Destination</h4>
+                                <p style="font-size: 15px; font-weight: 600;">(As entered in Step 2)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 6: Tracking ID -->
+                <div class="step-pane" data-step="6">
+                    <h2>Success!</h2>
+                    <div class="divider"></div>
+                    <div class="success-screen" style="text-align: center; padding: 20px;">
+                        <div class="success-icon" style="width: 80px; height: 80px; background: #dcfce7; color: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 24px;">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h3 style="font-size: 24px; font-weight: 700;">Shipment Created Successfully</h3>
+                        <p style="color: #64748b; margin-top: 8px;">Your package is ready for pickup.</p>
+                        
+                        <div class="tracking-id-label" style="margin-top: 40px; font-size: 12px; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Tracking ID</div>
+                        <div id="final-tracking-id" style="font-size: 32px; font-weight: 800; color: #1e293b; margin-top: 8px; letter-spacing: 2px;">ST-XXXXXX</div>
+                    </div>
+                </div>
+
+                <!-- Footer Navigation -->
+                <div class="wizard-footer">
+                    <div>
+                        <button class="btn-wizard btn-back" style="display: none;">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn-wizard btn-reset">Reset</button>
+                        <button class="btn-wizard btn-next">
+                            <span>Next</span> <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/merchant.js"></script>
+</body>
+</html>
