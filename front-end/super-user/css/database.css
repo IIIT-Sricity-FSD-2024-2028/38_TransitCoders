@@ -1,0 +1,21 @@
+/* Database local CSS */
+.storage-bar {
+    width: 100%;
+    height: 12px;
+    background-color: var(--surface-subtle);
+    border-radius: var(--radius-round);
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+.storage-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--clr-blue-500), var(--clr-blue-400));
+    border-radius: var(--radius-round);
+}
+.storage-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: var(--text-subtitle);
+    font-weight: 500;
+}

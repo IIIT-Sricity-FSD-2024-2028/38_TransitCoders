@@ -1,0 +1,6 @@
+[
+    { "id": "CMP-901", "customer": "John Doe", "date": "2026-03-29", "type": "Delayed Delivery", "priority": "High", "status": "Open" },
+    { "id": "CMP-902", "customer": "Alice Smith", "date": "2026-03-28", "type": "Damaged Package", "priority": "Critical", "status": "Escalated" },
+    { "id": "CMP-903", "customer": "Bob Brown", "date": "2026-03-27", "type": "Rude Behavior", "priority": "Medium", "status": "Resolved" },
+    { "id": "CMP-904", "customer": "Eve White", "date": "2026-03-27", "type": "Missing Item", "priority": "Low", "status": "Resolved" }
+]

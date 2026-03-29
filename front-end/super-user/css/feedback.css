@@ -1,0 +1,22 @@
+/* Feedback specific CSS */
+
+.rating-stars {
+    color: var(--clr-amber-300);
+    letter-spacing: 2px;
+}
+
+.rating-stars.low {
+    color: var(--clr-red-500);
+}
+
+.comment-cell {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.875rem;
+    color: var(--text-body);
+}
+
+.badge-pending { background-color: var(--clr-orange-50); color: var(--clr-orange-700); }
+.badge-reviewed { background-color: var(--clr-green-50); color: var(--clr-green-700); }

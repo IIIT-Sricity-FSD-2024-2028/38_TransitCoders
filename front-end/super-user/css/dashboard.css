@@ -1,0 +1,202 @@
+/* Dashboard Specific Styles */
+
+.global-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.global-search svg {
+    position: absolute;
+    left: 12px;
+    width: 16px;
+    height: 16px;
+    color: var(--text-subtitle);
+    pointer-events: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+.global-search input {
+    width: 260px;
+    padding: 10px 10px 10px 36px;
+    border-radius: var(--radius-m);
+    border: 1px solid var(--border-default);
+    background-color: var(--surface-default);
+    color: var(--text-title);
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.global-search input:focus {
+    outline: none;
+    border-color: var(--surface-brand);
+    box-shadow: 0 0 0 2px var(--surface-brand-subtle);
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.kpi-card {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.kpi-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-l);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kpi-icon svg {
+    width: 28px;
+    height: 28px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.kpi-icon.blue { background-color: var(--clr-blue-50); color: var(--clr-blue-500); }
+.kpi-icon.orange { background-color: var(--clr-orange-50); color: var(--clr-orange-500); }
+.kpi-icon.red { background-color: var(--clr-red-50); color: var(--clr-red-500); }
+.kpi-icon.green { background-color: var(--clr-green-50); color: var(--clr-green-500); }
+
+.kpi-label {
+    font-size: 0.875rem;
+    color: var(--text-subtitle);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.kpi-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.text-green { color: var(--clr-green-500); }
+
+.mt-4 { margin-top: 24px; }
+
+.dashboard-row {
+    display: flex;
+    gap: 24px;
+}
+
+.dashboard-row.col-2 > div {
+    flex: 1;
+}
+
+.section-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-card.stretch {
+    width: 100%;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-header h3 {
+    font-size: 1.125rem;
+    margin: 0;
+}
+
+.view-all {
+    font-size: 0.875rem;
+    color: var(--surface-brand);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.view-all:hover {
+    text-decoration: underline;
+}
+
+.infra-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-top: 16px;
+}
+
+.infra-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-m);
+    background-color: var(--surface-default);
+}
+
+.infra-stat span:first-child {
+    font-size: 0.875rem;
+    color: var(--text-subtitle);
+}
+
+.status-badge {
+    display: inline-flex;
+    padding: 4px 12px;
+    border-radius: var(--radius-round);
+    font-size: 0.75rem;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.status-badge.success { background-color: var(--clr-green-50); color: var(--clr-green-700); }
+.status-badge.warning { background-color: var(--clr-amber-50); color: var(--clr-amber-700); }
+.status-badge.error { background-color: var(--clr-red-50); color: var(--clr-red-700); }
+.status-badge.blue { background-color: var(--clr-blue-50); color: var(--clr-blue-700); }
+
+/* Activity Lists */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-radius: var(--radius-m);
+    border: 1px solid var(--border-default);
+    background-color: var(--surface-default);
+}
+
+.activity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.activity-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.activity-meta {
+    font-size: 0.75rem;
+    color: var(--text-subtitle);
+}

@@ -1,0 +1,55 @@
+/* Complaints Specific - Inherits widely from user-management.css table layout */
+
+.badge-open { background-color: var(--clr-blue-50); color: var(--clr-blue-700); }
+.badge-escalated { background-color: var(--clr-amber-50); color: var(--clr-amber-700); }
+.badge-resolved { background-color: var(--clr-green-50); color: var(--clr-green-700); }
+
+.badge-critical { background-color: var(--clr-red-50); color: var(--clr-red-700); }
+.badge-high { background-color: var(--clr-orange-50); color: var(--clr-orange-700); }
+.badge-medium { background-color: var(--clr-blue-50); color: var(--clr-blue-700); }
+.badge-low { background-color: var(--clr-neutral-100); color: var(--clr-neutral-700); }
+
+/* Quick Action Context Menu / Hover Menu */
+.action-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.action-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: var(--surface-default);
+    min-width: 140px;
+    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-m);
+    border: 1px solid var(--border-default);
+    z-index: 10;
+}
+
+.action-dropdown:hover .action-menu,
+.action-menu.show {
+    display: block;
+}
+
+.action-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 0.875rem;
+    color: var(--text-body);
+}
+
+.action-menu button:hover {
+    background-color: var(--surface-subtle);
+    color: var(--text-title);
+}
+
+.action-menu button.danger {
+    color: var(--clr-red-600);
+}
+.action-menu button.danger:hover {
+    background-color: var(--clr-red-50);
+}

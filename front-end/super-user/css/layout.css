@@ -1,0 +1,120 @@
+/* 
+ * Super User Layout CSS
+ * Extends global style.css 
+ */
+
+body {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    zoom: 0.9;
+}
+
+/* Sidebar structure */
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    background-color: var(--surface-default);
+    border-right: 1px solid var(--border-default);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+/* Main Content Area */
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background-color: var(--surface-subtle);
+}
+
+/* Topbar Header */
+.topbar {
+    height: 72px;
+    background-color: var(--surface-default);
+    border-bottom: 1px solid var(--border-default);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    flex-shrink: 0;
+}
+
+.topbar-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-title);
+}
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.theme-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-subtitle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.theme-toggle:hover {
+    background-color: var(--surface-subtle);
+    color: var(--text-title);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--surface-brand);
+    color: var(--text-on-brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+/* Page Content */
+.page-container {
+    padding: 32px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+/* Common form groups and cards in Layout */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+}
+
+.page-header p {
+    color: var(--text-subtitle);
+    font-size: 0.875rem;
+}
