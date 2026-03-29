@@ -1,0 +1,102 @@
+[
+  {
+    "id": "RPT-001",
+    "agentName": "Rajesh Kumar",
+    "deliveriesCompleted": 142,
+    "avgDeliveryTime": "32 min",
+    "rating": 4.8,
+    "hub": "Hub Central",
+    "onTimeRate": 96,
+    "trend": "up"
+  },
+  {
+    "id": "RPT-002",
+    "agentName": "Vijay Rathore",
+    "deliveriesCompleted": 138,
+    "avgDeliveryTime": "28 min",
+    "rating": 4.9,
+    "hub": "Hub Central",
+    "onTimeRate": 98,
+    "trend": "up"
+  },
+  {
+    "id": "RPT-003",
+    "agentName": "Deepak Nair",
+    "deliveriesCompleted": 127,
+    "avgDeliveryTime": "35 min",
+    "rating": 4.9,
+    "hub": "Hub East",
+    "onTimeRate": 94,
+    "trend": "stable"
+  },
+  {
+    "id": "RPT-004",
+    "agentName": "Manoj Tiwari",
+    "deliveriesCompleted": 119,
+    "avgDeliveryTime": "38 min",
+    "rating": 4.7,
+    "hub": "Hub North",
+    "onTimeRate": 91,
+    "trend": "up"
+  },
+  {
+    "id": "RPT-005",
+    "agentName": "Anand Sharma",
+    "deliveriesCompleted": 115,
+    "avgDeliveryTime": "40 min",
+    "rating": 4.6,
+    "hub": "Hub East",
+    "onTimeRate": 89,
+    "trend": "down"
+  },
+  {
+    "id": "RPT-006",
+    "agentName": "Amit Verma",
+    "deliveriesCompleted": 108,
+    "avgDeliveryTime": "42 min",
+    "rating": 4.6,
+    "hub": "Hub South",
+    "onTimeRate": 87,
+    "trend": "stable"
+  },
+  {
+    "id": "RPT-007",
+    "agentName": "Suresh Pillai",
+    "deliveriesCompleted": 102,
+    "avgDeliveryTime": "44 min",
+    "rating": 4.5,
+    "hub": "Hub Central",
+    "onTimeRate": 85,
+    "trend": "down"
+  },
+  {
+    "id": "RPT-008",
+    "agentName": "Karan Malhotra",
+    "deliveriesCompleted": 95,
+    "avgDeliveryTime": "46 min",
+    "rating": 4.4,
+    "hub": "Hub South",
+    "onTimeRate": 83,
+    "trend": "up"
+  },
+  {
+    "id": "RPT-009",
+    "agentName": "Sanjay Mishra",
+    "deliveriesCompleted": 88,
+    "avgDeliveryTime": "50 min",
+    "rating": 4.2,
+    "hub": "Hub North",
+    "onTimeRate": 80,
+    "trend": "down"
+  },
+  {
+    "id": "RPT-010",
+    "agentName": "Pradeep Yadav",
+    "deliveriesCompleted": 76,
+    "avgDeliveryTime": "52 min",
+    "rating": 4.3,
+    "hub": "Hub West",
+    "onTimeRate": 78,
+    "trend": "stable"
+  }
+]

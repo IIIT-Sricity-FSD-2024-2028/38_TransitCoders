@@ -1,0 +1,210 @@
+/* 
+ * Admin Sidebar Component
+ * Hub Manager navigation with Admin.jpg styling
+ */
+
+.sidebar-header {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border-default);
+    transition: border-color 0.3s ease;
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--text-title);
+    text-decoration: none;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    background-color: var(--surface-brand);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    font-size: 1.125rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+body.dark .logo-icon {
+    background-color: var(--surface-brand);
+}
+
+body.dark .logo-icon img {
+    filter: brightness(0) invert(1);
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+    padding: 24px 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+body.dark .sidebar {
+    background-color: #0b1220;
+    border-right-color: #1e293b;
+}
+
+body.dark .sidebar-header,
+body.dark .sidebar-footer {
+    border-color: #1e293b;
+}
+
+/* Custom scrollbar for sidebar */
+.sidebar-nav::-webkit-scrollbar { width: 4px; }
+.sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background-color: var(--border-default);
+    border-radius: 2px;
+}
+
+body.dark .sidebar-nav::-webkit-scrollbar { width: 6px; }
+body.dark .sidebar-nav::-webkit-scrollbar-track { background: #0b1223; }
+body.dark .sidebar-nav::-webkit-scrollbar-thumb {
+    background-color: #334155;
+    border-radius: 999px;
+}
+
+.nav-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-subtitle);
+    font-weight: 600;
+    margin: 20px 0 8px 12px;
+}
+
+.nav-label:first-child {
+    margin-top: 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    border-radius: var(--radius-m);
+    color: var(--text-body);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    position: relative;
+    border-left: 3px solid transparent;
+}
+
+.nav-item::before {
+    content: "";
+    position: absolute;
+    left: -3px;
+    top: 7px;
+    width: 3px;
+    height: calc(100% - 14px);
+    border-radius: 0 6px 6px 0;
+    background: transparent;
+    transition: background-color 0.2s ease;
+}
+
+.nav-item:hover {
+    background-color: var(--surface-subtle);
+    color: var(--text-title);
+    transform: translateX(4px);
+}
+
+body.dark .nav-item:hover {
+    background-color: #1e293b;
+}
+
+.nav-item.active {
+    background-color: var(--surface-brand-subtle);
+    color: var(--text-brand);
+    font-weight: 600;
+    border-left-color: transparent;
+}
+
+.nav-item.active::before {
+    background: var(--surface-brand);
+}
+
+body.dark .nav-item.active {
+    background-color: rgba(249, 115, 22, 0.14);
+    color: #fb923c;
+}
+
+.nav-item svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.7;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+}
+
+.nav-item:hover svg { opacity: 1; }
+.nav-item.active svg { opacity: 1; }
+
+.sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid var(--border-default);
+    transition: border-color 0.3s ease;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: var(--radius-m);
+    color: var(--clr-red-500);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.logout-btn:hover {
+    background-color: var(--clr-red-50);
+}
+
+body.dark .logout-btn { color: #fca5a5; }
+body.dark .logout-btn:hover { background-color: rgba(220, 38, 38, 0.12); }
+
+.logout-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}

@@ -1,0 +1,288 @@
+/* Hub Operations Dashboard Styles — Admin.jpg reference */
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.kpi-card {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 247, 237, 0.86));
+    border: 1px solid rgba(249, 115, 22, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.dark .kpi-card {
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.94));
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 26px rgba(15, 23, 42, 0.16);
+}
+
+body.dark .kpi-card:hover {
+    box-shadow: 0 16px 30px rgba(2, 6, 23, 0.5);
+}
+
+.kpi-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-l);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color 0.3s;
+}
+
+.kpi-icon svg {
+    width: 28px;
+    height: 28px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.kpi-icon.blue { background-color: var(--clr-blue-50); color: var(--clr-blue-500); }
+.kpi-icon.orange { background-color: var(--clr-orange-50); color: var(--clr-orange-500); }
+.kpi-icon.red { background-color: var(--clr-red-50); color: var(--clr-red-500); }
+.kpi-icon.green { background-color: var(--clr-green-50); color: var(--clr-green-500); }
+
+body.dark .kpi-icon.blue { background-color: rgba(2, 132, 199, 0.26); color: #7dd3fc; }
+body.dark .kpi-icon.orange { background-color: rgba(249, 115, 22, 0.26); color: #fdba74; }
+body.dark .kpi-icon.red { background-color: rgba(220, 38, 38, 0.24); color: #fecaca; }
+body.dark .kpi-icon.green { background-color: rgba(22, 163, 74, 0.24); color: #86efac; }
+
+.kpi-label {
+    font-size: 0.875rem;
+    color: var(--text-subtitle);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.kpi-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.kpi-trend {
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.kpi-trend.up { color: var(--clr-green-500); }
+.kpi-trend.down { color: var(--clr-red-500); }
+body.dark .kpi-trend.up { color: #4ade80; }
+body.dark .kpi-trend.down { color: #fca5a5; }
+
+/* Dashboard Grid Rows */
+.dashboard-row {
+    display: flex;
+    gap: 24px;
+}
+
+.dashboard-row.col-2 > div { flex: 1; }
+.dashboard-row.col-3 > div { flex: 1; }
+
+.section-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-card.stretch { width: 100%; }
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-header h3 {
+    font-size: 1.125rem;
+    margin: 0;
+}
+
+.view-all {
+    font-size: 0.875rem;
+    color: var(--surface-brand);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.view-all:hover {
+    text-decoration: underline;
+    color: var(--clr-orange-600);
+}
+
+/* Recent Orders Table */
+.recent-orders-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.recent-orders-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-subtitle);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-default);
+}
+
+.recent-orders-table td {
+    padding: 14px 16px;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--border-default);
+    color: var(--text-body);
+}
+
+body.dark .recent-orders-table th { border-bottom-color: #1e293b; }
+body.dark .recent-orders-table td { border-bottom-color: #1e293b; }
+
+.recent-orders-table tr:hover td {
+    background-color: var(--surface-subtle);
+}
+
+body.dark .recent-orders-table tr:hover td {
+    background-color: rgba(30, 41, 59, 0.5);
+}
+
+/* Overview Cards */
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.overview-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-m);
+    background-color: var(--surface-default);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+body.dark .overview-item {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.9));
+    border-color: #334155;
+}
+
+.overview-item .label {
+    font-size: 0.8rem;
+    color: var(--text-subtitle);
+}
+
+.overview-item .value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-title);
+}
+
+/* Activity Lists */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: var(--radius-m);
+    border: 1px solid var(--border-default);
+    background-color: var(--surface-default);
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.activity-item:hover { transform: translateX(2px); }
+
+body.dark .activity-item {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+.activity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.activity-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-title);
+}
+
+.activity-meta {
+    font-size: 0.75rem;
+    color: var(--text-subtitle);
+}
+
+/* Search bar in dashboard */
+.dashboard-search {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.dashboard-search svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: var(--text-subtitle);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    pointer-events: none;
+}
+
+.dashboard-search input {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px 12px 12px 42px;
+    border-radius: var(--radius-m);
+    border: 1px solid var(--border-default);
+    background-color: var(--surface-default);
+    color: var(--text-title);
+    font-size: 0.875rem;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+body.dark .dashboard-search input {
+    background-color: #0f172a;
+    border-color: #334155;
+}
+
+.dashboard-search input:focus {
+    outline: none;
+    border-color: var(--surface-brand);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}

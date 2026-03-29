@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Access Denied — You do not have permission to view this page.">
+    <title>Access Denied | SwiftTrack Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/access-denied.css">
+</head>
+<body>
+    <div class="access-denied-wrapper">
+        <div class="access-denied-card">
+            <div class="access-denied-icon">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                </svg>
+            </div>
+            <h1>Access Denied</h1>
+            <p>You do not have permission to access this page. This section is restricted to Super Users only. Please contact your system administrator if you believe this is an error.</p>
+            <button class="btn btn-primary" onclick="window.location.href='dashboard.html'">Return to Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+    </script>
+</body>
+</html>

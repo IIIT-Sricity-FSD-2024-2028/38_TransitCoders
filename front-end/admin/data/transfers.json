@@ -1,0 +1,122 @@
+[
+  {
+    "id": "TRF-2001",
+    "shipmentId": "SHP-5001",
+    "cargoType": "Electronics",
+    "currentHub": "Hub Central",
+    "destinationHub": "Hub North",
+    "priority": "High",
+    "estimatedTransit": "4 hrs",
+    "status": "Pending",
+    "weight": "120 kg",
+    "requestDate": "2026-03-28"
+  },
+  {
+    "id": "TRF-2002",
+    "shipmentId": "SHP-5002",
+    "cargoType": "Perishables",
+    "currentHub": "Hub North",
+    "destinationHub": "Hub East",
+    "priority": "Critical",
+    "estimatedTransit": "2 hrs",
+    "status": "Approved",
+    "weight": "85 kg",
+    "requestDate": "2026-03-27"
+  },
+  {
+    "id": "TRF-2003",
+    "shipmentId": "SHP-5003",
+    "cargoType": "Documents",
+    "currentHub": "Hub South",
+    "destinationHub": "Hub Central",
+    "priority": "Low",
+    "estimatedTransit": "6 hrs",
+    "status": "Pending",
+    "weight": "12 kg",
+    "requestDate": "2026-03-28"
+  },
+  {
+    "id": "TRF-2004",
+    "shipmentId": "SHP-5004",
+    "cargoType": "Fragile Goods",
+    "currentHub": "Hub East",
+    "destinationHub": "Hub West",
+    "priority": "High",
+    "estimatedTransit": "5 hrs",
+    "status": "Rejected",
+    "weight": "45 kg",
+    "requestDate": "2026-03-26"
+  },
+  {
+    "id": "TRF-2005",
+    "shipmentId": "SHP-5005",
+    "cargoType": "Textiles",
+    "currentHub": "Hub West",
+    "destinationHub": "Hub South",
+    "priority": "Medium",
+    "estimatedTransit": "3 hrs",
+    "status": "Pending",
+    "weight": "200 kg",
+    "requestDate": "2026-03-29"
+  },
+  {
+    "id": "TRF-2006",
+    "shipmentId": "SHP-5006",
+    "cargoType": "Medical Supplies",
+    "currentHub": "Hub Central",
+    "destinationHub": "Hub East",
+    "priority": "Critical",
+    "estimatedTransit": "1.5 hrs",
+    "status": "Approved",
+    "weight": "30 kg",
+    "requestDate": "2026-03-28"
+  },
+  {
+    "id": "TRF-2007",
+    "shipmentId": "SHP-5007",
+    "cargoType": "Machinery Parts",
+    "currentHub": "Hub North",
+    "destinationHub": "Hub West",
+    "priority": "Medium",
+    "estimatedTransit": "7 hrs",
+    "status": "Pending",
+    "weight": "350 kg",
+    "requestDate": "2026-03-29"
+  },
+  {
+    "id": "TRF-2008",
+    "shipmentId": "SHP-5008",
+    "cargoType": "Food Packages",
+    "currentHub": "Hub South",
+    "destinationHub": "Hub North",
+    "priority": "High",
+    "estimatedTransit": "4.5 hrs",
+    "status": "Rejected",
+    "weight": "95 kg",
+    "requestDate": "2026-03-25"
+  },
+  {
+    "id": "TRF-2009",
+    "shipmentId": "SHP-5009",
+    "cargoType": "Chemicals",
+    "currentHub": "Hub East",
+    "destinationHub": "Hub Central",
+    "priority": "Critical",
+    "estimatedTransit": "3 hrs",
+    "status": "Approved",
+    "weight": "60 kg",
+    "requestDate": "2026-03-27"
+  },
+  {
+    "id": "TRF-2010",
+    "shipmentId": "SHP-5010",
+    "cargoType": "Furniture",
+    "currentHub": "Hub West",
+    "destinationHub": "Hub East",
+    "priority": "Low",
+    "estimatedTransit": "8 hrs",
+    "status": "Pending",
+    "weight": "500 kg",
+    "requestDate": "2026-03-29"
+  }
+]
