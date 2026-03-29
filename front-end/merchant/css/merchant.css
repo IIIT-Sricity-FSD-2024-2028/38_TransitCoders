@@ -212,8 +212,201 @@ body.dark .form-control {
     color: white;
 }
 
-body.dark .btn-back {
+/* Tracking Timeline (Vertical) */
+.tracking-timeline {
+    position: relative;
+    padding-left: 40px;
+}
+
+.tracking-timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e2e8f0;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 32px;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -40px;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 50%;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #94a3b8;
+}
+
+.timeline-item.active .timeline-dot {
+    background: #ff5c02;
+    border-color: #ff5c02;
+    color: white;
+    box-shadow: 0 0 0 4px rgba(255, 92, 2, 0.2);
+}
+
+.timeline-item.completed .timeline-dot {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: white;
+}
+
+.timeline-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.timeline-info h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-title);
+    margin-bottom: 4px;
+}
+
+.timeline-info p {
+    font-size: 13px;
+    color: var(--text-subtitle);
+}
+
+.timeline-time {
+    font-size: 12px;
+    color: #94a3b8;
+    text-align: right;
+    min-width: 100px;
+}
+
+/* My Orders - Filters */
+.filter-bar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    background: var(--surface-default);
+    padding: 16px 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border-default);
+    align-items: center;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.filter-select {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-default);
+    font-size: 14px;
+    color: var(--text-title);
+    background: var(--surface-default);
+    outline: none;
+}
+
+/* Dashboard Hero */
+.dashboard-hero {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-radius: 20px;
+    padding: 48px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-hero::after {
+    content: '';
+    position: absolute;
+    right: -100px;
+    top: -100px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255, 92, 2, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.hero-content h1 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.hero-content p {
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.hero-badge {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Card Styling for Dashboard CTAs */
+.cta-card {
+    background: var(--surface-default);
+    border-radius: 20px;
+    padding: 32px;
+    border: 1px solid var(--border-default);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cta-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border-color: var(--clr-orange-500);
+}
+
+.cta-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+body.dark .cta-card {
     background: #111827;
-    border-color: #374151;
-    color: #9ca3af;
+}
+
+body.dark .filter-bar {
+    background: #111827;
 }
