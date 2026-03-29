@@ -1,9 +1,10 @@
 /**
- * SwiftTrack Central Mock Data Store
- * Refactored for hyper-realism, exact distributions, and edge cases.
+ * SwiftTrack UNIFIED Mock Data Store
+ * Consolidates Hub Manager, Merchant, and Delivery Agent data.
+ * This ensures all team members can work in the same environment without conflicts.
  */
 
-const mockData = {
+window.mockData = {
     hubs: [
         { hub_id: 'H001', name: 'Chennai Central Hub', location: 'Chennai', status: 'Active' },
         { hub_id: 'H002', name: 'Bangalore Logistics Park', location: 'Bangalore', status: 'Active' },
@@ -12,162 +13,196 @@ const mockData = {
     ],
     users: [],
     agents: [],
-    orders: [],
+    orders: [], // Hub Manager Orders
+    merchantShipments: [], // Merchant Portal Shipments
+    merchantTickets: [], // Merchant Portal Tickets
+    agentOrders: [], // Delivery Agent Orders
+    agentHistory: [], // Delivery Agent History
+    agentReports: [], // Delivery Agent Reports
     complaints: []
 };
 
 /* ========================================================================== */
-/* 1. USERS (Preserving existing auth flows & adding realistic Indian names)  */
+/* 1. UNIFIED USERS & AUTH SEEDS                                             */
 /* ========================================================================== */
 
-mockData.users.push({ user_id: 'U_SU_1', name: 'Admin Super User', email: 'admin@swifttrack.com', password: 'admin123', role: 'super_user', hub_id: null, active: true });
-
-mockData.hubs.forEach((hub, i) => {
-    mockData.users.push({ user_id: `U_HM_${i+1}`, name: `Hub Manager ${hub.location}`, email: `hm_${hub.location.toLowerCase()}@swifttrack.com`, password: 'password123', role: 'hub_manager', hub_id: hub.hub_id, active: true });
+// 1a. Core Admin Users (Merging teammate constraints)
+window.mockData.users.push({ 
+    user_id: 'U_SU_1', name: 'Admin Super User', email: 'admin@swifttrack.com', 
+    password: 'admin123', role: 'admin', hub_id: 'H001', active: true, avatar: 'AM', company: 'SwiftTrack Ops' 
+});
+window.mockData.users.push({ 
+    user_id: 'U_SU_2', name: 'Super Admin', email: 'super@swifttrack.com', 
+    password: 'super123', role: 'admin', hub_id: null, active: true, avatar: 'SA', company: 'SwiftTrack HQ' 
 });
 
+// 1b. Hub Managers
+window.mockData.hubs.forEach((hub, i) => {
+    window.mockData.users.push({ 
+        user_id: `U_HM_${i+1}`, name: `Hub Manager ${hub.location}`, 
+        email: `hm_${hub.location.toLowerCase()}@swifttrack.com`, 
+        password: 'password123', role: 'hub_manager', hub_id: hub.hub_id, active: true 
+    });
+});
+
+// 1c. Merchants (Preserving Shreesaanth's credentials)
 for (let i = 1; i <= 5; i++) {
-    mockData.users.push({ user_id: `U_MER_${i}`, name: i === 1 ? 'Vinod' : `Merchant ${i}`, email: i === 1 ? 'merchant@swifttrack.com' : `merchant${i}@swifttrack.com`, password: i === 1 ? 'merchant123' : 'password123', role: 'merchant', hub_id: null, active: true });
+    window.mockData.users.push({ 
+        user_id: `U_MER_${i}`, name: i === 1 ? 'Vinod' : `Merchant ${i}`, 
+        email: i === 1 ? 'merchant@swifttrack.com' : `merchant${i}@swifttrack.com`, 
+        password: i === 1 ? 'merchant123' : 'password123', 
+        role: 'merchant', hub_id: null, active: true, avatar: i === 1 ? 'VD' : 'M'+i, company: i === 1 ? "Vinod's Store" : "Merchant Store"
+    });
 }
 
-const customerNames = ['Aarav Sharma', 'Priya Patel', 'Neha Reddy', 'Vikram Singh', 'Rahul Desai', 'Anjali Menon', 'Kavya Iyer', 'Sameer Khan', 'Arjun Reddy', 'Sameera Rathod'];
-for (let i = 1; i <= 10; i++) {
-    mockData.users.push({ user_id: `U_CUS_${i}`, name: customerNames[i-1], email: i === 1 ? 'customer@swifttrack.com' : `customer${i}@swifttrack.com`, password: i === 1 ? 'password' : 'password123', role: 'customer', hub_id: null, active: true });
+// 1d. Customers
+const customerNames = ['Aarav Sharma', 'Priya Patel', 'Neha Reddy', 'Vikram Singh', 'Rahul Desai'];
+for (let i = 1; i <= 5; i++) {
+    window.mockData.users.push({ 
+        user_id: `U_CUS_${i}`, name: customerNames[i-1], 
+        email: i === 1 ? 'customer@swifttrack.com' : `customer${i}@swifttrack.com`, 
+        password: i === 1 ? 'password' : 'password123', 
+        role: 'customer', hub_id: null, active: true 
+    });
 }
 
 /* ========================================================================== */
-/* 2. AGENTS & WORKLOAD REALISM                                               */
+/* 2. MERCHANT PORTAL DATA (MockDB Interface)                                */
 /* ========================================================================== */
 
-const agentData = [
-    { name: 'Ramesh K.', hub: 'H001', avail: 'Available', type: 'Van' },
-    { name: 'Suresh P.', hub: 'H001', avail: 'Busy', type: 'Bike' },
-    { name: 'Kumar M.', hub: 'H001', avail: 'Busy', type: 'Van' }, // Chennai has 3 agents (heavy load)
-    { name: 'Anita Reddy', hub: 'H002', avail: 'Available', type: 'Bike' },
-    { name: 'Imran Khan', hub: 'H002', avail: 'Busy', type: 'Van' },
-    { name: 'John Doe', hub: 'H003', avail: 'Available', type: 'Bike' },
-    { name: 'Akshara Verma', hub: 'H003', avail: 'Busy', type: 'Van' },
-    { name: 'Ajay Prakash', hub: 'H004', avail: 'Available', type: 'Bike' }
+window.mockData.merchantShipments = [
+    { id:'SWT-2026-98471', recipient:'Jane Doe',       origin:'New York, NY',    dest:'Los Angeles, CA', service:'Express',   weight:'2.5 kg', amount:'$24.29', date:'Mar 28', status:'in-transit',  merchantId:'U_MER_1' },
+    { id:'SWT-2026-87230', recipient:'Carlos Ruiz',    origin:'Chicago, IL',     dest:'Dallas, TX',      service:'Standard',  weight:'1.2 kg', amount:'$12.50', date:'Mar 27', status:'delivered',   merchantId:'U_MER_1' },
+    { id:'SWT-2026-76184', recipient:'Sarah Kim',      origin:'Miami, FL',       dest:'Boston, MA',      service:'Overnight', weight:'0.8 kg', amount:'$42.00', date:'Mar 26', status:'pending',     merchantId:'U_MER_1' },
+    { id:'SWT-2026-65091', recipient:'Tom Nguyen',     origin:'Seattle, WA',     dest:'Denver, CO',      service:'Express',   weight:'5.0 kg', amount:'$34.75', date:'Mar 25', status:'delivered',   merchantId:'U_MER_1' },
+    { id:'SWT-2026-54380', recipient:'Emma Wilson',    origin:'Atlanta, GA',     dest:'Phoenix, AZ',     service:'Standard',  weight:'3.1 kg', amount:'$18.90', date:'Mar 24', status:'cancelled',   merchantId:'U_MER_1' }
 ];
 
-agentData.forEach((a, idx) => {
-    const aId = `AGT_${idx+1}`;
-    const uId = `U_AGT_${idx+1}`;
-    mockData.users.push({ user_id: uId, name: a.name, email: `agent${idx+1}@swifttrack.com`, password: 'password123', role: 'agent', hub_id: a.hub, active: true });
-    mockData.agents.push({ agent_id: aId, user_id: uId, name: a.name, hub_id: a.hub, phone: `987654321${idx}`, availability_status: a.avail, vehicle_type: a.type });
-});
-
-/* ========================================================================== */
-/* 3. ORDERS WITH HYPER-REALISM                                               */
-/* ========================================================================== */
-
-// Helper to generate a timestamp N hours ago
-const generateOffset = (minHours, maxHours) => new Date(Date.now() - (Math.random() * (maxHours - minHours) + minHours) * 3600000).toISOString();
-
-// Out of 40 Total Orders: Chennai (16), Bangalore (12), Hyderabad (8), Karimnagar (4)
-const hubDist = [
-    ...Array(16).fill('H001'), 
-    ...Array(12).fill('H002'), 
-    ...Array(8).fill('H003'), 
-    ...Array(4).fill('H004')
+window.mockData.merchantTickets = [
+    { id:'TKT-1042', subject:'Package delayed — weather', tid:'SWT-2026-98471', priority:'high', date:'Mar 28', status:'open', merchantId:'U_MER_1' },
+    { id:'TKT-1039', subject:'Address correction request', tid:'SWT-2026-76184', priority:'med',  date:'Mar 26', status:'open', merchantId:'U_MER_1' }
 ];
 
-// Exact Distribution out of 40:
-// 50% Pending (20), 20% Assigned (8), 15% In Transit (6), 10% Delivered (4), 5% Failed (2)
-const statusDist = [
-    ...Array(20).fill('Pending'),
-    ...Array(8).fill('Assigned'),
-    ...Array(6).fill('In Transit'),
-    ...Array(4).fill('Delivered'),
-    ...Array(2).fill('Failed')
-];
+window.MockDB = {
+    get shipments() { return window.mockData.merchantShipments; },
+    get tickets() { return window.mockData.merchantTickets; },
+    get users() { return window.mockData.users; },
+    
+    _shipCounter: 11000,
+    _ticketCounter: 1043,
+    
+    nextShipId() { return `SWT-2026-${this._shipCounter++}`; },
+    nextTicketId() { return `TKT-${this._ticketCounter++}`; },
 
-// Shuffle arrays so statuses are not clumped to one hub
-statusDist.sort(() => Math.random() - 0.5);
-hubDist.sort(() => Math.random() - 0.5);
+    /* ── AUTH COMPATIBILITY BRIDGE ── */
+    login(email, password) {
+        const u = this.users.find(u => u.email === email && u.password === password);
+        if (u) {
+            const userData = { user_id: u.user_id, name: u.name, email: u.email, role: u.role, hub_id: u.hub_id, active: true };
+            sessionStorage.setItem('st_session', JSON.stringify(userData));
+            localStorage.setItem('user', JSON.stringify(userData));
+            return userData;
+        }
+        return null;
+    },
+    logout() {
+        sessionStorage.removeItem('st_session');
+        localStorage.removeItem('user');
+    },
+    restoreSession() {
+        const s = sessionStorage.getItem('st_session') || localStorage.getItem('user');
+        if (s) return JSON.parse(s);
+        return null;
+    },
 
-const addresses = {
-    'H001': ['T. Nagar, Chennai', 'Adyar Main Road, Chennai', 'Velachery, Chennai', 'Anna Nagar, Chennai', 'DLF IT Park, Ramapuram, Chennai'],
-    'H002': ['Koramangala, Bangalore', 'Indiranagar, Bangalore', 'Whitefield, Bangalore', 'Jayanagar, Bangalore'],
-    'H003': ['Hitech City, Hyderabad', 'Banjara Hills, Hyderabad', 'Jubilee Hills, Hyderabad', 'Madhapur, Hyderabad'],
-    'H004': ['Karimnagar Main Road', 'Mukarampura, Karimnagar', 'Vidyanagar, Karimnagar', 'Kothirampur, Karimnagar']
+    getStats(merchantId) {
+        const data = this.shipments.filter(s => s.merchantId === merchantId);
+        return {
+            total: data.length,
+            delivered: data.filter(s => s.status === 'delivered').length,
+            inTransit: data.filter(s => s.status === 'in-transit').length,
+            pending: data.filter(s => s.status === 'pending').length,
+            cancelled: data.filter(s => s.status === 'cancelled').length,
+            revenue: data.reduce((sum, s) => sum + parseFloat(s.amount.replace('$','')), 0).toFixed(2),
+        };
+    },
+    getShipments(mId) { return this.shipments.filter(s => s.merchantId === mId); },
+    addShipment(d) {
+        const n = { ...d, id: this.nextShipId(), date: 'Mar 30', merchantId: JSON.parse(sessionStorage.getItem('user'))?.user_id };
+        window.mockData.merchantShipments.unshift(n);
+        return n;
+    }
 };
 
-const pkgTypes = ['Electronics', 'Clothing', 'Documents', 'Fragile', 'Heavy'];
+/* ========================================================================== */
+/* 3. DELIVERY AGENT DATA (DeliveryData Interface)                           */
+/* ========================================================================== */
 
-for (let i = 0; i < 40; i++) {
-    const hubId = hubDist[i];
-    const status = statusDist[i];
-    const hubAgents = mockData.agents.filter(a => a.hub_id === hubId);
+window.mockData.agentOrders = [
+    { id: 1001, customer: 'Rajesh Kumar', phone: '+91 98450 12345', status: 'in-transit', priority: 'High', origin: 'Chennai Central Hub', destination: 'Shanti Villa, Chennai', eta: '01:15 PM', amount: 1250, distance: '4.5 KM', packageId: 4421, paymentMode: 'Prepaid' },
+    { id: 1002, customer: 'Priya Nair', phone: '+91 98765 43210', status: 'pending', priority: 'Medium', origin: 'Chennai Central Hub', destination: 'OMR, Chennai', eta: '12:30 PM', amount: 849, distance: '3.2 KM', packageId: 4422, paymentMode: 'COD' }
+];
+
+window.mockData.agentHistory = [
+    { orderId: 505, customer: 'Rahul', location: 'T. Nagar, Chennai', date: '8-3-2026', time: '14:20 PM', status: 'Completed', rating: 4 }
+];
+
+// Delivery Agent Profile
+const agentMukesh = {
+    name: 'Mukesh', agentId: 'DA102', role: 'Delivery Agent', email: 'mukesh@swifttrack.com',
+    phone: '+91 98765 43210', currentStatus: 'available', hub: { name: 'Chennai Central Hub', code: 'CHN001' }
+};
+window.mockData.agentProfile = agentMukesh;
+window.mockData.users.push({ user_id: 'U_AGT_102', name: 'Mukesh', email: 'mukesh@swifttrack.com', password: 'password123', role: 'agent', hub_id: 'H001', active: true });
+
+window.DeliveryData = {
+    get orders() { return window.mockData.agentOrders; },
+    get history() { return window.mockData.agentHistory; },
     
-    // EDGE CASE: Agent Assignment Workload
-    // Force heavy load onto 'Busy' agents to simulate 3-5 orders per agent
-    let agentId = null;
-    if (['Assigned', 'Picked Up', 'In Transit', 'Out for Delivery', 'Delivered', 'Failed'].includes(status)) {
-        if (hubAgents.length > 0) {
-            const busyAgents = hubAgents.filter(a => a.availability_status === 'Busy');
-            // If there's a busy agent, assign it to them 80% of the time, else random
-            if (busyAgents.length > 0 && Math.random() > 0.2) {
-                agentId = busyAgents[i % busyAgents.length].agent_id;
-            } else {
-                agentId = hubAgents[i % hubAgents.length].agent_id;
-            }
-        }
-    }
+    getOrders(filter = 'all') {
+        if (filter === 'all') return [...this.orders];
+        return this.orders.filter(o => o.status === filter);
+    },
+    getOrderById(id) { return this.orders.find(o => o.id === parseInt(id)); },
+    updateOrderStatus(id, newStatus) {
+        const o = this.orders.find(o => o.id === parseInt(id));
+        if (o) { o.status = newStatus; return true; }
+        return false;
+    },
+    getProfile() { return window.mockData.agentProfile; }
+};
 
-    // EDGE CASE: Time Variation & Stuck Orders
-    let created, updated;
-    if (status === 'Pending') {
-        // Some pending orders are very old (urgent)
-        const isUrgent = Math.random() > 0.6; 
-        created = generateOffset(isUrgent ? 3 : 0.1, isUrgent ? 48 : 2); // 0.1h up to 48h ago
-        updated = created;
-    } else if (status === 'Delivered') {
-        created = generateOffset(24, 72); // 1-3 days ago
-        updated = generateOffset(0.1, 8); // Delivered within last 8 hours today
-    } else if (status === 'In Transit') {
-        created = generateOffset(12, 48);
-        updated = generateOffset(5, 12); // Stuck in transit for 5+ hours (edge case)
-    } else {
-        created = generateOffset(4, 24);
-        updated = generateOffset(0.5, 3);
-    }
+/* ========================================================================== */
+/* 4. HUB MANAGER DATA (Real-time Simulation)                                */
+/* ========================================================================== */
 
-    // Repeated customers (i % 10 loops over the 10 real indian names)
-    const customerUser = mockData.users.filter(u => u.role === 'customer')[i % 10];
-    const locArr = addresses[hubId];
+// Seed Hub Manager Agents
+const agentSeed = [
+    { name: 'Ramesh K.', hub: 'H001', avail: 'Available', type: 'Van' },
+    { name: 'Suresh P.', hub: 'H001', avail: 'Busy', type: 'Bike' },
+    { name: 'Anita Reddy', hub: 'H002', avail: 'Available', type: 'Bike' }
+];
 
-    mockData.orders.push({
-        order_id: `ORD_${1001 + i}`,
-        tracking_id: `ST-${800001 + i}`,
-        customer_name: customerUser.name,
-        merchant_id: 'U_MER_1', // Using Vinod's merchant account
-        pickup_hub_id: hubId,
-        delivery_address: locArr[i % locArr.length],
+agentSeed.forEach((a, idx) => {
+    const aId = `AGT_${idx+1}`;
+    const uId = `U_AGT_${idx+1}`;
+    window.mockData.users.push({ user_id: uId, name: a.name, email: `agent${idx+1}@swifttrack.com`, password: 'password123', role: 'agent', hub_id: a.hub, active: true });
+    window.mockData.agents.push({ agent_id: aId, user_id: uId, name: a.name, hub_id: a.hub, phone: `987654321${idx}`, availability_status: a.avail, vehicle_type: a.type });
+});
+
+// Seed Hub Manager Orders
+for (let i = 1; i <= 20; i++) {
+    const hub = window.mockData.hubs[i % 4];
+    const status = i % 5 === 0 ? 'Delivered' : (i % 3 === 0 ? 'In Transit' : 'Pending');
+    window.mockData.orders.push({
+        order_id: `ORD_${i}`,
+        customer_name: customerNames[i % 5],
+        pickup_hub_id: hub.hub_id,
+        delivery_address: `Street ${i}, ${hub.location}`,
         status: status,
-        agent_id: agentId, // No agent (null) if Pending
-        package_type: pkgTypes[Math.floor(Math.random() * pkgTypes.length)],
-        weight: parseFloat((Math.random() * 8 + 0.5).toFixed(1)), // random 0.5 - 8.5 kg
-        created_at: created,
-        updated_at: updated
+        agent_id: status === 'Pending' ? null : `AGT_${(i%3)+1}`,
+        merchant_id: `U_MER_1`
     });
 }
 
-/* ========================================================================== */
-/* 4. COMPLAINTS                                                              */
-/* ========================================================================== */
-
-const complaintStatus = ['Open', 'In Progress', 'Resolved'];
-for (let i = 1; i <= 6; i++) {
-    mockData.complaints.push({
-        complaint_id: `CMP_${100 + i}`,
-        order_id: mockData.orders[i].order_id,
-        customer_id: 'U_CUS_1', // Customer 1
-        subject: `Delivery Issue for ${mockData.orders[i].tracking_id}`,
-        description: i % 2 === 0 ? 'Package is delayed in transit.' : 'Outer box arrived damaged.',
-        status: complaintStatus[i % complaintStatus.length],
-        created_at: generateOffset(2, 48)
-    });
-}
-
-window.mockData = mockData;
+console.log('SwiftTrack Unified Mock Data Initialized.');

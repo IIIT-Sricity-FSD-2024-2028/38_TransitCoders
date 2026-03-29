@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="css/hub-manager.css">
 
     <style>
+        /* ---- Elegant Desktop Center Constrain ---- */
+        .hm-main { flex: 1; width: calc(100% - var(--hm-sidebar-w)); }
+        #page-content { max-width: 1400px; width: 100%; margin: 0 auto; }
+
         .hm-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-24); }
         .hm-toolbar-title { font-size: 20px; font-weight: 700; color: var(--text-title); }
         .hm-toolbar-actions { display: flex; align-items: center; gap: var(--space-12); }
@@ -58,9 +62,6 @@
         
         body.dark .hm-order-card { background: var(--surface-subtle); border-color: var(--border-default); }
         body.dark .hm-progress-track { background: var(--surface-lighter); }
-    </style>
-    <style>
-        #page-content { max-width: 1400px; width: 100%; margin: 0 auto; padding-right: var(--space-24); }
     </style>
 </head>
 <body class="light" onload="initPage()">

@@ -70,6 +70,7 @@ async function handleLogin(form) {
 
         // Route based on role — add new roles here as needed
         const routeMap = {
+            'admin':       '../index.html',
             'super_user':  '../index.html',
             'hub_manager': '../hub-manager/dashboard.html',
             'merchant':    '../merchant/dashboard.html',
