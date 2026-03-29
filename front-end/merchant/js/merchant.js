@@ -196,7 +196,25 @@ function initWizard() {
 document.addEventListener('DOMContentLoaded', () => {
     initFilters();
     initTrackSearch();
+    initAccordions();
 });
+
+function initAccordions() {
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+        const header = item.querySelector('.faq-header');
+        header.addEventListener('click', () => {
+            const isActive = item.classList.contains('active');
+            
+            // Close all other items (optional, but requested for fidelity)
+            faqItems.forEach(otherItem => otherItem.classList.remove('active'));
+            
+            if (!isActive) {
+                item.classList.add('active');
+            }
+        });
+    });
+}
 
 function initFilters() {
     const searchInput = document.getElementById('order-search');

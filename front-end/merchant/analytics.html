@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Report | SwiftTrack Merchant</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../customer/css/dashboard.css">
+    <link rel="stylesheet" href="css/merchant.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-box">
+                    <i class="fas fa-truck-fast text-white"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-swift">Swift</span><span class="logo-track">Track</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-grid-2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="create-shipment.html" class="nav-link">
+                    <i class="fas fa-plus"></i>
+                    <span>Create Shipment</span>
+                </a>
+                <a href="orders.html" class="nav-link">
+                    <i class="fas fa-box-open"></i>
+                    <span>My Orders</span>
+                </a>
+                <a href="tracking.html" class="nav-link">
+                    <i class="fas fa-location-arrow"></i>
+                    <span>Track Shipment</span>
+                </a>
+                <a href="analytics.html" class="nav-link active">
+                    <i class="fas fa-chart-simple"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="support.html" class="nav-link">
+                    <i class="fas fa-headset"></i>
+                    <span>Support</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar-initials">V</div>
+                    <div class="user-info">
+                        <span class="name merchant-name">Vinod</span>
+                        <span class="role">Merchant</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="header-meta">
+                    <h1>Analytics Report</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="theme-switch" role="button">
+                        <i class="fas fa-sun icon-light"></i>
+                        <i class="fas fa-moon icon-dark" style="display:none;"></i>
+                        <span>Light</span>
+                    </div>
+                    <i class="fas fa-bell notification-bell"></i>
+                    <img src="https://ui-avatars.com/api/?name=Vinod&background=ff5c02&color=fff" style="width: 32px; height: 32px; border-radius: 50%;" alt="Vinod">
+                </div>
+            </header>
+
+            <!-- Delivery Performance Section -->
+            <section class="performance-overview animate-reveal">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <h2 style="font-size: 20px; font-weight: 700; color: var(--text-title);">Delivery Performance</h2>
+                        <p style="color: #64748b; font-size: 14px;">Real-time insights across your logistics network</p>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 13px;">Last 7 Days</button>
+                        <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 13px; background: white; border: 1px solid var(--border-default);">Last 30 Days</button>
+                    </div>
+                </div>
+
+                <div class="stats-grid" style="margin-bottom: 32px;">
+                    <div class="stat-card" style="margin: 0; position: relative;">
+                        <span class="stat-label">Total Shipments</span>
+                        <div class="stat-value" style="color: var(--text-title);">12,480</div>
+                        <span style="position: absolute; top: 24px; right: 24px; color: #3b82f6; font-size: 11px; font-weight: 700; background: #eff6ff; padding: 4px 8px; border-radius: 50px;">+12.5%</span>
+                    </div>
+                    <div class="stat-card" style="margin: 0; position: relative;">
+                        <span class="stat-label">Delivered</span>
+                        <div class="stat-value" style="color: #22c55e;">11,200</div>
+                        <span style="position: absolute; top: 24px; right: 24px; color: #22c55e; font-size: 11px; font-weight: 700; background: #f0fdf4; padding: 4px 8px; border-radius: 50px;">+15.2%</span>
+                    </div>
+                    <div class="stat-card" style="margin: 0; position: relative;">
+                        <span class="stat-label">Delayed</span>
+                        <div class="stat-value" style="color: #f59e0b;">840</div>
+                        <span style="position: absolute; top: 24px; right: 24px; color: #ef4444; font-size: 11px; font-weight: 700; background: #fef2f2; padding: 4px 8px; border-radius: 50px;">-5.1%</span>
+                    </div>
+                    <div class="stat-card" style="margin: 0; position: relative;">
+                        <span class="stat-label">Returned</span>
+                        <div class="stat-value" style="color: #ef4444;">440</div>
+                        <span style="position: absolute; top: 24px; right: 24px; color: #ef4444; font-size: 11px; font-weight: 700; background: #fef2f2; padding: 4px 8px; border-radius: 50px;">-2.3%</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Row -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 32px;">
+                <!-- Delivery Trends Area Chart -->
+                <div class="form-wizard-card animate-reveal" style="margin: 0; padding: 32px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px;">
+                        <div>
+                            <h3 style="font-size: 18px; font-weight: 700;">Delivery Trends</h3>
+                            <p style="color: #64748b; font-size: 13px;">Monthly shipment volume across all hubs</p>
+                        </div>
+                        <div style="display: flex; gap: 20px; font-size: 12px; font-weight: 600;">
+                            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #ff5c02;"></span> Current Period</div>
+                            <div style="display: flex; align-items: center; gap: 8px; color: #94a3b8;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #fed7aa;"></span> Previous</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container" style="height: 250px; position: relative; border-left: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; padding: 0 10px;">
+                        <!-- SVG Chart Background Grid -->
+                        <div style="position: absolute; width: 100%; height: 100%; pointer-events: none;">
+                            <div style="height: 25%; border-top: 1px dashed #f1f5f9; position: relative;"><span style="position: absolute; left: -35px; top: -7px; color: #94a3b8; font-size: 10px;">15K</span></div>
+                            <div style="height: 25%; border-top: 1px dashed #f1f5f9; position: relative;"><span style="position: absolute; left: -35px; top: -7px; color: #94a3b8; font-size: 10px;">10K</span></div>
+                            <div style="height: 25%; border-top: 1px dashed #f1f5f9; position: relative;"><span style="position: absolute; left: -35px; top: -7px; color: #94a3b8; font-size: 10px;">5K</span></div>
+                        </div>
+
+                        <!-- Area Chart SVG -->
+                        <svg viewBox="0 0 1000 250" preserveAspectRatio="none" style="width: 100%; height: 100%; position: relative; z-index: 1;">
+                            <defs>
+                                <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#ff5c02" stop-opacity="0.2"/>
+                                    <stop offset="100%" stop-color="#ff5c02" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M0,250 L0,200 C100,180 200,210 300,160 C400,110 500,150 600,140 C700,130 800,50 900,100 L1000,120 L1000,250 Z" fill="url(#areaGradient)" />
+                            <path d="M0,200 C100,180 200,210 300,160 C400,110 500,150 600,140 C700,130 800,50 900,100 L1000,120" fill="none" stroke="#ff5c02" stroke-width="4" stroke-linecap="round" />
+                        </svg>
+
+                        <!-- X Axis Labels -->
+                        <div style="display: flex; justify-content: space-between; margin-top: 12px; font-size: 11px; color: #94a3b8; padding: 0 5%;">
+                            <span>JAN</span><span>FEB</span><span>MAR</span><span>APR</span><span>MAY</span><span>JUN</span><span>JUL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipment Distribution Doughnut -->
+                <div class="form-wizard-card animate-reveal" style="margin: 0; padding: 32px; animation-delay: 0.1s;">
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 32px;">Shipment Distribution</h3>
+                    
+                    <div class="doughnut-chart">
+                        <div class="doughnut-center">
+                            <div class="doughnut-value">88%</div>
+                            <div class="doughnut-label">On Time</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
+                            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e;"></span> Delivered</div>
+                            <span style="font-weight: 700;">11,200</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
+                            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6;"></span> In Transit</div>
+                            <span style="font-weight: 700;">840</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
+                            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span> Pending</div>
+                            <span style="font-weight: 700;">440</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hubs & Feedback Row -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+                <!-- Top Performance Hubs -->
+                <div class="form-wizard-card animate-reveal" style="margin: 0; padding: 32px; animation-delay: 0.2s;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3 style="font-size: 18px; font-weight: 700;">Top Performance Hubs</h3>
+                        <a href="#" style="font-size: 13px; color: #ff5c02; font-weight: 600;">View All</a>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 12px; background: #f8fafc; border: 1px solid #f1f5f9;">
+                            <div style="width: 40px; height: 40px; border-radius: 10px; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-location-dot"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <h4 style="font-size: 14px; font-weight: 700;">Singapore East Hub</h4>
+                                <p style="font-size: 11px; color: #64748b;">Regional Distribution Center</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 14px; font-weight: 800; color: #22c55e;">99.2%</div>
+                                <div style="font-size: 10px; color: #94a3b8; font-weight: 600;">SUCCESS RATE</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 12px; border: 1px solid #f1f5f9;">
+                            <div style="width: 40px; height: 40px; border-radius: 10px; background: #f1f5f9; color: #94a3b8; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-location-dot"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <h4 style="font-size: 14px; font-weight: 700;">Cyberjaya Logistics Park</h4>
+                                <p style="font-size: 11px; color: #64748b;">Major Gateway Hub</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 14px; font-weight: 800; color: #22c55e;">98.5%</div>
+                                <div style="font-size: 10px; color: #94a3b8; font-weight: 600;">SUCCESS RATE</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 12px; border: 1px solid #f1f5f9;">
+                            <div style="width: 40px; height: 40px; border-radius: 10px; background: #f1f5f9; color: #94a3b8; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-location-dot"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <h4 style="font-size: 14px; font-weight: 700;">Ho Chi Minh Central</h4>
+                                <p style="font-size: 11px; color: #64748b;">Urban Delivery Node</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 14px; font-weight: 800; color: #22c55e;">97.8%</div>
+                                <div style="font-size: 10px; color: #94a3b8; font-weight: 600;">SUCCESS RATE</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Merchant Feedback -->
+                <div class="form-wizard-card animate-reveal" style="margin: 0; padding: 32px; animation-delay: 0.3s;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3 style="font-size: 18px; font-weight: 700;">Recent Merchant Feedback</h3>
+                        <div style="display: flex; align-items: center; gap: 4px; color: #f59e0b; font-size: 13px; font-weight: 700;">
+                            <i class="fas fa-star"></i> 4.8/5.0
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div style="display: flex; gap: 16px; position: relative;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #eff6ff; color: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <h4 style="font-size: 14px; font-weight: 700;">Urban Outfitters</h4>
+                                    <span style="font-size: 10px; color: #94a3b8; text-transform: uppercase;">2h ago</span>
+                                </div>
+                                <p style="font-size: 13px; color: #64748b; font-style: italic; line-height: 1.5;">"The delivery times to the North hub have improved significantly this week. Great tracking updates."</p>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 16px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #f0fdf4; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <h4 style="font-size: 14px; font-weight: 700;">Tech World Inc.</h4>
+                                    <span style="font-size: 10px; color: #94a3b8; text-transform: uppercase;">5h ago</span>
+                                </div>
+                                <p style="font-size: 13px; color: #64748b; font-style: italic; line-height: 1.5;">"Highly satisfied with the returned parcel handling. Very seamless process for our customers."</p>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 16px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #fef2f2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <h4 style="font-size: 14px; font-weight: 700;">Global Garments</h4>
+                                    <span style="font-size: 10px; color: #94a3b8; text-transform: uppercase;">Yesterday</span>
+                                </div>
+                                <p style="font-size: 13px; color: #64748b; font-style: italic; line-height: 1.5;">"Some minor delays reported at the East hub due to weather, but communication was proactive."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/merchant.js"></script>
+</body>
+</html>
