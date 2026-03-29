@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merchant Dashboard | SwiftTrack</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../customer/css/dashboard.css">
+    <link rel="stylesheet" href="css/merchant.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-box">
+                    <i class="fas fa-truck-fast text-white"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-swift">Swift</span><span class="logo-track">Track</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link active">
+                    <i class="fas fa-grid-2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="create-shipment.html" class="nav-link">
+                    <i class="fas fa-plus"></i>
+                    <span>Create Shipment</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-box-open"></i>
+                    <span>Shipments</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-location-arrow"></i>
+                    <span>Tracker</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-chart-simple"></i>
+                    <span>Analytics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar-initials">V</div>
+                    <div class="user-info">
+                        <span class="name merchant-name">Vinod</span>
+                        <span class="role">Merchant</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="header-meta">
+                    <h1>Merchant Dashboard</h1>
+                    <p>Welcome back! Grow your business with SwiftTrack.</p>
+                </div>
+                <div class="header-actions">
+                    <div class="theme-switch" role="button">
+                        <i class="fas fa-sun icon-light"></i>
+                        <i class="fas fa-moon icon-dark" style="display:none;"></i>
+                        <span>Light</span>
+                    </div>
+                    <i class="fas fa-bell notification-bell"></i>
+                    <img src="https://ui-avatars.com/api/?name=Vinod&background=ff5c02&color=fff" style="width: 32px; height: 32px; border-radius: 50%;" alt="Vinod">
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <section class="stats-grid animate-reveal">
+                <div class="stat-card">
+                    <span class="stat-label">Total Shipments</span>
+                    <div class="stat-value text-brand">156</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">In Transit</span>
+                    <div class="stat-value" style="color: #3b82f6;">12</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Pending Pickup</span>
+                    <div class="stat-value" style="color: #f59e0b;">5</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Total Revenue</span>
+                    <div class="stat-value" style="color: #22c55e;">₹45,200</div>
+                </div>
+            </section>
+
+            <!-- Main Features -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px;">
+                <div class="form-wizard-card animate-reveal" style="margin: 0; padding: 32px; text-align: left; cursor: pointer;" onclick="window.location.href='create-shipment.html'">
+                    <div style="width: 48px; height: 48px; background: #fff7ed; color: #ff5c02; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 20px;">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Create New Shipment</h3>
+                    <p style="color: #64748b; font-size: 14px;">Start adding a new package to your delivery queue.</p>
+                </div>
+
+                <div class="form-wizard-card animate-reveal" style="margin: 0; padding: 32px; text-align: left; animation-delay: 0.1s;">
+                    <div style="width: 48px; height: 48px; background: #f0f9ff; color: #0ea5e9; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 20px;">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">View Payments</h3>
+                    <p style="color: #64748b; font-size: 14px;">Check your recent transactions and pending payouts.</p>
+                </div>
+            </div>
+
+            <!-- Recent Shipments Table -->
+            <section class="table-container animate-reveal" style="margin-top: 32px; animation-delay: 0.2s;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h2 style="font-size: 18px; font-weight: 700;">Recent Shipments</h2>
+                    <a href="#" style="color: #ff5c02; font-size: 14px; font-weight: 600;">View All</a>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Receiver</th>
+                            <th>Status</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#ST-88219</td>
+                            <td>Mar 28, 2026</td>
+                            <td>Ajay Prakash</td>
+                            <td><span class="status-badge status-in-transit">IN TRANSIT</span></td>
+                            <td>₹350.00</td>
+                        </tr>
+                        <tr>
+                            <td>#ST-88220</td>
+                            <td>Mar 27, 2026</td>
+                            <td>Ravi Kumar</td>
+                            <td><span class="status-badge status-delivered">DELIVERED</span></td>
+                            <td>₹420.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/merchant.js"></script>
+</body>
+</html>
