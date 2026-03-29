@@ -192,6 +192,66 @@ function initWizard() {
     }
 }
 
+// Interactive logic for Orders and Tracking pages
+document.addEventListener('DOMContentLoaded', () => {
+    initFilters();
+    initTrackSearch();
+});
+
+function initFilters() {
+    const searchInput = document.getElementById('order-search');
+    const statusFilter = document.getElementById('status-filter');
+    const ordersTable = document.getElementById('orders-tbody');
+
+    if (!ordersTable || !searchInput || !statusFilter) return;
+
+    function performFilter() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusValue = statusFilter.value.toLowerCase();
+        const rows = ordersTable.getElementsByTagName('tr');
+
+        Array.from(rows).forEach(row => {
+            const orderId = row.cells[0].textContent.toLowerCase();
+            const receiver = row.cells[2].textContent.toLowerCase();
+            const statusCell = row.cells[3].textContent.toLowerCase();
+            
+            const matchesSearch = orderId.includes(searchTerm) || receiver.includes(searchTerm);
+            const matchesStatus = statusValue === 'all' || statusCell.includes(statusValue.replace('-', ' '));
+
+            row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', performFilter);
+    statusFilter.addEventListener('change', performFilter);
+}
+
+function initTrackSearch() {
+    const trackInput = document.getElementById('track-id-input');
+    const trackBtn = document.querySelector('.btn-next'); // Used as 'Track' in this page
+
+    if (trackInput && trackBtn && window.location.pathname.includes('tracking.html')) {
+        trackBtn.addEventListener('click', () => {
+            const id = trackInput.value.trim();
+            if (id) {
+                showToast(`Searching for shipment ${id}...`, 'info');
+                // Simulate loading
+                trackBtn.disabled = true;
+                trackBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Tracking...';
+                
+                setTimeout(() => {
+                    showToast('Shipment record found!', 'success');
+                    trackBtn.disabled = false;
+                    trackBtn.innerHTML = 'Track Order';
+                    // In a real app, update the timeline here
+                }, 1500);
+            } else {
+                showToast('Please enter a valid Tracking ID', 'error');
+            }
+        });
+    }
+}
+
 function initThemeSwitch() {
     const themeToggle = document.querySelector('.theme-switch');
     if (themeToggle) {

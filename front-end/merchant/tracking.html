@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Shipment | SwiftTrack Merchant</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../customer/css/dashboard.css">
+    <link rel="stylesheet" href="css/merchant.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-box">
+                    <i class="fas fa-truck-fast text-white"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-swift">Swift</span><span class="logo-track">Track</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-grid-2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="create-shipment.html" class="nav-link">
+                    <i class="fas fa-plus"></i>
+                    <span>Create Shipment</span>
+                </a>
+                <a href="orders.html" class="nav-link">
+                    <i class="fas fa-box-open"></i>
+                    <span>My Orders</span>
+                </a>
+                <a href="tracking.html" class="nav-link active">
+                    <i class="fas fa-location-arrow"></i>
+                    <span>Track Shipment</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-chart-simple"></i>
+                    <span>Analytics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar-initials">V</div>
+                    <div class="user-info">
+                        <span class="name merchant-name">Vinod</span>
+                        <span class="role">Merchant</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="header-meta">
+                    <h1>Track Shipment</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="theme-switch" role="button">
+                        <i class="fas fa-sun icon-light"></i>
+                        <i class="fas fa-moon icon-dark" style="display:none;"></i>
+                        <span>Light</span>
+                    </div>
+                    <i class="fas fa-bell notification-bell"></i>
+                    <img src="https://ui-avatars.com/api/?name=Vinod&background=ff5c02&color=fff" style="width: 32px; height: 32px; border-radius: 50%;" alt="Vinod">
+                </div>
+            </header>
+
+            <!-- Tracking Hero Search -->
+            <div class="form-wizard-card animate-reveal" style="max-width: 100%; margin-bottom: 32px; padding: 32px;">
+                <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 24px;">Enter Tracking ID</h3>
+                <div style="display: flex; gap: 16px;">
+                    <div class="search-bar" style="background: var(--surface-default); padding: 12px 24px; border-radius: 12px; display: flex; align-items: center; gap: 8px; flex: 1; border: 2px solid var(--clr-orange-500);">
+                        <i class="fas fa-location-arrow" style="color: var(--clr-orange-500);"></i>
+                        <input type="text" id="track-id-input" placeholder="e.g. TRK74661803" value="TRK74661803" style="border: none; background: transparent; outline: none; font-size: 16px; font-weight: 600; color: var(--text-title); width: 100%;">
+                    </div>
+                    <button class="btn btn-primary btn-next" style="margin: 0; padding: 0 40px;">Track Order</button>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px;">
+                <!-- Tracking Timeline Card -->
+                <div class="form-wizard-card animate-reveal" style="margin: 0; padding: 40px; animation-delay: 0.1s;">
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 32px;">Shipment Progress</h3>
+                    
+                    <div class="tracking-timeline">
+                        <div class="timeline-item completed">
+                            <div class="timeline-dot"><i class="fas fa-check"></i></div>
+                            <div class="timeline-content">
+                                <div class="timeline-info">
+                                    <h4>Order Placed</h4>
+                                    <p>Package has been registered by Merchant.</p>
+                                </div>
+                                <div class="timeline-time">Mar 27, 2026<br>09:12 AM</div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item completed">
+                            <div class="timeline-dot"><i class="fas fa-check"></i></div>
+                            <div class="timeline-content">
+                                <div class="timeline-info">
+                                    <h4>Picked Up</h4>
+                                    <p>Shipment picked up from Vinod's Warehouse, Chennai.</p>
+                                </div>
+                                <div class="timeline-time">Mar 28, 2026<br>11:45 AM</div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item active">
+                            <div class="timeline-dot"><i class="fas fa-truck"></i></div>
+                            <div class="timeline-content">
+                                <div class="timeline-info">
+                                    <h4>In Transit</h4>
+                                    <p>Arrived at Bengaluru Distribution Center.</p>
+                                </div>
+                                <div class="timeline-time">Mar 29, 2026<br>03:30 AM</div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item pending">
+                            <div class="timeline-dot">4</div>
+                            <div class="timeline-content">
+                                <div class="timeline-info">
+                                    <h4>Out for Delivery</h4>
+                                    <p>Package is with our delivery partner.</p>
+                                </div>
+                                <div class="timeline-time">---</div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item pending">
+                            <div class="timeline-dot">5</div>
+                            <div class="timeline-content">
+                                <div class="timeline-info">
+                                    <h4>Delivered</h4>
+                                    <p>Successfully delivered to recipient.</p>
+                                </div>
+                                <div class="timeline-time">---</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Package Details Sidebar Card -->
+                <div class="animate-reveal" style="display: flex; flex-direction: column; gap: 24px; animation-delay: 0.2s;">
+                    <div class="form-wizard-card" style="margin: 0; padding: 24px;">
+                        <h4 style="font-size: 14px; font-weight: 700; color: #ff5c02; text-transform: uppercase; margin-bottom: 20px;">Shipment Details</h4>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label style="font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Origin</label>
+                            <p style="font-size: 14px; font-weight: 600; color: var(--text-title);">Chennai Hub, TN</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label style="font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Destination</label>
+                            <p style="font-size: 14px; font-weight: 600; color: var(--text-title);">Whitefield, Bengaluru</p>
+                        </div>
+
+                        <div style="margin-bottom: 16px;">
+                            <label style="font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Expected Arrival</label>
+                            <p style="font-size: 14px; font-weight: 600; color: #22c55e;">Mar 30, 2026 | 02:00 PM</p>
+                        </div>
+
+                        <hr style="border: none; border-top: 1px solid var(--border-default); margin: 20px 0;">
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <label style="font-size: 11px; color: #94a3b8; font-weight: 600;">Weight</label>
+                                <p style="font-size: 14px; font-weight: 600;">2.5 Kg</p>
+                            </div>
+                            <div>
+                                <label style="font-size: 11px; color: #94a3b8; font-weight: 600;">Type</label>
+                                <p style="font-size: 14px; font-weight: 600;">Fragile Item</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-wizard-card" style="margin: 0; padding: 24px; background: var(--clr-orange-500); border: none; color: white;">
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Need Help?</h4>
+                        <p style="font-size: 13px; opacity: 0.9; margin-bottom: 20px;">Contact our merchant support team for any issues with this shipment.</p>
+                        <button style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; font-weight: 600; cursor: pointer;">Chat with Support</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/merchant.js"></script>
+</body>
+</html>
