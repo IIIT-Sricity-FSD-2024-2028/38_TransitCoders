@@ -1,39 +1,4 @@
-/* Dashboard Specific Styles */
-
-.global-search {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.global-search svg {
-    position: absolute;
-    left: 12px;
-    width: 16px;
-    height: 16px;
-    color: var(--text-subtitle);
-    pointer-events: none;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-}
-
-.global-search input {
-    width: 260px;
-    padding: 10px 10px 10px 36px;
-    border-radius: var(--radius-m);
-    border: 1px solid var(--border-default);
-    background-color: var(--surface-default);
-    color: var(--text-title);
-    font-size: 0.875rem;
-    transition: all 0.2s;
-}
-
-.global-search input:focus {
-    outline: none;
-    border-color: var(--surface-brand);
-    box-shadow: 0 0 0 2px var(--surface-brand-subtle);
-}
+/* Dashboard Specific Styles — Enhanced for Admin.jpg reference */
 
 .kpi-grid {
     display: grid;
@@ -47,6 +12,23 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 247, 237, 0.86));
+    border: 1px solid rgba(249, 115, 22, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.dark .kpi-card {
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.94));
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 26px rgba(15, 23, 42, 0.16);
+}
+
+body.dark .kpi-card:hover {
+    box-shadow: 0 16px 30px rgba(2, 6, 23, 0.5);
 }
 
 .kpi-icon {
@@ -56,6 +38,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    transition: background-color 0.3s;
 }
 
 .kpi-icon svg {
@@ -73,6 +57,11 @@
 .kpi-icon.red { background-color: var(--clr-red-50); color: var(--clr-red-500); }
 .kpi-icon.green { background-color: var(--clr-green-50); color: var(--clr-green-500); }
 
+body.dark .kpi-icon.blue { background-color: rgba(2, 132, 199, 0.26); color: #7dd3fc; }
+body.dark .kpi-icon.orange { background-color: rgba(249, 115, 22, 0.26); color: #fdba74; }
+body.dark .kpi-icon.red { background-color: rgba(220, 38, 38, 0.24); color: #fecaca; }
+body.dark .kpi-icon.green { background-color: rgba(22, 163, 74, 0.24); color: #86efac; }
+
 .kpi-label {
     font-size: 0.875rem;
     color: var(--text-subtitle);
@@ -86,16 +75,16 @@
     line-height: 1.2;
 }
 
-.text-green { color: var(--clr-green-500); }
-
-.mt-4 { margin-top: 24px; }
-
 .dashboard-row {
     display: flex;
     gap: 24px;
 }
 
 .dashboard-row.col-2 > div {
+    flex: 1;
+}
+
+.dashboard-row.col-3 > div {
     flex: 1;
 }
 
@@ -126,16 +115,18 @@
     color: var(--surface-brand);
     text-decoration: none;
     font-weight: 500;
+    transition: color 0.2s;
 }
 
 .view-all:hover {
     text-decoration: underline;
+    color: var(--clr-orange-600);
 }
 
 .infra-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    gap: 16px;
     margin-top: 16px;
 }
 
@@ -147,26 +138,18 @@
     border: 1px solid var(--border-default);
     border-radius: var(--radius-m);
     background-color: var(--surface-default);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+body.dark .infra-stat {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.9));
+    border-color: #334155;
 }
 
 .infra-stat span:first-child {
     font-size: 0.875rem;
     color: var(--text-subtitle);
 }
-
-.status-badge {
-    display: inline-flex;
-    padding: 4px 12px;
-    border-radius: var(--radius-round);
-    font-size: 0.75rem;
-    font-weight: 600;
-    width: fit-content;
-}
-
-.status-badge.success { background-color: var(--clr-green-50); color: var(--clr-green-700); }
-.status-badge.warning { background-color: var(--clr-amber-50); color: var(--clr-amber-700); }
-.status-badge.error { background-color: var(--clr-red-50); color: var(--clr-red-700); }
-.status-badge.blue { background-color: var(--clr-blue-50); color: var(--clr-blue-700); }
 
 /* Activity Lists */
 .activity-list {
@@ -179,10 +162,20 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
+    padding: 12px 16px;
     border-radius: var(--radius-m);
     border: 1px solid var(--border-default);
     background-color: var(--surface-default);
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.activity-item:hover {
+    transform: translateX(2px);
+}
+
+body.dark .activity-item {
+    background-color: #1e293b;
+    border-color: #334155;
 }
 
 .activity-info {
@@ -194,6 +187,7 @@
 .activity-title {
     font-weight: 600;
     font-size: 0.875rem;
+    color: var(--text-title);
 }
 
 .activity-meta {

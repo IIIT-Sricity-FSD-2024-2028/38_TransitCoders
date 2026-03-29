@@ -1,4 +1,4 @@
-/* Shared Modal Styles */
+/* Shared Modal Styles — Enhanced */
 
 .modal-backdrop {
     position: fixed;
@@ -6,7 +6,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(15, 23, 42, 0.45);
     backdrop-filter: blur(4px);
     z-index: 1000;
     display: none;
@@ -14,6 +14,10 @@
     justify-content: center;
     opacity: 0;
     transition: opacity 0.3s ease;
+}
+
+body.dark .modal-backdrop {
+    background: rgba(2, 6, 23, 0.78);
 }
 
 .modal-backdrop.active {
@@ -28,12 +32,18 @@
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-premium);
     overflow: hidden;
-    transform: scale(0.95);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(12px) scale(0.96);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark .modal-container {
+    background: linear-gradient(180deg, #0f172a 0%, #111c34 100%);
+    border: 1px solid #1e293b;
+    box-shadow: 0 22px 50px rgba(2, 6, 23, 0.6);
 }
 
 .modal-backdrop.active .modal-container {
-    transform: scale(1);
+    transform: translateY(0) scale(1);
 }
 
 .modal-header {
@@ -44,9 +54,17 @@
     align-items: center;
 }
 
+body.dark .modal-header {
+    border-bottom-color: #243246;
+}
+
 .modal-header h2 {
     font-size: 1.25rem;
     margin: 0;
+}
+
+body.dark .modal-header h2 {
+    color: #f1f5f9;
 }
 
 .modal-close {
@@ -59,11 +77,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 .modal-close:hover {
     background-color: var(--surface-subtle);
     color: var(--text-title);
+}
+
+body.dark .modal-close:hover {
+    background-color: #1e293b;
 }
 
 .modal-body {
@@ -72,10 +95,33 @@
     overflow-y: auto;
 }
 
+body.dark .modal-body {
+    color: #cbd5e1;
+}
+
+body.dark .modal-body::-webkit-scrollbar {
+    width: 10px;
+}
+
+body.dark .modal-body::-webkit-scrollbar-track {
+    background: #0b1223;
+}
+
+body.dark .modal-body::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 999px;
+    border: 2px solid #0b1223;
+}
+
 .modal-footer {
     padding: 16px 24px;
     border-top: 1px solid var(--border-default);
     display: flex;
     justify-content: flex-end;
     gap: 12px;
+}
+
+body.dark .modal-footer {
+    border-top-color: #243246;
+    background: rgba(15, 23, 42, 0.45);
 }

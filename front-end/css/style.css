@@ -1,6 +1,6 @@
 /**
  * SwiftTrack Design System & Global Styles
- * Based on Figma Tokens
+ * Based on Figma Tokens — Enhanced for Admin.jpg Reference
  */
 
 :root {
@@ -14,6 +14,7 @@
     --clr-blue-50: #f0f9ff;
     --clr-blue-100: #e0f2fe;
     --clr-blue-300: #7dd3fc;
+    --clr-blue-400: #38bdf8;
     --clr-blue-500: #0284c7;
     --clr-blue-700: #075985;
 
@@ -34,6 +35,7 @@
     --clr-red-100: #fee2e2;
     --clr-red-300: #fca5a5;
     --clr-red-500: #dc2626;
+    --clr-red-600: #dc2626;
     --clr-red-700: #991b1b;
 
     --clr-neutral-50: #ffffff;
@@ -49,8 +51,10 @@
     /* Semantic - Light Mode (Default) */
     --surface-default: var(--clr-neutral-50);
     --surface-subtle: var(--clr-neutral-100);
+    --surface-card: rgba(255, 255, 255, 0.85);
     --surface-brand: var(--clr-orange-500);
     --surface-brand-subtle: var(--clr-orange-50);
+    --icon-notification: #64748b;
 
     --text-title: var(--clr-neutral-900);
     --text-body: var(--clr-neutral-700);
@@ -78,15 +82,26 @@
     --shadow-premium: 0px 12px 30px 1px rgba(0, 0, 0, 0.13);
 }
 
-/* Dark Mode Tokens */
+/* Dark Mode Tokens — Matches Admin.jpg Navy Reference with Enhanced Aesthetics */
 body.dark {
-    --surface-default: #030712;
-    --surface-subtle: #111827;
-    --text-title: #f8fafc;
-    --text-body: #e8e8e8;
-    --text-subtitle: #9ca3af;
-    --border-default: #1f2937;
-    --border-strong: #4b5563;
+    --surface-default: #0f172a;
+    --surface-subtle: #020d1a;
+    --surface-card: #0f172a;
+    --surface-brand-subtle: rgba(249, 115, 22, 0.12);
+    --icon-notification: #94a3b8;
+
+    --text-title: #f1f5f9;
+    --text-body: #cbd5e1;
+    --text-subtitle: #64748b;
+    --text-brand: #fb923c;
+
+    --border-default: #1e293b;
+    --border-strong: #334155;
+
+    --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0px 4px 12px -2px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0px 12px 20px -4px rgba(0, 0, 0, 0.45);
+    --shadow-premium: 0px 16px 40px -2px rgba(0, 0, 0, 0.5);
     
     background-color: var(--surface-subtle);
 }
@@ -104,6 +119,7 @@ body {
     color: var(--text-body);
     line-height: 1.5;
     overflow-x: hidden;
+    transition: background-color 0.35s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4 {
@@ -150,7 +166,8 @@ button {
     padding: 12px 24px;
     border-radius: var(--radius-m);
     font-weight: 600;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-size: 0.875rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .btn:active {
@@ -168,6 +185,10 @@ button {
     box-shadow: var(--shadow-lg);
 }
 
+body.dark .btn-primary:hover {
+    background: #fb7a2e;
+}
+
 .btn-secondary {
     background: var(--surface-default);
     color: var(--text-title);
@@ -178,17 +199,139 @@ button {
     background: var(--surface-subtle);
 }
 
+body.dark .btn-secondary {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark .btn-secondary:hover {
+    background: #334155;
+}
+
+body.dark .btn-secondary {
+    border-color: #475569;
+}
+
+.btn-danger {
+    background: var(--clr-red-500);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: var(--clr-red-700);
+}
+
 /* Card Glassmorphism */
 .glass-card {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: var(--surface-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: var(--radius-xl);
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 body.dark .glass-card {
-    background: rgba(15, 23, 42, 0.7);
-    border-color: rgba(255, 255, 255, 0.05);
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    border-color: rgba(148, 163, 184, 0.16);
+}
+
+/* Status Badges — Unified */
+.status-badge {
+    display: inline-flex;
+    padding: 4px 12px;
+    border-radius: var(--radius-round);
+    font-size: 0.75rem;
+    font-weight: 600;
+    width: fit-content;
+    transition: background-color 0.2s;
+}
+
+.status-badge.success { background-color: var(--clr-green-50); color: var(--clr-green-700); }
+.status-badge.warning { background-color: var(--clr-amber-50); color: var(--clr-amber-700); }
+.status-badge.error   { background-color: var(--clr-red-50); color: var(--clr-red-700); }
+.status-badge.blue    { background-color: var(--clr-blue-50); color: var(--clr-blue-700); }
+
+body.dark .status-badge.success { background-color: rgba(22, 163, 74, 0.15); color: #4ade80; }
+body.dark .status-badge.warning { background-color: rgba(249, 115, 22, 0.18); color: #fdba74; }
+body.dark .status-badge.error   { background-color: rgba(220, 38, 38, 0.15); color: #fca5a5; }
+body.dark .status-badge.blue    { background-color: rgba(2, 132, 199, 0.15); color: #7dd3fc; }
+
+/* Notification Bell */
+.topbar-bell {
+    position: relative;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--icon-notification);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.topbar-bell:hover {
+    background-color: var(--surface-subtle);
+    color: var(--text-title);
+}
+
+body.dark .topbar-bell:hover {
+    background-color: #1e293b;
+}
+
+.topbar-bell .bell-dot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background: var(--clr-red-500);
+    border-radius: 50%;
+    border: 2px solid var(--surface-default);
+}
+
+/* Toast Notification */
+.toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: all;
+    padding: 14px 20px;
+    border-radius: var(--radius-m);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: white;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1), toastOut 0.3s ease 2.7s forwards;
+    min-width: 280px;
+}
+
+.toast.success { background: var(--clr-green-500); }
+.toast.error   { background: var(--clr-red-500); }
+.toast.info    { background: var(--clr-blue-500); }
+.toast.warning { background: var(--clr-orange-500); }
+
+@keyframes toastIn {
+    from { opacity: 0; transform: translateX(100px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toastOut {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(100px); }
 }
 
 /* Animations */
@@ -205,3 +348,8 @@ body.dark .glass-card {
 .animate-reveal {
     animation: slideUp 0.6s ease forwards;
 }
+
+/* Utility */
+.mt-4 { margin-top: 24px; }
+.text-green { color: var(--clr-green-500); }
+body.dark .text-green { color: #4ade80; }

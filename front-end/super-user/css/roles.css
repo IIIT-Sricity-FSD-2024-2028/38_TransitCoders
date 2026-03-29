@@ -1,9 +1,14 @@
-/* Roles & Permissions Specific CSS */
+/* Roles & Permissions Specific CSS — Enhanced */
 
 .full-container {
     padding: 0;
     overflow: hidden;
     background-color: var(--surface-default);
+    transition: background-color 0.3s;
+}
+
+body.dark .full-container {
+    background-color: rgba(15, 23, 42, 0.8);
 }
 
 .table-responsive {
@@ -25,9 +30,15 @@
 
 .matrix-table th {
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: var(--text-subtitle);
     background-color: var(--surface-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+body.dark .matrix-table th {
+    background-color: #0f172a;
 }
 
 .matrix-table .role-col {
@@ -35,8 +46,12 @@
     font-weight: 600;
     color: var(--text-title);
     background-color: var(--surface-subtle);
-    font-size: 1rem;
+    font-size: 0.95rem;
     width: 250px;
+}
+
+body.dark .matrix-table .role-col {
+    background-color: #0f172a;
 }
 
 .matrix-table tbody td {
@@ -67,7 +82,7 @@
 }
 
 body.dark .slider {
-    background-color: var(--clr-neutral-700);
+    background-color: #334155;
 }
 
 .slider::before {

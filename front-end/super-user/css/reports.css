@@ -1,8 +1,4 @@
-/* Reports Specific Styles */
-
-.col-3 > div {
-    flex: 1;
-}
+/* Reports Specific Styles — Enhanced */
 
 .graph-placeholder {
     width: 100%;
@@ -17,6 +13,12 @@
     font-size: 0.875rem;
     position: relative;
     overflow: hidden;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+body.dark .graph-placeholder {
+    background-color: #1e293b;
+    border-color: #334155;
 }
 
 .graph-placeholder::after {
@@ -31,6 +33,16 @@
         transparent 30px,
         rgba(22, 163, 74, 0.1) 30px,
         rgba(22, 163, 74, 0.1) 60px
+    );
+}
+
+body.dark .graph-placeholder[data-type="bar"] {
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 30px,
+        rgba(74, 222, 128, 0.08) 30px,
+        rgba(74, 222, 128, 0.08) 60px
     );
 }
 
@@ -52,4 +64,10 @@
     border: 16px solid var(--clr-blue-100);
     border-top-color: var(--clr-blue-500);
     border-right-color: var(--clr-blue-500);
+}
+
+body.dark .graph-placeholder[data-type="donut"] {
+    border-color: #1e293b;
+    border-top-color: #38bdf8;
+    border-right-color: #38bdf8;
 }

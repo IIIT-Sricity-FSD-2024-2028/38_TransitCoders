@@ -1,4 +1,4 @@
-/* Complaints Specific - Inherits widely from user-management.css table layout */
+/* Complaints Specific — Enhanced with dark mode */
 
 .badge-open { background-color: var(--clr-blue-50); color: var(--clr-blue-700); }
 .badge-escalated { background-color: var(--clr-amber-50); color: var(--clr-amber-700); }
@@ -8,6 +8,15 @@
 .badge-high { background-color: var(--clr-orange-50); color: var(--clr-orange-700); }
 .badge-medium { background-color: var(--clr-blue-50); color: var(--clr-blue-700); }
 .badge-low { background-color: var(--clr-neutral-100); color: var(--clr-neutral-700); }
+
+body.dark .badge-open { background-color: rgba(2, 132, 199, 0.15); color: #7dd3fc; }
+body.dark .badge-escalated { background-color: rgba(234, 179, 8, 0.15); color: #fde047; }
+body.dark .badge-resolved { background-color: rgba(22, 163, 74, 0.15); color: #4ade80; }
+
+body.dark .badge-critical { background-color: rgba(220, 38, 38, 0.15); color: #fca5a5; }
+body.dark .badge-high { background-color: rgba(249, 115, 22, 0.15); color: #fb923c; }
+body.dark .badge-medium { background-color: rgba(2, 132, 199, 0.15); color: #7dd3fc; }
+body.dark .badge-low { background-color: rgba(100, 116, 139, 0.15); color: #94a3b8; }
 
 /* Quick Action Context Menu / Hover Menu */
 .action-dropdown {
@@ -26,6 +35,11 @@
     border-radius: var(--radius-m);
     border: 1px solid var(--border-default);
     z-index: 10;
+}
+
+body.dark .action-menu {
+    background-color: #1e293b;
+    border-color: #334155;
 }
 
 .action-dropdown:hover .action-menu,
@@ -47,9 +61,19 @@
     color: var(--text-title);
 }
 
+body.dark .action-menu button:hover {
+    background-color: #334155;
+}
+
 .action-menu button.danger {
-    color: var(--clr-red-600);
+    color: var(--clr-red-500);
 }
 .action-menu button.danger:hover {
     background-color: var(--clr-red-50);
+}
+body.dark .action-menu button.danger {
+    color: #fca5a5;
+}
+body.dark .action-menu button.danger:hover {
+    background-color: rgba(220, 38, 38, 0.12);
 }

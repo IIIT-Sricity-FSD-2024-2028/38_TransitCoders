@@ -1,4 +1,4 @@
-/* Feedback specific CSS */
+/* Feedback specific CSS — Enhanced */
 
 .rating-stars {
     color: var(--clr-amber-300);
@@ -7,6 +7,14 @@
 
 .rating-stars.low {
     color: var(--clr-red-500);
+}
+
+body.dark .rating-stars {
+    color: #fde047;
+}
+
+body.dark .rating-stars.low {
+    color: #fca5a5;
 }
 
 .comment-cell {
@@ -20,3 +28,5 @@
 
 .badge-pending { background-color: var(--clr-orange-50); color: var(--clr-orange-700); }
 .badge-reviewed { background-color: var(--clr-green-50); color: var(--clr-green-700); }
+
+body.dark .badge-reviewed { background-color: rgba(22, 163, 74, 0.15); color: #4ade80; }
