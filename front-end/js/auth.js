@@ -32,7 +32,7 @@ function initAuth() {
 }
 
 async function handleLogin(form) {
-    const email = form.querySelector('#email').value;
+    const email = form.querySelector('#email').value.trim();
     const password = form.querySelector('#password').value;
 
     if (!email || !password) {
@@ -41,23 +41,44 @@ async function handleLogin(form) {
     }
 
     showToast('Signing in...', 'info');
-    
+
     setTimeout(() => {
-        if (email === 'admin@swifttrack.com' && password === 'admin123') {
-            showToast('Login successful!', 'success');
-            localStorage.setItem('user', JSON.stringify({ email, role: 'admin' }));
-            setTimeout(() => window.location.href = '../index.html', 1500);
-        } else if (email === 'customer@swifttrack.com' && password === 'password') {
-            showToast('Login successful!', 'success');
-            localStorage.setItem('user', JSON.stringify({ email, role: 'customer' }));
-            setTimeout(() => window.location.href = '../customer/dashboard.html', 1500);
-        } else if (email === 'merchant@swifttrack.com' && password === 'merchant123') {
-            showToast('Login successful!', 'success');
-            localStorage.setItem('user', JSON.stringify({ email, role: 'merchant', name: 'Vinod' }));
-            setTimeout(() => window.location.href = '../merchant/dashboard.html', 1500);
-        } else {
+        // Dynamic lookup from mockData — works for ANY user added to mockData.users
+        const users = (window.mockData && window.mockData.users) || [];
+        const matchedUser = users.find(u => u.email === email && u.password === password && u.active);
+
+        if (!matchedUser) {
             showToast('Invalid credentials', 'error');
+            return;
         }
+
+        showToast('Login successful!', 'success');
+
+        // Build user session data
+        const userData = {
+            user_id: matchedUser.user_id,
+            name: matchedUser.name,
+            email: matchedUser.email,
+            role: matchedUser.role,
+            hub_id: matchedUser.hub_id || null,
+            active: matchedUser.active
+        };
+
+        // Store in both localStorage and sessionStorage
+        localStorage.setItem('user', JSON.stringify(userData));
+        sessionStorage.setItem('user', JSON.stringify(userData));
+
+        // Route based on role — add new roles here as needed
+        const routeMap = {
+            'super_user':  '../index.html',
+            'hub_manager': '../hub-manager/dashboard.html',
+            'merchant':    '../merchant/dashboard.html',
+            'customer':    '../customer/dashboard.html',
+            'agent':       '../agent/dashboard.html'
+        };
+
+        const destination = routeMap[matchedUser.role] || '../index.html';
+        setTimeout(() => window.location.href = destination, 1500);
     }, 1000);
 }
 
