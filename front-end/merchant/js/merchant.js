@@ -72,6 +72,25 @@ function initWizard() {
             pane.classList.toggle('active', (index + 1) === currentStep);
         });
 
+        // Update Buttons
+        const backBtn = document.querySelector('.btn-back');
+        const nextBtn = document.querySelector('.btn-next');
+        const resetBtn = document.querySelector('.btn-reset');
+        
+        if (backBtn) backBtn.style.display = currentStep === 1 ? 'none' : 'flex';
+        if (nextBtn) {
+            const nextText = nextBtn.querySelector('span');
+            const nextIcon = nextBtn.querySelector('i');
+            if (currentStep === totalSteps) {
+                if (nextText) nextText.textContent = 'Done';
+                if (nextIcon) nextIcon.classList.replace('fa-arrow-right', 'fa-check');
+            } else {
+                if (nextText) nextText.textContent = 'Next';
+                if (nextIcon) nextIcon.classList.replace('fa-check', 'fa-arrow-right');
+            }
+        }
+        if (resetBtn) resetBtn.style.display = currentStep === totalSteps ? 'none' : 'flex';
+
         // Scroll to top of card
         const card = document.querySelector('.form-wizard-card');
         if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -165,10 +184,10 @@ function initWizard() {
     }
 
     function generateTrackingID() {
-        const idElem = document.getElementById('final-tracking-id');
+        const idElem = document.getElementById('final-tracking-id-inp');
         if (idElem) {
-            const randomID = 'ST-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-            idElem.textContent = randomID;
+            const randomID = 'TRK' + Math.floor(10000000 + Math.random() * 90000000);
+            idElem.value = randomID;
         }
     }
 }

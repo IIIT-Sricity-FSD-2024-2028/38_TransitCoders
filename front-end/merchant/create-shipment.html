@@ -247,16 +247,26 @@
                     <div class="divider"></div>
                     <div class="form-grid">
                         <div class="form-group full-width">
-                            <label>Pickup Date</label>
-                            <input type="date" id="pickup-date" class="form-control" required>
+                            <label>Merchant ID</label>
+                            <input type="text" id="merchant-id-sched" class="form-control" value="M1023" readonly>
                         </div>
                         <div class="form-group full-width">
-                            <label>Preferred Pickup Window</label>
-                            <select id="pickup-window" class="form-control" required>
-                                <option value="9am-12pm">Morning (9 AM - 12 PM)</option>
-                                <option value="12pm-3pm">Afternoon (12 PM - 3 PM)</option>
-                                <option value="3pm-6pm">Evening (3 PM - 6 PM)</option>
-                            </select>
+                            <label>GST Number</label>
+                            <input type="text" id="gst-number" class="form-control" value="33ABCDE1234F1Z5" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Pickup Date</label>
+                            <input type="text" id="pickup-date-str" class="form-control" value="12 March 2026" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Pickup Time Slot</label>
+                            <input type="text" id="pickup-time-slot" class="form-control" value="10:00 AM – 12:00 PM" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Pickup Status</label>
+                            <div class="form-control" style="background: #fdfdfd; display: flex; align-items: center; justify-content: flex-start;">
+                                <span class="status-badge" style="background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; font-size: 11px;">Status</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -265,35 +275,87 @@
                 <div class="step-pane" data-step="5">
                     <h2>Order Summary</h2>
                     <div class="divider"></div>
-                    <div class="summary-box" style="background: #f8fafc; padding: 24px; border-radius: 12px; border: 1px dashed #cbd5e1;">
-                        <p style="text-align: center; color: #64748b; font-size: 14px;">Please review all the information before confirming the shipment.</p>
-                        <!-- In a real app, this would be populated with JS -->
-                        <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-                            <div>
-                                <h4 style="font-size: 12px; color: #ff5c02; text-transform: uppercase;">Origin</h4>
-                                <p style="font-size: 15px; font-weight: 600;">Vinod's Warehouse, Chennai</p>
+                    <div class="summary-details" style="padding: 10px 40px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 32px; font-weight: 600; font-size: 14px; color: var(--clr-neutral-500);">
+                            <span>Order ID: <span style="color: var(--clr-neutral-700);">ORD24578</span></span>
+                            <span>Package ID: <span style="color: var(--clr-neutral-700);">PKG78321</span></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 40px; font-weight: 600; font-size: 14px; color: var(--clr-neutral-500);">
+                            <span>Date: <span style="color: var(--clr-neutral-700);">16/08/2026</span></span>
+                            <span>Time: <span style="color: var(--clr-neutral-700);">03:05</span></span>
+                        </div>
+
+                        <div class="summary-list" style="max-width: 400px; margin: 0 auto;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 15px;">
+                                <span style="color: var(--clr-neutral-500); font-weight: 500;">Base Delivery Charge</span>
+                                <span style="font-weight: 600;">120</span>
                             </div>
-                            <div>
-                                <h4 style="font-size: 12px; color: #ff5c02; text-transform: uppercase;">Destination</h4>
-                                <p style="font-size: 15px; font-weight: 600;">(As entered in Step 2)</p>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 15px;">
+                                <span style="color: var(--clr-neutral-500); font-weight: 500;">Packet Weight Charge</span>
+                                <span style="font-weight: 600;">40</span>
                             </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 15px;">
+                                <span style="color: var(--clr-neutral-500); font-weight: 500;">Fragile Fee Handling Cost</span>
+                                <span style="font-weight: 600;">30</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 15px;">
+                                <span style="color: var(--clr-neutral-500); font-weight: 500;">Pickup Service Charge</span>
+                                <span style="font-weight: 600;">20</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 40px; font-size: 15px;">
+                                <span style="color: var(--clr-neutral-500); font-weight: 500;">Taxes(GST)</span>
+                                <span style="font-weight: 600;">38</span>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; padding-top: 24px; font-size: 16px; font-weight: 700;">
+                                <span style="color: var(--clr-neutral-500);">Total Amount</span>
+                                <span>248</span>
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 48px;">
+                            <button class="btn btn-primary" style="background: white; color: var(--clr-orange-500); border: 2px solid #ff5c02; border-radius: 8px; padding: 10px 40px; font-weight: 700;">Pay</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Step 6: Tracking ID -->
                 <div class="step-pane" data-step="6">
-                    <h2>Success!</h2>
+                    <h2 style="font-size: 36px;">Tracking ID</h2>
                     <div class="divider"></div>
-                    <div class="success-screen" style="text-align: center; padding: 20px;">
-                        <div class="success-icon" style="width: 80px; height: 80px; background: #dcfce7; color: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 24px;">
-                            <i class="fas fa-check"></i>
+                    
+                    <div class="form-grid" style="max-width: 500px; margin: 40px auto 0;">
+                        <div class="form-group full-width">
+                            <label>Tracking ID</label>
+                            <input type="text" id="final-tracking-id-inp" class="form-control" value="TRK453217" readonly style="font-weight: 700; background: #fff;">
                         </div>
-                        <h3 style="font-size: 24px; font-weight: 700;">Shipment Created Successfully</h3>
-                        <p style="color: #64748b; margin-top: 8px;">Your package is ready for pickup.</p>
-                        
-                        <div class="tracking-id-label" style="margin-top: 40px; font-size: 12px; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Tracking ID</div>
-                        <div id="final-tracking-id" style="font-size: 32px; font-weight: 800; color: #1e293b; margin-top: 8px; letter-spacing: 2px;">ST-XXXXXX</div>
+
+                        <div style="grid-column: span 2; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px 0; color: #94a3b8; font-size: 14px;">
+                            <i class="fas fa-location-dot"></i>
+                            <span style="font-weight: 500;">Track</span>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Order ID</label>
+                            <input type="text" class="form-control" value="ORD24578" readonly>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Package ID</label>
+                            <input type="text" class="form-control" value="PKG78321" readonly>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Shipment Status</label>
+                            <div class="form-control" style="background: #fdfdfd; display: flex; align-items: center; justify-content: flex-start;">
+                                <span class="status-badge" style="background: #dcfce7; color: #22c55e; border: 1px solid #bbf7d0; font-size: 11px;">Picked Up</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Last Updated</label>
+                            <input type="text" class="form-control" value="08 Mar 2026 | 4:30 PM" readonly>
+                        </div>
                     </div>
                 </div>
 
