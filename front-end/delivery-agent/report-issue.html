@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Issue | SwiftTrack Agent</title>
+    <meta name="description" content="Report delivery issues — package damage, customer unavailable, refused, or other problems.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/delivery-agent.css">
+</head>
+<body>
+    <div class="da-layout">
+        <!-- Sidebar -->
+        <aside class="da-sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon"><i class="fas fa-truck-fast"></i></div>
+                <div>
+                    <div class="logo-text"><span class="swift">Swift</span><span class="track">Track</span></div>
+                    <span class="logo-sub">Agent Panel</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="worklist.html" class="nav-link active"><i class="fas fa-clipboard-list"></i><span>Worklist</span></a>
+                <a href="delivery-history.html" class="nav-link"><i class="fas fa-clock-rotate-left"></i><span>Delivery History</span></a>
+                <a href="profile.html" class="nav-link"><i class="fas fa-user"></i><span>Profile</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-avatar">M</div>
+                    <div class="sidebar-user-info"><span class="user-name">Mukesh</span><span class="user-role">Delivery Agent</span></div>
+                </div>
+                <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i><span>LOGOUT</span></a>
+            </div>
+        </aside>
+
+        <main class="da-main">
+            <a href="javascript:history.back()" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+
+            <div class="da-report-wrapper">
+                <div class="report-card" id="report-card">
+                    <!-- Default: Issue Type Selector -->
+                    <h1 id="report-title">Report Issue</h1>
+                    <p class="subtitle" id="report-subtitle">Please provide details about the issue with your delivery to help us resolve it quickly.</p>
+
+                    <form class="report-form" id="report-form">
+                        <!-- Issue Type Selector -->
+                        <div class="form-group" id="issue-type-group">
+                            <label>Select Issue Type</label>
+                            <select class="form-select" id="issue-type-select">
+                                <option value="">Select Issue Type</option>
+                                <option value="package">Package Issue</option>
+                                <option value="unavailable">Customer Unavailable</option>
+                                <option value="refused">Customer Refused</option>
+                                <option value="other">Others</option>
+                            </select>
+                            <span class="field-error">Please select an issue type</span>
+                        </div>
+
+                        <!-- Dynamic Form Sections -->
+                        <div id="dynamic-form-section">
+                            <!-- Rendered based on issue type selection -->
+                        </div>
+
+                        <button type="submit" class="submit-report-btn" id="submit-report-btn" style="display:none;">Submit Report</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="report-success-modal">
+        <div class="modal-card">
+            <div class="modal-icon"><i class="fas fa-check"></i></div>
+            <h2>Report Submitted</h2>
+            <p>You can return to Dashboard</p>
+            <button class="modal-proceed-btn" id="report-proceed-btn">Proceed</button>
+        </div>
+    </div>
+
+    <footer class="da-footer">
+        <span class="da-footer-copy">© 2026 SWIFTTRACK. ALL RIGHTS RESERVED.</span>
+        <div class="da-footer-social">
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Verification | SwiftTrack Agent</title>
+    <meta name="description" content="Verify delivery with OTP and barcode scan.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/delivery-agent.css">
+</head>
+<body>
+    <div class="da-layout">
+        <!-- Sidebar -->
+        <aside class="da-sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon"><i class="fas fa-truck-fast"></i></div>
+                <div>
+                    <div class="logo-text"><span class="swift">Swift</span><span class="track">Track</span></div>
+                    <span class="logo-sub">Agent Panel</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="worklist.html" class="nav-link active"><i class="fas fa-clipboard-list"></i><span>Worklist</span></a>
+                <a href="delivery-history.html" class="nav-link"><i class="fas fa-clock-rotate-left"></i><span>Delivery History</span></a>
+                <a href="profile.html" class="nav-link"><i class="fas fa-user"></i><span>Profile</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-avatar">M</div>
+                    <div class="sidebar-user-info"><span class="user-name">Mukesh</span><span class="user-role">Delivery Agent</span></div>
+                </div>
+                <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i><span>LOGOUT</span></a>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="da-main">
+            <div class="da-header">
+                <div class="da-header-left">
+                    <div class="logo-text" style="font-size:18px;">
+                        <span class="swift">Swift</span><span class="track">Track</span>
+                        <span style="font-weight:800;color:var(--text-title);margin-left:8px;font-family:'Poppins';">Location Tracking</span>
+                    </div>
+                </div>
+                <div class="da-header-right">
+                    <div class="theme-toggle">
+                        <i class="fas fa-sun icon-sun"></i>
+                        <i class="fas fa-moon icon-moon" style="display:none"></i>
+                        <div class="toggle-track"><div class="toggle-dot"></div></div>
+                        <span class="theme-label">Light</span>
+                    </div>
+                    <div class="header-avatar">M</div>
+                    <div class="header-user-info">
+                        <span class="name">Mukesh</span>
+                        <span class="role">Delivery Agent</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="da-acceptance-layout">
+                <!-- Left: Map -->
+                <div class="da-map-section">
+                    <div class="da-map-container" style="height:100%;min-height:500px;">
+                        <img src="../assets/map-bg.png" alt="Live tracking map">
+                    </div>
+                </div>
+
+                <!-- Right: Verification Panel -->
+                <div class="da-details-panel verification-panel">
+                    <h2>Delivery Verification</h2>
+                    <p class="subtitle">Complete the steps below to finalize order <strong id="verify-order-ref">#ST-99812</strong></p>
+
+                    <div class="verification-recipient">
+                        <div><span class="label">Recipient</span><br><span class="value" id="verify-recipient">Rajesh Kumar</span></div>
+                        <div><span class="label">Address</span><br><span class="value" id="verify-address">Shanti Villa, Chennai</span></div>
+                    </div>
+
+                    <!-- Step 1: OTP Verification -->
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <h3>Customer Verification</h3>
+                    </div>
+                    <div class="otp-section">
+                        <div class="otp-header">
+                            <span>Verify via OTP</span>
+                            <button class="otp-send-btn" id="send-otp-btn">SEND OTP</button>
+                        </div>
+                        <div class="otp-inputs" id="otp-inputs">
+                            <input type="text" class="otp-input" maxlength="1" data-index="0" id="otp-0">
+                            <input type="text" class="otp-input" maxlength="1" data-index="1" id="otp-1">
+                            <input type="text" class="otp-input" maxlength="1" data-index="2" id="otp-2">
+                            <input type="text" class="otp-input" maxlength="1" data-index="3" id="otp-3">
+                        </div>
+                        <button class="authenticate-btn" id="auth-btn">Authenticate Now</button>
+                    </div>
+
+                    <!-- Step 2: Evidence -->
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h3>Evidence of Delivery</h3>
+                    </div>
+                    <div class="barcode-section" id="barcode-btn">
+                        <i class="fas fa-barcode barcode-icon"></i>
+                        <div>
+                            <h4>Scan/Upload Barcode</h4>
+                            <p>Validate package serial number</p>
+                        </div>
+                    </div>
+
+                    <!-- Trouble Section -->
+                    <div class="da-trouble-section">
+                        <div class="trouble-info">
+                            <div class="trouble-icon"><i class="fas fa-exclamation-circle"></i></div>
+                            <div>
+                                <h4>Having trouble with the delivery?</h4>
+                                <p>Select an issue from the list to notify support.</p>
+                            </div>
+                        </div>
+                        <button class="report-btn" onclick="window.location.href='report-issue.html?id=' + getUrlParam('id')">Report</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- OTP Success Modal -->
+    <div class="modal-overlay" id="otp-success-modal">
+        <div class="modal-card">
+            <div class="modal-icon"><i class="fas fa-check"></i></div>
+            <h2>OTP Verified</h2>
+            <p>You can now proceed to scan the Barcode on the package</p>
+            <button class="modal-proceed-btn" id="otp-proceed-btn">Proceed</button>
+        </div>
+    </div>
+
+    <!-- Barcode Scanned Modal -->
+    <div class="modal-overlay" id="barcode-success-modal">
+        <div class="modal-card">
+            <div class="modal-icon"><i class="fas fa-check"></i></div>
+            <h2>Barcode Verified</h2>
+            <p>Package serial number validated successfully</p>
+            <button class="modal-proceed-btn" id="barcode-proceed-btn">Complete Delivery</button>
+        </div>
+    </div>
+
+    <footer class="da-footer">
+        <span class="da-footer-copy">© 2026 SWIFTTRACK. ALL RIGHTS RESERVED.</span>
+        <div class="da-footer-social">
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+    </footer>
+
+
+</body>
+</html>
