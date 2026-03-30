@@ -224,18 +224,106 @@ const DeliveryData = (() => {
         { orderId: 403, customer: 'Ananya Das', location: 'Whitefield', date: '3-3-2026', time: '09:00 AM', status: 'Completed', rating: 3 },
     ];
 
+    // ── Agent Profile ───────────────────────────────────────
+    let profile = {
+        name: 'Mukesh',
+        agentId: 'DA102',
+        role: 'Delivery Agent',
+        phone: '+91 98765 43210',
+        email: 'mukesh@swifttrack.com',
+        licenseNo: 'TN0720210001234',
+        joinedDate: '12 Jan 2023',
+        contractStatus: 'Active',
+        currentStatus: 'available', // available | on-delivery | offline
+        performance: { total: 210, completed: 198, failed: 12, rating: 4.6 },
+        vehicle: { number: 'TN07 AB 1234', type: 'Truck', capacity: '30 kg', status: 'Active' },
+        hub: { name: 'Chennai Central Hub', code: 'CHN001', contact: '+91 44 2345 6789' }
+    };
 
     // ── Reports ─────────────────────────────────────────────
+    let reports = [];
+
+    // ── CRUD Helpers ────────────────────────────────────────
+    function getOrders(filter = 'all') {
+        if (filter === 'all') return [...orders];
+        return orders.filter(o => o.status === filter);
+    }
+
+    function getOrderById(id) {
+        return orders.find(o => o.id === parseInt(id));
+    }
+
+    function updateOrderStatus(id, newStatus) {
+        const order = orders.find(o => o.id === parseInt(id));
+        if (order) {
+            order.status = newStatus;
+            if (newStatus === 'delivered') {
+                history.unshift({
+                    orderId: order.id,
+                    customer: order.customer,
+                    location: order.destination.split(',')[0],
+                    date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' }).replace(/\//g, '-'),
+                    time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                    status: 'Completed',
+                    rating: 0
+                });
+            }
+            return true;
+        }
+        return false;
+    }
+
+    function getOrderCounts() {
+        return {
+            all: orders.length,
+            pending: orders.filter(o => o.status === 'pending').length,
+            'in-transit': orders.filter(o => o.status === 'in-transit').length,
+            delivered: orders.filter(o => o.status === 'delivered').length
+        };
+    }
+
+    function getHistory(period = 'today') {
+        // Simple mock filtering
+        if (period === 'today') return history.filter(h => h.date === '8-3-2026');
+        if (period === 'week') return history.filter(h => ['8-3-2026', '7-3-2026', '5-3-2026'].includes(h.date));
+        return [...history];
+    }
+
+    function getProfile() {
+        return { ...profile };
+    }
+
+    function updateProfile(data) {
+        Object.assign(profile, data);
+        return true;
+    }
+
+    function updateProfileStatus(status) {
+        profile.currentStatus = status;
+        return true;
+    }
+
+    function submitReport(report) {
+        report.id = reports.length + 1;
+        report.timestamp = new Date().toISOString();
+        reports.push(report);
+        return true;
+    }
+
+    function getTotalDeliveriesToday() {
+        return orders.filter(o => o.status !== 'delivered').length;
+    }
 
     return {
-        getOrders: () => orders,
-        getOrderById: (id) => orders.find(o => o.id == id),
-        updateOrderStatus: (id, status) => {
-            const order = orders.find(o => o.id == id);
-            if (order) order.status = status;
-        },
-        getHistory: () => history,
-        getProfile: () => profile
+        getOrders,
+        getOrderById,
+        updateOrderStatus,
+        getOrderCounts,
+        getHistory,
+        getProfile,
+        updateProfile,
+        updateProfileStatus,
+        submitReport,
+        getTotalDeliveriesToday
     };
 })();
-
