@@ -296,7 +296,211 @@
     }
 }
 
-/* Dark Mode Overrides for Auth */
+/* =========================================================================
+   Dark Mode Overrides for Auth
+   Using design system tokens: --surface-subtle (#111827), --surface-default (#030712)
+   ========================================================================= */
+
+body.dark .auth-container {
+    background-color: var(--surface-subtle);
+}
+
 body.dark .auth-overlay {
     background: linear-gradient(145deg, rgba(20, 20, 30, 0.8) 0%, rgba(43, 127, 255, 0.1) 50%, rgba(0, 0, 0, 0.9) 100%);
 }
+
+body.dark .auth-right {
+    background: var(--surface-subtle);
+}
+
+body.dark .form-input {
+    background: #1e293b;
+    border-color: #334155;
+    color: var(--text-title);
+}
+
+body.dark .form-input::placeholder {
+    color: var(--text-subtitle);
+}
+
+body.dark .form-input:focus {
+    border-color: var(--clr-orange-500);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+
+body.dark .google-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: var(--text-title);
+}
+
+body.dark .google-btn:hover {
+    background: #334155;
+}
+
+body.dark .divider::before,
+body.dark .divider::after {
+    background: #334155;
+}
+
+body.dark .theme-switch {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark .remember-me input {
+    accent-color: var(--clr-orange-500);
+}
+
+/* =========================================================================
+   Forgot Password Page Styles
+   ========================================================================= */
+
+.forgot-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-subtle);
+    padding: 40px;
+    transition: background 0.3s ease;
+}
+
+.forgot-card {
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: 16px;
+    padding: 48px 40px;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.forgot-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+    text-decoration: none;
+}
+
+.forgot-logo .logo-box {
+    background-color: var(--clr-orange-500);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.forgot-logo .logo-text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.forgot-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(249, 115, 22, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 24px;
+    color: var(--clr-orange-500);
+}
+
+.forgot-card h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-title);
+    margin-bottom: 8px;
+}
+
+.forgot-card .subtitle {
+    font-size: 14px;
+    color: var(--text-subtitle);
+    margin-bottom: 32px;
+    line-height: 1.6;
+}
+
+.forgot-card .form-group {
+    text-align: left;
+}
+
+.forgot-card .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-title);
+    margin-bottom: 8px;
+}
+
+.forgot-card .auth-btn {
+    margin-top: 8px;
+}
+
+.forgot-card .back-to-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--text-subtitle);
+    transition: color 0.2s;
+}
+
+.forgot-card .back-to-login:hover {
+    color: var(--clr-orange-500);
+}
+
+.forgot-card .back-to-login i {
+    font-size: 12px;
+}
+
+/* Success state for forgot password */
+.forgot-success {
+    display: none;
+}
+
+.forgot-success.show {
+    display: block;
+}
+
+.forgot-success .check-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 28px;
+    color: #22c55e;
+}
+
+/* Dark mode for forgot password */
+body.dark .forgot-card {
+    background: #111827;
+    border-color: #1f2937;
+}
+
+body.dark .forgot-card .form-input {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+/* Forgot password theme toggle */
+.forgot-theme-toggle {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+}
+
