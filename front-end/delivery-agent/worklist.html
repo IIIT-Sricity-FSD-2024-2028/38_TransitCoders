@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worklist | SwiftTrack Delivery Agent</title>
+    <meta name="description" content="SwiftTrack Delivery Agent worklist — view and manage today's delivery orders.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/delivery-agent.css">
+</head>
+<body>
+    <div class="da-layout">
+        <!-- Sidebar -->
+        <aside class="da-sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon"><i class="fas fa-truck-fast"></i></div>
+                <div>
+                    <div class="logo-text"><span class="swift">Swift</span><span class="track">Track</span></div>
+                    <span class="logo-sub">Agent Panel</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="worklist.html" class="nav-link active">
+                    <i class="fas fa-clipboard-list"></i><span>Worklist</span>
+                </a>
+                <a href="delivery-history.html" class="nav-link">
+                    <i class="fas fa-clock-rotate-left"></i><span>Delivery History</span>
+                </a>
+                <a href="profile.html" class="nav-link">
+                    <i class="fas fa-user"></i><span>Profile</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-avatar">M</div>
+                    <div class="sidebar-user-info">
+                        <span class="user-name">Mukesh</span>
+                        <span class="user-role">Delivery Agent</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i><span>LOGOUT</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="da-main">
+            <div class="da-header">
+                <div class="da-header-left">
+                    <h1>Welcome, Mukesh</h1>
+                    <p id="delivery-count-text">You have 6 deliveries pending for today.</p>
+                </div>
+                <div class="da-header-right">
+                    <div class="theme-toggle">
+                        <i class="fas fa-sun icon-sun"></i>
+                        <i class="fas fa-moon icon-moon" style="display:none"></i>
+                        <div class="toggle-track"><div class="toggle-dot"></div></div>
+                        <span class="theme-label">Light</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="da-filters">
+                <span class="da-filters-label">TODAY ORDERS</span>
+                <div class="da-filter-tabs" id="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">All Loads <span class="filter-count" id="count-all">8</span></button>
+                    <button class="filter-tab" data-filter="pending">Pending <span class="filter-count" id="count-pending">1</span></button>
+                    <button class="filter-tab" data-filter="in-transit">In-transit <span class="filter-count" id="count-transit">1</span></button>
+                    <button class="filter-tab" data-filter="delivered">Delivered <span class="filter-count" id="count-delivered">6</span></button>
+                </div>
+            </div>
+
+            <!-- Orders List -->
+            <div class="da-orders-list" id="orders-list">
+                <!-- Rendered by JS -->
+            </div>
+
+            <!-- View All Orders -->
+            <div id="view-all-wrapper" style="display:none;">
+                <button class="view-all-btn" id="view-all-btn">View All Orders</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="da-footer">
+        <span class="da-footer-copy">© 2026 SWIFTTRACK. ALL RIGHTS RESERVED.</span>
+        <div class="da-footer-social">
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+    </footer>
+
+
+</body>
+</html>
