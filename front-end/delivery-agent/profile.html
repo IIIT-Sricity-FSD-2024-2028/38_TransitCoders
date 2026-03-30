@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | SwiftTrack Agent</title>
+    <meta name="description" content="Delivery agent profile, status, performance and vehicle details.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/delivery-agent.css">
+</head>
+<body>
+    <div class="da-layout">
+        <!-- Sidebar -->
+        <aside class="da-sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon"><i class="fas fa-truck-fast"></i></div>
+                <div>
+                    <div class="logo-text"><span class="swift">Swift</span><span class="track">Track</span></div>
+                    <span class="logo-sub">Agent Panel</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="worklist.html" class="nav-link"><i class="fas fa-clipboard-list"></i><span>Worklist</span></a>
+                <a href="delivery-history.html" class="nav-link"><i class="fas fa-clock-rotate-left"></i><span>Delivery History</span></a>
+                <a href="profile.html" class="nav-link active"><i class="fas fa-user"></i><span>Profile</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-avatar">M</div>
+                    <div class="sidebar-user-info"><span class="user-name">Mukesh</span><span class="user-role">Delivery Agent</span></div>
+                </div>
+                <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i><span>LOGOUT</span></a>
+            </div>
+        </aside>
+
+        <main class="da-main">
+            <div class="da-header">
+                <div class="da-header-left">
+                    <h1>Your Profile</h1>
+                    <p>Manage your personal details and preferences</p>
+                </div>
+                <div class="da-header-right">
+                    <div class="theme-toggle">
+                        <i class="fas fa-sun icon-sun"></i>
+                        <i class="fas fa-moon icon-moon" style="display:none"></i>
+                        <div class="toggle-track"><div class="toggle-dot"></div></div>
+                        <span class="theme-label">Light</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="da-profile-grid">
+                <!-- Main Column -->
+                <div class="profile-main">
+                    <!-- Agent Card -->
+                    <div class="profile-card">
+                        <div class="profile-header-card">
+                            <img src="../assets/avatar-neutral.png" alt="Agent photo" class="profile-photo">
+                            <div class="profile-name-section">
+                                <h2 id="profile-name">Mukesh <span class="active-badge">Active</span></h2>
+                                <p class="profile-sub-id" id="profile-sub-id">DA102 · Delivery Agent</p>
+                                <div class="profile-actions">
+                                    <button class="profile-action-btn primary" id="edit-profile-btn"><i class="fas fa-pen" style="margin-right:6px"></i>Edit Profile</button>
+                                    <button class="profile-action-btn"><i class="fas fa-download" style="margin-right:6px"></i>Download ID</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal Details -->
+                    <div class="profile-card">
+                        <h3>Personal Details</h3>
+                        <div class="profile-details-grid">
+                            <div class="profile-detail-item">
+                                <span class="label">Full Name</span>
+                                <span class="value" id="pd-name">Mukesh</span>
+                            </div>
+                            <div class="profile-detail-item">
+                                <span class="label">Agent ID</span>
+                                <span class="value" id="pd-id">DA102</span>
+                            </div>
+                            <div class="profile-detail-item">
+                                <span class="label">Role</span>
+                                <span class="value" id="pd-role">Delivery Agent</span>
+                            </div>
+                            <div class="profile-detail-item">
+                                <span class="label">Phone</span>
+                                <span class="value" id="pd-phone">+91 98765 43210</span>
+                            </div>
+                            <div class="profile-detail-item">
+                                <span class="label">Email</span>
+                                <span class="value" id="pd-email">mukesh@swifttrack.com</span>
+                            </div>
+                            <div class="profile-detail-item">
+                                <span class="label">License No.</span>
+                                <span class="value" id="pd-license">TN0720210001234</span>
+                            </div>
+                            <div class="profile-detail-item">
+                                <span class="label">Joined Date</span>
+                                <span class="value" id="pd-joined">12 Jan 2023</span>
+                            </div>
+                            <div class="profile-detail-item">
+                                <span class="label">Contract Status</span>
+                                <span class="value active-text" id="pd-contract">Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance -->
+                    <div class="profile-card">
+                        <h3>Performance</h3>
+                        <div class="perf-grid">
+                            <div class="perf-item">
+                                <span class="label">Total Deliveries</span>
+                                <span class="value" id="perf-total">210</span>
+                            </div>
+                            <div class="perf-item">
+                                <span class="label">Completed</span>
+                                <span class="value green" id="perf-completed">198</span>
+                            </div>
+                            <div class="perf-item">
+                                <span class="label">Failed</span>
+                                <span class="value red" id="perf-failed">12</span>
+                            </div>
+                            <div class="perf-item">
+                                <span class="label">Rating</span>
+                                <div class="perf-rating" id="perf-rating">
+                                    <span class="value">4.6</span>
+                                    <i class="fas fa-star star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Side Column -->
+                <div class="profile-sidebar">
+                    <!-- Current Status -->
+                    <div class="profile-card">
+                        <h3>Current Status</h3>
+                        <div class="status-options" id="status-options">
+                            <div class="status-option active" data-status="available">
+                                <div class="status-dot available"></div>
+                                <span>Available</span>
+                            </div>
+                            <div class="status-option" data-status="on-delivery">
+                                <div class="status-dot on-delivery"></div>
+                                <span>On Delivery</span>
+                            </div>
+                            <div class="status-option" data-status="offline">
+                                <div class="status-dot offline"></div>
+                                <span>Offline</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Details -->
+                    <div class="profile-card">
+                        <h3>Vehicle Details</h3>
+                        <img src="../assets/van-image.png" alt="Delivery Vehicle" class="vehicle-image">
+                        <div class="vehicle-details">
+                            <div class="vehicle-row">
+                                <span class="label">Vehicle Number</span>
+                                <span class="value" id="v-number">TN07 AB 1234</span>
+                            </div>
+                            <div class="vehicle-row">
+                                <span class="label">Vehicle Type</span>
+                                <span class="value" id="v-type">Truck</span>
+                            </div>
+                            <div class="vehicle-row">
+                                <span class="label">Capacity</span>
+                                <span class="value" id="v-capacity">30 kg</span>
+                            </div>
+                            <div class="vehicle-row">
+                                <span class="label">Status</span>
+                                <span class="value active-text" id="v-status">Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assigned Hub -->
+                    <div class="profile-card">
+                        <h3>Assigned Hub</h3>
+                        <div class="hub-info">
+                            <div class="hub-row">
+                                <span class="label">Hub Name</span>
+                                <span class="value" id="h-name">Chennai Central Hub</span>
+                            </div>
+                            <div class="hub-contact-row">
+                                <div class="hub-row">
+                                    <span class="label">Hub Code</span>
+                                    <span class="value" id="h-code">CHN001</span>
+                                </div>
+                                <div class="hub-row">
+                                    <span class="label">Contact</span>
+                                    <span class="value" id="h-contact">+91 44 2345 6789</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="edit-profile-modal">
+        <div class="modal-card" style="text-align:left;max-width:480px;">
+            <h2 style="margin-bottom:20px;">Edit Profile</h2>
+            <form id="edit-profile-form">
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label>Full Name</label>
+                    <input type="text" class="form-input-field" id="edit-name" required>
+                    <span class="field-error">Name is required</span>
+                </div>
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label>Phone</label>
+                    <input type="text" class="form-input-field" id="edit-phone" required>
+                    <span class="field-error">Phone is required</span>
+                </div>
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label>Email</label>
+                    <input type="email" class="form-input-field" id="edit-email" required>
+                    <span class="field-error">Valid email is required</span>
+                </div>
+                <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
+                    <button type="button" class="profile-action-btn" onclick="hideModal('edit-profile-modal')">Cancel</button>
+                    <button type="submit" class="profile-action-btn primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="da-footer">
+        <span class="da-footer-copy">© 2026 SWIFTTRACK. ALL RIGHTS RESERVED.</span>
+        <div class="da-footer-social">
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+    </footer>
+
+</body>
+</html>
