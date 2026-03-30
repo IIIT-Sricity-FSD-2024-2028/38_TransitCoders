@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hub Manager — Modal Reference</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="css/hub-manager.css" />
+  </head>
+  <body>
+
+    <!-- MAP MODAL -->
+    <div class="hm-modal-overlay" id="map-modal">
+      <div class="hm-modal hm-modal-wide" style="border-radius:var(--radius-l);overflow:hidden; padding:0;">
+        <div class="modal-map-header" style="display:flex;justify-content:space-between;align-items:flex-start; padding: 24px 32px 16px;">
+          <div>
+            <h2 style="margin:0; font-size:18px; font-weight:700; color:var(--text-title);">Delivery Route Map</h2>
+            <p style="margin:4px 0 0; font-size:12px; color:var(--text-subtitle);">Route between hub and delivery destination</p>
+          </div>
+          <button style="background:none;border:none;color:var(--text-caption);cursor:pointer;padding:4px;" onclick="closeModal('map-modal')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <div class="modal-map-body" style="background:var(--surface-subtle); padding: 0 32px;">
+          <img src="assets/delivery-route-map.png" alt="Delivery Route" id="modal-map-img" />
+        </div>
+        <div class="modal-map-footer" style="padding:24px 32px; display:grid; grid-template-columns: repeat(5, 1fr); gap:16px; align-items:start; border-top:1px solid var(--border-default);">
+          <div><div style="font-size:10px; color:var(--text-subtitle); text-transform:uppercase; margin-bottom:4px;">Pickup Hub</div><div class="modal-info-val-pickup" style="font-size:13px; font-weight:600; color:var(--text-title);">—</div></div>
+          <div><div style="font-size:10px; color:var(--text-subtitle); text-transform:uppercase; margin-bottom:4px;">Destination</div><div class="modal-info-val-dest" style="font-size:13px; font-weight:600; color:var(--text-title);">—</div></div>
+          <div><div style="font-size:10px; color:var(--text-subtitle); text-transform:uppercase; margin-bottom:4px;">Distance</div><div style="font-size:13px; font-weight:600; color:var(--text-title);"><span>3.8</span> km</div></div>
+          <div><div style="font-size:10px; color:var(--text-subtitle); text-transform:uppercase; margin-bottom:4px;">Est. Time</div><div style="font-size:13px; font-weight:600; color:var(--text-title);"><span>12</span> mins</div></div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="modal-agent-badge" style="width:32px; height:32px; border-radius:50%; background:var(--info-surface); color:var(--info-fill); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;">??</div>
+            <div><div style="font-size:10px; color:var(--text-subtitle); text-transform:uppercase; margin-bottom:0;">Agent</div><div class="modal-info-val-agent" style="font-size:12px; font-weight:600; color:var(--text-title);">Unassigned</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHANGE DESTINATION MODAL (Revamped) -->
+    <div class="hm-modal-overlay" id="changeDestModal">
+      <div class="hm-modal" style="border-radius:var(--radius-l);overflow:hidden;max-width:480px;">
+        <div class="hm-modal-header" style="border-bottom:1px solid var(--border-default);padding: 24px 32px 16px;">
+          <h2 class="hm-modal-title" style="display:flex;align-items:center;gap:12px; margin:0; font-size:18px; font-weight:700;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Change Destination Hub
+          </h2>
+          <button class="hm-modal-close" onclick="closeModal('changeDestModal')" style="background:none; border:none; font-size:24px; cursor:pointer; color:var(--text-caption);">&times;</button>
+        </div>
+        <div class="hm-modal-body" style="padding: 24px 32px;">
+          <p style="font-size:13px;color:var(--text-subtitle);margin-bottom:24px;">Reassign this order to a different hub for route optimization or capacity management.</p>
+          
+          <div class="hm-form-group" style="margin-bottom:20px;">
+            <label class="hm-label" style="display:block; font-size:12px; font-weight:600; color:var(--text-title); margin-bottom:8px;">Target Pickup Hub <span style="color:var(--brand-action);">*</span></label>
+            <select id="cd-hub-select" class="hm-form-select" style="width:100%; height:44px; border-radius:var(--radius-m); border:1px solid var(--border-default); padding:0 12px; font-size:14px; background:var(--surface-default);">
+              <option value="">Select new destination hub</option>
+            </select>
+          </div>
+          
+          <div class="hm-form-group">
+            <label class="hm-label" style="display:block; font-size:12px; font-weight:600; color:var(--text-title); margin-bottom:8px;">Reason for Change <span style="color:var(--brand-action);">*</span></label>
+            <select id="cd-reason-select" class="hm-form-select" style="width:100%; height:44px; border-radius:var(--radius-m); border:1px solid var(--border-default); padding:0 12px; font-size:14px; background:var(--surface-default);">
+              <option value="">Select a reason</option>
+              <option value="route">Route Optimization</option>
+              <option value="capacity">Hub at Capacity</option>
+              <option value="refusal">Customer Request</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="hm-modal-footer" style="padding:24px 32px; border-top:1px solid var(--border-default); display:flex; justify-content:flex-end; gap:12px;">
+          <button class="hm-btn hm-btn-ghost" onclick="closeModal('changeDestModal')">Cancel</button>
+          <button class="hm-btn hm-btn-primary" onclick="confirmChangeDestinationAction()">Update Destination</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/hub-manager.js"></script>
+    <script>
+      initTheme();
+    </script>
+  </body>
+</html>

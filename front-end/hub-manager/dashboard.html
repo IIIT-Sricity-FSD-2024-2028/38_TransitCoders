@@ -1,639 +1,569 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Hub Manager — SwiftTrack</title>
-    <meta name="description" content="Hub operations dashboard for SwiftTrack logistics platform.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="css/hub-manager.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hub Manager Dashboard | SwiftTrack</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="css/hub-manager.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body class="light" onload="initPage()">
+    <div class="hm-layout">
+      <!-- SIDEBAR -->
+      <aside id="sidebar" class="hm-sidebar"></aside>
 
-    <!-- Page-specific overrides (dashboard only) -->
-    <style>
-        /* ---- Elegant Desktop Center Constrain ---- */
-        .hm-main {
-            flex: 1;
-            /* Ensure it expands to fill the entire remaining screen width */
-            width: calc(100% - var(--hm-sidebar-w)); 
-        }
+      <!-- NAVBAR -->
+      <header id="navbar" class="hm-navbar"></header>
 
-        #page-content {
-            max-width: 1600px;
-            width: 100%;
-            margin: 0 auto; /* Perfect horizontal centering inside hm-main! */
-        }
-
-        /* ---- Stat Card Icon ---- */
-        .hm-stat-icon {
-            width: 48px; height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: var(--space-12);
-        }
-        .hm-stat-icon svg { width: 22px; height: 22px; }
-        .hm-stat-icon.orange { background: var(--brand-surface-default); }
-        .hm-stat-icon.orange svg { stroke: var(--brand-action); fill: none; }
-        .hm-stat-icon.green  { background: var(--success-surface); }
-        .hm-stat-icon.green svg  { stroke: var(--success-fill); fill: none; }
-        .hm-stat-icon.blue   { background: var(--info-surface); }
-        .hm-stat-icon.blue svg   { stroke: var(--info-fill); fill: none; }
-
-        .hm-stat-sub {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-subtitle);
-            margin-top: var(--space-4);
-        }
-
-        /* ---- Filter Tabs ---- */
-        .hm-filter-tabs {
-            display: flex;
-            align-items: center;
-            gap: var(--space-8);
-            flex-wrap: wrap;
-        }
-        .hm-filter-tab {
-            padding: var(--space-8) var(--space-16);
-            border-radius: var(--radius-s);
-            border: 1px solid var(--border-default);
-            background: var(--surface-default);
-            color: var(--text-subtitle);
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            font-family: inherit;
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-8);
-            transition: all var(--hm-transition);
-        }
-        .hm-filter-tab:hover { color: var(--text-title); border-color: var(--border-strong); }
-        .hm-filter-tab.active {
-            background: var(--brand-action);
-            color: #fff;
-            border-color: var(--brand-action);
-        }
-        .hm-filter-count {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: var(--radius-badge);
-            background: var(--surface-subtle);
-            color: var(--text-subtitle);
-        }
-        .hm-filter-tab.active .hm-filter-count {
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-        }
-
-        /* ---- Stats Grid Override ---- */
-        .hm-stats-grid {
-            grid-template-columns: repeat(4, 1fr) !important;
-            margin-bottom: var(--space-32);
-        }
-
-        /* ---- Order Card ---- */
-        .hm-order-cards { 
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-24); 
-        }
-
-        .hm-order-card {
-            background: var(--surface-default);
-            border: 1px solid var(--border-default);
-            border-radius: var(--radius-m);
-            padding: var(--space-24);
-            transition: border-color var(--hm-transition), background-color var(--hm-transition);
-        }
-        .hm-order-card:hover { border-color: var(--border-strong); }
-
-        .hm-order-card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: var(--space-16);
-            flex-wrap: wrap;
-            gap: var(--space-16);
-        }
-        .hm-order-card-left {
-            display: flex;
-            align-items: center;
-            gap: var(--space-12);
-        }
-        .hm-order-id {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--brand-action);
-        }
-        .hm-order-card-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: var(--space-12);
-            flex: 1;
-        }
-
-        .hm-order-card-info {
-            margin-bottom: var(--space-16);
-        }
-        .hm-order-customer {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-title);
-            margin-bottom: var(--space-4);
-        }
-        .hm-order-agent {
-            font-size: 13px;
-            color: var(--text-subtitle);
-        }
-
-        /* Progress line */
-        .hm-order-progress {
-            display: flex;
-            align-items: center;
-            gap: var(--space-8);
-            margin-bottom: var(--space-12);
-            padding: var(--space-4) 0;
-        }
-        .hm-progress-dot {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            background: var(--brand-action);
-            flex-shrink: 0;
-        }
-        .hm-progress-dot.end {
-            background: transparent;
-            border: 2px solid var(--border-strong);
-        }
-        .hm-progress-line {
-            flex: 1;
-            height: 2px;
-            background: var(--surface-disabled); /* inactive light gray */
-            position: relative;
-        }
-        /* ---- Progress Animations ---- */
-        @keyframes floatTruck {
-            0% { transform: translateY(-50%) translateX(0); }
-            50% { transform: translateY(-50%) translateX(3px); }
-            100% { transform: translateY(-50%) translateX(0); }
-        }
-        .hm-progress-truck {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            left: 0;
-            margin-left: -8px;
-            width: 16px; 
-            height: 16px;
-            fill: var(--text-subtitle);
-            transition: left 1s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: floatTruck 2.5s ease-in-out infinite;
-        }
-
-        .hm-progress-fill {
-            height: 100%;
-            background-color: var(--brand-action);
-            width: 0%;
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* ---- Stat Card Entry Animation ---- */
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .hm-stat-card {
-            background: var(--surface-default);
-            border: 1px solid var(--border-default);
-            border-radius: var(--radius-l);
-            padding: var(--space-24);
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-8);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            animation: slideUp 0.5s ease-out forwards;
-            opacity: 0; /* starts hidden */
-        }
-        .hm-stat-card:nth-child(1) { animation-delay: 0.1s; }
-        .hm-stat-card:nth-child(2) { animation-delay: 0.2s; }
-        .hm-stat-card:nth-child(3) { animation-delay: 0.3s; }
-        .hm-stat-card:nth-child(4) { animation-delay: 0.4s; }
-        
-        .hm-order-card {
-            animation: slideUp 0.4s ease-out forwards;
-        }
-
-        /* Locations */
-        .hm-order-locations {
-            display: flex;
-            justify-content: space-between;
-            gap: var(--space-16);
-            margin-bottom: var(--space-16);
-        }
-        .hm-loc { display: flex; align-items: flex-start; gap: var(--space-8); }
-        .hm-loc-icon svg { width: 16px; height: 16px; stroke: var(--text-caption); fill: none; stroke-width: 2; flex-shrink: 0; margin-top: 2px; }
-        .hm-loc-label { font-size: 11px; font-weight: 600; color: var(--text-caption); text-transform: uppercase; letter-spacing: 0.04em; }
-        .hm-loc-value { font-size: 13px; color: var(--text-body); }
-        .hm-loc.end { text-align: right; }
-        .hm-loc.end .hm-loc-icon svg { stroke: var(--brand-action); }
-
-        /* Meta row (clean SaaS format) */
-        .hm-order-meta-row {
-            padding-top: var(--space-16);
-            border-top: 1px solid var(--border-default);
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-subtitle);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        /* ---- View All Button ---- */
-        .hm-view-all-wrap { text-align: center; margin-top: var(--space-24); }
-
-        /* ---- Dark mode overrides ---- */
-        body.dark .hm-order-card { background: var(--surface-subtle); border-color: var(--border-default); }
-        body.dark .hm-filter-tab { background: var(--surface-subtle); border-color: var(--border-default); }
-        body.dark .hm-filter-count { background: var(--surface-lighter); }
-    </style>
-</head>
-<body onload="initPage()">
-
-<div class="hm-layout">
-    <aside id="sidebar" class="hm-sidebar"></aside>
-    <header id="navbar" class="hm-navbar"></header>
-
-    <main class="hm-main">
+      <!-- MAIN CONTENT -->
+      <main class="hm-main">
         <div id="page-content">
-
-            <!-- HEADER -->
-            <div class="hm-page-header">
-                <div>
-                    <div class="hm-page-title">Hub Operations Dashboard</div>
-                    <div class="hm-page-subtitle">Monitor deliveries and agents in real time</div>
-                </div>
+          <div class="hm-page-header">
+            <div class="hm-header-left">
+              <h1 class="hm-page-title">Operations Dashboard</h1>
+              <p class="hm-page-subtitle">
+                Real-time overview of hub activities and order tracking
+              </p>
             </div>
+            <div class="hm-header-right"></div>
+          </div>
 
-            <!-- STATS -->
-            <div class="hm-stats-grid" id="statsGrid"></div>
+          <div class="hm-stats-grid" id="statsGrid">
+            <!-- Stats loaded via JS -->
+          </div>
 
-            <!-- ORDERS SECTION -->
-            <div class="hm-card" style="padding:var(--space-24);">
-                <div class="hm-card-header">
-                    <div class="hm-card-title">Orders Overview</div>
-                    <div class="hm-filter-tabs" id="filterTabs"></div>
-                </div>
-                <div id="ordersContainer"></div>
-                <div class="hm-view-all-wrap">
-                    <a href="order-queue.html" class="hm-btn hm-btn-primary">View All Orders</a>
-                </div>
+          <div class="hm-section-header" style="margin-bottom: var(--space-24)">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+              "
+            >
+              <h2 class="hm-section-title">Recent Orders</h2>
+              <div class="hm-filter-tabs" id="filterTabs">
+                <!-- Tabs loaded via JS -->
+              </div>
             </div>
+          </div>
 
+          <div id="ordersContainer">
+            <!-- Order cards loaded via JS -->
+          </div>
+
+          <div class="hm-view-all-wrap">
+            <a href="order-queue.html" class="hm-btn hm-btn-ghost"
+              >View All Orders &rarr;</a
+            >
+          </div>
+
+          <!-- BRAND FOOTER -->
+          <div class="hm-brand-footer">
+            <div>© 2026 SWIFTTRACK. ALL RIGHTS RESERVED.</div>
+            <div class="hm-social">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12 2C6.47 2 2 6.47 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.92c-2.78.6-3.37-1.12-3.37-1.12-.45-1.15-1.1-1.46-1.1-1.46-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02.8-.22 1.65-.33 2.5-.33.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.75c0 .26.18.58.69.48A10.01 10.01 0 0022 12c0-5.53-4.47-10-10-10z"
+                />
+              </svg>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"
+                ></path>
+                <rect x="2" y="9" width="4" height="12"></rect>
+                <circle cx="4" cy="4" r="2"></circle>
+              </svg>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"
+                ></path>
+              </svg>
+            </div>
+          </div>
         </div>
-    </main>
-</div>
+      </main>
+    </div>
 
-<!-- VIEW ORDER MODAL -->
-<div id="viewOrderModal" class="hm-modal-overlay">
-    <div class="hm-modal">
-        <button class="hm-modal-close" onclick="closeModal('viewOrderModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <!-- VIEW ORDER MODAL -->
+    <div class="hm-modal-overlay" id="viewOrderModal">
+      <div class="hm-modal hm-modal-wide">
+        <button class="hm-modal-close" onclick="closeModal('viewOrderModal')">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
         <div class="hm-modal-title">Order Details</div>
         <div class="hm-modal-body" id="viewOrderBody"></div>
         <div class="hm-modal-footer">
-            <button class="hm-btn hm-btn-ghost" onclick="closeModal('viewOrderModal')">Close</button>
+          <!-- Populated by JS -->
         </div>
+      </div>
     </div>
-</div>
 
-<!-- TRANSFER MODAL -->
-<div id="approveTransferModal" class="hm-modal-overlay">
-    <div class="hm-modal">
-        <button class="hm-modal-close" onclick="closeModal('approveTransferModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        <div class="hm-modal-title">Transfer Order</div>
+    <!-- TRANSFER MODAL -->
+    <div class="hm-modal-overlay" id="approveTransferModal">
+      <div class="hm-modal">
+        <button
+          class="hm-modal-close"
+          onclick="closeModal('approveTransferModal')"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+        <div class="hm-modal-title">Transfer Hub</div>
         <div class="hm-modal-body" id="transferBody"></div>
         <div class="hm-modal-footer">
-            <button class="hm-btn hm-btn-ghost" onclick="closeModal('approveTransferModal')">Cancel</button>
-            <button class="hm-btn hm-btn-primary" onclick="confirmTransfer()">Confirm Transfer</button>
+          <button
+            class="hm-btn hm-btn-ghost"
+            onclick="closeModal('approveTransferModal')"
+          >
+            Cancel
+          </button>
+          <button class="hm-btn hm-btn-primary" onclick="confirmTransfer()">
+            Confirm Transfer
+          </button>
         </div>
+      </div>
     </div>
-</div>
 
-<!-- ASSIGN AGENT MODAL -->
-<div id="assignAgentModal" class="hm-modal-overlay">
-    <div class="hm-modal">
-        <button class="hm-modal-close" onclick="closeModal('assignAgentModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <!-- ASSIGN AGENT MODAL -->
+    <div class="hm-modal-overlay" id="assignAgentModal">
+      <div class="hm-modal">
+        <button class="hm-modal-close" onclick="closeModal('assignAgentModal')">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
         <div class="hm-modal-title">Assign Agent</div>
         <div class="hm-modal-body" id="assignAgentBody"></div>
         <div class="hm-modal-footer">
-            <button class="hm-btn hm-btn-ghost" onclick="closeModal('assignAgentModal')">Cancel</button>
-            <button class="hm-btn hm-btn-primary" id="confirmAssignBtn" onclick="confirmAssign()">Assign Agent</button>
+          <button
+            class="hm-btn hm-btn-ghost"
+            onclick="closeModal('assignAgentModal')"
+          >
+            Cancel
+          </button>
+          <button class="hm-btn hm-btn-primary" onclick="confirmAssign()">
+            Confirm Assignment
+          </button>
         </div>
+      </div>
     </div>
-</div>
 
-<script src="../js/mockData.js"></script>
-<script src="js/hub-manager.js"></script>
-<script>
-/* ================================================================
-   DASHBOARD PAGE LOGIC
-   ================================================================ */
-var currentOrders = [];
-var currentAgents = [];
-var refreshInterval = null;
-var selectedTransferOrder = null;
-var selectedAssignOrder = null;
-var selectedAgentId = null;
-var activeFilter = 'all';
+    <!-- CHANGE DESTINATION MODAL -->
+    <div class="hm-modal-overlay" id="changeDestModal">
+      <div
+        class="hm-modal"
+        style="
+          border-radius: var(--radius-l);
+          overflow: hidden;
+          max-width: 480px;
+        "
+      >
+        <div
+          class="hm-modal-header"
+          style="
+            border-bottom: 1px solid var(--border-default);
+            padding: 24px 32px 16px;
+          "
+        >
+          <h2
+            class="hm-modal-title"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              margin: 0;
+              font-size: 18px;
+              font-weight: 700;
+            "
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              style="width: 20px; height: 20px"
+            >
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            Change Destination Hub
+          </h2>
+          <button
+            class="hm-modal-close"
+            onclick="closeModal('changeDestModal')"
+            style="
+              background: none;
+              border: none;
+              font-size: 24px;
+              cursor: pointer;
+              color: var(--text-caption);
+            "
+          >
+            &times;
+          </button>
+        </div>
+        <div class="hm-modal-body" style="padding: 24px 32px">
+          <p
+            style="
+              font-size: 13px;
+              color: var(--text-subtitle);
+              margin-bottom: 24px;
+            "
+          >
+            Reassign this order to a different hub for route optimization or
+            capacity management.
+          </p>
 
-function initPage() {
-    if (!checkSession()) return;
-    initTheme();
-    renderSidebar('dashboard.html');
-    renderNavbar('Hub Operations Dashboard');
-    loadDashboard();
-    refreshInterval = setInterval(loadDashboard, 60000);
-}
+          <div class="hm-form-group" style="margin-bottom: 20px">
+            <label
+              class="hm-label"
+              style="
+                display: block;
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-title);
+                margin-bottom: 8px;
+              "
+              >Target Pickup Hub
+              <span style="color: var(--brand-action)">*</span></label
+            >
+            <select
+              id="cd-hub-select"
+              class="hm-form-select"
+              style="
+                width: 100%;
+                height: 44px;
+                border-radius: var(--radius-m);
+                border: 1px solid var(--border-default);
+                padding: 0 12px;
+                font-size: 14px;
+                background: var(--surface-default);
+              "
+            >
+              <option value="">Select new destination hub</option>
+            </select>
+          </div>
 
-function loadDashboard() {
-    showSkeletonStats();
-    showSkeleton('ordersContainer', 8);
-    setTimeout(function () {
-        currentOrders = filterOrdersByHub(window.mockData.orders);
-        currentAgents = filterAgentsByHub(window.mockData.agents);
-        renderStats();
-        renderFilterTabs();
-        renderOrderCards();
-    }, 500);
-}
+          <div class="hm-form-group">
+            <label
+              class="hm-label"
+              style="
+                display: block;
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-title);
+                margin-bottom: 8px;
+              "
+              >Reason for Change
+              <span style="color: var(--brand-action)">*</span></label
+            >
+            <select
+              id="cd-reason-select"
+              class="hm-form-select"
+              style="
+                width: 100%;
+                height: 44px;
+                border-radius: var(--radius-m);
+                border: 1px solid var(--border-default);
+                padding: 0 12px;
+                font-size: 14px;
+                background: var(--surface-default);
+              "
+            >
+              <option value="">Select a reason</option>
+              <option value="route">Route Optimization</option>
+              <option value="capacity">Hub at Capacity</option>
+              <option value="refusal">Customer Request</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div
+          class="hm-modal-footer"
+          style="
+            padding: 24px 32px;
+            border-top: 1px solid var(--border-default);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+          "
+        >
+          <button
+            class="hm-btn hm-btn-ghost"
+            onclick="closeModal('changeDestModal')"
+          >
+            Cancel
+          </button>
+          <button
+            class="hm-btn hm-btn-primary"
+            onclick="confirmChangeDestinationAction()"
+          >
+            Update Destination
+          </button>
+        </div>
+      </div>
+    </div>
 
-/* ================================================================
-   STATS
-   ================================================================ */
-function showSkeletonStats() {
-    var g = document.getElementById('statsGrid');
-    if (!g) return;
-    var h = '';
-    for (var i = 0; i < 4; i++) h += '<div class="hm-card hm-stat-card"><div class="hm-skeleton hm-skeleton-row" style="width:48px;height:48px;border-radius:50%"></div><div class="hm-skeleton hm-skeleton-row" style="width:50%;margin-top:12px"></div><div class="hm-skeleton hm-skeleton-row" style="width:30%;height:24px;margin-top:8px"></div></div>';
-    g.innerHTML = h;
-}
+    <!-- MAP MODAL -->
+    <div class="hm-modal-overlay" id="map-modal">
+      <div
+        class="hm-modal hm-modal-wide"
+        style="border-radius: var(--radius-l); overflow: hidden; padding: 0"
+      >
+        <div
+          class="modal-map-header"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 24px 32px 16px;
+          "
+        >
+          <div>
+            <h2
+              style="
+                margin: 0;
+                font-size: 18px;
+                font-weight: 700;
+                color: var(--text-title);
+              "
+            >
+              Delivery Route Map
+            </h2>
+            <p
+              style="
+                margin: 4px 0 0;
+                font-size: 12px;
+                color: var(--text-subtitle);
+              "
+            >
+              Route between hub and delivery destination
+            </p>
+          </div>
+          <button
+            style="
+              background: none;
+              border: none;
+              color: var(--text-caption);
+              cursor: pointer;
+              padding: 4px;
+            "
+            onclick="closeModal('map-modal')"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div
+          class="modal-map-body"
+          style="background: var(--surface-subtle); padding: 0 32px"
+        >
+          <img
+            src="assets/delivery-route-map.png"
+            alt="Delivery Route"
+            id="modal-map-img"
+          />
+        </div>
+        <div
+          class="modal-map-footer"
+          style="
+            padding: 24px 32px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            align-items: start;
+            border-top: 1px solid var(--border-default);
+          "
+        >
+          <div>
+            <div
+              style="
+                font-size: 10px;
+                color: var(--text-subtitle);
+                text-transform: uppercase;
+                margin-bottom: 4px;
+              "
+            >
+              Pickup Hub
+            </div>
+            <div
+              class="modal-info-val-pickup"
+              style="
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-title);
+              "
+            >
+              —
+            </div>
+          </div>
+          <div>
+            <div
+              style="
+                font-size: 10px;
+                color: var(--text-subtitle);
+                text-transform: uppercase;
+                margin-bottom: 4px;
+              "
+            >
+              Destination
+            </div>
+            <div
+              class="modal-info-val-dest"
+              style="
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-title);
+              "
+            >
+              —
+            </div>
+          </div>
+          <div>
+            <div
+              style="
+                font-size: 10px;
+                color: var(--text-subtitle);
+                text-transform: uppercase;
+                margin-bottom: 4px;
+              "
+            >
+              Distance
+            </div>
+            <div
+              style="
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-title);
+              "
+            >
+              <span>3.8</span> km
+            </div>
+          </div>
+          <div>
+            <div
+              style="
+                font-size: 10px;
+                color: var(--text-subtitle);
+                text-transform: uppercase;
+                margin-bottom: 4px;
+              "
+            >
+              Est. Time
+            </div>
+            <div
+              style="
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-title);
+              "
+            >
+              <span>12</span> mins
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px">
+            <div
+              class="modal-agent-badge"
+              style="
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: var(--info-surface);
+                color: var(--info-fill);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 11px;
+                font-weight: 700;
+              "
+            >
+              ??
+            </div>
+            <div>
+              <div
+                style="
+                  font-size: 10px;
+                  color: var(--text-subtitle);
+                  text-transform: uppercase;
+                  margin-bottom: 0;
+                "
+              >
+                Agent
+              </div>
+              <div
+                class="modal-info-val-agent"
+                style="
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: var(--text-title);
+                "
+              >
+                Unassigned
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-function renderStats() {
-    var g = document.getElementById('statsGrid');
-    if (!g) return;
-    var total = currentOrders.length;
-    var pending = currentOrders.filter(function(o){return o.status==='Pending'}).length;
-    var avail = currentAgents.filter(function(a){return a.availability_status==='Available'}).length;
-    var delivering = currentAgents.length - avail;
-
-    var stats = [
-        { icon: 'orange', svg: iconBox(), label: 'Active Orders', value: total, sub: '+8% vs yesterday' },
-        { icon: 'orange', svg: iconGrid(), label: 'Pending Orders', value: pending, sub: pending + ' waiting assignment' },
-        { icon: 'green', svg: iconUserSvg(), label: 'Available Agents', value: avail, sub: delivering + ' currently delivering' },
-        { icon: 'blue', svg: iconClock(), label: 'Avg Delivery Time', value: '38 min', sub: '~4 min improvement' }
-    ];
-
-    g.innerHTML = stats.map(function(s){
-        return '<div class="hm-card hm-stat-card">' +
-            '<div class="hm-stat-icon ' + s.icon + '">' + s.svg + '</div>' +
-            '<div class="hm-stat-label">' + s.label + '</div>' +
-            '<div class="hm-stat-value">' + s.value + '</div>' +
-            '<div class="hm-stat-sub">' + s.sub + '</div>' +
-        '</div>';
-    }).join('');
-}
-
-/* ================================================================
-   FILTER TABS
-   ================================================================ */
-function renderFilterTabs() {
-    var c = document.getElementById('filterTabs');
-    if (!c) return;
-    var total = currentOrders.length;
-    var counts = { all: total, Pending: 0, 'In Transit': 0, Delivered: 0 };
-    currentOrders.forEach(function(o){ if (counts[o.status] !== undefined) counts[o.status]++; });
-
-    var tabs = [
-        { key: 'all', label: 'All Orders', count: counts.all },
-        { key: 'Pending', label: 'Pending', count: counts.Pending },
-        { key: 'In Transit', label: 'In Transit', count: counts['In Transit'] },
-        { key: 'Delivered', label: 'Delivered', count: counts.Delivered }
-    ];
-
-    c.innerHTML = tabs.map(function(t){
-        return '<button class="hm-filter-tab' + (activeFilter === t.key ? ' active' : '') +
-            '" onclick="setFilter(\'' + t.key + '\')">' +
-            t.label + '<span class="hm-filter-count">' + t.count + '</span></button>';
-    }).join('');
-}
-
-function setFilter(key) {
-    activeFilter = key;
-    renderFilterTabs();
-    renderOrderCards();
-}
-
-/* ================================================================
-   ORDER CARDS
-   ================================================================ */
-function renderOrderCards() {
-    var c = document.getElementById('ordersContainer');
-    if (!c) return;
-
-    var filtered = activeFilter === 'all'
-        ? currentOrders
-        : currentOrders.filter(function(o){ return o.status === activeFilter; });
-
-    if (filtered.length === 0) {
-        c.innerHTML = '<div class="hm-empty-state">' +
-            '<div class="hm-empty-icon">' + iconBox() + '</div>' +
-            '<div class="hm-empty-title">No Orders Found</div>' +
-            '<div class="hm-empty-msg">No orders match the selected filter.</div></div>';
-        return;
-    }
-
-    var display = filtered.slice(0, 6);
-    var html = '<div class="hm-order-cards">';
-
-    display.forEach(function(order) {
-        var isPending = order.status === 'Pending';
-        var isInTransit = order.status === 'In Transit';
-        var progress = getProgressPercent(order.status);
-        
-        var disClass = isInTransit ? ' disabled tabindex="-1" aria-disabled="true"' : '';
-        var transferClick = isInTransit ? '' : ' onclick="openTransferModal(\'' + order.order_id + '\')"';
-
-        html += '<div class="hm-order-card">';
-
-        // 1. TOP ROW: ID + Badges + Actions
-        html += '<div class="hm-order-card-header">' +
-            '<div class="hm-order-card-left">' +
-                '<span class="hm-order-id">' + order.order_id + '</span>' +
-                getStatusBadge(order.status) +
-            '</div>' +
-            '<div class="hm-order-card-actions">' +
-                (isPending ? '<button class="hm-btn hm-btn-outline hm-btn-sm" onclick="openAssignModal(\'' + order.order_id + '\')">Assign Agent</button>' : '') +
-                '<button class="hm-btn hm-btn-outline hm-btn-sm"' + disClass + transferClick + '>Transfer Hub</button>' +
-                '<button class="hm-btn hm-btn-ghost hm-btn-sm" onclick="viewOrder(\'' + order.order_id + '\')">View</button>' +
-            '</div>' +
-        '</div>';
-
-        // 2. SECOND ROW: Customer + Agent
-        html += '<div class="hm-order-card-info">' +
-            '<div class="hm-order-customer">' + order.customer_name + '</div>' +
-            '<div class="hm-order-agent">Assigned Agent: ' + getAgentName(order.agent_id) + '</div>' +
-        '</div>';
-
-        // 3. THIRD ROW: Progress line (centered and clean)
-        html += '<div class="hm-order-progress">' +
-            '<div class="hm-progress-dot"></div>' +
-            '<div class="hm-progress-line"><div class="hm-progress-fill" style="width:' + progress + '%"></div>' +
-            '<div class="hm-progress-truck" style="left:' + Math.max(0, progress - 5) + '%">' + iconTruckSmall() + '</div></div>' +
-            '<div class="hm-progress-dot end"></div>' +
-        '</div>';
-
-        // 4. FOURTH ROW: Locations
-        html += '<div class="hm-order-locations">' +
-            '<div class="hm-loc">' +
-                '<div class="hm-loc-icon">' + iconMapPin() + '</div>' +
-                '<div><div class="hm-loc-label">Pick Up Hub</div><div class="hm-loc-value">' + getHubName(order.pickup_hub_id) + '</div></div>' +
-            '</div>' +
-            '<div class="hm-loc end">' +
-                '<div><div class="hm-loc-label">Delivery Location</div><div class="hm-loc-value">' + order.delivery_address + '</div></div>' +
-                '<div class="hm-loc-icon">' + iconNavigation() + '</div>' +
-            '</div>' +
-        '</div>';
-
-        // 5. BOTTOM ROW (Clean format)
-        html += '<div class="hm-order-meta-row">' +
-            '<span>⏱ ' + getTimeAgo(order.updated_at) + '</span> • ' +
-            '<span>📦 ' + order.package_type + '</span> • ' +
-            '<span>⚖ ' + order.weight + ' kg</span>' +
-        '</div>';
-
-        html += '</div>'; // card end
-    });
-
-    html += '</div>';
-    c.innerHTML = html;
-}
-
-function getProgressPercent(status) {
-    var map = { 'Pending': 5, 'Assigned': 15, 'Picked Up': 30, 'In Transit': 55, 'Out for Delivery': 80, 'Delivered': 100, 'Failed': 50 };
-    return map[status] || 0;
-}
-
-/* ================================================================
-   VIEW ORDER MODAL
-   ================================================================ */
-function viewOrder(orderId) {
-    var order = currentOrders.find(function(o){ return o.order_id === orderId; });
-    if (!order) return;
-    var body = document.getElementById('viewOrderBody');
-    body.innerHTML =
-        '<div class="hm-info-row"><span class="hm-info-label">Order ID</span><span class="hm-info-value">' + order.order_id + '</span></div>' +
-        '<div class="hm-info-row"><span class="hm-info-label">Tracking ID</span><span class="hm-info-value">' + order.tracking_id + '</span></div>' +
-        '<div class="hm-info-row"><span class="hm-info-label">Customer</span><span class="hm-info-value">' + order.customer_name + '</span></div>' +
-        '<div class="hm-info-row"><span class="hm-info-label">Status</span><span class="hm-info-value">' + getStatusBadge(order.status) + '</span></div>' +
-        '<div class="hm-info-row"><span class="hm-info-label">Hub</span><span class="hm-info-value">' + getHubName(order.pickup_hub_id) + '</span></div>' +
-        '<div class="hm-info-row"><span class="hm-info-label">Agent</span><span class="hm-info-value">' + getAgentName(order.agent_id) + '</span></div>' +
-        '<div class="hm-info-row"><span class="hm-info-label">Delivery Address</span><span class="hm-info-value">' + order.delivery_address + '</span></div>' +
-        '<div class="hm-info-row"><span class="hm-info-label">Package</span><span class="hm-info-value">' + order.package_type + '</span></div>' +
-        '<div class="hm-info-row"><span class="hm-info-label">Weight</span><span class="hm-info-value">' + order.weight + ' kg</span></div>' +
-        '<div class="hm-info-row"><span class="hm-info-label">Created</span><span class="hm-info-value">' + formatDate(order.created_at) + '</span></div>';
-    openModal('viewOrderModal');
-}
-
-/* ================================================================
-   TRANSFER MODAL
-   ================================================================ */
-function openTransferModal(orderId) {
-    var order = currentOrders.find(function(o){ return o.order_id === orderId; });
-    if (!order || order.status !== 'Pending') { showToast('Only PENDING orders can be transferred','error'); return; }
-    selectedTransferOrder = order;
-    var hubs = window.mockData.hubs.filter(function(h){ return h.hub_id !== order.pickup_hub_id && h.status === 'Active'; });
-    var body = document.getElementById('transferBody');
-    body.innerHTML =
-        '<div class="hm-info-row"><span class="hm-info-label">Order</span><span class="hm-info-value">' + order.order_id + '</span></div>' +
-        '<div class="hm-info-row"><span class="hm-info-label">From Hub</span><span class="hm-info-value">' + getHubName(order.pickup_hub_id) + '</span></div>' +
-        '<div class="hm-form-group" style="margin-top:var(--space-16)"><label class="hm-label">Transfer To Hub <span class="required">*</span></label>' +
-        '<select id="transferHubSelect" class="hm-form-select" required><option value="">Select destination hub</option>' +
-        hubs.map(function(h){ return '<option value="'+h.hub_id+'">'+h.name+'</option>'; }).join('') +
-        '</select><span class="hm-field-error" id="transferHubError"></span></div>' +
-        '<div class="hm-form-group"><label class="hm-label">Reason</label><select id="transferReason" class="hm-form-select">' +
-        '<option value="closer">Closer to delivery</option><option value="capacity">Hub at capacity</option><option value="route">Route optimization</option></select></div>';
-    openModal('approveTransferModal');
-}
-
-function confirmTransfer() {
-    if (!selectedTransferOrder) return;
-    var sel = document.getElementById('transferHubSelect');
-    if (!sel.value) { sel.classList.add('input-error'); document.getElementById('transferHubError').textContent='Select a hub'; sel.focus(); return; }
-    sel.classList.remove('input-error');
-    var order = window.mockData.orders.find(function(o){ return o.order_id === selectedTransferOrder.order_id; });
-    if (order) { order.pickup_hub_id = sel.value; order.updated_at = new Date().toISOString(); }
-    closeModal('approveTransferModal');
-    showToast('Order transferred to ' + getHubName(sel.value),'success');
-    selectedTransferOrder = null;
-    loadDashboard();
-}
-
-/* ================================================================
-   ASSIGN AGENT MODAL
-   ================================================================ */
-function openAssignModal(orderId) {
-    var order = currentOrders.find(function(o){ return o.order_id === orderId; });
-    if (!order || order.status !== 'Pending') { showToast('Only PENDING orders can be assigned','error'); return; }
-    selectedAssignOrder = order;
-    selectedAgentId = null;
-    var agents = filterAgentsByHub(window.mockData.agents);
-    var body = document.getElementById('assignAgentBody');
-    body.innerHTML =
-        '<div class="hm-info-row"><span class="hm-info-label">Order</span><span class="hm-info-value">' + order.order_id + '</span></div>' +
-        '<p class="hm-label" style="margin-top:var(--space-16);margin-bottom:var(--space-8)">Select an agent:</p>' +
-        '<ul class="hm-agent-list">' +
-        agents.map(function(a){
-            var workload = currentOrders.filter(function(o){ return o.agent_id===a.agent_id && o.status!=='Delivered' && o.status!=='Failed'; }).length;
-            var initials = a.name.split(' ').map(function(w){return w[0]}).join('').toUpperCase().slice(0,2);
-            return '<li class="hm-agent-item" data-agent="'+a.agent_id+'" onclick="selectAgent(this,\''+a.agent_id+'\')">' +
-                '<div class="hm-agent-item-info"><div class="hm-avatar">'+initials+'</div><div>' +
-                '<div class="hm-agent-item-name">'+a.name+'</div>' +
-                '<div class="hm-agent-item-meta">'+workload+' active · '+a.vehicle_type+'</div></div></div>' +
-                getAgentBadge(a.availability_status) + '</li>';
-        }).join('') + '</ul>';
-    openModal('assignAgentModal');
-}
-
-function selectAgent(el, agentId) {
-    document.querySelectorAll('#assignAgentBody .hm-agent-item').forEach(function(li){ li.classList.remove('selected'); });
-    el.classList.add('selected');
-    selectedAgentId = agentId;
-}
-
-function confirmAssign() {
-    if (!selectedAssignOrder || !selectedAgentId) { showToast('Select an agent first','error'); return; }
-    var order = window.mockData.orders.find(function(o){ return o.order_id === selectedAssignOrder.order_id; });
-    if (order) { order.agent_id = selectedAgentId; order.status = 'Assigned'; order.updated_at = new Date().toISOString(); }
-    closeModal('assignAgentModal');
-    showToast('Agent assigned to ' + selectedAssignOrder.order_id,'success');
-    selectedAssignOrder = null; selectedAgentId = null;
-    loadDashboard();
-}
-
-/* ================================================================
-   EXTRA ICON HELPERS (page-specific)
-   ================================================================ */
-function iconUserSvg() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'; }
-function iconClock() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'; }
-function iconMapPin() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>'; }
-function iconNavigation() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>'; }
-function iconWeight() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a4 4 0 00-4 4h8a4 4 0 00-4-4z"/><path d="M6 7l-2 13h16L18 7H6z"/></svg>'; }
-function iconTruckSmall() { return '<svg viewBox="0 0 24 24" fill="var(--text-subtitle)"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zM18 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>'; }
-</script>
-</body>
+    <script src="../js/mockData.js"></script>
+    <script src="js/hub-manager.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
 </html>

@@ -1,5 +1,5 @@
 /**
- * Hub Manager — Shared JS Module
+ * Hub Manager â€” Shared JS Module
  * Reusable functions for all hub-manager pages.
  * Depends on: ../js/mockData.js (window.mockData)
  */
@@ -82,16 +82,18 @@ function renderNavbar(pageTitle) {
                 ${isDark ? iconMoon() : iconSun()}
                 <span>${isDark ? 'Dark' : 'Light'}</span>
             </button>
-            <button class="hm-notif-btn">
+            <button class="hm-notif-btn" onclick="openNotificationsModal()">
                 ${iconBell()}
                 <span class="hm-notif-badge"></span>
             </button>
-            <div class="hm-navbar-user">
+            <div class="hm-navbar-user hm-navbar-user-clickable" onclick="openProfileModal()">
                 <span class="hm-navbar-user-name">${user.name || 'Hub Manager'}</span>
                 <div class="hm-navbar-avatar">${initials}</div>
             </div>
         </div>
     `;
+
+    ensureGlobalModals();
 }
 
 /* ================================================================
@@ -240,14 +242,14 @@ function getAgentName(agentId) {
    ================================================================ */
 
 function formatDate(isoString) {
-    if (!isoString) return '—';
+    if (!isoString) return 'â€”';
     var d = new Date(isoString);
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
 }
 
 function getTimeAgo(isoString) {
-    if (!isoString) return '—';
+    if (!isoString) return 'â€”';
     var now = Date.now();
     var then = new Date(isoString).getTime();
     var diff = Math.floor((now - then) / 1000);
@@ -440,3 +442,275 @@ function iconSearch() {
 function iconClose() {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
 }
+
+/* ================================================================
+   GLOBAL MODALS + DATA HELPERS
+   ================================================================ */
+function ensureGlobalModals() {
+    if (!document.getElementById("hmNotificationsModal")) {
+        var notifications = document.createElement("div");
+        notifications.id = "hmNotificationsModal";
+        notifications.className = "hm-modal-overlay";
+        notifications.innerHTML =
+            '<div class="hm-modal hm-modal-sm">' +
+                '<button class="hm-modal-close" onclick="closeModal(\'hmNotificationsModal\')">' + iconClose() + '</button>' +
+                '<div class="hm-modal-title">Notifications</div>' +
+                '<div class="hm-modal-body" id="hmNotificationsBody"></div>' +
+            '</div>';
+        document.body.appendChild(notifications);
+    }
+
+    if (!document.getElementById("hmProfileModal")) {
+        var profile = document.createElement("div");
+        profile.id = "hmProfileModal";
+        profile.className = "hm-modal-overlay";
+        profile.innerHTML =
+            '<div class="hm-modal hm-modal-sm">' +
+                '<button class="hm-modal-close" onclick="closeModal(\'hmProfileModal\')">' + iconClose() + '</button>' +
+                '<div class="hm-modal-title">Profile</div>' +
+                '<div class="hm-modal-body" id="hmProfileBody"></div>' +
+                '<div class="hm-modal-footer">' +
+                    '<button class="hm-btn hm-btn-ghost" onclick="closeModal(\'hmProfileModal\')">Close</button>' +
+                    '<button class="hm-btn hm-btn-primary" onclick="handleLogout()">Logout</button>' +
+                '</div>' +
+            '</div>';
+        document.body.appendChild(profile);
+    }
+}
+
+function getOrderById(orderId) {
+    return (window.mockData.orders || []).find(function (o) { return o.order_id === orderId; }) || null;
+}
+
+function deriveOrderMeta(order) {
+    var str = (order.order_id || "ORD_0").replace(/\D/g, "");
+    var n = parseInt(str || "0", 10);
+    var distance = (2.4 + ((n % 28) / 5)).toFixed(1);
+    var etaMinutes = 12 + (n % 35);
+    var phone = order.customer_phone || ("+91 98" + String(10000000 + (n % 89999999)).slice(-8));
+    var payment = n % 3 === 0 ? "COD" : "PREPAID";
+    return {
+        phone: phone,
+        distanceKm: distance,
+        etaText: etaMinutes + " mins",
+        paymentMode: payment
+    };
+}
+
+function adjustAgentTaskCounts(oldAgentId, newAgentId) {
+    var agents = window.mockData.agents || [];
+    if (oldAgentId) {
+        var oldAgent = agents.find(function (a) { return a.agent_id === oldAgentId; });
+        if (oldAgent) oldAgent.tasks_count = Math.max(0, (oldAgent.tasks_count || 0) - 1);
+    }
+    if (newAgentId) {
+        var newAgent = agents.find(function (a) { return a.agent_id === newAgentId; });
+        if (newAgent) newAgent.tasks_count = (newAgent.tasks_count || 0) + 1;
+    }
+}
+
+function setOrderAssignment(orderId, agentId, nextStatus) {
+    var order = getOrderById(orderId);
+    if (!order) return false;
+    var previousAgent = order.agent_id || null;
+    order.agent_id = agentId;
+    order.status = nextStatus || "Assigned";
+    order.updated_at = new Date().toISOString();
+    adjustAgentTaskCounts(previousAgent, agentId);
+    return true;
+}
+
+function setOrderHub(orderId, hubId) {
+    var order = getOrderById(orderId);
+    if (!order) return false;
+    order.pickup_hub_id = hubId;
+    order.updated_at = new Date().toISOString();
+    return true;
+}
+
+function setActionLoading(buttonEl, isLoading, label) {
+    if (!buttonEl) return;
+    if (isLoading) {
+        buttonEl.dataset.oldLabel = buttonEl.innerHTML;
+        buttonEl.disabled = true;
+        buttonEl.classList.add("hm-btn-loading");
+        buttonEl.innerHTML = '<span class="hm-btn-spinner"></span>' + (label || "Processing...");
+    } else {
+        buttonEl.disabled = false;
+        buttonEl.classList.remove("hm-btn-loading");
+        if (buttonEl.dataset.oldLabel) buttonEl.innerHTML = buttonEl.dataset.oldLabel;
+    }
+}
+
+function showSuccessTick(message) {
+    var existing = document.getElementById("hmSuccessTick");
+    if (existing) existing.remove();
+    var wrap = document.createElement("div");
+    wrap.id = "hmSuccessTick";
+    wrap.className = "hm-success-pop";
+    wrap.innerHTML =
+        '<div class="hm-success-icon">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>' +
+        '</div>' +
+        '<div class="hm-success-text">' + (message || "Saved successfully") + "</div>";
+    document.body.appendChild(wrap);
+    setTimeout(function () { wrap.classList.add("show"); }, 10);
+    setTimeout(function () {
+        wrap.classList.remove("show");
+        setTimeout(function () { wrap.remove(); }, 220);
+    }, 1800);
+}
+
+function openNotificationsModal() {
+    ensureGlobalModals();
+    var container = document.getElementById("hmNotificationsBody");
+    var user = JSON.parse(sessionStorage.getItem("user") || "{}");
+    var orders = filterOrdersByHub(window.mockData.orders || []).slice().sort(function (a, b) {
+        return new Date(b.updated_at) - new Date(a.updated_at);
+    }).slice(0, 6);
+
+    if (!orders.length) {
+        container.innerHTML = '<div class="hm-empty-msg">No recent notifications.</div>';
+        openModal("hmNotificationsModal");
+        return;
+    }
+
+    container.innerHTML = orders.map(function (o) {
+        return (
+            '<div class="hm-notif-item">' +
+                '<div class="hm-notif-title">' + o.order_id + " · " + o.status + "</div>" +
+                '<div class="hm-notif-sub">' + o.customer_name + " · " + getTimeAgo(o.updated_at) + "</div>" +
+                '<div class="hm-notif-sub">Hub: ' + getHubName(user.hub_id || o.pickup_hub_id) + "</div>" +
+            "</div>"
+        );
+    }).join("");
+    openModal("hmNotificationsModal");
+}
+
+function openProfileModal() {
+    ensureGlobalModals();
+    var container = document.getElementById("hmProfileBody");
+    var user = JSON.parse(sessionStorage.getItem("user") || localStorage.getItem("user") || "{}");
+    var initials = (user.name || "HM").split(" ").map(function (w) { return w[0]; }).join("").toUpperCase().slice(0, 2);
+    container.innerHTML =
+        '<div class="hm-profile-card">' +
+            '<div class="hm-profile-avatar">' + initials + "</div>" +
+            '<div class="hm-profile-name">' + (user.name || "Hub Manager") + "</div>" +
+            '<div class="hm-profile-meta">' + (user.email || "hub@swifttrack.com") + "</div>" +
+            '<div class="hm-profile-meta">Hub: ' + getHubName(user.hub_id || "H001") + "</div>" +
+            '<div class="hm-profile-meta">Role: Hub Manager</div>' +
+        "</div>";
+    openModal("hmProfileModal");
+}
+
+/* ================================================================
+   7. TIME & DATE HELPERS
+   ================================================================ */
+function getTimeAgo(dateStr) {
+    if (!dateStr) return "Just now";
+    try {
+        const d = new Date(dateStr);
+        const now = new Date();
+        const diff = Math.floor((now - d) / 1000); // seconds
+        if (diff < 60) return "Just now";
+        if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+        if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+        return Math.floor(diff / 86400) + "d ago";
+    } catch(e) { return "--"; }
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return "--";
+    try {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    } catch(e) { return "--"; }
+}
+
+/* ================================================================
+   8. CHANGE DESTINATION MODAL LOGIC
+   ================================================================ */
+function openChangeDestinationModal(orderId) {
+    window._cdOrderId = orderId;
+    var order = window.mockData.orders.find(function(o) { return o.order_id === orderId; });
+    if (!order) return;
+
+    var hubSelect = document.getElementById('cd-hub-select');
+    var reasonSelect = document.getElementById('cd-reason-select');
+    
+    if (hubSelect) {
+        var otherHubs = (window.mockData.hubs || []).filter(function(h) {
+            return h.hub_id !== order.pickup_hub_id && h.status === 'Active';
+        });
+        hubSelect.innerHTML = '<option value="">Select new destination hub</option>' + 
+            otherHubs.map(function(h) {
+                return '<option value="' + h.hub_id + '">' + h.name + '</option>';
+            }).join('');
+    }
+
+    if (reasonSelect) reasonSelect.value = '';
+    
+    openModal('changeDestModal');
+}
+
+function confirmChangeDestinationAction() {
+    var hubSelect = document.getElementById('cd-hub-select');
+    var reasonSelect = document.getElementById('cd-reason-select');
+    if (!hubSelect || !reasonSelect) return;
+
+    var hubId = hubSelect.value;
+    var reason = reasonSelect.value;
+
+    if (!hubId || !reason) {
+        showToast('Please select both hub and reason', 'error');
+        return;
+    }
+
+    if (setOrderHub(window._cdOrderId, hubId)) {
+        showSuccessTick('Destination updated');
+        showToast('Destination hub updated successfully', 'success');
+    }
+
+    closeModal('changeDestModal');
+
+    // Re-render current page
+    if (typeof loadDashboard === 'function') loadDashboard();
+    if (typeof filterAndRender === 'function') filterAndRender(); // Order Queue
+    if (typeof loadDispatchData === 'function') loadDispatchData();
+}
+
+function openDeliveryMap(orderId) {
+    var order = window.mockData.orders.find(function(o) { return o.order_id === orderId; }) || {};
+    var agent = window.mockData.agents.find(function(a) { return a.agent_id === order.agent_id; });
+
+    // Populate modal fields
+    var pickupEl = document.querySelector('#map-modal .modal-info-val-pickup');
+    var destEl   = document.querySelector('#map-modal .modal-info-val-dest');
+    var agentEl  = document.querySelector('#map-modal .modal-info-val-agent');
+    var badgeEl  = document.querySelector('#map-modal .modal-agent-badge');
+
+    if (pickupEl) pickupEl.textContent = getHubName(order.pickup_hub_id) || 'â€”';
+    if (destEl)   destEl.textContent   = order.delivery_address || 'â€”';
+    if (agentEl)  agentEl.textContent  = agent ? agent.name : 'Unassigned';
+    if (badgeEl)  badgeEl.textContent  = agent ? agent.name.substring(0, 2).toUpperCase() : '??';
+
+    openModal('map-modal');
+}
+
+/* ================================================================
+   9. GLOBAL EVENT DELEGATION
+   ================================================================ */
+
+document.addEventListener('click', function(e) {
+    var target = e.target.closest('[data-action]');
+    if (!target) return;
+
+    var action = target.getAttribute('data-action');
+    var orderId = target.getAttribute('data-id');
+
+    if (action === 'expand-map') {
+        openDeliveryMap(orderId);
+    } else if (action === 'change-destination') {
+        openChangeDestinationModal(orderId);
+    }
+});

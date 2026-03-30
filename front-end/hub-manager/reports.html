@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Operational Intelligence | Hub Manager — SwiftTrack</title>
+    <meta name="description" content="Analytics and reports for SwiftTrack logistics hub." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="css/hub-manager.css" />
+    <link rel="stylesheet" href="css/reports.css" />
+  </head>
+  <body onload="initPage()">
+    <div class="hm-layout">
+      <aside id="sidebar" class="hm-sidebar"></aside>
+      <header id="navbar" class="hm-navbar"></header>
+
+      <main class="hm-main">
+        <div id="page-content">
+          <!-- PAGE HEADER -->
+          <div class="hm-page-header">
+            <div>
+              <div class="hm-page-title">Operational Intelligence</div>
+              <div class="hm-page-subtitle">Analytics for Karimnagar regional delivery network</div>
+            </div>
+          </div>
+
+          <!-- ROW 1: 4 Stats -->
+          <div class="hm-rep-stats">
+            <div class="hm-rstat-card">
+              <div class="hm-rstat-title">Network Health</div>
+              <div class="hm-rstat-val">92% On-Time</div>
+              <div class="hm-rstat-sub up">+3% today</div>
+              <div class="hm-rstat-icon green"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+            </div>
+            <div class="hm-rstat-card">
+              <div class="hm-rstat-title">Active Deliveries</div>
+              <div class="hm-rstat-val">47 Orders</div>
+              <div class="hm-rstat-sub">8 arriving soon</div>
+              <div class="hm-rstat-icon blue"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            </div>
+            <div class="hm-rstat-card">
+              <div class="hm-rstat-title">Karimnagar Hub Load</div>
+              <div class="hm-rstat-val">72% Capacity</div>
+              <div class="hm-rstat-sub">3 awaiting transfer</div>
+              <div class="hm-rstat-icon orange"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></div>
+            </div>
+            <div class="hm-rstat-card">
+              <div class="hm-rstat-title">Operational Alerts</div>
+              <div class="hm-rstat-val">4 Delayed</div>
+              <div class="hm-rstat-sub">2 need review</div>
+              <div class="hm-rstat-icon red"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+            </div>
+          </div>
+
+          <!-- ROW 2: Volume Chart + Agents -->
+          <div class="hm-rep-row-2">
+            <!-- Weekly Delivery Volume -->
+            <div class="hm-rcard">
+              <div class="hm-rcard-header">
+                <div>
+                  <div class="hm-rcard-title">Weekly Delivery Volume</div>
+                  <div class="hm-rcard-sub">Karimnagar Regional Network · deliveries per day</div>
+                </div>
+                <span class="hm-pill-gray">Current Week</span>
+              </div>
+              <div class="hm-vol-stats">
+                <div>
+                  <div class="hm-vstat-val">3,847</div>
+                  <div class="hm-vstat-label">This week</div>
+                  <div class="hm-vstat-trend up">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+                    12.4%
+                  </div>
+                </div>
+                <div>
+                  <div class="hm-vstat-val">549</div>
+                  <div class="hm-vstat-label">Today (Thu)</div>
+                  <div class="hm-vstat-trend down">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                    3.1%
+                  </div>
+                </div>
+                <div>
+                  <div class="hm-vstat-val">712</div>
+                  <div class="hm-vstat-label">Peak (Tue)</div>
+                  <div class="hm-vstat-trend up">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+                    peak day
+                  </div>
+                </div>
+              </div>
+              <div id="volumeChartContainer"></div>
+            </div>
+
+            <!-- Top Performing Agents -->
+            <div class="hm-rcard">
+              <div class="hm-rcard-title" style="margin-bottom:var(--space-32);">Top Performing Agents</div>
+              <div class="hm-agent-perf">
+                <div class="hm-agent-row">
+                  <div class="hm-agent-name">Rahul Kumar</div>
+                  <div class="hm-agent-bar-area"><div class="hm-agent-bar"><div class="hm-agent-bar-fill" style="width:92%"></div></div><div class="hm-agent-pct">92%</div></div>
+                </div>
+                <div class="hm-agent-row">
+                  <div class="hm-agent-name">Kavya Sharma</div>
+                  <div class="hm-agent-bar-area"><div class="hm-agent-bar"><div class="hm-agent-bar-fill" style="width:88%"></div></div><div class="hm-agent-pct">88%</div></div>
+                </div>
+                <div class="hm-agent-row">
+                  <div class="hm-agent-name">Imran Khan</div>
+                  <div class="hm-agent-bar-area"><div class="hm-agent-bar"><div class="hm-agent-bar-fill" style="width:85%"></div></div><div class="hm-agent-pct">85%</div></div>
+                </div>
+                <div class="hm-agent-row">
+                  <div class="hm-agent-name">Arun Sharma</div>
+                  <div class="hm-agent-bar-area"><div class="hm-agent-bar"><div class="hm-agent-bar-fill" style="width:80%"></div></div><div class="hm-agent-pct">80%</div></div>
+                </div>
+                <div class="hm-agent-row">
+                  <div class="hm-agent-name">Sanjay Patel</div>
+                  <div class="hm-agent-bar-area"><div class="hm-agent-bar"><div class="hm-agent-bar-fill" style="width:76%"></div></div><div class="hm-agent-pct">76%</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ROW 3: Hub Performance Overview -->
+          <div class="hm-rcard" style="margin-bottom:var(--space-32);">
+            <div class="hm-rcard-title">Hub Performance Overview</div>
+            <div class="hm-hub-grid">
+              <!-- Karimnagar Hub -->
+              <div class="hm-hub-block">
+                <div class="hm-hub-bheader">
+                  <span class="hm-hub-btitle">Karimnagar Hub</span>
+                  <span class="hm-badge-status status-active">Active</span>
+                </div>
+                <div class="hm-hub-metrics">
+                  <div class="hm-hmetric"><div class="hm-hmetric-label">Deliveries Today</div><div class="hm-hmetric-val">428</div></div>
+                  <div class="hm-hmetric"><div class="hm-hmetric-label">Avg Time</div><div class="hm-hmetric-val">42m</div></div>
+                </div>
+                <div class="hm-hub-cap-area">
+                  <div class="hm-hub-cap-label">Capacity</div>
+                  <div class="hm-agent-bar" style="height:4px;"><div class="hm-agent-bar-fill" style="width:72%"></div></div>
+                  <div class="hm-hub-cap-pct">72%</div>
+                </div>
+              </div>
+              <!-- Hyderabad Hub -->
+              <div class="hm-hub-block">
+                <div class="hm-hub-bheader">
+                  <span class="hm-hub-btitle">Hyderabad Hub</span>
+                </div>
+                <div class="hm-hub-metrics">
+                  <div class="hm-hmetric"><div class="hm-hmetric-label">Deliveries Today</div><div class="hm-hmetric-val">1,892</div></div>
+                  <div class="hm-hmetric"><div class="hm-hmetric-label">Avg Time</div><div class="hm-hmetric-val">38m</div></div>
+                </div>
+                <div class="hm-hub-cap-area">
+                  <div class="hm-hub-cap-label">Capacity</div>
+                  <div class="hm-agent-bar" style="height:4px;"><div class="hm-agent-bar-fill" style="width:54%"></div></div>
+                  <div class="hm-hub-cap-pct">54%</div>
+                </div>
+              </div>
+              <!-- Warangal Hub -->
+              <div class="hm-hub-block">
+                <div class="hm-hub-bheader">
+                  <span class="hm-hub-btitle">Warangal Hub</span>
+                  <span class="hm-badge-status status-busy">Busy</span>
+                </div>
+                <div class="hm-hub-metrics">
+                  <div class="hm-hmetric"><div class="hm-hmetric-label">Deliveries Today</div><div class="hm-hmetric-val">215</div></div>
+                  <div class="hm-hmetric"><div class="hm-hmetric-label">Avg Time</div><div class="hm-hmetric-val">54m</div></div>
+                </div>
+                <div class="hm-hub-cap-area">
+                  <div class="hm-hub-cap-label">Capacity</div>
+                  <div class="hm-agent-bar" style="height:4px;"><div class="hm-agent-bar-fill" style="width:88%"></div></div>
+                  <div class="hm-hub-cap-pct">88%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ROW 4: Map + Issues Table -->
+          <div class="hm-rep-row-4">
+            <!-- Map -->
+            <div class="hm-rcard">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div class="hm-rcard-title" style="margin:0;">Delivery Activity Map</div>
+                <a href="#" class="hm-expand-link" onclick="openReportsMapModal(event)">
+                  Expand Map <svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                </a>
+              </div>
+              <!-- Put your map screenshot at assets/reports-map.png -->
+              <div class="hm-map-container">
+                <img src="assets/expanded-map-overlay-light.png" alt="Activity Map" onerror="this.src='assets/reports-map.png'" style="width:100%; height:auto; display:block;" />
+              </div>
+            </div>
+
+            <!-- Issues Table -->
+            <div class="hm-rcard">
+              <div class="hm-rcard-title">Recent Delivery Issues</div>
+              <table class="hm-itable">
+                <thead><tr><th>Order ID</th><th>Description</th><th>Agent</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td>#2034</td><td>Route blocked by traffic accident</td><td>Rahul K.</td>
+                    <td><span class="hm-ibadge ibadge-err">Delayed</span></td>
+                  </tr>
+                  <tr>
+                    <td>#2041</td><td>Recipient not available at address</td><td>Kavya S.</td>
+                    <td><span class="hm-ibadge ibadge-warn">Attention</span></td>
+                  </tr>
+                  <tr>
+                    <td>#2052</td><td>Incomplete delivery document</td><td>Imran K.</td>
+                    <td><span class="hm-ibadge ibadge-muted">Review</span></td>
+                  </tr>
+                  <tr>
+                    <td>#2060</td><td>Weather delay on main highway</td><td>Arun P.</td>
+                    <td><span class="hm-ibadge ibadge-err">Delayed</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="hm-brand-footer">
+            <div>© 2026 SWIFTTRACK. ALL RIGHTS RESERVED.</div>
+            <div class="hm-social">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.92c-2.78.6-3.37-1.12-3.37-1.12-.45-1.15-1.1-1.46-1.1-1.46-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02.8-.22 1.65-.33 2.5-.33.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.75c0 .26.18.58.69.48A10.01 10.01 0 0022 12c0-5.53-4.47-10-10-10z"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path></svg>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- EXPANDED REPORT MAP MODAL -->
+    <div class="hm-modal-overlay" id="reportsMapModal">
+      <div class="hm-modal hm-modal-wide" style="border-radius:var(--radius-l);overflow:hidden; padding:0;">
+        <div class="modal-map-header" style="display:flex;justify-content:space-between;align-items:flex-start; padding: 24px 32px 16px;">
+          <div>
+            <h2 style="margin:0; font-size:18px; font-weight:700; color:var(--text-title);">Delivery Activity Map</h2>
+            <p style="margin:4px 0 0; font-size:12px; color:var(--text-subtitle);">Expanded regional visualization</p>
+          </div>
+          <button style="background:none;border:none;color:var(--text-caption);cursor:pointer;padding:4px;" onclick="closeModal('reportsMapModal')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <div class="modal-map-body" style="background:var(--surface-subtle); padding: 0 24px 24px;">
+          <img src="assets/expanded-map-overlay-light.png" alt="Expanded Activity Map" onerror="this.src='assets/reports-map.png'" class="hm-reports-expanded-map" />
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/mockData.js"></script>
+    <script src="js/hub-manager.js"></script>
+    <script src="js/reports.js"></script>
+  </body>
+</html>
