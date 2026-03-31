@@ -8,6 +8,10 @@ function initPage() {
     renderSidebar("inter-hub-transfer.html");
     renderNavbar("Inter-Hub Transfer");
     loadTransferData();
+    window.addEventListener('appStateChanged', loadTransferData);
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'swifttrack_central_state') loadTransferData();
+    });
 }
 
 function loadTransferData() {

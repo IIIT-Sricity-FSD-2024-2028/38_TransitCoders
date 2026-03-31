@@ -218,13 +218,9 @@ function filterOrdersByHub(orders) {
     var user = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user')) || {};
     if (!user.hub_id) return [];
     
-    // Hub Manager sees any order assigned to their hub, or any unassigned new global orders if they are the default Chennai Hub (H001) for testing
+    // Strict Hub Filter for Review-3
     return orders.filter(function (o) { 
-        var hub = o.assigned_hub || o.pickup_hub_id;
-        if (!hub && user.hub_id === 'H001') return true; 
-        if (!hub && o.pickup_address && o.pickup_address.toLowerCase().indexOf('chennai') !== -1 && user.hub_id === 'H001') return true;
-        if (!hub && o.pickup_address && o.pickup_address.toLowerCase().indexOf('bengaluru') !== -1 && user.hub_id === 'H002') return true;
-        return hub === user.hub_id; 
+        return o.assigned_hub === user.hub_id || o.pickup_hub_id === user.hub_id;
     });
 }
 
@@ -534,6 +530,11 @@ function setOrderAssignment(orderId, agentId, nextStatus) {
     
     window.AppState.saveState(state);
     adjustAgentTaskCounts(previousAgent, agentId);
+    console.log("🔵 [HUB MANAGER] Order Assigned to Agent:", agentId);
+    try {
+        window.dispatchEvent(new Event('appStateChanged'));
+        window.dispatchEvent(new StorageEvent('storage', { key: 'swifttrack_central_state', newValue: JSON.stringify(state) }));
+    } catch(e) {}
     return true;
 }
 

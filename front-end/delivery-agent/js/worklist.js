@@ -23,6 +23,13 @@ function initWorklist() {
         renderOrders();
         updateDeliveryCountText();
     });
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'swifttrack_central_state') {
+            updateCounts();
+            renderOrders();
+            updateDeliveryCountText();
+        }
+    });
 }
 
 function updateCounts() {

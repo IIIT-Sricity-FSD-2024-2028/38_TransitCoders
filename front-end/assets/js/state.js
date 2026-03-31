@@ -12,7 +12,7 @@
         orders: [], /* <--- UNIFIED CANONICAL SOURCE */
         complaints: [], adminAgents: [], transfers: [], adminReports: [],
         merchantTickets: [],
-        suUsers: [], suComplaints: [], feedback: [], roles: [], zones: [], notifications: [], customerOrders: [], customerComplaints: []
+        suUsers: [], suComplaints: [], feedback: [], roles: [], zones: [], notifications: [], customerOrders: [], customerComplaints: [], securityLogs: []
     };
 
     function getState() {
@@ -42,22 +42,22 @@
         var state = JSON.parse(JSON.stringify(defaultState));
         
         state.hubs = [
-            { hub_id: 'H001', name: 'Chennai Central Hub', location: 'Chennai', status: 'Active' },
-            { hub_id: 'H002', name: 'Bengaluru Logistics Park', location: 'Bengaluru', status: 'Active' },
-            { hub_id: 'H003', name: 'Hyderabad Logistics Hub', location: 'Hyderabad', status: 'Active' },
-            { hub_id: 'H004', name: 'Kharimnagar City Hub', location: 'Kharimnagar', status: 'Active' },
-            { hub_id: 'H005', name: 'Visakhapatnam Port Hub', location: 'Visakhapatnam', status: 'Active' }
+            { hub_id: 'hub_01', name: 'Chennai Central Hub', location: 'Chennai', status: 'Active' },
+            { hub_id: 'hub_02', name: 'Karimnagar City Hub', location: 'Karimnagar', status: 'Active' },
+            { hub_id: 'hub_03', name: 'Bengaluru Logistics Park', location: 'Bengaluru', status: 'Active' },
+            { hub_id: 'hub_04', name: 'Visakhapatnam Port Hub', location: 'Visakhapatnam', status: 'Active' },
+            { hub_id: 'hub_05', name: 'Hyderabad Logistics Hub', location: 'Hyderabad', status: 'Active' }
         ];
 
         state.users.push(
             { user_id: 'U_SU_1', name: 'Admin Super User', email: 'admin@swifttrack.com', password: 'admin123', role: 'hub_manager', active: true, avatar: 'AM' },
             { user_id: 'U_MER_1', name: 'Prasanna Raja R', email: 'merchant@swifttrack.com', password: 'merchant123', role: 'merchant', active: true, avatar: 'PR', company: 'Swift Merchants' },
-            { user_id: 'U_AGT_102', name: 'Karthik', email: 'karthik@swifttrack.com', password: 'password123', role: 'delivery_agent', hub_id: 'H001', active: true },
-            { user_id: 'U_HM_1', name: 'Hub Manager Chennai', email: 'hm_chennai@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H001', active: true },
-            { user_id: 'U_HM_2', name: 'Hub Manager Bengaluru', email: 'hm_bengaluru@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H002', active: true },
-            { user_id: 'U_HM_3', name: 'Hub Manager Hyderabad', email: 'hm_hyderabad@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H003', active: true },
-            { user_id: 'U_HM_4', name: 'Hub Manager Kharimnagar', email: 'hm_kharimnagar@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H004', active: true },
-            { user_id: 'U_HM_5', name: 'Hub Manager Visakhapatnam', email: 'hm_visakhapatnam@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H005', active: true },
+            { user_id: 'U_AGT_102', name: 'Karthik', email: 'karthik@swifttrack.com', password: 'password123', role: 'delivery_agent', hub_id: 'hub_01', active: true },
+            { user_id: 'U_HM_1', name: 'Hub Manager Chennai', email: 'hm_chennai@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'hub_01', active: true },
+            { user_id: 'U_HM_2', name: 'Hub Manager Karimnagar', email: 'hm_karimnagar@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'hub_02', active: true },
+            { user_id: 'U_HM_3', name: 'Hub Manager Bengaluru', email: 'hm_bengaluru@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'hub_03', active: true },
+            { user_id: 'U_HM_4', name: 'Hub Manager Visakhapatnam', email: 'hm_visakhapatnam@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'hub_04', active: true },
+            { user_id: 'U_HM_5', name: 'Hub Manager Hyderabad', email: 'hm_hyderabad@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'hub_05', active: true },
             { user_id: 'U_SUPER_1', name: 'Super User Admin', email: 'superuser@swifttrack.com', password: 'super123', role: 'super_user', active: true },
             { user_id: 'U_CUS_1', name: 'Priya Iyer', email: 'customer@swifttrack.com', password: 'password', role: 'customer', active: true }
         );
@@ -73,7 +73,7 @@
             { id: 'H001', pickup: 'Chennai Central Hub', delivery: 'T. Nagar, Chennai' },
             { id: 'H002', pickup: 'Bengaluru Logistics Park', delivery: 'Indiranagar, Bengaluru' },
             { id: 'H003', pickup: 'Hyderabad Logistics Hub', delivery: 'Madhapur, Hyderabad' },
-            { id: 'H004', pickup: 'Kharimnagar City Hub', delivery: 'Civil Lines, Kharimnagar' },
+            { id: 'H004', pickup: 'Karimnagar City Hub', delivery: 'Civil Lines, Karimnagar' },
             { id: 'H005', pickup: 'Visakhapatnam Port Hub', delivery: 'MVP Colony, Visakhapatnam' }
         ];
         var statuses = ['Pending', 'Assigned', 'In Transit', 'Out for Delivery', 'Delivered', 'Cancelled'];

@@ -7,6 +7,10 @@ function initPage() {
   renderSidebar("dispatch.html");
   renderNavbar("Dispatch & Assignment Control");
   loadDispatchData();
+  window.addEventListener('appStateChanged', loadDispatchData);
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'swifttrack_central_state') loadDispatchData();
+  });
 }
 
 function loadDispatchData() {

@@ -4,6 +4,10 @@ function initPage() {
     renderSidebar("reports.html");
     renderNavbar("Operational Intelligence");
     hydrateReportFromData();
+    window.addEventListener('appStateChanged', hydrateReportFromData);
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'swifttrack_central_state') hydrateReportFromData();
+    });
 }
 
 function hydrateReportFromData() {

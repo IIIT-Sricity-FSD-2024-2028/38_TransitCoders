@@ -106,10 +106,10 @@ async function handleLogin(form) {
         if (
           !stateObj.users ||
           !stateObj.users.find(u => u.email === 'hm_chennai@swifttrack.com') ||
-          !stateObj.users.find(u => u.email === 'hm_kharimnagar@swifttrack.com') ||
+          !stateObj.users.find(u => u.email === 'hm_karimnagar@swifttrack.com') ||
           !stateObj.users.find(u => u.email === 'hm_visakhapatnam@swifttrack.com')
         ) {
-           localStorage.removeItem(window.AppState.STORAGE_KEY);
+           localStorage.removeItem('swifttrack_central_state');
            location.reload(); // Instantly reload to trigger fresh database seeding!
            return;
         }

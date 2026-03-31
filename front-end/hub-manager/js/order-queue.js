@@ -19,12 +19,13 @@ function initPage() {
   window.addEventListener('appStateChanged', function() {
     loadQueue();
   });
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'swifttrack_central_state') loadQueue();
+  });
 }
 
 function loadQueue() {
-  allOrders = (window.mockData.orders || []).filter(function (o) {
-    return o.pickup_hub_id === currentUser.hub_id;
-  });
+  allOrders = filterOrdersByHub(window.mockData.orders || []);
   filterAndRender();
 }
 

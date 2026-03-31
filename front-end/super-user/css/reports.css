@@ -1,10 +1,8 @@
-/* Reports Specific Styles — Enhanced */
+/* Reports Specific Styles — Enhanced with Real Charts */
 
 .graph-placeholder {
     width: 100%;
-    height: 200px;
-    background-color: var(--surface-subtle);
-    border: 1px dashed var(--border-strong);
+    min-height: 200px;
     border-radius: var(--radius-m);
     display: flex;
     align-items: center;
@@ -14,60 +12,109 @@
     position: relative;
     overflow: hidden;
     transition: background-color 0.3s, border-color 0.3s;
+    padding: 16px;
 }
 
-body.dark .graph-placeholder {
-    background-color: #1e293b;
-    border-color: #334155;
-}
-
+/* Remove the ::after "loading" text once JS populates */
 .graph-placeholder::after {
-    content: "Graph Module Loading...";
+    content: "";
 }
 
-/* Faking designs using CSS backgrounds */
-.graph-placeholder[data-type="bar"] {
-    background: repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent 30px,
-        rgba(22, 163, 74, 0.1) 30px,
-        rgba(22, 163, 74, 0.1) 60px
-    );
+/* ---- Bar Charts ---- */
+.chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+    height: 180px;
+    padding: 8px 0;
 }
 
-body.dark .graph-placeholder[data-type="bar"] {
-    background: repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent 30px,
-        rgba(74, 222, 128, 0.08) 30px,
-        rgba(74, 222, 128, 0.08) 60px
-    );
+.chart-bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    max-width: 60px;
 }
 
-.graph-placeholder[data-type="line"] {
-    background: linear-gradient(
-        to right bottom,
-        transparent 50%,
-        rgba(2, 132, 199, 0.05) 50.5%
-    );
+.chart-bar-track {
+    width: 100%;
+    height: 140px;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    background: rgba(100, 116, 139, 0.08);
 }
 
-.graph-placeholder[data-type="donut"]::after {
-    content: "76%";
-    font-size: 1.5rem;
-    font-weight: 700;
+.chart-bar-fill {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    min-height: 4px;
+    transition: height 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: barGrow 0.8s ease-out;
 }
 
+@keyframes barGrow {
+    from { height: 0 !important; }
+}
+
+.chart-bar-label {
+    font-size: 0.65rem;
+    color: var(--text-subtitle);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60px;
+}
+
+.chart-bar-value {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ---- Mini Sparkline ---- */
+.mini-sparkline {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    height: 120px;
+    padding: 8px 0;
+}
+
+.spark-bar {
+    flex: 1;
+    max-width: 20px;
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    animation: barGrow 0.8s ease-out;
+    transition: height 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ---- Donut override ---- */
 .graph-placeholder[data-type="donut"] {
-    border: 16px solid var(--clr-blue-100);
-    border-top-color: var(--clr-blue-500);
-    border-right-color: var(--clr-blue-500);
+    border: none;
+    background: none;
 }
 
 body.dark .graph-placeholder[data-type="donut"] {
-    border-color: #1e293b;
-    border-top-color: #38bdf8;
-    border-right-color: #38bdf8;
+    border: none;
+}
+
+/* ---- 3-col grid ---- */
+.col-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+}
+
+@media (max-width: 768px) {
+    .col-3 {
+        grid-template-columns: 1fr !important;
+    }
 }
