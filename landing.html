@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftTrack | Next-Gen Logistics</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Global and Landing Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/landing.css">
+</head>
+<body class="landing-page">
+
+    <!-- Orbs for aesthetic background -->
+    <div class="orb orb-primary"></div>
+    <div class="orb orb-secondary"></div>
+
+    <!-- Navigation -->
+    <nav class="landing-nav">
+        <div class="nav-container">
+            <a href="landing.html" class="nav-logo">
+                <span class="dot"></span>
+                Swift<span style="color: var(--clr-orange-600);">Track</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="#">Solutions</a>
+                <a href="#">Tracking</a>
+                <a href="#">Pricing</a>
+                <a href="#">Support</a>
+            </div>
+
+            <div class="header-actions">
+                <a href="auth/login.html" class="btn btn-secondary">Login</a>
+                <a href="auth/login.html" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container animate-reveal">
+            <div class="hero-pill">
+                <span class="dot" style="background:var(--clr-green-500); width:8px; height:8px; border-radius:50%; display:inline-block;"></span>
+                India's #1 Logistics Platform
+            </div>
+            
+            <h1 class="hero-title">
+                Streamline Your Deliveries with <span>SwiftTrack</span>
+            </h1>
+            
+            <p class="hero-subtitle">
+                Track shipments in real-time, manage dispatches, and optimize your logistics workflow with our powerful route-optimizing AI.
+            </p>
+            
+            <!-- Quick Tracking Box -->
+            <div class="hero-tracking">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 12px 0 0 12px; color: var(--text-subtitle);">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" placeholder="Enter Tracking ID (e.g. SWT-...)" id="landing-track-input">
+                <button class="btn btn-primary" onclick="window.location.href='auth/login.html'">Track Order</button>
+            </div>
+            <div style="font-size:13px; color:var(--text-subtitle); margin-bottom:60px;">
+                Already have an account? <a href="auth/login.html" style="color:var(--clr-orange-600); font-weight:600;">Sign in to your dashboard →</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Statistics Trust Strip -->
+    <div class="stats-strip">
+        <div class="stats-track">
+            <!-- Repeat multiple times to create a seamless infinite scroll -->
+            <div class="stat-item"><span class="stat-dot">•</span> 1200+ Deliveries</div>
+            <div class="stat-item"><span class="stat-dot">•</span> 85 Active Delivery Agents</div>
+            <div class="stat-item"><span class="stat-dot">•</span> 15 Logistics Hubs</div>
+            <div class="stat-item"><span class="stat-dot">•</span> Real-Time Shipment Tracking</div>
+            <div class="stat-item"><span class="stat-dot">•</span> Smart Route Optimization</div>
+
+            <div class="stat-item"><span class="stat-dot">•</span> 1200+ Deliveries</div>
+            <div class="stat-item"><span class="stat-dot">•</span> 85 Active Delivery Agents</div>
+            <div class="stat-item"><span class="stat-dot">•</span> 15 Logistics Hubs</div>
+            <div class="stat-item"><span class="stat-dot">•</span> Real-Time Shipment Tracking</div>
+            <div class="stat-item"><span class="stat-dot">•</span> Smart Route Optimization</div>
+            
+            <div class="stat-item"><span class="stat-dot">•</span> 1200+ Deliveries</div>
+            <div class="stat-item"><span class="stat-dot">•</span> 85 Active Delivery Agents</div>
+            <div class="stat-item"><span class="stat-dot">•</span> 15 Logistics Hubs</div>
+            <div class="stat-item"><span class="stat-dot">•</span> Real-Time Shipment Tracking</div>
+            <div class="stat-item"><span class="stat-dot">•</span> Smart Route Optimization</div>
+        </div>
+    </div>
+
+    <!-- UI Mockup Showcase -->
+    <section class="showcase">
+        <div class="showcase-container animate-reveal" style="animation-delay: 0.2s;">
+            <!-- Mockup of the dashboard to show prospective users -->
+            <div style="position: absolute; top: 18px; left: 24px; display: flex; gap: 8px;">
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #fc5c5c;"></div>
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #fdbc40;"></div>
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #34c84a;"></div>
+            </div>
+            
+            <div style="padding: 40px; text-align: center; color: var(--text-subtitle);">
+                <div style="width: 600px; height: 400px; background: url('images/8909ed036f3f557c70b2bae33ee6710332e09133.png') center/contain no-repeat; opacity: 0.8; margin-bottom: 20px;"></div>
+                <div style="font-weight: 600; font-size: 20px; color: var(--text-title); margin-bottom: 8px;">Experience the Dashboard</div>
+                <div>Join Prasanna's Enterprises and 2,000+ others scaling their logistics.</div>
+                <br>
+                <a href="auth/login.html" class="btn btn-primary">Start Free Trial</a>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
