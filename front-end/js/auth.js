@@ -12,6 +12,8 @@ function initAuth() {
     const registerForm = document.getElementById('register-form');
     const themeToggle = document.querySelector('.theme-switch');
 
+    initPasswordToggles();
+
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -29,6 +31,29 @@ function initAuth() {
     if (themeToggle) {
         themeToggle.addEventListener('click', toggleTheme);
     }
+}
+
+function initPasswordToggles() {
+    const toggles = document.querySelectorAll('[data-toggle-password]');
+    if (!toggles.length) return;
+
+    toggles.forEach((toggleBtn) => {
+        const targetSelector = toggleBtn.getAttribute('data-toggle-password');
+        const targetInput = targetSelector ? document.querySelector(targetSelector) : null;
+        const icon = toggleBtn.querySelector('i');
+        if (!targetInput) return;
+
+        toggleBtn.addEventListener('click', () => {
+            const showing = targetInput.type === 'text';
+            targetInput.type = showing ? 'password' : 'text';
+            if (icon) {
+                icon.classList.toggle('fa-eye', !showing);
+                icon.classList.toggle('fa-eye-slash', showing);
+            }
+            toggleBtn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+            toggleBtn.setAttribute('aria-pressed', showing ? 'false' : 'true');
+        });
+    });
 }
 
 async function handleLogin(form) {

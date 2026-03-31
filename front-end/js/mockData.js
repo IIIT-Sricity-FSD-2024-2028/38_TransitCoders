@@ -88,7 +88,7 @@ for (let i = 1; i <= 5; i++) {
   window.mockData.users.push({
     user_id: `U_MER_${i}`,
     name: i === 1 ? "Vinod" : `Merchant ${i}`,
-    email: i === 1 ? "merchant@swifttrack.com" : `merchant${i}@swifttrack.com`,
+    email: i === 1 ? "c" : `merchant${i}@swifttrack.com`,
     password: i === 1 ? "merchant123" : "password123",
     role: "merchant",
     hub_id: null,

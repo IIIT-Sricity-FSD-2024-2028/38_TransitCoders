@@ -49,17 +49,29 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 24px;
-    font-weight: 800;
     color: white;
     text-decoration: none;
 }
 
-.auth-logo .dot {
-    width: 12px;
-    height: 12px;
-    background-color: #f97316;
-    border-radius: 50%;
+.auth-logo-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+}
+
+.auth-logo-text {
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.01em;
+}
+
+.auth-logo-swift {
+    color: #ffffff;
+}
+
+.auth-logo-track {
+    color: #ff5c02;
 }
 
 .auth-promo h2 {
@@ -162,6 +174,42 @@
     font-family: 'Poppins';
     font-size: 14px;
     transition: all 0.2s;
+}
+
+.password-input-wrap {
+    position: relative;
+}
+
+.password-input-wrap .form-input {
+    padding-right: 72px;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #f97316;
+    font-size: 16px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 6px;
+}
+
+.password-toggle-btn:hover {
+    background: rgba(249, 115, 22, 0.08);
+}
+
+.password-toggle-btn:focus-visible {
+    outline: 2px solid #f97316;
+    outline-offset: 1px;
 }
 
 .form-input:focus {
