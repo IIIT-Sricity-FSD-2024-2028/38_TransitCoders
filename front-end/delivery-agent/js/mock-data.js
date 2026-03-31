@@ -1,0 +1,329 @@
+/**
+ * Delivery Agent Module — Mock Data & CRUD Helpers
+ * All in-memory data used across the delivery agent pages.
+ */
+
+const DeliveryData = (() => {
+    // ── Orders ──────────────────────────────────────────────
+    let orders = [
+        {
+            id: 1001,
+            customer: 'Rajesh Kumar',
+            phone: '+91 98450 12345',
+            status: 'in-transit',
+            priority: 'High',
+            origin: 'Chennai Central Hub, Velachery',
+            destination: 'Shanti Villa, Chennai',
+            destinationFull: 'Shanti Villa, Chennai, Tamil Nadu 600007',
+            eta: '01:15 PM',
+            amount: 1250,
+            distance: '4.5 KM',
+            etaMinutes: 19,
+            distanceKm: 9.3,
+            fragile: true,
+            packageId: 4421,
+            paymentMode: 'Prepaid',
+            weight: '0.5 kg',
+            volume: '30x20x15 cm'
+        },
+        {
+            id: 1002,
+            customer: 'Priya Nair',
+            phone: '+91 98765 43210',
+            status: 'pending',
+            priority: 'Medium',
+            origin: 'Chennai Central Hub, Velachery',
+            destination: 'OMR (Sholinganallur), Chennai',
+            destinationFull: 'OMR Road, Sholinganallur, Chennai, Tamil Nadu 600119',
+            eta: '12:30 PM',
+            amount: 849,
+            distance: '3.2 KM',
+            etaMinutes: 15,
+            distanceKm: 3.2,
+            fragile: false,
+            packageId: 4422,
+            paymentMode: 'COD',
+            weight: '1.2 kg',
+            volume: '40x30x20 cm'
+        },
+        {
+            id: 1003,
+            customer: 'Vijaya Kumar',
+            phone: '+91 98450 12345',
+            status: 'delivered',
+            priority: 'Medium',
+            origin: 'North Chennai Hub, Perambur',
+            destination: 'Adyar, Near Adyar Bus Depot, Chennai',
+            destinationFull: 'Adyar, Near Adyar Bus Depot, Chennai, Tamil Nadu 600020',
+            eta: '01:15 PM',
+            amount: 1250,
+            distance: '4.5 KM',
+            etaMinutes: 22,
+            distanceKm: 4.5,
+            fragile: false,
+            packageId: 4423,
+            paymentMode: 'Prepaid',
+            weight: '2.0 kg',
+            volume: '50x40x30 cm'
+        },
+        {
+            id: 1004,
+            customer: 'Vinod Reddy',
+            phone: '+91 98450 57893',
+            status: 'delivered',
+            priority: 'Low',
+            origin: 'North Chennai Hub, Perambur',
+            destination: 'Madipakkam, Chennai',
+            destinationFull: 'Madipakkam, Chennai, Tamil Nadu 600091',
+            eta: '01:15 PM',
+            amount: 1250,
+            distance: '4.5 KM',
+            etaMinutes: 18,
+            distanceKm: 4.5,
+            fragile: false,
+            packageId: 4424,
+            paymentMode: 'Prepaid',
+            weight: '0.8 kg',
+            volume: '25x20x10 cm'
+        },
+        {
+            id: 1010,
+            customer: 'Arun Kumar',
+            phone: '+91 98765 67532',
+            status: 'pending',
+            priority: 'Medium',
+            origin: 'SwiftTrack OMR Logistics Hub',
+            destination: 'Anna Nagar, Chennai',
+            destinationFull: 'Anna Nagar, Chennai, Tamil Nadu 600040',
+            eta: '12:30 PM',
+            amount: 849,
+            distance: '3.2 KM',
+            etaMinutes: 20,
+            distanceKm: 3.2,
+            fragile: false,
+            packageId: 4425,
+            paymentMode: 'Prepaid',
+            weight: '1.5 kg',
+            volume: '35x25x15 cm'
+        },
+        {
+            id: 1011,
+            customer: 'Divya Srinivasan',
+            phone: '+91 98765 48940',
+            status: 'pending',
+            priority: 'Medium',
+            origin: 'Chennai Central Hub, Velachery',
+            destination: 'T. Nagar, Chennai',
+            destinationFull: 'T. Nagar, Chennai, Tamil Nadu 600017',
+            eta: '12:30 PM',
+            amount: 849,
+            distance: '3.2 KM',
+            etaMinutes: 14,
+            distanceKm: 3.2,
+            fragile: true,
+            packageId: 4426,
+            paymentMode: 'COD',
+            weight: '0.3 kg',
+            volume: '20x15x10 cm'
+        },
+        {
+            id: 1056,
+            customer: 'Rohit Sharma',
+            phone: '+91 67846 43210',
+            status: 'pending',
+            priority: 'Medium',
+            origin: 'SwiftTrack Metro Hub',
+            destination: 'OMR (Sholinganallur), Chennai',
+            destinationFull: 'OMR Road, Sholinganallur, Chennai, Tamil Nadu 600119',
+            eta: '12:30 PM',
+            amount: 849,
+            distance: '3.2 KM',
+            etaMinutes: 25,
+            distanceKm: 3.2,
+            fragile: false,
+            packageId: 4427,
+            paymentMode: 'Prepaid',
+            weight: '3.0 kg',
+            volume: '60x40x30 cm'
+        },
+        {
+            id: 1005,
+            customer: 'Sneha Reddy',
+            phone: '+91 98765 11223',
+            status: 'delivered',
+            priority: 'Low',
+            origin: 'Chennai Central Hub, Velachery',
+            destination: 'East End - Plaza, Chennai',
+            destinationFull: 'East End Plaza, Chennai, Tamil Nadu 600005',
+            eta: '09:30 AM',
+            amount: 650,
+            distance: '5.1 KM',
+            etaMinutes: 30,
+            distanceKm: 5.1,
+            fragile: false,
+            packageId: 4428,
+            paymentMode: 'Prepaid',
+            weight: '1.0 kg',
+            volume: '30x20x15 cm'
+        },
+        {
+            id: 1006,
+            customer: 'Vikram Singh',
+            phone: '+91 98765 44556',
+            status: 'delivered',
+            priority: 'Medium',
+            origin: 'Chennai Central Hub, Velachery',
+            destination: 'Ring Road, New Delhi',
+            destinationFull: 'Ring Road, New Delhi 110001',
+            eta: '08:15 AM',
+            amount: 2100,
+            distance: '12.0 KM',
+            etaMinutes: 45,
+            distanceKm: 12.0,
+            fragile: true,
+            packageId: 4429,
+            paymentMode: 'Prepaid',
+            weight: '5.0 kg',
+            volume: '80x60x40 cm'
+        },
+        {
+            id: 1007,
+            customer: 'Arjun Patel',
+            phone: '+91 98765 77889',
+            status: 'delivered',
+            priority: 'High',
+            origin: 'North Chennai Hub, Perambur',
+            destination: 'Gachibowli, Hyderabad',
+            destinationFull: 'Gachibowli, Hyderabad, Telangana 500032',
+            eta: '10:45 AM',
+            amount: 1800,
+            distance: '8.0 KM',
+            etaMinutes: 35,
+            distanceKm: 8.0,
+            fragile: false,
+            packageId: 4430,
+            paymentMode: 'COD',
+            weight: '2.5 kg',
+            volume: '45x35x25 cm'
+        }
+    ];
+
+    // ── Delivery History ────────────────────────────────────
+    let history = [
+        { orderId: 505, customer: 'Rahul', location: 'T. Nagar, Chennai', date: '8-3-2026', time: '14:20 PM', status: 'Completed', rating: 4 },
+        { orderId: 508, customer: 'Priya Nair', location: 'Whitefield', date: '8-3-2026', time: '12:15 PM', status: 'Completed', rating: 5 },
+        { orderId: 602, customer: 'Arjun Patel', location: 'Gachibowli', date: '8-3-2026', time: '10:45 AM', status: 'Completed', rating: 2 },
+        { orderId: 701, customer: 'Sneha Reddy', location: 'East End - Plaza', date: '8-3-2026', time: '09:30 AM', status: 'Completed', rating: 3 },
+        { orderId: 725, customer: 'Vikram Singh', location: 'Ring Road, New Delhi', date: '8-3-2026', time: '08:15 AM', status: 'Completed', rating: 5 },
+        { orderId: 310, customer: 'Meera Joshi', location: 'Andheri West', date: '7-3-2026', time: '16:00 PM', status: 'Completed', rating: 4 },
+        { orderId: 311, customer: 'Karan Malhotra', location: 'Bandra East', date: '7-3-2026', time: '14:30 PM', status: 'Completed', rating: 5 },
+        { orderId: 312, customer: 'Nisha Gupta', location: 'Powai', date: '7-3-2026', time: '11:00 AM', status: 'Completed', rating: 3 },
+        { orderId: 400, customer: 'Suresh Kumar', location: 'Koramangala', date: '5-3-2026', time: '15:45 PM', status: 'Completed', rating: 4 },
+        { orderId: 401, customer: 'Lakshmi Iyer', location: 'Jayanagar', date: '5-3-2026', time: '13:20 PM', status: 'Completed', rating: 5 },
+        { orderId: 402, customer: 'Ravi Shankar', location: 'Indiranagar', date: '4-3-2026', time: '10:00 AM', status: 'Completed', rating: 4 },
+        { orderId: 403, customer: 'Ananya Das', location: 'Whitefield', date: '3-3-2026', time: '09:00 AM', status: 'Completed', rating: 3 },
+    ];
+
+    // ── Agent Profile ───────────────────────────────────────
+    let profile = {
+        name: 'Mukesh',
+        agentId: 'DA102',
+        role: 'Delivery Agent',
+        phone: '+91 98765 43210',
+        email: 'mukesh@swifttrack.com',
+        licenseNo: 'TN0720210001234',
+        joinedDate: '12 Jan 2023',
+        contractStatus: 'Active',
+        currentStatus: 'available', // available | on-delivery | offline
+        performance: { total: 210, completed: 198, failed: 12, rating: 4.6 },
+        vehicle: { number: 'TN07 AB 1234', type: 'Truck', capacity: '30 kg', status: 'Active' },
+        hub: { name: 'Chennai Central Hub', code: 'CHN001', contact: '+91 44 2345 6789' }
+    };
+
+    // ── Reports ─────────────────────────────────────────────
+    let reports = [];
+
+    // ── CRUD Helpers ────────────────────────────────────────
+    function getOrders(filter = 'all') {
+        if (filter === 'all') return [...orders];
+        return orders.filter(o => o.status === filter);
+    }
+
+    function getOrderById(id) {
+        return orders.find(o => o.id === parseInt(id));
+    }
+
+    function updateOrderStatus(id, newStatus) {
+        const order = orders.find(o => o.id === parseInt(id));
+        if (order) {
+            order.status = newStatus;
+            if (newStatus === 'delivered') {
+                history.unshift({
+                    orderId: order.id,
+                    customer: order.customer,
+                    location: order.destination.split(',')[0],
+                    date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' }).replace(/\//g, '-'),
+                    time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                    status: 'Completed',
+                    rating: 0
+                });
+            }
+            return true;
+        }
+        return false;
+    }
+
+    function getOrderCounts() {
+        return {
+            all: orders.length,
+            pending: orders.filter(o => o.status === 'pending').length,
+            'in-transit': orders.filter(o => o.status === 'in-transit').length,
+            delivered: orders.filter(o => o.status === 'delivered').length
+        };
+    }
+
+    function getHistory(period = 'today') {
+        // Simple mock filtering
+        if (period === 'today') return history.filter(h => h.date === '8-3-2026');
+        if (period === 'week') return history.filter(h => ['8-3-2026', '7-3-2026', '5-3-2026'].includes(h.date));
+        return [...history];
+    }
+
+    function getProfile() {
+        return { ...profile };
+    }
+
+    function updateProfile(data) {
+        Object.assign(profile, data);
+        return true;
+    }
+
+    function updateProfileStatus(status) {
+        profile.currentStatus = status;
+        return true;
+    }
+
+    function submitReport(report) {
+        report.id = reports.length + 1;
+        report.timestamp = new Date().toISOString();
+        reports.push(report);
+        return true;
+    }
+
+    function getTotalDeliveriesToday() {
+        return orders.filter(o => o.status !== 'delivered').length;
+    }
+
+    return {
+        getOrders,
+        getOrderById,
+        updateOrderStatus,
+        getOrderCounts,
+        getHistory,
+        getProfile,
+        updateProfile,
+        updateProfileStatus,
+        submitReport,
+        getTotalDeliveriesToday
+    };
+})();

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Confirmation | SwiftTrack Agent</title>
+    <meta name="description" content="Delivery confirmation summary.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/delivery-agent.css">
+</head>
+<body>
+    <div class="da-layout">
+        <!-- Sidebar -->
+        <aside class="da-sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon"><i class="fas fa-truck-fast"></i></div>
+                <div>
+                    <div class="logo-text"><span class="swift">Swift</span><span class="track">Track</span></div>
+                    <span class="logo-sub">Agent Panel</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="worklist.html" class="nav-link"><i class="fas fa-clipboard-list"></i><span>Worklist</span></a>
+                <a href="delivery-history.html" class="nav-link"><i class="fas fa-clock-rotate-left"></i><span>Delivery History</span></a>
+                <a href="profile.html" class="nav-link"><i class="fas fa-user"></i><span>Profile</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-avatar">M</div>
+                    <div class="sidebar-user-info"><span class="user-name">Mukesh</span><span class="user-role">Delivery Agent</span></div>
+                </div>
+                <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i><span>LOGOUT</span></a>
+            </div>
+        </aside>
+
+        <main class="da-main" style="justify-content:center;align-items:center;">
+            <div class="da-header" style="width:100%;position:absolute;top:32px;left:0;padding:0 40px;margin-left:var(--da-sidebar-w);">
+                <div class="da-header-left">
+                    <div class="sidebar-logo" style="padding:0;">
+                        <div class="logo-icon"><i class="fas fa-truck-fast"></i></div>
+                        <div>
+                            <div class="logo-text"><span class="swift">Swift</span><span class="track">Track</span></div>
+                            <span class="logo-sub">Agent Panel</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="da-header-right">
+                    <div class="header-avatar">M</div>
+                    <div class="header-user-info">
+                        <span class="name">Mukesh</span>
+                        <span class="role">Delivery Agent</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="da-confirmation-wrapper">
+                <div class="confirmation-card">
+                    <h1>Delivery Confirmation</h1>
+                    <div class="confirm-rows">
+                        <div class="confirm-row">
+                            <span class="label">Recipient</span>
+                            <span class="value" id="conf-recipient">Rajesh Kumar</span>
+                        </div>
+                        <div class="confirm-row">
+                            <span class="label">Address</span>
+                            <span class="value" id="conf-address">Shanti Villa, Chennai</span>
+                        </div>
+                        <div class="confirm-row" style="margin-top:12px;">
+                            <span class="label">Order ID</span>
+                            <span class="value" id="conf-order-id">1001</span>
+                        </div>
+                        <div class="confirm-row">
+                            <span class="label">Package ID</span>
+                            <span class="value" id="conf-package-id">4421</span>
+                        </div>
+                        <div class="confirm-row" style="margin-top:12px;">
+                            <span class="label">Payment Mode</span>
+                            <span class="value prepaid" id="conf-payment">Prepaid</span>
+                        </div>
+                        <div class="confirm-row">
+                            <span class="label">Amount</span>
+                            <span class="value" id="conf-amount">₹450.00</span>
+                        </div>
+                    </div>
+                    <div class="confirm-package-row" style="margin-top:16px;">
+                        <div class="confirm-package-item">
+                            <span class="label">Weight</span>
+                            <span class="value" id="conf-weight">0.5 kg</span>
+                        </div>
+                        <div class="confirm-package-item">
+                            <span class="label">Volume</span>
+                            <span class="value" id="conf-volume">30x20x15 cm</span>
+                        </div>
+                    </div>
+                    <button class="return-btn" id="return-btn">
+                        <i class="fas fa-check-circle"></i> Return to Dashboard
+                    </button>
+                    <p class="confirm-terms">By clicking confirm, you agree to the <a href="#">delivery terms and conditions</a> and verify that the package has been handed over to the authorized recipient.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="da-footer">
+        <span class="da-footer-copy">© 2026 SWIFTTRACK. ALL RIGHTS RESERVED.</span>
+        <div class="da-footer-social">
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+    </footer>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/ui-common.js"></script>
+    <script src="js/delivery-confirmation.js"></script>
+</body>
+</html>

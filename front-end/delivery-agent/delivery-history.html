@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery History | SwiftTrack Agent</title>
+    <meta name="description" content="View past delivery history and feedback.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/delivery-agent.css">
+</head>
+<body>
+    <div class="da-layout">
+        <!-- Sidebar -->
+        <aside class="da-sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon"><i class="fas fa-truck-fast"></i></div>
+                <div>
+                    <div class="logo-text"><span class="swift">Swift</span><span class="track">Track</span></div>
+                    <span class="logo-sub">Agent Panel</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="worklist.html" class="nav-link"><i class="fas fa-clipboard-list"></i><span>Worklist</span></a>
+                <a href="delivery-history.html" class="nav-link active"><i class="fas fa-clock-rotate-left"></i><span>Delivery History</span></a>
+                <a href="profile.html" class="nav-link"><i class="fas fa-user"></i><span>Profile</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-avatar">M</div>
+                    <div class="sidebar-user-info"><span class="user-name">Mukesh</span><span class="user-role">Delivery Agent</span></div>
+                </div>
+                <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i><span>LOGOUT</span></a>
+            </div>
+        </aside>
+
+        <main class="da-main">
+            <a href="worklist.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+
+            <div class="da-header">
+                <div class="da-header-left">
+                    <h1>Delivery History</h1>
+                    <p>Review and manage your past completed tasks</p>
+                </div>
+                <div class="da-header-right">
+                    <div class="theme-toggle">
+                        <i class="fas fa-sun icon-sun"></i>
+                        <i class="fas fa-moon icon-moon" style="display:none"></i>
+                        <div class="toggle-track"><div class="toggle-dot"></div></div>
+                        <span class="theme-label">Light</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time Filters -->
+            <div class="da-history-header">
+                <div></div>
+                <div class="history-filters" id="history-filters">
+                    <button class="history-filter-btn active" data-period="today">Today</button>
+                    <button class="history-filter-btn" data-period="week">This Week</button>
+                    <button class="history-filter-btn" data-period="month">This Month</button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="da-table-container">
+                <table class="da-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Location</th>
+                            <th>Delivered at</th>
+                            <th>Delivered Time</th>
+                            <th>Status</th>
+                            <th>Feedback</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body">
+                        <!-- Rendered by JS -->
+                    </tbody>
+                </table>
+                <div class="da-pagination" id="pagination">
+                    <span class="pagination-info" id="pagination-info">Showing 5 of 128 deliveries</span>
+                    <div class="pagination-controls" id="pagination-controls">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="da-footer">
+        <span class="da-footer-copy">© 2026 SWIFTTRACK. ALL RIGHTS RESERVED.</span>
+        <div class="da-footer-social">
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+    </footer>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/ui-common.js"></script>
+    <script src="js/delivery-history.js"></script>
+</body>
+</html>
