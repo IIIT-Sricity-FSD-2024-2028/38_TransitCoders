@@ -9,18 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Initialize Interactivity
     initSmoothScroll();
     initStatsStrip();
-    initSearchForm();
-    initMockCRUD();
-
-    // 2. Mock Data for "Recent Delivery Issues"
-    const mockIssues = [
-        { id: '#2034', desc: 'Route blocked by traffic accident', agent: 'Rahul K.', status: 'Delayed', statusClass: 'status-delayed' },
-        { id: '#2041', desc: 'Recipient not available at address', agent: 'Kavya S.', status: 'Attention', statusClass: 'status-attention' },
-        { id: '#2052', desc: 'Incomplete delivery document', agent: 'Imran K.', status: 'Review', statusClass: 'status-review' },
-        { id: '#2060', desc: 'Weather delay on main highway', agent: 'Arun P.', status: 'Delayed', statusClass: 'status-delayed' }
-    ];
-
-    renderIssues(mockIssues);
+    initTracking();
+    initScrollReveal();
 });
 
 /**
@@ -74,7 +64,7 @@ function initSmoothScroll() {
  * Stats Strip Marquee Logic (Simulated)
  */
 function initStatsStrip() {
-    const statsContainer = document.querySelector('.marquee-content');
+    const statsContainer = document.querySelector('.marquee');
     if (!statsContainer) return;
     
     // Duplicate content for seamless loop
@@ -83,61 +73,90 @@ function initStatsStrip() {
 }
 
 /**
- * Tracking Search Simulation
+ * Modern Tracking Simulation
  */
-function initSearchForm() {
-    const searchForm = document.getElementById('search-form');
-    const searchInput = document.getElementById('tracking-id');
-    
-    if (searchForm) {
-        searchForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const query = searchInput.value.trim();
+function initTracking() {
+    const mockData = {
+        "ST-20481": { id: "ST-20481", status: "In Transit", hub: "Bangalore Hub", eta: "2h 15m", step: 3, color: "#f97316" },
+        "ST-30291": { id: "ST-30291", status: "Processing", hub: "Chennai Hub", eta: "5h 40m", step: 1, color: "#2563eb" },
+        "ST-10042": { id: "ST-10042", status: "Delivered", hub: "Destination Branch", eta: "Completed", step: 4, color: "#059669" }
+    };
+
+    const trackBtn = document.getElementById('track-btn');
+    const trackInput = document.getElementById('tracking-input');
+    const trackResult = document.getElementById('tracking-result');
+    const trackError = document.getElementById('tracking-error');
+    const trackLine = document.getElementById('trk-progress-line');
+
+    if (!trackBtn || !trackInput) return;
+
+    const handleTrack = () => {
+        const id = trackInput.value.trim().toUpperCase();
+        if (mockData[id]) {
+            const data = mockData[id];
+            trackError.style.display = 'none';
+            trackResult.style.display = 'block';
             
-            if (!query) {
-                showToast('Please enter a valid Tracking ID', 'error');
-                return;
+            // Reset state
+            if (trackLine) trackLine.style.width = '0%';
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step-${i}`);
+                if (step) {
+                    step.classList.remove('active', 'current');
+                }
             }
             
-            // Simulation of Search
-            console.log(`Searching for ID: ${query}`);
-            showToast(`Searching for shipment ${query}...`, 'info');
+            // Re-populate text
+            document.getElementById('res-id').innerText = data.id;
+            document.getElementById('res-hub').innerText = data.hub;
+            document.getElementById('res-eta').innerText = data.eta;
             
-            // Redirect simulation (in a real app, this would route to a detail page)
-            setTimeout(() => {
-                alert(`Shipment found! Redirecting to tracking details for ${query}...`);
-            }, 1000);
-        });
-    }
-}
+            const badge = document.getElementById('res-status-badge');
+            badge.innerText = data.status;
+            badge.style.backgroundColor = `${data.color}22`;
+            badge.style.color = data.color;
 
-/**
- * Table Simulation & CRUD
- */
-function renderIssues(issues) {
-    const tableBody = document.querySelector('.issues-table-body');
-    if (!tableBody) return;
-    
-    tableBody.innerHTML = '';
-    
-    issues.forEach(issue => {
-        const row = document.createElement('div');
-        row.className = 'table-row';
-        row.innerHTML = `
-            <div class="table-cell id">${issue.id}</div>
-            <div class="table-cell desc">${issue.desc}</div>
-            <div class="table-cell agent">${issue.agent}</div>
-            <div class="table-cell status">
-                <span class="status-badge ${issue.statusClass}">${issue.status}</span>
-            </div>
-        `;
-        tableBody.appendChild(row);
+            // Trigger animations after a tiny delay for aesthetic effect
+            setTimeout(() => {
+                if (trackLine) {
+                    const percentage = ((data.step - 1) / 3) * 100;
+                    trackLine.style.width = `${percentage}%`;
+                }
+
+                for (let i = 1; i <= 4; i++) {
+                    const step = document.getElementById(`step-${i}`);
+                    if (step) {
+                        if (i <= data.step) step.classList.add('active');
+                        if (i === data.step) step.classList.add('current');
+                    }
+                }
+            }, 50);
+
+        } else if (id) {
+            trackResult.style.display = 'none';
+            trackError.style.display = 'block';
+        }
+    };
+
+    trackBtn.addEventListener('click', handleTrack);
+    trackInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleTrack();
     });
 }
 
-function initMockCRUD() {
-    // This is where "Delete" or "Add" logic would live for the prototype
-    console.log('CRUD simulation initialized.');
+/**
+ * Scroll Reveal Animation (AI Workflow)
+ */
+function initScrollReveal() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+            }
+        });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.wf-step-alt').forEach(el => observer.observe(el));
 }
 
 /**

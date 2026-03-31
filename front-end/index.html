@@ -4,663 +4,768 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SwiftTrack | Unified Logistics Platform</title>
-    <meta name="description" content="Streamline logistics from merchant creation to last-mile delivery.">
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SwiftTrack | Unified Logistics Platform</title>
+        <meta name="description" content="Streamline logistics from merchant creation to last-mile delivery.">
     
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <!-- Icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Modern Aesthetic Styles -->
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        /* Precise Figma Layout Adjustments */
+        <!-- Modern Aesthetic Styles -->
+        <link rel="stylesheet" href="css/style.css">
+        <style>
+            /* Precise Figma Layout Adjustments */
         
-        header {
-            background: var(--surface-default);
-            opacity: 0.95;
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-default);
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            transition: background 0.3s ease;
-        }
+            header {
+                background: var(--surface-default);
+                opacity: 0.95;
+                backdrop-filter: blur(12px);
+                border-bottom: 1px solid var(--border-default);
+                padding: 20px 0;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                transition: background 0.3s ease;
+            }
 
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+            .header-content {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #111827;
-        }
+            .logo {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-size: 1.5rem;
+                font-weight: 800;
+                color: #111827;
+            }
 
-        .logo-icon {
-            background: var(--surface-brand);
-            color: white;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            font-size: 1.25rem;
-        }
+            .logo-icon {
+                background: var(--surface-brand);
+                color: white;
+                width: 44px;
+                height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 12px;
+                font-size: 1.25rem;
+            }
 
-        .nav-links {
-            display: flex;
-            gap: 40px;
-            font-weight: 600;
-        }
+            .nav-links {
+                display: flex;
+                gap: 40px;
+                font-weight: 600;
+            }
 
-        .nav-links a { color: var(--text-subtitle); font-family: 'Poppins'; font-size: 15px; }
-        .nav-links a.active { color: #f97316; }
-        .nav-links a:hover { color: #f97316; }
+            .nav-links a { color: var(--text-subtitle); font-family: 'Poppins'; font-size: 15px; }
+            .nav-links a.active { color: #f97316; }
+            .nav-links a:hover { color: #f97316; }
 
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
+            .nav-actions {
+                display: flex;
+                align-items: center;
+                gap: 24px;
+            }
 
-        .theme-switch {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--surface-default);
-            padding: 8px 16px;
-            border-radius: 100px;
-            border: 1px solid var(--border-default);
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-title);
-            cursor: pointer;
-        }
+            .theme-switch {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                background: var(--surface-default);
+                padding: 8px 16px;
+                border-radius: 100px;
+                border: 1px solid var(--border-default);
+                font-weight: 600;
+                font-size: 14px;
+                color: var(--text-title);
+                cursor: pointer;
+            }
 
-        .switch-toggle {
-            width: 44px;
-            height: 24px;
-            background: var(--surface-subtle);
-            border-radius: 12px;
-            position: relative;
-            transition: background 0.3s;
-        }
+            .switch-toggle {
+                width: 44px;
+                height: 24px;
+                background: var(--surface-subtle);
+                border-radius: 12px;
+                position: relative;
+                transition: background 0.3s;
+            }
 
-        .switch-thumb {
-            width: 18px;
-            height: 18px;
-            background: #fff;
-            border-radius: 50%;
-            position: absolute;
-            left: 3px;
-            top: 3px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: left 0.3s ease;
-        }
+            .switch-thumb {
+                width: 18px;
+                height: 18px;
+                background: #fff;
+                border-radius: 50%;
+                position: absolute;
+                left: 3px;
+                top: 3px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                transition: left 0.3s ease;
+            }
 
-        body.dark .switch-thumb {
-            left: 23px;
-        }
+            body.dark .switch-thumb {
+                left: 23px;
+            }
 
-        /* Hero Section 1:1 */
-        .hero {
-            padding: 80px 0 120px;
-            background-color: var(--surface-subtle);
-            text-align: center;
-            overflow: hidden;
-            transition: background 0.3s ease;
-        }
+            /* Hero Section 1:1 */
+            .hero {
+                padding: 80px 0 120px;
+                background-color: var(--surface-subtle);
+                text-align: center;
+                overflow: hidden;
+                transition: background 0.3s ease;
+            }
 
-        .hero h1 {
-            font-family: 'Poppins';
-            font-weight: 900;
-            font-size: 49px;
-            line-height: 1.2;
-            margin-bottom: 24px;
-            color: var(--text-title);
-            text-transform: uppercase;
-        }
+            .hero h1 {
+                font-family: 'Poppins';
+                font-weight: 900;
+                font-size: 49px;
+                line-height: 1.2;
+                margin-bottom: 24px;
+                color: var(--text-title);
+                text-transform: uppercase;
+            }
 
-        .hero h1 .accent { color: #f97316; }
+            .hero h1 .accent { color: #f97316; }
 
-        .hero-desc {
-            font-family: 'Poppins';
-            font-size: 20px;
-            color: var(--text-body);
-            max-width: 500px;
-            margin-left: auto;
-            text-align: right;
-            line-height: 1.5;
-            margin-bottom: 60px;
-        }
+            .hero-desc {
+                font-family: 'Poppins';
+                font-size: 20px;
+                color: var(--text-body);
+                max-width: 500px;
+                margin-left: auto;
+                text-align: right;
+                line-height: 1.5;
+                margin-bottom: 60px;
+            }
 
-        .hero-layout {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            position: relative;
-            margin-top: 40px;
-        }
+            .hero-layout {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+                position: relative;
+                margin-top: 40px;
+            }
 
-        .hero-left {
-            width: 400px;
-            position: relative;
-            z-index: 10;
-        }
+            .hero-left {
+                width: 400px;
+                position: relative;
+                z-index: 10;
+            }
 
-        /* Shipment Card */
-        .shipment-card {
-            background: var(--surface-default);
-            border: 1px solid var(--border-default);
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0px 10px 40px rgba(0,0,0,0.25);
-            text-align: left;
-            transition: background 0.3s;
-        }
+            /* Shipment Card */
+            .shipment-card {
+                background: var(--surface-default);
+                border: 1px solid var(--border-default);
+                border-radius: 16px;
+                padding: 32px;
+                box-shadow: 0px 10px 40px rgba(0,0,0,0.25);
+                text-align: left;
+                transition: background 0.3s;
+            }
 
-        .status-header { font-size: 20px; font-family: 'Poppins'; color: var(--text-body); margin-bottom: 24px; }
-        .shipment-info { font-size: 18px; font-family: 'Poppins'; color: var(--text-body); line-height: 1.6; margin-bottom: 32px; }
+            .status-header { font-size: 20px; font-family: 'Poppins'; color: var(--text-body); margin-bottom: 24px; }
+            .shipment-info { font-size: 18px; font-family: 'Poppins'; color: var(--text-body); line-height: 1.6; margin-bottom: 32px; }
 
-        .progress-box { margin-top: 24px; }
-        .progress-label { font-weight: 700; font-size: 14px; margin-bottom: 12px; display: block; color: var(--text-body); }
-        .progress-bar { height: 8px; background: var(--surface-subtle); border-radius: 100px; overflow: hidden; margin-bottom: 8px; }
-        .progress-fill { width: 40%; height: 100%; background: #ff5c02; border-radius: 100px; }
-        .progress-footer { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--text-body); }
+            .progress-box { margin-top: 24px; }
+            .progress-label { font-weight: 700; font-size: 14px; margin-bottom: 12px; display: block; color: var(--text-body); }
+            .progress-bar { height: 8px; background: var(--surface-subtle); border-radius: 100px; overflow: hidden; margin-bottom: 8px; }
+            .progress-fill { width: 40%; height: 100%; background: #ff5c02; border-radius: 100px; }
+            .progress-footer { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--text-body); }
 
-        .hero-right {
-            width: 900px;
-            position: relative;
-        }
+            .hero-right {
+                width: 900px;
+                position: relative;
+            }
 
-        .van-bg-box {
-            background: #ff6b35;
-            width: 328px;
-            height: 270px;
-            border-radius: 20px;
-            position: absolute;
-            right: 0;
-            bottom: 60px;
-            z-index: 1;
-        }
+            .van-bg-box {
+                background: #ff6b35;
+                width: 328px;
+                height: 270px;
+                border-radius: 20px;
+                position: absolute;
+                right: 0;
+                bottom: 60px;
+                z-index: 1;
+            }
 
-        .van-img {
-            width: 834px;
-            position: absolute;
-            right: 150px;
-            bottom: 0px;
-            z-index: 5;
-        }
+            .van-img {
+                width: 834px;
+                position: absolute;
+                right: 150px;
+                bottom: 0px;
+                z-index: 5;
+            }
 
-        .arrow-up-box {
-            position: absolute;
-            right: 280px;
-            bottom: 240px;
-            width: 158px;
-            height: 158px;
-            background: #fff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-xl);
-            color: #ff5c02;
-            font-size: 4rem;
-            z-index: 10;
-        }
+            /* Stats Strip */
+            .stats-strip {
+                background: var(--surface-default);
+                border-top: 1px solid var(--border-default);
+                border-bottom: 1px solid var(--border-default);
+                padding: 16px 0;
+                overflow: hidden;
+                white-space: nowrap;
+            }
 
-        /* Stats Strip */
-        .stats-strip {
-            background: var(--surface-default);
-            border-top: 1px solid var(--border-default);
-            border-bottom: 1px solid var(--border-default);
-            padding: 16px 0;
-            overflow: hidden;
-            white-space: nowrap;
-        }
+            .marquee {
+                display: inline-block;
+                animation: marquee 40s linear infinite;
+                color: var(--text-subtitle);
+                font-family: 'Poppins';
+                font-size: 16px;
+            }
 
-        .marquee {
-            display: inline-block;
-            animation: marquee 40s linear infinite;
-            color: var(--text-subtitle);
-            font-family: 'Poppins';
-            font-size: 16px;
-        }
+            /* Why Choose */
+            .section-header { text-align: center; margin-bottom: 80px; }
+            .section-header h2 { font-family: 'Poppins'; font-weight: 800; font-size: 25px; color: var(--text-title); margin-bottom: 12px; }
+            .section-header p { font-family: 'Poppins'; font-size: 16px; color: var(--text-body); }
 
-        /* Why Choose */
-        .section-header { text-align: center; margin-bottom: 80px; }
-        .section-header h2 { font-family: 'Poppins'; font-weight: 800; font-size: 25px; color: var(--text-title); margin-bottom: 12px; }
-        .section-header p { font-family: 'Poppins'; font-size: 16px; color: var(--text-body); }
+            .feature-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 32px;
+            }
 
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 32px;
-        }
+            .feature-card {
+                background: var(--surface-default);
+                border: 1px solid var(--border-default);
+                border-radius: 20px;
+                padding: 40px 24px;
+                text-align: center;
+                box-shadow: 0px 10px 40px rgba(0,0,0,0.15);
+                transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
+            }
 
-        .feature-card {
-            background: var(--surface-default);
-            border: 1px solid var(--border-default);
-            border-radius: 20px;
-            padding: 40px 24px;
-            text-align: center;
-            box-shadow: 0px 10px 40px rgba(0,0,0,0.15);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
-        }
+            .feature-card:hover { transform: translateY(-12px) rotate(3deg); }
+            .feature-icon-box {
+                width: 44px;
+                height: 44px;
+                background: var(--surface-subtle);
+                border-radius: 50%;
+                margin: 0 auto 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #f97316;
+                font-size: 1.25rem;
+            }
 
-        .feature-card:hover { transform: translateY(-12px) rotate(3deg); }
-        .feature-icon-box {
-            width: 44px;
-            height: 44px;
-            background: var(--surface-subtle);
-            border-radius: 50%;
-            margin: 0 auto 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #f97316;
-            font-size: 1.25rem;
-        }
+            .feature-card h3 { font-size: 16px; color: var(--text-body); margin-bottom: 16px; font-family: 'Poppins'; font-weight: 600; }
+            .feature-card p { font-size: 13px; color: var(--text-subtitle); line-height: 1.5; font-family: 'Poppins'; }
 
-        .feature-card h3 { font-size: 16px; color: var(--text-body); margin-bottom: 16px; font-family: 'Poppins'; font-weight: 600; }
-        .feature-card p { font-size: 13px; color: var(--text-subtitle); line-height: 1.5; font-family: 'Poppins'; }
+            /* How it Works */
+            .how-works { padding: 100px 0; background: var(--surface-subtle); transition: background 0.3s ease; }
+            .timeline { display: flex; justify-content: space-between; position: relative; margin-top: 100px; padding: 0 40px; }
+            .timeline::before { content: ''; position: absolute; top: 16px; left: 60px; right: 60px; height: 2px; background: var(--border-default); z-index: 1; }
+            .step { width: 140px; text-align: center; z-index: 5; }
+            .step-circle { width: 18px; height: 18px; background: var(--text-subtitle); border-radius: 50%; border: 3px solid var(--surface-default); margin: 0 auto 24px; }
+            .step.active .step-circle { background: #ff5c02; }
+            .step-icon { font-size: 1.5rem; margin-bottom: 16px; color: var(--text-body); }
+            .step h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-body); }
+            .step p { font-size: 12px; color: var(--text-subtitle); }
 
-        /* How it Works */
-        .how-works { padding: 100px 0; background: var(--surface-subtle); transition: background 0.3s ease; }
-        .timeline { display: flex; justify-content: space-between; position: relative; margin-top: 100px; padding: 0 40px; }
-        .timeline::before { content: ''; position: absolute; top: 16px; left: 60px; right: 60px; height: 2px; background: var(--border-default); z-index: 1; }
-        .step { width: 140px; text-align: center; z-index: 5; }
-        .step-circle { width: 18px; height: 18px; background: var(--text-subtitle); border-radius: 50%; border: 3px solid var(--surface-default); margin: 0 auto 24px; }
-        .step.active .step-circle { background: #ff5c02; }
-        .step-icon { font-size: 1.5rem; margin-bottom: 16px; color: var(--text-body); }
-        .step h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-body); }
-        .step p { font-size: 12px; color: var(--text-subtitle); }
-
-        /* Platform Section */
-        .platform { padding: 100px 0; background: var(--surface-subtle); transition: background 0.3s ease; }
-        .platform-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; margin-top: 40px; }
+            /* Platform Section */
+            .platform { padding: 100px 0; background: var(--surface-subtle); transition: background 0.3s ease; }
+            .platform-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; margin-top: 40px; }
         
-        .p-card { background: var(--surface-default); border: 1px solid var(--border-default); border-radius: 24px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .p-header { padding: 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-default); }
-        .p-header h3 { font-size: 16px; font-weight: 700; color: var(--text-title); }
-        .p-link { color: #ff6a00; font-size: 12px; font-weight: 700; }
+            .p-card { background: var(--surface-default); border: 1px solid var(--border-default); border-radius: 24px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+            .p-header { padding: 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-default); }
+            .p-header h3 { font-size: 16px; font-weight: 700; color: var(--text-title); }
+            .p-link { color: #ff6a00; font-size: 12px; font-weight: 700; }
 
-        .map-img { width: 100%; height: 400px; object-fit: cover; opacity: 0.8; }
+            .map-img { width: 100%; height: 400px; object-fit: cover; opacity: 0.8; }
         
-        .issues-table { width: 100%; border-collapse: collapse; padding: 24px; }
-        .issues-table th { text-align: left; font-size: 12px; color: var(--text-subtitle); padding: 16px 0; border-bottom: 1px solid var(--border-default); text-transform: uppercase; }
-        .issues-table td { padding: 16px 0; border-bottom: 1px solid var(--border-default); font-size: 12px; color: var(--text-body); }
-        .status-btn { padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; display: inline-block; }
+            .issues-table { width: 100%; border-collapse: collapse; padding: 24px; }
+            .issues-table th { text-align: left; font-size: 12px; color: var(--text-subtitle); padding: 16px 0; border-bottom: 1px solid var(--border-default); text-transform: uppercase; }
+            .issues-table td { padding: 16px 0; border-bottom: 1px solid var(--border-default); font-size: 12px; color: var(--text-body); }
+            .status-btn { padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; display: inline-block; }
 
-        /* Testimonials */
-        .testi-section { padding: 100px 0; }
-        .testi-row { display: flex; gap: 40px; justify-content: center; }
-        .testi-card { width: 350px; background: #f8fafc; padding: 40px 32px; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.13); position: relative; }
-        .q-icon { position: absolute; font-size: 1.5rem; color: #fdba74; }
-        .content-txt { font-size: 13px; color: #374151; line-height: 1.6; text-align: center; margin-bottom: 32px; }
-        .author-box { display: flex; align-items: center; gap: 16px; }
-        .author-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        .author-info h5 { font-size: 12px; font-weight: 700; color: #374151; }
-        .author-info p { font-size: 11px; color: #6b7280; }
+            /* Testimonials */
+            .testi-section { padding: 100px 0; }
+            .testi-row { display: flex; gap: 40px; justify-content: center; }
+            .testi-card { width: 350px; background: #f8fafc; padding: 40px 32px; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.13); position: relative; }
+            .q-icon { position: absolute; font-size: 1.5rem; color: #fdba74; }
+            .content-txt { font-size: 13px; color: #374151; line-height: 1.6; text-align: center; margin-bottom: 32px; }
+            .author-box { display: flex; align-items: center; gap: 16px; }
+            .author-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+            .author-info h5 { font-size: 12px; font-weight: 700; color: #374151; }
+            .author-info p { font-size: 11px; color: #6b7280; }
 
-        /* CTA */
-        .cta-box { background: #f97316; padding: 80px; border-radius: 20px; color: #fff; position: relative; overflow: hidden; }
-        .cta-box h2 { font-size: 40px; font-weight: 800; margin-bottom: 16px; }
-        .cta-box p { font-size: 18px; opacity: 0.9; margin-bottom: 40px; max-width: 600px; }
-        .cta-btns { display: flex; gap: 16px; }
-        .cta-white { background: #fff; color: #111827; padding: 12px 24px; border-radius: 8px; font-weight: 700; }
-        .cta-outline { border: 2px solid #fff; color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 700; }
+            /* CTA */
+            .cta-box { background: #f97316; padding: 80px; border-radius: 20px; color: #fff; position: relative; overflow: hidden; }
+            .cta-box h2 { font-size: 40px; font-weight: 800; margin-bottom: 16px; }
+            .cta-box p { font-size: 18px; opacity: 0.9; margin-bottom: 40px; max-width: 600px; }
+            .cta-btns { display: flex; gap: 16px; }
+            .cta-white { background: #fff; color: #111827; padding: 12px 24px; border-radius: 8px; font-weight: 700; }
+            .cta-outline { border: 2px solid #fff; color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 700; }
 
-        /* Footer */
-        footer { padding: 80px 0 40px; border-top: 1px solid #e2e8f0; }
-        .f-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 80px; margin-bottom: 80px; }
-        .f-desc { font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 16px; }
-        .f-col h4 { font-size: 16px; color: #111827; margin-bottom: 24px; position: relative; display: inline-block; }
-        .f-col h4::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 40px; height: 2px; background: #f97316; }
-        .f-links li { margin-bottom: 12px; }
-        .f-links a { font-size: 14px; color: #374151; }
-        .f-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 40px; border-top: 1px solid #f1f5f9; color: #6b7280; font-size: 14px; }
-        .socials { display: flex; gap: 20px; font-size: 1.25rem; }
+            /* Footer */
+            footer { padding: 80px 0 40px; border-top: 1px solid #e2e8f0; }
+            .f-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 80px; margin-bottom: 80px; }
+            .f-desc { font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 16px; }
+            .f-col h4 { font-size: 16px; color: #111827; margin-bottom: 24px; position: relative; display: inline-block; }
+            .f-col h4::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 40px; height: 2px; background: #f97316; }
+            .f-links li { margin-bottom: 12px; }
+            .f-links a { font-size: 14px; color: #374151; }
+            .f-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 40px; border-top: 1px solid #f1f5f9; color: #6b7280; font-size: 14px; }
+            .socials { display: flex; gap: 20px; font-size: 1.25rem; }
 
-        /* Animations */
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-    </style>
-</head>
-<body>
+            /* Animations */
+            @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-    <header>
-        <div class="container header-content">
-            <a href="#" class="logo">
-                <div class="logo-icon"><i class="fa-solid fa-truck"></i></div>
-                <span>SwiftTrack</span>
-            </a>
+            /* New Tracking Section CSS */
+            .new-tracking { padding: 100px 0; text-align: center; background: #f8fafc; }
+            .trk-card { max-width: 600px; margin: 0 auto; background: #fff; padding: 12px; border-radius: 100px; display: flex; box-shadow: 0 10px 40px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+            .trk-input { flex: 1; border: none; padding: 0 32px; font-size: 16px; outline: none; background: transparent; }
+        
+            #tracking-result { display: none; margin-top: 40px; max-width: 700px; margin-left: auto; margin-right: auto; padding: 40px; border-radius: 24px; background: #fff; box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; text-align: left; transition: all 0.5s ease; }
+            .trk-timeline { display: flex; justify-content: space-between; position: relative; margin-top: 40px; }
+            .trk-timeline::before { content: ''; position: absolute; top: 16px; left: 0; right: 0; height: 2px; background: #e2e8f0; z-index: 0; }
+            .trk-progress-fill { position: absolute; top: 16px; left: 0; height: 2px; background: #f97316; z-index: 1; width: 0%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 0 15px rgba(249,115,22,0.8); }
+            .trk-step { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 25%; }
+            .trk-dot { width: 32px; height: 32px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; transition: all 0.5s ease; color: #64748b; font-size: 14px; border: 2px solid white; }
+            .trk-step.active .trk-dot { background: #f97316; color: white; box-shadow: 0 0 10px rgba(249,115,22,0.4); }
+            .trk-step.current .trk-dot { animation: pulse-glow 2s infinite; transform: scale(1.15); box-shadow: 0 0 20px rgba(249,115,22,0.6); }
+
+            @keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(249,115,22, 0.5); } 70% { box-shadow: 0 0 0 20px rgba(249,115,22, 0); } 100% { box-shadow: 0 0 0 0 rgba(249,115,22, 0); } }
+        
+            /* Floating background blobs for aesthetic value */
+            .animated-blob { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.15; animation: blob-float 20s ease-in-out infinite; z-index: 0; pointer-events: none; }
+            @keyframes blob-float {
+                0%, 100% { transform: translate(0, 0) scale(1); }
+                25% { transform: translate(50px, -50px) scale(1.05); }
+                50% { transform: translate(-30px, 30px) scale(0.95); }
+                75% { transform: translate(40px, 40px) scale(1.02); }
+            }
+
+            /* Custom CTA Matching Image */
+            .custom-cta-wrapper { padding: 100px 0; background: #f8fafc; position: relative; overflow: hidden; margin: 0 auto; }
+            .cta-header { margin-bottom: 40px; max-width: 800px; }
+            .cta-header h2 { font-family: 'Poppins'; font-size: 32px; font-weight: 800; color: #0f172a; margin-bottom: 16px; line-height: 1.3; }
+            .cta-header p { font-size: 18px; color: #475569; line-height: 1.6; max-width: 600px; }
+        
+            .cta-orange-block {
+                background: linear-gradient(135deg, #f97316, #fb923c);
+                border-radius: 20px; padding: 60px; position: relative; overflow: hidden;
+                display: flex; flex-direction: column; justify-content: center;
+            }
+            .cta-orange-block::after {
+                content: ''; position: absolute; top: 0; right: -100px; width: 600px; height: 100%;
+                background: url("data:image/svg+xml,%3Csvg width='600' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='300' cy='200' r='150' fill='none' stroke='white' stroke-opacity='0.15' stroke-width='40'/%3E%3Ccircle cx='300' cy='200' r='250' fill='none' stroke='white' stroke-opacity='0.1' stroke-width='60'/%3E%3C/svg%3E") no-repeat right center;
+                pointer-events: none;
+            }
+            .cta-block-title { font-family: 'Poppins'; font-size: 36px; font-weight: 900; color: #1e293b; margin-bottom: 16px; position: relative; z-index: 2; line-height: 1.2; }
+            .cta-block-desc { font-size: 18px; color: #334155; max-width: 500px; margin-bottom: 40px; line-height: 1.6; position: relative; z-index: 2; }
+            .cta-actions { display: flex; gap: 16px; position: relative; z-index: 2; }
+            /* Advanced Alternating AI Workflow Sections */
+            .ai-workflow { padding: 120px 0; background: #fff; overflow: hidden; position: relative; }
+            .wf-container { max-width: 1000px; margin: 0 auto; padding: 0 20px; position: relative; }
+            .wf-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: #f1f5f9; transform: translateX(-50%); z-index: 1; border-radius: 4px; }
+            .wf-line-progress { position: absolute; left: 50%; top: 0; width: 4px; background: linear-gradient(to bottom, #f97316, #fb923c); transform: translateX(-50%); z-index: 2; border-radius: 4px; height: 100%; transform-origin: top; 
+                animation: drawLine 6s cubic-bezier(0.1, 0.7, 0.1, 1) infinite; }
+        
+            @keyframes drawLine { 0% { transform: translateX(-50%) scaleY(0); } 40% { transform: translateX(-50%) scaleY(1); } 100% { transform: translateX(-50%) scaleY(1); opacity: 0; } }
+
+            .wf-step-alt { display: flex; justify-content: space-between; align-items: center; margin-bottom: 120px; position: relative; z-index: 3; opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+            .wf-step-alt.revealed { opacity: 1; transform: translateY(0); }
+
+            .wf-content, .wf-visual { width: 42%; position: relative; }
+            .wf-step-alt:nth-child(even) { flex-direction: row-reverse; }
+            .wf-step-alt:nth-child(even) .wf-content { text-align: left; }
+            .wf-step-alt:nth-child(odd) .wf-content { text-align: right; }
+
+            .wf-icon-box { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; background: #fff; border-radius: 50%; border: 4px solid #f97316; display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 0 0 6px #fff, 0 10px 30px rgba(249,115,22,0.3); color: #f97316; font-size: 28px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+            .wf-step-alt:hover .wf-icon-box { transform: translate(-50%, -50%) scale(1.15); box-shadow: 0 0 0 6px #fff, 0 20px 40px rgba(249,115,22,0.5); }
+
+            .wf-content h4 { font-family: 'Poppins'; font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 12px; }
+            .wf-content p { color: #475569; font-size: 16px; line-height: 1.8; }
+
+            .wf-glass-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(241,245,249,0.8); padding: 32px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.06); overflow: hidden; position: relative; transition: transform 0.4s; }
+            .wf-step-alt:nth-child(even):hover .wf-glass-card { transform: translateX(10px); border-color: #fdba74; }
+            .wf-step-alt:nth-child(odd):hover .wf-glass-card { transform: translateX(-10px); border-color: #fdba74; }
+
+            /* Step 1 Visual */
+            .wfv-bar-bg { width: 100%; height: 8px; background: #f1f5f9; border-radius: 10px; overflow: hidden; position: relative; margin-bottom: 20px;}
+            .wfv-bar-fill { position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(90deg, #f97316, #fb923c); width: 0%; animation: loadBar 2.5s ease-in-out infinite; }
+            @keyframes loadBar { 0% { width: 0%; left: 0; } 50% { width: 75%; left: 0; } 100% { width: 50%; left: 100%; } }
+        
+            /* Step 2 Visual */
+            .wfv-scanner { position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: #f97316; box-shadow: 0 0 15px #f97316; animation: scanLine 2s linear infinite; }
+            @keyframes scanLine { 0% { top: 10%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 90%; opacity: 0; } }
+
+            /* Step 3 Visual */
+            .wfv-radar { width: 80px; height: 80px; margin: 0 auto; border-radius: 50%; border: 2px dashed #f97316; position: relative; animation: spinRadar 10s linear infinite; display: flex; align-items: center; justify-content: center; }
+            @keyframes spinRadar { 100% { transform: rotate(360deg); } }
+            .wfv-radar::after { content: ''; width: 40px; height: 40px; background: #ffedd5; border-radius: 50%; animation: popPulse 2s infinite; }
+            @keyframes popPulse { 0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(249,115,22,0.5); } 70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(249,115,22,0); } 100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(249,115,22,0); } }
+
+            /* Mobile Adjustments */
+            @media (max-width: 900px) {
+                .wf-line, .wf-line-progress { left: 40px; transform: none; }
+                .wf-step-alt, .wf-step-alt:nth-child(even) { flex-direction: column; align-items: flex-start; margin-bottom: 60px; }
+                .wf-content, .wf-visual { width: 100%; padding-left: 90px; text-align: left !important; margin-bottom: 30px; }
+                .wf-icon-box { left: 40px; top: 0; transform: translate(-50%, 0); width: 60px; height: 60px; font-size: 20px; border-width: 3px; box-shadow: 0 0 0 4px #fff, 0 10px 20px rgba(249,115,22,0.2); }
+                .wf-step-alt:hover .wf-icon-box { transform: translate(-50%, 0) scale(1.1); }
+                .wf-step-alt:nth-child(even):hover .wf-glass-card, .wf-step-alt:nth-child(odd):hover .wf-glass-card { transform: none; }
+            }
+        </style>
+    </head>
+    <body>
+
+        <header>
+            <div class="container header-content">
+                <a href="#" class="logo">
+                    <div class="logo-icon"><i class="fa-solid fa-truck"></i></div>
+                    <span>SwiftTrack</span>
+                </a>
             
-            <nav class="nav-links">
-                <a href="#about">What is SwiftTrack?</a>
-                <a href="#features">Features</a>
-                <a href="#tracking">Tracking</a>
-            </nav>
+                <nav class="nav-links">
+                    <a href="#about">What is SwiftTrack?</a>
+                    <a href="#features">Features</a>
+                    <a href="#tracking">Tracking</a>
+                </nav>
 
-            <div class="header-actions">
-                <div class="theme-switch" role="button" aria-label="Toggle dark mode">
-                    <div class="switch-toggle"><div class="switch-thumb"></div></div>
-                    <span>Light</span>
+                <div class="header-actions">
+                    <div class="theme-switch" role="button" aria-label="Toggle dark mode">
+                        <div class="switch-toggle"><div class="switch-thumb"></div></div>
+                        <span>Light</span>
+                    </div>
+                    <a href="auth/login.html" class="cta-btn primary-btn">Sign In</a>
                 </div>
-                <a href="auth/login.html" class="cta-btn primary-btn">Sign In</a>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <section class="hero">
-        <div class="container" style="position: relative;">
-            <h1>WE WILL <span class="accent">TRACK</span> YOUR PACKAGE <br> <span class="accent">ALL THE WAY</span> HOME</h1>
+        <section class="hero" style="position: relative;">
+            <!-- Animated Blobs -->
+            <div class="animated-blob" style="width: 700px; height: 700px; background: #f97316; top: -200px; right: -200px;"></div>
+            <div class="animated-blob" style="width: 500px; height: 500px; background: #fb923c; bottom: -100px; left: -100px; animation-delay: -10s;"></div>
+
+            <div class="container" style="position: relative; z-index: 2;">
+                <h1>WE WILL <span class="accent">TRACK</span> YOUR PACKAGE <br> <span class="accent">ALL THE WAY</span> HOME</h1>
             
-            <p class="hero-desc">
-                A unified platform for merchants, hub managers, and delivery agents to manage and track shipments in real time.
-            </p>
+                <p class="hero-desc">
+                    A unified platform for merchants, hub managers, and delivery agents to manage and track shipments in real time.
+                </p>
 
-            <div class="hero-layout">
-                <div class="hero-left">
-                    <div class="shipment-card">
-                        <div class="status-header">Shipment Status</div>
-                        <div class="shipment-info">
-                            Order ID: ST-20481 <br>
-                            Route: Chennai → Bangalore <br>
-                            Status: In Transit
-                        </div>
-                        <div class="progress-box">
-                            <span class="progress-label">Progress</span>
-                            <div class="progress-bar">
-                                <div class="progress-fill"></div>
+                <div class="hero-layout">
+                    <div class="hero-left">
+                        <div class="shipment-card">
+                            <div class="status-header">Shipment Status</div>
+                            <div class="shipment-info">
+                                Order ID: ST-20481 <br>
+                                Route: Chennai → Bangalore <br>
+                                Status: In Transit
                             </div>
-                            <div class="progress-footer">
-                                <span>40%</span>
-                                <span>ETA: 2h 15m</span>
+                            <div class="progress-box">
+                                <span class="progress-label">Progress</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill"></div>
+                                </div>
+                                <div class="progress-footer">
+                                    <span>40%</span>
+                                    <span>ETA: 2h 15m</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hero-right">
+                        <div class="van-bg-box"></div>
+                        <img src="assets/van-image.png" class="van-img" alt="Logistics Van">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="stats-strip">
+            <div class="marquee">
+                1200+ Deliveries • 85 Active Delivery Agents • 15 Logistics Hubs • Real-Time Shipment Tracking • Smart Route Optimization •
+                1200+ Deliveries • 85 Active Delivery Agents • 15 Logistics Hubs • Real-Time Shipment Tracking • Smart Route Optimization •
+            </div>
+        </div>
+
+        <section style="padding: 100px 0;">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Why Choose SwiftTrack</h2>
+                    <p>Powerful logistics tools built for merchants, hub managers and delivery agents</p>
+                </div>
+            
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon-box"><i class="fa-solid fa-truck"></i></div>
+                        <h3>Real-Time Tracking</h3>
+                        <p>Track shipments and monitor delivery progress in real time.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon-box"><i class="fa-solid fa-cube"></i></div>
+                        <h3>Smart Dispatch</h3>
+                        <p>Automatically assign delivery agents based on route efficiency.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon-box"><i class="fa-solid fa-warehouse"></i></div>
+                        <h3>Hub Management</h3>
+                        <p>Manage logistics hubs and shipments across multiple locations.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon-box"><i class="fa-solid fa-chart-line"></i></div>
+                        <h3>Delivery Analytics</h3>
+                        <p>Monitor delivery performance and optimize operations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="workflow" class="ai-workflow">
+            <div class="container">
+                <div class="section-header" style="text-align: center; margin-bottom: 6rem;">
+                    <h2 style="font-size: 38px; font-weight: 800; margin-bottom: 12px; color: #0f172a; font-family: 'Poppins';">How SwiftTrack <span style="color: #f97316;">Works</span></h2>
+                    <p style="color: #64748b; font-size: 18px;">Seamless end-to-end logistics processing tracked in real time</p>
+                </div>
+
+                <div class="wf-container">
+                    <div class="wf-line"></div>
+                    <div class="wf-line-progress"></div>
+                
+                    <!-- Step 1 -->
+                    <div class="wf-step-alt">
+                        <div class="wf-icon-box"><i class="fa-solid fa-box"></i></div>
+                        <div class="wf-content">
+                            <h4>1. Package Creation</h4>
+                            <p>Merchant schedules shipment and generates tracking label with optimized hub-to-hub routing directly from the portal before the truck even starts.</p>
+                        </div>
+                        <div class="wf-visual">
+                            <div class="wf-glass-card" style="text-align: center;">
+                                <div class="wfv-bar-bg"><div class="wfv-bar-fill"></div></div>
+                                <div class="wfv-bar-bg" style="width: 70%;"><div class="wfv-bar-fill" style="animation-delay: 0.5s;"></div></div>
+                                <p style="color: #94a3b8; font-size: 12px; font-family: monospace; letter-spacing: 1px; margin-top: 10px;">CALCULATING_OPTIMAL_PATH...</p>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Step 2 -->
+                    <div class="wf-step-alt">
+                        <div class="wf-icon-box"><i class="fa-solid fa-warehouse"></i></div>
+                        <div class="wf-content">
+                            <h4>2. Hub Processing</h4>
+                            <p>The shipment is securely scanned via barcode and routed to the correct staging area within the central hub, continuously updating the cloud ledger.</p>
+                        </div>
+                        <div class="wf-visual">
+                            <div class="wf-glass-card" style="display: flex; gap: 15px; flex-direction: column; align-items: center;">
+                                <div class="wfv-scanner"></div>
+                                <i class="fa-solid fa-barcode" style="font-size: 48px; color: #cbd5e1;"></i>
+                                <div style="background: #f1f5f9; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: bold; color: #64748b;">AWAITING SCAN</div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Step 3 -->
+                    <div class="wf-step-alt">
+                        <div class="wf-icon-box"><i class="fa-solid fa-truck-fast"></i></div>
+                        <div class="wf-content">
+                            <h4>3. Smart Dispatch</h4>
+                            <p>Our algorithm determines the most efficient path and instantly dispatches a delivery agent for the final package drop-off to the exact location.</p>
+                        </div>
+                        <div class="wf-visual">
+                            <div class="wf-glass-card">
+                                <div class="wfv-radar"></div>
+                                <p style="text-align: center; color: #94a3b8; font-size: 12px; font-family: monospace; margin-top: 15px;">DISPATCH_AGENT_FOUND</p>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Step 4 -->
+                    <div class="wf-step-alt">
+                        <div class="wf-icon-box"><i class="fa-solid fa-circle-check"></i></div>
+                        <div class="wf-content">
+                            <h4>4. Verified Success</h4>
+                            <p>The customer receives the package safely. Agents capture physical signatures or upload photo proof securely straight from the SwiftTrack app.</p>
+                        </div>
+                        <div class="wf-visual">
+                            <div class="wf-glass-card" style="text-align: center; padding: 50px 0;">
+                                <i class="fa-solid fa-check" style="font-size: 40px; color: #22c55e; background: #dcfce7; padding: 20px; border-radius: 50%; box-shadow: 0 10px 20px rgba(34,197,94,0.2);"></i>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+            </div>
+        </section>
+
+        <!-- Inside SwiftTrack Platform Removed -->
+
+        <section id="tracking" class="new-tracking">
+            <div class="container">
+                <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 12px;">Track Your Shipment</h2>
+                <p style="color: #64748b; margin-bottom: 40px;">Enter your tracking ID to view real-time delivery status</p>
+            
+                <div class="trk-card">
+                    <input type="text" id="tracking-input" class="trk-input" placeholder="e.g. ST-20481">
+                    <button id="track-btn" class="cta-btn primary-btn" style="padding: 14px 32px; border-radius: 100px;">Track Order</button>
+                </div>
+                <p id="tracking-error" style="color: #ef4444; margin-top: 16px; display: none;">No shipment found. Try: ST-20481</p>
+
+                <div id="tracking-result">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px;">
+                        <div>
+                            <div style="font-size: 12px; color: #64748b; margin-bottom: 4px; text-transform: uppercase;">Shipment ID</div>
+                            <div id="res-id" style="font-size: 24px; font-weight: 800; color: #0f172a;">ST-20481</div>
+                        </div>
+                        <div id="res-status-badge" style="padding: 6px 16px; border-radius: 100px; font-size: 14px; font-weight: 700; background: #ff5c0222; color: #ff5c02;">In Transit</div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px;">
+                        <div style="background: #f8fafc; padding: 20px; border-radius: 16px;">
+                            <div style="font-size: 12px; color: #64748b; margin-bottom: 8px;"><i class="fa-solid fa-location-dot"></i> Current Location</div>
+                            <div id="res-hub" style="font-size: 16px; font-weight: 700; color: #1e293b;">Chennai Hub</div>
+                        </div>
+                        <div style="background: #f8fafc; padding: 20px; border-radius: 16px;">
+                            <div style="font-size: 12px; color: #64748b; margin-bottom: 8px;"><i class="fa-solid fa-clock"></i> Estimated Delivery</div>
+                            <div id="res-eta" style="font-size: 16px; font-weight: 700; color: #1e293b;">2h 15m</div>
+                        </div>
+                    </div>
+
+                    <div class="trk-timeline">
+                        <div class="trk-progress-fill" id="trk-progress-line"></div>
+                        <div class="trk-step" id="step-1">
+                            <div class="trk-dot"><i class="fa-solid fa-box"></i></div>
+                            <span style="font-size: 12px; font-weight: 600; color: #334155;">Ordered</span>
+                        </div>
+                        <div class="trk-step" id="step-2">
+                            <div class="trk-dot"><i class="fa-solid fa-warehouse"></i></div>
+                            <span style="font-size: 12px; font-weight: 600; color: #334155;">At Hub</span>
+                        </div>
+                        <div class="trk-step" id="step-3">
+                            <div class="trk-dot"><i class="fa-solid fa-truck"></i></div>
+                            <span style="font-size: 12px; font-weight: 600; color: #334155;">Transit</span>
+                        </div>
+                        <div class="trk-step" id="step-4">
+                            <div class="trk-dot"><i class="fa-solid fa-circle-check"></i></div>
+                            <span style="font-size: 12px; font-weight: 600; color: #334155;">Delivered</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="testi-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Trusted by Logistics Teams</h2>
+                    <p>Companies rely on SwiftTrack to streamline delivery operations and monitor logistics in real time.</p>
+                </div>
+
+                <div class="testi-row">
+                    <div class="testi-card">
+                        <i class="fa-solid fa-quote-left q-icon" style="top: 20px; left: 20px;"></i>
+                        <p class="content-txt">SwiftTrack helped us streamline delivery operations and track shipments efficiently.</p>
+                        <i class="fa-solid fa-quote-right q-icon" style="bottom: 80px; right: 20px;"></i>
+                        <div class="author-box">
+                            <img src="https://ui-avatars.com/api/?name=Rahul+Mehta&background=f97316&color=fff" class="author-img">
+                            <div class="author-info">
+                                <h5>Rahul Mehta</h5>
+                                <p>Operations Manager</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testi-card">
+                        <i class="fa-solid fa-quote-left q-icon" style="top: 20px; left: 20px;"></i>
+                        <p class="content-txt">The hub management tools in SwiftTrack allow us to coordinate deliveries with complete visibility.</p>
+                        <i class="fa-solid fa-quote-right q-icon" style="bottom: 80px; right: 20px;"></i>
+                        <div class="author-box">
+                            <img src="https://ui-avatars.com/api/?name=Sameera+Nair&background=0284c7&color=fff" class="author-img">
+                            <div class="author-info">
+                                <h5>Sameera Nair</h5>
+                                <p>Hub Manager — Chennai</p>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                <div class="hero-right">
-                    <div class="van-bg-box"></div>
-                    <img src="assets/van-image.png" class="van-img" alt="Logistics Van">
-                    <div class="arrow-up-box">
-                        <i class="fa-solid fa-arrow-up"></i>
+        <section class="custom-cta-wrapper">
+            <div class="container">
+                <div class="cta-header">
+                    <h2>Start Managing Your Logistics Operations with SwiftTrack</h2>
+                    <p>Built for merchants, hub managers and delivery agents to track shipments, dispatch deliveries and optimize logistics operations</p>
+                </div>
+
+                <div class="cta-orange-block">
+                    <h3 class="cta-block-title">Optimize Your Delivery Network with SwiftTrack</h3>
+                    <p class="cta-block-desc">Track shipments, dispatch delivery agents, and manage logistics hubs from one unified logistics platform</p>
+                    <div class="cta-actions">
+                        <a href="auth/login.html" class="cta-btn-white">Access SwiftTrack</a>
+                        <a href="auth/register.html" class="cta-btn-white">Schedule Demo</a>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <div class="stats-strip">
-        <div class="marquee">
-            1200+ Deliveries • 85 Active Delivery Agents • 15 Logistics Hubs • Real-Time Shipment Tracking • Smart Route Optimization •
-            1200+ Deliveries • 85 Active Delivery Agents • 15 Logistics Hubs • Real-Time Shipment Tracking • Smart Route Optimization •
-        </div>
-    </div>
-
-    <section style="padding: 100px 0;">
-        <div class="container">
-            <div class="section-header">
-                <h2>Why Choose SwiftTrack</h2>
-                <p>Powerful logistics tools built for merchants, hub managers and delivery agents</p>
-            </div>
-            
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon-box"><i class="fa-solid fa-truck"></i></div>
-                    <h3>Real-Time Tracking</h3>
-                    <p>Track shipments and monitor delivery progress in real time.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon-box"><i class="fa-solid fa-cube"></i></div>
-                    <h3>Smart Dispatch</h3>
-                    <p>Automatically assign delivery agents based on route efficiency.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon-box"><i class="fa-solid fa-warehouse"></i></div>
-                    <h3>Hub Management</h3>
-                    <p>Manage logistics hubs and shipments across multiple locations.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon-box"><i class="fa-solid fa-chart-line"></i></div>
-                    <h3>Delivery Analytics</h3>
-                    <p>Monitor delivery performance and optimize operations.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="how-works">
-        <div class="container">
-            <div class="section-header" style="text-align: left;">
-                <h2 style="font-size: 25px; font-weight: 800;">How SwiftTrack Works</h2>
-                <p>From order creation to final delivery — every step is tracked in real time</p>
-            </div>
-
-            <div class="timeline">
-                <div class="step active">
-                    <div class="step-circle"></div>
-                    <div class="step-icon"><i class="fa-solid fa-box"></i></div>
-                    <h4>Order Created</h4>
-                    <p>Merchant schedules <br> shipment</p>
-                </div>
-                <div class="step">
-                    <div class="step-circle"></div>
-                    <div class="step-icon"><i class="fa-solid fa-warehouse"></i></div>
-                    <h4>Hub Processing</h4>
-                    <p>Shipment routed <br> to hub</p>
-                </div>
-                <div class="step">
-                    <div class="step-circle"></div>
-                    <div class="step-icon"><i class="fa-solid fa-truck"></i></div>
-                    <h4>Dispatch Assigned</h4>
-                    <p>Agent receives <br> delivery task</p>
-                </div>
-                <div class="step">
-                    <div class="step-circle"></div>
-                    <div class="step-icon"><i class="fa-solid fa-location-dot"></i></div>
-                    <h4>Out for Delivery</h4>
-                    <p>Package on the <br> way</p>
-                </div>
-                <div class="step">
-                    <div class="step-circle"></div>
-                    <div class="step-icon"><i class="fa-solid fa-circle-check"></i></div>
-                    <h4>Delivered</h4>
-                    <p>Proof of delivery <br> uploaded</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="platform" id="platform">
-        <div class="container">
-            <div class="section-header" style="text-align: left;">
-                <h2 style="font-size: 25px; font-weight: 800;">Inside the SwiftTrack Platform</h2>
-                <p>Tools built for merchants, hub managers, and delivery agents.</p>
-            </div>
-
-            <div class="platform-grid">
-                <div class="p-card">
-                    <div class="p-header">
-                        <h3>Delivery Activity Map</h3>
-                        <a href="#" class="p-link">Expand Map <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i></a>
+        <footer>
+            <div class="container">
+                <div class="f-grid">
+                    <div class="f-col">
+                        <a href="#" class="logo">
+                            <div class="logo-icon"><i class="fa-solid fa-truck"></i></div>
+                            <span>SwiftTrack</span>
+                        </a>
+                        <p class="f-desc">Smart logistics dispatch and delivery tracking platform built for merchants, hub managers, and delivery teams.</p>
                     </div>
-                    <img src="assets/map-bg.png" class="map-img" alt="Map Preview">
-                </div>
-
-                <div class="p-card">
-                    <div class="p-header">
-                        <h3>Recent Delivery Issues</h3>
-                        <a href="#" class="p-link">View All</a>
+                    <div class="f-col">
+                        <h4>Company</h4>
+                        <ul class="f-links">
+                            <li><a href="#">About SwiftTrack</a></li>
+                            <li><a href="#">Contact</a></li>
+                            <li><a href="#">Careers</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                        </ul>
                     </div>
-                    <div style="padding: 0 24px;">
-                        <table class="issues-table">
-                            <thead>
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Description</th>
-                                    <th>Agent</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>#2034</td>
-                                    <td>Route blocked by accident</td>
-                                    <td>Rahul K.</td>
-                                    <td><span class="status-btn" style="background: #fee2e2; color: #991b1b;">Delayed</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#2041</td>
-                                    <td>Recipient not found</td>
-                                    <td>Kavya S.</td>
-                                    <td><span class="status-btn" style="background: #fef9c3; color: #a16207;">Attention</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#2052</td>
-                                    <td>Incomplete document</td>
-                                    <td>Imran K.</td>
-                                    <td><span class="status-btn" style="background: #f3f4f6; color: #4b5563;">Review</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#2060</td>
-                                    <td>Weather delay</td>
-                                    <td>Arun P.</td>
-                                    <td><span class="status-btn" style="background: #fee2e2; color: #991b1b;">Delayed</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="f-col">
+                        <h4>Platform</h4>
+                        <ul class="f-links">
+                            <li><a href="#">Merchant Dashboard</a></li>
+                            <li><a href="#">Hub Manager Tools</a></li>
+                            <li><a href="#">Delivery Agent Portal</a></li>
+                            <li><a href="#">Admin Panel</a></li>
+                        </ul>
+                    </div>
+                    <div class="f-col">
+                        <h4>Logistics</h4>
+                        <ul class="f-links">
+                            <li><a href="#">Track Shipment</a></li>
+                            <li><a href="#">Dispatch Management</a></li>
+                            <li><a href="#">Hub Monitoring</a></li>
+                            <li><a href="#">Delivery Analytics</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="f-bottom">
+                    <p>© 2026 SWIFTTRACK. ALL RIGHTS RESERVED.</p>
+                    <div class="socials">
+                        <a href="#"><i class="fa-brands fa-github"></i></a>
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#"><i class="fa-brands fa-twitter"></i></a>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </footer>
 
-    <section id="tracking" style="padding: 100px 0; text-align: center;">
-        <div class="container">
-            <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 12px;">Track Your Shipment</h2>
-            <p style="color: #64748b; margin-bottom: 40px;">Enter your tracking ID to view real-time delivery status</p>
-            
-            <div style="max-width: 600px; margin: 0 auto; background: #fff; padding: 12px; border-radius: 100px; border: 1px solid #e2e8f0; display: flex; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
-                <input type="text" placeholder="Enter tracking ID" style="flex: 1; border: none; padding: 0 32px; font-size: 16px; outline: none; background: transparent;">
-                <button class="btn btn-primary" style="padding: 14px 32px; border-radius: 100px;">Track Shipment <i class="fa-solid fa-magnifying-glass" style="margin-left: 10px;"></i></button>
-            </div>
-        </div>
-    </section>
-
-    <section class="testi-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>Trusted by Logistics Teams</h2>
-                <p>Companies rely on SwiftTrack to streamline delivery operations and monitor logistics in real time.</p>
-            </div>
-
-            <div class="testi-row">
-                <div class="testi-card">
-                    <i class="fa-solid fa-quote-left q-icon" style="top: 20px; left: 20px;"></i>
-                    <p class="content-txt">SwiftTrack helped us streamline delivery operations and track shipments efficiently.</p>
-                    <i class="fa-solid fa-quote-right q-icon" style="bottom: 80px; right: 20px;"></i>
-                    <div class="author-box">
-                        <img src="https://ui-avatars.com/api/?name=Rahul+Mehta&background=f97316&color=fff" class="author-img">
-                        <div class="author-info">
-                            <h5>Rahul Mehta</h5>
-                            <p>Operations Manager</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="testi-card">
-                    <i class="fa-solid fa-quote-left q-icon" style="top: 20px; left: 20px;"></i>
-                    <p class="content-txt">The hub management tools in SwiftTrack allow us to coordinate deliveries with complete visibility.</p>
-                    <i class="fa-solid fa-quote-right q-icon" style="bottom: 80px; right: 20px;"></i>
-                    <div class="author-box">
-                        <img src="https://ui-avatars.com/api/?name=Sameera+Nair&background=0284c7&color=fff" class="author-img">
-                        <div class="author-info">
-                            <h5>Sameera Nair</h5>
-                            <p>Hub Manager — Chennai</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section style="padding: 100px 0;">
-        <div class="container">
-            <div class="cta-box">
-                <h2>Optimize Your Delivery Network with SwiftTrack</h2>
-                <p>Track shipments, dispatch delivery agents, and manage logistics hubs from one unified logistics platform.</p>
-                <div class="cta-btns">
-                    <a href="#" class="cta-white">Access SwiftTrack</a>
-                    <a href="#" class="cta-outline">Schedule Demo</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <div class="f-grid">
-                <div class="f-col">
-                    <a href="#" class="logo">
-                        <div class="logo-icon"><i class="fa-solid fa-truck"></i></div>
-                        <span>SwiftTrack</span>
-                    </a>
-                    <p class="f-desc">Smart logistics dispatch and delivery tracking platform built for merchants, hub managers, and delivery teams.</p>
-                </div>
-                <div class="f-col">
-                    <h4>Company</h4>
-                    <ul class="f-links">
-                        <li><a href="#">About SwiftTrack</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                    </ul>
-                </div>
-                <div class="f-col">
-                    <h4>Platform</h4>
-                    <ul class="f-links">
-                        <li><a href="#">Merchant Dashboard</a></li>
-                        <li><a href="#">Hub Manager Tools</a></li>
-                        <li><a href="#">Delivery Agent Portal</a></li>
-                        <li><a href="#">Admin Panel</a></li>
-                    </ul>
-                </div>
-                <div class="f-col">
-                    <h4>Logistics</h4>
-                    <ul class="f-links">
-                        <li><a href="#">Track Shipment</a></li>
-                        <li><a href="#">Dispatch Management</a></li>
-                        <li><a href="#">Hub Monitoring</a></li>
-                        <li><a href="#">Delivery Analytics</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="f-bottom">
-                <p>© 2026 SWIFTTRACK. ALL RIGHTS RESERVED.</p>
-                <div class="socials">
-                    <a href="#"><i class="fa-brands fa-github"></i></a>
-                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
-                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Interactivity Script -->
-    <script src="js/script.js"></script>
-</body>
-</html>
+        <!-- Interactivity Script -->
+        <script src="js/script.js"></script>
+    </body>
+    </html>
