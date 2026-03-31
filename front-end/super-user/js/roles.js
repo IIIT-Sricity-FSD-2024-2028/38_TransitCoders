@@ -67,4 +67,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Init
     renderMatrix();
+
+    window.addEventListener('appStateChanged', () => {
+        renderMatrix();
+    });
 });

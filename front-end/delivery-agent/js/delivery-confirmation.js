@@ -45,3 +45,7 @@ function bindReturn() {
         }, 800);
     });
 }
+
+
+// React to centralized state changes
+window.addEventListener('appStateChanged', initConfirmation);

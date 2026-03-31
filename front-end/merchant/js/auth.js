@@ -38,7 +38,7 @@ const Auth = (() => {
 
   /* ── CURRENT USER ── */
   function currentUser() {
-    const s = sessionStorage.getItem('st_session');
+    const s = sessionStorage.getItem('user') || sessionStorage.getItem('st_session');
     return s ? JSON.parse(s) : null;
   }
   function currentRole() { return currentUser()?.role || null; }
@@ -99,10 +99,10 @@ const Auth = (() => {
   /* ── LOGOUT ── */
   function logout() {
     MockDB.logout();
-    if (window.location.pathname.includes('/auth/')) {
-      window.location.replace('login.html');
+    if (typeof window.Auth !== 'undefined') {
+        window.Auth.logout();
     } else {
-      window.location.replace('auth/login.html');
+        window.location.replace('../auth/login.html');
     }
   }
 

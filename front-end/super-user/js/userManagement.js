@@ -4,7 +4,7 @@
  */
 
 document.addEventListener("DOMContentLoaded", async () => {
-    await StorageAPI.init();
+    // StorageAPI.init() no longer needed; state managed centrally
     
     // UI Elements
     const userTableBody = document.getElementById("userTableBody");
@@ -205,4 +205,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Initial render
     renderTable();
+
+    window.addEventListener('appStateChanged', () => {
+        renderTable();
+    });
 });

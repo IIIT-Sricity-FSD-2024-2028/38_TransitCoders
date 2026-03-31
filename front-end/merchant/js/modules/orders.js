@@ -147,6 +147,9 @@ const Orders = (() => {
     // Attach live validation to edit form
     const editForm = document.getElementById('edit-shipment-form');
     if (editForm) Validator.attachLiveValidation(editForm);
+    
+    // LIVE UI REFRESH
+    window.addEventListener('appStateChanged', () => render());
   });
 
   return { render, setFilter, trackFrom, openEdit, saveEdit, confirmDelete };

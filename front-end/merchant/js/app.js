@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Auth.applyRoleUI();
   } else {
     // Redirect unauthenticated users
-    window.location.replace('auth/login.html');
+    window.location.replace('../auth/login.html');
   }
 });
 

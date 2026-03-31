@@ -34,4 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     searchInput.addEventListener("input", renderTable);
     renderTable();
+
+    window.addEventListener('appStateChanged', () => {
+        renderTable();
+    });
 });

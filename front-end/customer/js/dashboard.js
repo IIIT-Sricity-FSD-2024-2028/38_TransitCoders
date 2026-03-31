@@ -10,7 +10,88 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initDropdowns();
     initOrdersPage();
+    renderOrdersTable();
+
+    // LIVE UI REFRESH
+    window.addEventListener('appStateChanged', () => {
+        renderOrdersTable();
+    });
 });
+
+function renderOrdersTable() {
+    const tbody = document.getElementById('orders-tbody');
+    if (!tbody) return;
+
+    const orders = window.CustomerAPI.getOrders();
+    updateStats(orders);
+
+    if (orders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-subtitle)">You have no active orders.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = orders.map(order => {
+        const st = String(order.status).toUpperCase();
+        const stClass = st.toLowerCase().replace(/ /g, '-');
+        const date = new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        
+        return `
+            <tr>
+                <td style="font-weight: 700;">${order.tracking_id || order.id}</td>
+                <td>${date}</td>
+                <td>
+                    <div style="font-weight: 500;">${order.pickup_address || 'Origin'}</div>
+                    <div style="font-size: 11px; color: var(--text-subtitle);">to ${order.delivery_address}</div>
+                </td>
+                <td>
+                    <span class="status-badge status-${stClass}">${st}</span>
+                </td>
+                <td>${order.assigned_agent === 'U_AGT_102' ? 'Mukesh' : (order.assigned_agent || 'Unassigned')}</td>
+                <td>
+                    <div class="action-menu-wrapper">
+                        <span class="action-menu-btn" onclick="toggleActionMenu(this, event)">⋮</span>
+                        <div class="action-context-menu">
+                            <div class="action-context-item" onclick="showToast('Viewing order details...', 'info')">
+                                <i class="fas fa-eye"></i> View Details
+                            </div>
+                            <div class="action-context-item" onclick="window.location.href='tracking.html?id=${order.tracking_id}'">
+                                <i class="fas fa-location-dot"></i> Track Order
+                            </div>
+                            <div class="action-context-item" onclick="showToast('Invoice downloaded!', 'success')">
+                                <i class="fas fa-download"></i> Download Invoice
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function toggleActionMenu(btn, e) {
+    e.stopPropagation();
+    const menu = btn.nextElementSibling;
+    const isShowing = menu.classList.contains('show');
+    document.querySelectorAll('.action-context-menu').forEach(m => m.classList.remove('show'));
+    if (!isShowing) menu.classList.add('show');
+}
+
+function updateStats(orders) {
+    const stats = {
+        total: orders.length,
+        inTransit: orders.filter(o => ['IN TRANSIT', 'OUT FOR DELIVERY'].includes(String(o.status).toUpperCase())).length,
+        delivered: orders.filter(o => String(o.status).toUpperCase() === 'DELIVERED').length,
+        pending: orders.filter(o => String(o.status).toUpperCase() === 'PENDING').length
+    };
+
+    const cards = document.querySelectorAll('.stat-card .stat-value');
+    if (cards.length >= 4) {
+        cards[0].textContent = stats.total;
+        cards[1].textContent = stats.inTransit;
+        cards[2].textContent = stats.delivered;
+        cards[3].textContent = stats.pending;
+    }
+}
 
 function checkAuth() {
     const user = JSON.parse(localStorage.getItem('user'));

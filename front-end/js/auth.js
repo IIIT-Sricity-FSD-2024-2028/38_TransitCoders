@@ -1,11 +1,36 @@
-/**
- * Authentication Module Logic
- */
-
 document.addEventListener("DOMContentLoaded", () => {
   initAuth();
   initTheme();
 });
+
+// GLOBAL AUTH API
+window.Auth = {
+  login: (email, password) => {
+    // This is used by some legacy modules; handleLogin is the primary form handler
+    console.log("Auth.login called for:", email);
+    // For simplicity in this demo, redirected logic usually handles the heavy lifting
+    // but we can provide a helper to verify credentials if needed.
+    return JSON.parse(sessionStorage.getItem('user')); 
+  },
+  logout: () => {
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
+    localStorage.removeItem("userRole");
+    // Determine redirect path based on current location
+    const isRoot = window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/');
+    const path = (window.location.pathname.includes('/auth/') || isRoot) ? "auth/login.html" : "../auth/login.html";
+    window.location.href = path;
+  },
+  currentUser: () => {
+    try {
+      return JSON.parse(sessionStorage.getItem("user"));
+    } catch (e) { return null; }
+  },
+  isSuperUser: () => {
+    const u = Auth.currentUser();
+    return u && (u.role === 'super_user' || u.role === 'admin');
+  }
+};
 
 function initAuth() {
   const loginForm = document.getElementById("login-form");
@@ -73,13 +98,27 @@ async function handleLogin(form) {
   showToast("Signing in...", "info");
 
   setTimeout(() => {
-    // Dynamic lookup from mockData — works for any active user added to mockData.users.
-    const users = (window.mockData && window.mockData.users) || [];
+    // Read directly from universal state to avoid browser caching issues on adapters
+    let users = [];
+    if (window.AppState && window.AppState.getState) {
+        let stateObj = window.AppState.getState();
+        // AUTO REPAIR: If user database is outdated, forcefully re-seed it so user doesn't have to clear storage manually!
+        if (!stateObj.users || !stateObj.users.find(u => u.email === 'hm_chennai@swifttrack.com')) {
+           localStorage.removeItem(window.AppState.STORAGE_KEY);
+           location.reload(); // Instantly reload to trigger fresh database seeding!
+           return;
+        }
+        users = stateObj.users || [];
+    } else if (window.mockData && window.mockData.users) {
+        users = window.mockData.users; // Fallback
+    }
+
     const matchedUser = users.find(
-      (u) => u.email === email && u.password === password && u.active,
+      (u) => String(u.email).toLowerCase() === String(email).toLowerCase() && u.password === password && u.active
     );
 
     if (!matchedUser) {
+      console.warn("Login Failed! Tried email:", email, "| Expected one of:", users.map(u => u.email).join(', '));
       showToast("Invalid credentials", "error");
       return;
     }
@@ -98,19 +137,22 @@ async function handleLogin(form) {
     // Keep both storages aligned because different role dashboards read different stores.
     localStorage.setItem("user", JSON.stringify(userData));
     sessionStorage.setItem("user", JSON.stringify(userData));
+    sessionStorage.setItem("st_session", JSON.stringify(userData));
 
     const normalizedRole = String(matchedUser.role || "").toLowerCase();
     localStorage.setItem("userRole", normalizedRole);
 
     const routeMap = {
-      admin: "../index.html",
+      admin: "../hub-manager/dashboard.html",
       super_user: "../super-user/dashboard.html",
       "super-user": "../super-user/dashboard.html",
       superuser: "../super-user/dashboard.html",
       hub_manager: "../hub-manager/dashboard.html",
-      merchant: "../merchant/dashboard.html",
+      merchant: "../merchant/index.html",
       customer: "../customer/dashboard.html",
-      agent: "../agent/dashboard.html",
+      agent: "../delivery-agent/worklist.html",
+      delivery_agent: "../delivery-agent/worklist.html",
+      deliveryagent: "../delivery-agent/worklist.html"
     };
 
     const destination = routeMap[normalizedRole] || "../index.html";

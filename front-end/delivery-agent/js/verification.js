@@ -138,3 +138,7 @@ function bindVerificationActions() {
         }, 1000);
     });
 }
+
+
+// React to centralized state changes
+window.addEventListener('appStateChanged', initVerification);

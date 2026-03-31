@@ -35,10 +35,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function performLogout() {
-    localStorage.removeItem("user");
-    sessionStorage.removeItem("user");
-    localStorage.removeItem("userRole");
-    window.location.href = "../auth/login.html";
+    if (typeof Auth !== 'undefined') {
+        Auth.logout();
+    } else {
+        localStorage.removeItem("user");
+        sessionStorage.removeItem("user");
+        localStorage.removeItem("userRole");
+        window.location.href = "../auth/login.html";
+    }
 }
 
 function initProfileModal(user) {

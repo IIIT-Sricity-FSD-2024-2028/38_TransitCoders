@@ -14,6 +14,11 @@ function initPage() {
   renderNavbar("Orders Queue");
   showSkeletonBlock("ordersGrid");
   setTimeout(loadQueue, 450);
+
+  // LIVE UI REFRESH
+  window.addEventListener('appStateChanged', function() {
+    loadQueue();
+  });
 }
 
 function loadQueue() {

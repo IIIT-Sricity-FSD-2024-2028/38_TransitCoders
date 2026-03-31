@@ -13,6 +13,11 @@ function initPage() {
   renderNavbar("Hub Operations Dashboard");
   loadDashboard();
   refreshInterval = setInterval(loadDashboard, 60000);
+
+  // LIVE UI REFRESH
+  window.addEventListener('appStateChanged', function() {
+    loadDashboard();
+  });
 }
 
 function loadDashboard() {
@@ -463,3 +468,7 @@ function calculatePriority(order) {
     return "MEDIUM";
   return "LOW";
 }
+
+
+// React to centralized state changes
+window.addEventListener('appStateChanged', populateDashboardData);

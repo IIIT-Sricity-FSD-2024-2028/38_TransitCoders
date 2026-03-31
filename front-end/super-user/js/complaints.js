@@ -2,8 +2,8 @@
  * Complaints Management Logic
  */
 
-document.addEventListener("DOMContentLoaded", async () => {
-    await StorageAPI.init();
+document.addEventListener("DOMContentLoaded", () => {
+    // StorageAPI.init() no longer needed; state managed centrally
     const tableBody = document.getElementById("complaintsTableBody");
     const searchInput = document.getElementById("searchInput");
     const priorityFilter = document.getElementById("priorityFilter");
@@ -17,7 +17,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Filter 
         let filtered = complaints.filter(c => {
-            const matchesSearch = c.id.toLowerCase().includes(search) || c.customer.toLowerCase().includes(search) || c.type.toLowerCase().includes(search);
+            const matchesSearch = c.id.toLowerCase().includes(search) || 
+                                 c.customer.toLowerCase().includes(search) || 
+                                 c.type.toLowerCase().includes(search);
             const matchesPriority = fPriority === "All" || c.priority === fPriority;
             const matchesStatus = fStatus === "All" || c.status === fStatus;
             return matchesSearch && matchesPriority && matchesStatus;
@@ -73,4 +75,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     statusFilter.addEventListener("change", renderTable);
 
     renderTable();
+
+    window.addEventListener('appStateChanged', () => {
+        renderTable();
+    });
 });

@@ -109,6 +109,16 @@ const Dashboard = (() => {
     renderKPIs();
     renderTable();
     renderBarChart();
+
+    // LIVE UI REFRESH
+    if (!window.merchantDashListenerAdded) {
+      window.addEventListener('appStateChanged', () => {
+        renderKPIs();
+        renderTable();
+        renderBarChart();
+      });
+      window.merchantDashListenerAdded = true;
+    }
   }
 
   // XSS-safe helper

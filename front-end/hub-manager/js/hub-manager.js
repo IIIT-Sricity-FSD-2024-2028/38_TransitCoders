@@ -215,9 +215,17 @@ function getComplaintBadge(status) {
    ================================================================ */
 
 function filterOrdersByHub(orders) {
-    var user = JSON.parse(sessionStorage.getItem('user')) || {};
+    var user = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user')) || {};
     if (!user.hub_id) return [];
-    return orders.filter(function (o) { return o.pickup_hub_id === user.hub_id; });
+    
+    // Hub Manager sees any order assigned to their hub, or any unassigned new global orders if they are the default Chennai Hub (H001) for testing
+    return orders.filter(function (o) { 
+        var hub = o.assigned_hub || o.pickup_hub_id;
+        if (!hub && user.hub_id === 'H001') return true; 
+        if (!hub && o.pickup_address && o.pickup_address.toLowerCase().indexOf('chennai') !== -1 && user.hub_id === 'H001') return true;
+        if (!hub && o.pickup_address && o.pickup_address.toLowerCase().indexOf('bangalore') !== -1 && user.hub_id === 'H002') return true;
+        return hub === user.hub_id; 
+    });
 }
 
 function filterAgentsByHub(agents) {
@@ -287,9 +295,13 @@ function showSkeletonBlock(containerId) {
    ================================================================ */
 
 function handleLogout() {
-    sessionStorage.removeItem('user');
-    localStorage.removeItem('user');
-    window.location.href = '../auth/login.html';
+    if (typeof Auth !== 'undefined') {
+        Auth.logout();
+    } else {
+        sessionStorage.removeItem('user');
+        localStorage.removeItem('user');
+        window.location.href = '../auth/login.html';
+    }
 }
 
 /* ================================================================
@@ -510,21 +522,32 @@ function adjustAgentTaskCounts(oldAgentId, newAgentId) {
 }
 
 function setOrderAssignment(orderId, agentId, nextStatus) {
-    var order = getOrderById(orderId);
+    if (!window.AppState) return false;
+    var state = window.AppState.getState();
+    var order = state.orders.find(function(o) { return o.order_id === orderId; });
     if (!order) return false;
-    var previousAgent = order.agent_id || null;
-    order.agent_id = agentId;
+    
+    var previousAgent = order.assigned_agent || null;
+    order.assigned_agent = agentId;
     order.status = nextStatus || "Assigned";
     order.updated_at = new Date().toISOString();
+    
+    window.AppState.saveState(state);
     adjustAgentTaskCounts(previousAgent, agentId);
     return true;
 }
 
 function setOrderHub(orderId, hubId) {
-    var order = getOrderById(orderId);
+    if (!window.AppState) return false;
+    var state = window.AppState.getState();
+    var order = state.orders.find(function(o) { return o.order_id === orderId; });
     if (!order) return false;
-    order.pickup_hub_id = hubId;
+    
+    order.assigned_hub = hubId;
+    order.pickup_address = hubId;
     order.updated_at = new Date().toISOString();
+    
+    window.AppState.saveState(state);
     return true;
 }
 

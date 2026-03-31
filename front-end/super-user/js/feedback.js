@@ -2,8 +2,8 @@
  * Feedback Review Logic
  */
 
-document.addEventListener("DOMContentLoaded", async () => {
-    await StorageAPI.init();
+document.addEventListener("DOMContentLoaded", () => {
+    // StorageAPI.init() no longer needed; state managed centrally
     const tableBody = document.getElementById("feedbackTableBody");
     const searchInput = document.getElementById("searchInput");
     const ratingFilter = document.getElementById("ratingFilter");
@@ -16,7 +16,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         const fStatus = statusFilter.value;
 
         let filtered = feedbackList.filter(f => {
-            const matchesSearch = f.id.toLowerCase().includes(search) || f.customer.toLowerCase().includes(search) || f.comment.toLowerCase().includes(search);
+            const matchesSearch = f.id.toLowerCase().includes(search) || 
+                                 f.customer.toLowerCase().includes(search) || 
+                                 f.comment.toLowerCase().includes(search);
             const matchesRating = fRating === "All" || f.rating == fRating;
             const matchesStatus = fStatus === "All" || f.status === fStatus;
             return matchesSearch && matchesRating && matchesStatus;
@@ -62,4 +64,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     statusFilter.addEventListener("change", renderTable);
 
     renderTable();
+
+    window.addEventListener('appStateChanged', () => {
+        renderTable();
+    });
 });

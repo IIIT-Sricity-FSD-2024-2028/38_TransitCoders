@@ -1,4 +1,4 @@
-/**
+/**
  * Worklist Page — Order rendering, filtering, navigation
  */
 
@@ -16,6 +16,13 @@ function initWorklist() {
     bindFilters();
     bindViewAll();
     updateDeliveryCountText();
+
+    // LIVE UI REFRESH
+    window.addEventListener('appStateChanged', () => {
+        updateCounts();
+        renderOrders();
+        updateDeliveryCountText();
+    });
 }
 
 function updateCounts() {
@@ -158,3 +165,7 @@ function navigateToOrder(id) {
         window.location.href = `delivery-confirmation.html?id=${id}`;
     }
 }
+
+
+// React to centralized state changes
+window.addEventListener('appStateChanged', initWorklist);

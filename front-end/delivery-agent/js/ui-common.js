@@ -62,8 +62,12 @@ function initLogout() {
     if (btn) {
         btn.addEventListener('click', e => {
             e.preventDefault();
-            localStorage.removeItem('user');
-            window.location.href = '../auth/login.html';
+            if (typeof Auth !== 'undefined') {
+                Auth.logout();
+            } else {
+                localStorage.removeItem('user');
+                window.location.href = '../auth/login.html';
+            }
         });
     }
 }
