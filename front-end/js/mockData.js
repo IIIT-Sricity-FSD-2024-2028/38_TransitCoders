@@ -63,7 +63,7 @@ window.mockData.users.push({
   name: "Super Admin",
   email: "super@swifttrack.com",
   password: "super123",
-  role: "admin",
+  role: "super_user",
   hub_id: null,
   active: true,
   avatar: "SA",

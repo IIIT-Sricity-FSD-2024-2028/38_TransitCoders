@@ -226,6 +226,135 @@ body.dark .page-container::-webkit-scrollbar-thumb {
     font-size: 0.875rem;
 }
 
+/* Super-user profile modal (triggered from top-right avatar) */
+.profile-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 1200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.profile-modal-backdrop.active {
+    display: flex;
+}
+
+.profile-modal {
+    width: 100%;
+    max-width: 430px;
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: 14px;
+    box-shadow: 0 24px 50px rgba(15, 23, 42, 0.28);
+    padding: 24px 28px 20px;
+    position: relative;
+    text-align: center;
+}
+
+.profile-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-subtitle);
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+
+.profile-modal-close:hover {
+    background: var(--surface-subtle);
+    color: var(--text-title);
+}
+
+.profile-modal-title {
+    font-size: 1.6rem;
+    margin: 2px 0 20px;
+}
+
+.profile-modal-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    background: var(--surface-brand-subtle);
+    color: var(--surface-brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.35rem;
+}
+
+.profile-modal-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-title);
+    margin-bottom: 6px;
+}
+
+.profile-modal-email,
+.profile-modal-hub,
+.profile-modal-role {
+    font-size: 0.95rem;
+    color: var(--text-subtitle);
+    margin-bottom: 5px;
+}
+
+.profile-modal-actions {
+    border-top: 1px solid var(--border-default);
+    margin-top: 18px;
+    padding-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.profile-modal-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.profile-modal-btn-secondary {
+    background: var(--surface-subtle);
+    color: var(--text-title);
+}
+
+.profile-modal-btn-primary {
+    background: var(--surface-brand);
+    color: var(--text-on-brand);
+}
+
+body.dark .profile-modal-backdrop {
+    background: rgba(2, 6, 23, 0.72);
+}
+
+body.dark .profile-modal {
+    border-color: #334155;
+    box-shadow: 0 26px 54px rgba(2, 6, 23, 0.62);
+}
+
+body.dark .profile-modal-close:hover,
+body.dark .profile-modal-btn-secondary {
+    background: #1e293b;
+}
+
+body.dark .profile-modal-actions {
+    border-top-color: #334155;
+}
+
 @media (max-width: 1100px) {
     .global-search input {
         width: 220px;

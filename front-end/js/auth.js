@@ -43,27 +43,9 @@ async function handleLogin(form) {
     showToast('Signing in...', 'info');
 
     setTimeout(() => {
-        if (email === 'admin@swifttrack.com' && password === 'admin123') {
-            showToast('Login successful!', 'success');
-            localStorage.setItem('user', JSON.stringify({ email, role: 'admin' }));
-            setTimeout(() => window.location.href = '../index.html', 1500);
-        } else if (email === 'customer@swifttrack.com' && password === 'password') {
-            showToast('Login successful!', 'success');
-            localStorage.setItem('user', JSON.stringify({ email, role: 'customer' }));
-            setTimeout(() => window.location.href = '../customer/dashboard.html', 1500);
-        } else if (email === 'merchant@swifttrack.com' && password === 'merchant123') {
-            showToast('Login successful!', 'success');
-            localStorage.setItem('user', JSON.stringify({ email, role: 'merchant', name: 'Vinod' }));
-            setTimeout(() => window.location.href = '../merchant/dashboard.html', 1500);
-        } 
-        else if (email === 'super@swifttrack.com' && password === 'password') {
-            showToast('Login successful!', 'success');
-            localStorage.setItem('user', JSON.stringify({ email, role: 'super-user', name: 'Vinod' }));
-            setTimeout(() => window.location.href = '../super-user/dashboard.html', 1500);
-        } else {
-        // Dynamic lookup from mockData — works for ANY user added to mockData.users
+        // Dynamic lookup from mockData — works for any active user added to mockData.users.
         const users = (window.mockData && window.mockData.users) || [];
-        const matchedUser = users.find(u => u.email === email && u.password === password && u.active);
+        const matchedUser = users.find((u) => u.email === email && u.password === password && u.active);
 
         if (!matchedUser) {
             showToast('Invalid credentials', 'error');
@@ -72,7 +54,6 @@ async function handleLogin(form) {
 
         showToast('Login successful!', 'success');
 
-        // Build user session data
         const userData = {
             user_id: matchedUser.user_id,
             name: matchedUser.name,
@@ -82,22 +63,28 @@ async function handleLogin(form) {
             active: matchedUser.active
         };
 
-        // Store in both localStorage and sessionStorage
+        // Keep both storages aligned because different role dashboards read different stores.
         localStorage.setItem('user', JSON.stringify(userData));
         sessionStorage.setItem('user', JSON.stringify(userData));
 
-        // Route based on role — add new roles here as needed
+        const normalizedRole = String(matchedUser.role || '').toLowerCase();
+        localStorage.setItem('userRole', normalizedRole);
+
         const routeMap = {
-            'admin':       '../index.html',
-            'super_user':  '../index.html',
-            'hub_manager': '../hub-manager/dashboard.html',
-            'merchant':    '../merchant/dashboard.html',
-            'customer':    '../customer/dashboard.html',
-            'agent':       '../agent/dashboard.html'
+            admin: '../index.html',
+            super_user: '../super-user/dashboard.html',
+            'super-user': '../super-user/dashboard.html',
+            superuser: '../super-user/dashboard.html',
+            hub_manager: '../hub-manager/dashboard.html',
+            merchant: '../merchant/dashboard.html',
+            customer: '../customer/dashboard.html',
+            agent: '../agent/dashboard.html'
         };
 
-        const destination = routeMap[matchedUser.role] || '../index.html';
-        setTimeout(() => window.location.href = destination, 1500);
+        const destination = routeMap[normalizedRole] || '../index.html';
+        setTimeout(() => {
+            window.location.href = destination;
+        }, 1500);
     }, 1000);
 }
 
