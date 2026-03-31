@@ -71,8 +71,60 @@
                         <i class="fas fa-moon icon-dark"></i>
                         <span class="theme-status">Light</span>
                     </div>
-                    <i class="fas fa-bell notification-bell"></i>
-                    <div class="avatar-initials" style="width: 32px; height: 32px; font-size: 12px;">AP</div>
+                    <div class="notification-wrapper">
+                        <i class="fas fa-bell notification-bell"></i>
+                        <span class="notification-badge">3</span>
+                        <div class="notification-dropdown">
+                            <div class="notif-header">
+                                <h3>Notifications</h3>
+                                <span class="mark-read">Mark all read</span>
+                            </div>
+                            <div class="notif-item">
+                                <div class="notif-icon icon-transit"><i class="fas fa-truck"></i></div>
+                                <div class="notif-content">
+                                    <p><strong>Order #AD345JK</strong> has reached Hubli Checkpoint, KA</p>
+                                    <span class="notif-time">15 min ago</span>
+                                </div>
+                            </div>
+                            <div class="notif-item">
+                                <div class="notif-icon icon-delivered"><i class="fas fa-check-circle"></i></div>
+                                <div class="notif-content">
+                                    <p><strong>Order #TC-2026-2490</strong> delivered successfully</p>
+                                    <span class="notif-time">2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="notif-item">
+                                <div class="notif-icon icon-alert"><i class="fas fa-exclamation-triangle"></i></div>
+                                <div class="notif-content">
+                                    <p><strong>Order #TC-2026-9012</strong> is delayed due to weather</p>
+                                    <span class="notif-time">5 hours ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-wrapper">
+                        <div class="avatar-initials" style="width: 32px; height: 32px; font-size: 12px;">AP</div>
+                        <div class="profile-dropdown">
+                            <div class="profile-dropdown-header">
+                                <div class="avatar-initials">AP</div>
+                                <div class="profile-dropdown-info">
+                                    <span class="profile-name">Ajay Prakash</span>
+                                    <span class="profile-email">customer@swifttrack.com</span>
+                                </div>
+                            </div>
+                            <div class="profile-dropdown-menu">
+                                <div class="profile-menu-item" onclick="window.location.href='dashboard.html'">
+                                    <i class="fas fa-chart-line"></i> Dashboard
+                                </div>
+                                <div class="profile-menu-item" onclick="window.location.href='orders.html'">
+                                    <i class="fas fa-box"></i> My Orders
+                                </div>
+                                <div class="profile-menu-item danger" onclick="document.querySelector('.logout-btn').click()">
+                                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </header>
 

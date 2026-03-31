@@ -1,0 +1,406 @@
+/**
+ * SwiftTrack Global UI Consistency Overrides
+ * Ensures consistent styling across all portals
+ */
+
+/* ========================================================================
+   1. HEADER STANDARDIZATION
+   ======================================================================== */
+
+.page-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 24px !important;
+  padding: 20px 32px !important;
+  background: var(--surface-default) !important;
+  border-bottom: 1px solid var(--border-default) !important;
+  flex-wrap: wrap !important;
+}
+
+.header-meta {
+  flex: 1 !important;
+  min-width: 200px !important;
+}
+
+.header-meta h1 {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: var(--text-title) !important;
+  margin: 0 0 4px 0 !important;
+}
+
+.header-meta p {
+  font-size: 14px !important;
+  color: var(--text-subtitle) !important;
+  margin: 0 !important;
+}
+
+.header-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
+}
+
+/* ========================================================================
+   2. BUTTON STANDARDIZATION
+   ======================================================================== */
+
+.btn,
+[class*="btn-"],
+button[type="submit"],
+button[type="button"] {
+  padding: 10px 20px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-m, 8px) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.btn-primary,
+[class*="btn-primary"],
+.auth-btn {
+  background: var(--surface-brand, #ff5c02) !important;
+  color: var(--text-on-brand, #fff) !important;
+}
+
+.btn-primary:hover,
+[class*="btn-primary"]:hover,
+.auth-btn:hover {
+  background: #e85a00 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 92, 2, 0.3) !important;
+}
+
+.btn-secondary,
+[class*="btn-ghost"] {
+  background: var(--surface-subtle, #f3f4f6) !important;
+  color: var(--text-title, #111827) !important;
+  border: 1px solid var(--border-default, #e2e8f0) !important;
+}
+
+.btn-secondary:hover,
+[class*="btn-ghost"]:hover {
+  background: var(--border-default, #e2e8f0) !important;
+}
+
+/* ========================================================================
+   3. FORM INPUT STANDARDIZATION
+   ======================================================================== */
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="tel"],
+select,
+textarea {
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+  border: 1px solid var(--border-default, #e2e8f0) !important;
+  border-radius: var(--radius-m, 8px) !important;
+  background: var(--surface-default) !important;
+  color: var(--text-title) !important;
+  font-family: inherit !important;
+  transition: all 0.2s ease !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none !important;
+  border-color: var(--surface-brand, #ff5c02) !important;
+  box-shadow: 0 0 0 3px rgba(255, 92, 2, 0.1) !important;
+}
+
+input[required]:invalid {
+  border-color: #dc2626 !important;
+}
+
+/* ========================================================================
+   4. MODAL STANDARDIZATION
+   ======================================================================== */
+
+.modal,
+[class*="modal"],
+.hm-modal {
+  border-radius: var(--radius-l, 12px) !important;
+  background: var(--surface-default) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
+  max-width: 90vw !important;
+}
+
+.modal-overlay,
+[class*="modal-overlay"],
+.hm-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 1000 !important;
+}
+
+.modal-header,
+[class*="modal-header"],
+.hm-modal-header {
+  padding: 24px !important;
+  border-bottom: 1px solid var(--border-default) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.modal-title,
+[class*="modal-title"],
+.hm-modal-title {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: var(--text-title) !important;
+  margin: 0 !important;
+}
+
+.modal-body,
+[class*="modal-body"],
+.hm-modal-body {
+  padding: 24px !important;
+  max-height: 60vh !important;
+  overflow-y: auto !important;
+}
+
+.modal-footer,
+[class*="modal-footer"],
+.hm-modal-footer {
+  padding: 24px !important;
+  border-top: 1px solid var(--border-default) !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+}
+
+/* ========================================================================
+   5. TABLE STANDARDIZATION
+   ======================================================================== */
+
+table,
+.data-table,
+[class*="table"] {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-size: 14px !important;
+}
+
+table thead th,
+.data-table thead th,
+[class*="table"] thead th {
+  background: var(--surface-subtle) !important;
+  color: var(--text-title) !important;
+  font-weight: 600 !important;
+  padding: 12px !important;
+  text-align: left !important;
+  border-bottom: 1px solid var(--border-default) !important;
+}
+
+table tbody td,
+.data-table tbody td,
+[class*="table"] tbody td {
+  padding: 12px !important;
+  border-bottom: 1px solid var(--border-default) !important;
+  color: var(--text-body) !important;
+}
+
+table tbody tr:hover,
+.data-table tbody tr:hover {
+  background: var(--surface-subtle) !important;
+}
+
+/* ========================================================================
+   6. STATUS BADGE STANDARDIZATION
+   ======================================================================== */
+
+.status-badge,
+[class*="status"],
+.badge {
+  padding: 4px 12px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  display: inline-block !important;
+  text-transform: capitalize !important;
+}
+
+.status-pending,
+[class*="pending"] {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+.status-delivered,
+[class*="delivered"] {
+  background: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
+.status-in-transit,
+[class*="in-transit"] {
+  background: #dbeafe !important;
+  color: #0c2340 !important;
+}
+
+.status-cancelled,
+[class*="cancelled"] {
+  background: #fee2e2 !important;
+  color: #7f1d1d !important;
+}
+
+.status-active,
+[class*="active"] {
+  background: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
+/* ========================================================================
+   7. CARD & CONTAINER STANDARDIZATION
+   ======================================================================== */
+
+.card,
+[class*="card"],
+section {
+  background: var(--surface-default) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-l, 12px) !important;
+  padding: 24px !important;
+  transition: all 0.2s ease !important;
+}
+
+.card:hover,
+[class*="card"]:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ========================================================================
+   8. TOAST NOTIFICATION STANDARDIZATION
+   ======================================================================== */
+
+.toast,
+[class*="toast"] {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  padding: 12px 24px !important;
+  border-radius: 8px !important;
+  color: white !important;
+  font-size: 14px !important;
+  z-index: 9999 !important;
+  animation: slideInUp 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.toast-success {
+  background: #10b981 !important;
+}
+
+.toast-error {
+  background: #ef4444 !important;
+}
+
+.toast-info {
+  background: #3b82f6 !important;
+}
+
+.toast-warning {
+  background: #f59e0b !important;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ========================================================================
+   9. DARK MODE ADJUSTMENTS
+   ======================================================================== */
+
+body.dark {
+  background: var(--surface-subtle, #111827) !important;
+}
+
+body.dark .page-header,
+body.dark .card,
+body.dark section {
+  background: var(--surface-default, #030712) !important;
+  border-color: var(--border-default, #1f2937) !important;
+}
+
+body.dark input,
+body.dark select,
+body.dark textarea {
+  background: var(--surface-subtle, #111827) !important;
+  color: var(--text-title, #f8fafc) !important;
+  border-color: var(--border-default, #1f2937) !important;
+}
+
+/* ========================================================================
+   10. RESPONSIVE ADJUSTMENTS
+   ======================================================================== */
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .header-actions {
+    width: 100% !important;
+  }
+
+  button,
+  .btn,
+  [class*="btn-"] {
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+  }
+
+  .modal,
+  [class*="modal"] {
+    margin: 16px !important;
+  }
+}
+
+/* ========================================================================
+   11. ANIMATION CLASSES
+   ======================================================================== */
+
+.animate-reveal {
+  animation: fadeInDown 0.5s ease !important;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

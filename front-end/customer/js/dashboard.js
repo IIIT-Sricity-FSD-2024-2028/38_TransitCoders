@@ -1,5 +1,6 @@
 /**
  * Dashboard & Navigation Logic
+ * Customer Flow — Interactive Features
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -7,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initDashboard();
     initForms();
     initTheme();
+    initDropdowns();
+    initOrdersPage();
 });
 
 function checkAuth() {
@@ -49,6 +52,189 @@ function initDashboard() {
     updateDashboardThemeIcons();
 }
 
+/* =========================================================================
+   DROPDOWN SYSTEM — Notifications, Profile, Filter, Action Menus
+   ========================================================================= */
+
+function initDropdowns() {
+    // --- Notification Bell ---
+    const notifWrapper = document.querySelector('.notification-wrapper');
+    if (notifWrapper) {
+        const bell = notifWrapper.querySelector('.notification-bell');
+        const dropdown = notifWrapper.querySelector('.notification-dropdown');
+        const badge = notifWrapper.querySelector('.notification-badge');
+
+        bell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAllDropdowns();
+            dropdown.classList.toggle('show');
+        });
+
+        // Mark all read
+        const markRead = notifWrapper.querySelector('.mark-read');
+        if (markRead) {
+            markRead.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (badge) badge.style.display = 'none';
+                showToast('All notifications marked as read', 'success');
+            });
+        }
+    }
+
+    // --- Profile Avatar ---
+    const profileWrapper = document.querySelector('.profile-wrapper');
+    if (profileWrapper) {
+        const avatar = profileWrapper.querySelector('.avatar-initials');
+        const dropdown = profileWrapper.querySelector('.profile-dropdown');
+
+        avatar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAllDropdowns();
+            dropdown.classList.toggle('show');
+        });
+    }
+
+    // --- Filter Button ---
+    const filterBtn = document.getElementById('filter-btn');
+    const filterDropdown = document.getElementById('filter-dropdown');
+    if (filterBtn && filterDropdown) {
+        filterBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAllDropdowns();
+            filterDropdown.classList.toggle('show');
+        });
+
+        // Filter option clicks
+        const filterOptions = filterDropdown.querySelectorAll('.filter-option');
+        filterOptions.forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.stopPropagation();
+                filterOptions.forEach(o => o.classList.remove('active'));
+                option.classList.add('active');
+                filterDropdown.classList.remove('show');
+                const filterValue = option.dataset.filter;
+                filterOrdersTable(filterValue);
+            });
+        });
+    }
+
+    // --- Action Menu Buttons (⋮) ---
+    const actionBtns = document.querySelectorAll('.action-menu-btn');
+    actionBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAllDropdowns();
+            const menu = btn.nextElementSibling;
+            if (menu && menu.classList.contains('action-context-menu')) {
+                menu.classList.toggle('show');
+            }
+        });
+    });
+
+    // --- Close all dropdowns on click outside ---
+    document.addEventListener('click', () => {
+        closeAllDropdowns();
+    });
+
+    // Prevent dropdown content from closing when clicking inside
+    document.querySelectorAll('.notification-dropdown, .profile-dropdown, .filter-dropdown, .action-context-menu').forEach(dd => {
+        dd.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    });
+}
+
+function closeAllDropdowns() {
+    document.querySelectorAll('.notification-dropdown, .profile-dropdown, .filter-dropdown, .action-context-menu').forEach(dd => {
+        dd.classList.remove('show');
+    });
+}
+
+/* =========================================================================
+   ORDERS PAGE — Search & Filter
+   ========================================================================= */
+
+function initOrdersPage() {
+    const searchInput = document.getElementById('order-search');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase().trim();
+        const table = document.getElementById('orders-table');
+        if (!table) return;
+
+        const rows = table.querySelectorAll('tbody tr');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const match = text.includes(query);
+            row.style.display = match ? '' : 'none';
+            if (match) visibleCount++;
+        });
+
+        // Show no results message
+        let noResults = table.parentElement.querySelector('.no-results');
+        if (visibleCount === 0) {
+            if (!noResults) {
+                noResults = document.createElement('div');
+                noResults.className = 'no-results';
+                noResults.innerHTML = '<i class="fas fa-search"></i><p>No orders match your search.</p>';
+                table.parentElement.appendChild(noResults);
+            }
+            noResults.style.display = 'block';
+        } else if (noResults) {
+            noResults.style.display = 'none';
+        }
+    });
+}
+
+function filterOrdersTable(status) {
+    const table = document.getElementById('orders-table');
+    if (!table) return;
+
+    const rows = table.querySelectorAll('tbody tr');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        if (status === 'all') {
+            row.style.display = '';
+            visibleCount++;
+            return;
+        }
+
+        const badge = row.querySelector('.status-badge');
+        if (!badge) return;
+
+        const badgeClasses = badge.className;
+        const match = badgeClasses.includes(`status-${status}`);
+        row.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+    });
+
+    // Show no results message
+    let noResults = table.parentElement.querySelector('.no-results');
+    if (visibleCount === 0) {
+        if (!noResults) {
+            noResults = document.createElement('div');
+            noResults.className = 'no-results';
+            noResults.innerHTML = '<i class="fas fa-filter"></i><p>No orders with this status.</p>';
+            table.parentElement.appendChild(noResults);
+        }
+        noResults.style.display = 'block';
+    } else if (noResults) {
+        noResults.style.display = 'none';
+    }
+
+    // Clear search input when filtering
+    const searchInput = document.getElementById('order-search');
+    if (searchInput) searchInput.value = '';
+}
+
+/* =========================================================================
+   FORMS — Star Rating, Feedback/Complaint Submission
+   ========================================================================= */
+
 function initForms() {
     // Star Rating logic
     const stars = document.querySelectorAll('.star-btn');
@@ -60,6 +246,19 @@ function initForms() {
                 } else {
                     s.classList.remove('active');
                 }
+            });
+        });
+
+        // Hover effect
+        star.addEventListener('mouseenter', () => {
+            stars.forEach((s, i) => {
+                s.style.color = i <= index ? '#f59e0b' : '';
+            });
+        });
+
+        star.addEventListener('mouseleave', () => {
+            stars.forEach(s => {
+                s.style.color = s.classList.contains('active') ? '#f59e0b' : '';
             });
         });
     });
@@ -84,8 +283,11 @@ function initForms() {
     }
 }
 
+/* =========================================================================
+   TOAST NOTIFICATION
+   ========================================================================= */
+
 function showToast(message, type = 'info') {
-    // Reusing the toast logic from auth.js if needed, or implement local version
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
@@ -126,6 +328,10 @@ function showToast(message, type = 'info') {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
+
+/* =========================================================================
+   THEME SYSTEM
+   ========================================================================= */
 
 function initTheme() {
     const savedTheme = localStorage.getItem('theme');
