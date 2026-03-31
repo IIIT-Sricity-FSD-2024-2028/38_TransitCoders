@@ -223,7 +223,7 @@ function filterOrdersByHub(orders) {
         var hub = o.assigned_hub || o.pickup_hub_id;
         if (!hub && user.hub_id === 'H001') return true; 
         if (!hub && o.pickup_address && o.pickup_address.toLowerCase().indexOf('chennai') !== -1 && user.hub_id === 'H001') return true;
-        if (!hub && o.pickup_address && o.pickup_address.toLowerCase().indexOf('bangalore') !== -1 && user.hub_id === 'H002') return true;
+        if (!hub && o.pickup_address && o.pickup_address.toLowerCase().indexOf('bengaluru') !== -1 && user.hub_id === 'H002') return true;
         return hub === user.hub_id; 
     });
 }

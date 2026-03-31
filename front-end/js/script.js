@@ -77,7 +77,7 @@ function initStatsStrip() {
  */
 function initTracking() {
     const mockData = {
-        "ST-20481": { id: "ST-20481", status: "In Transit", hub: "Bangalore Hub", eta: "2h 15m", step: 3, color: "#f97316" },
+        "ST-20481": { id: "ST-20481", status: "In Transit", hub: "Bengaluru Hub", eta: "2h 15m", step: 3, color: "#f97316" },
         "ST-30291": { id: "ST-30291", status: "Processing", hub: "Chennai Hub", eta: "5h 40m", step: 1, color: "#2563eb" },
         "ST-10042": { id: "ST-10042", status: "Delivered", hub: "Destination Branch", eta: "Completed", step: 4, color: "#059669" }
     };

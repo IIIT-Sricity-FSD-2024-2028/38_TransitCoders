@@ -19,7 +19,7 @@ const Dashboard = (() => {
     if (el('kpi-total'))    el('kpi-total').textContent    = stats.total;
     if (el('kpi-delivered'))el('kpi-delivered').textContent = stats.delivered;
     if (el('kpi-transit'))  el('kpi-transit').textContent  = stats.inTransit;
-    if (el('kpi-revenue'))  el('kpi-revenue').textContent  = '$' + parseFloat(stats.revenue).toLocaleString();
+    if (el('kpi-revenue'))  el('kpi-revenue').textContent  = '₹' + parseFloat(stats.revenue).toLocaleString('en-IN');
   }
 
   function renderTable() {

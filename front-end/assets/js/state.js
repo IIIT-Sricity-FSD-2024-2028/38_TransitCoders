@@ -43,20 +43,23 @@
         
         state.hubs = [
             { hub_id: 'H001', name: 'Chennai Central Hub', location: 'Chennai', status: 'Active' },
-            { hub_id: 'H002', name: 'Bangalore Logistics Park', location: 'Bangalore', status: 'Active' },
-            { hub_id: 'H003', name: 'Hyderabad Logistics Hub', location: 'Hyderabad', status: 'Active' }
+            { hub_id: 'H002', name: 'Bengaluru Logistics Park', location: 'Bengaluru', status: 'Active' },
+            { hub_id: 'H003', name: 'Hyderabad Logistics Hub', location: 'Hyderabad', status: 'Active' },
+            { hub_id: 'H004', name: 'Kharimnagar City Hub', location: 'Kharimnagar', status: 'Active' },
+            { hub_id: 'H005', name: 'Visakhapatnam Port Hub', location: 'Visakhapatnam', status: 'Active' }
         ];
 
         state.users.push(
             { user_id: 'U_SU_1', name: 'Admin Super User', email: 'admin@swifttrack.com', password: 'admin123', role: 'hub_manager', active: true, avatar: 'AM' },
             { user_id: 'U_MER_1', name: 'Prasanna Raja R', email: 'merchant@swifttrack.com', password: 'merchant123', role: 'merchant', active: true, avatar: 'PR', company: 'Swift Merchants' },
-            { user_id: 'U_AGT_102', name: 'Mukesh', email: 'mukesh@swifttrack.com', password: 'password123', role: 'delivery_agent', hub_id: 'H001', active: true },
+            { user_id: 'U_AGT_102', name: 'Karthik', email: 'karthik@swifttrack.com', password: 'password123', role: 'delivery_agent', hub_id: 'H001', active: true },
             { user_id: 'U_HM_1', name: 'Hub Manager Chennai', email: 'hm_chennai@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H001', active: true },
-            { user_id: 'U_HM_2', name: 'Hub Manager Bangalore', email: 'hm_bangalore@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H002', active: true },
+            { user_id: 'U_HM_2', name: 'Hub Manager Bengaluru', email: 'hm_bengaluru@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H002', active: true },
             { user_id: 'U_HM_3', name: 'Hub Manager Hyderabad', email: 'hm_hyderabad@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H003', active: true },
-            { user_id: 'U_HM_4', name: 'Hub Manager Karimnagar', email: 'hm_karimnagar@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H004', active: true },
+            { user_id: 'U_HM_4', name: 'Hub Manager Kharimnagar', email: 'hm_kharimnagar@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H004', active: true },
+            { user_id: 'U_HM_5', name: 'Hub Manager Visakhapatnam', email: 'hm_visakhapatnam@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H005', active: true },
             { user_id: 'U_SUPER_1', name: 'Super User Admin', email: 'superuser@swifttrack.com', password: 'super123', role: 'super_user', active: true },
-            { user_id: 'U_CUS_1', name: 'Priya Sharma', email: 'customer@swifttrack.com', password: 'password', role: 'customer', active: true }
+            { user_id: 'U_CUS_1', name: 'Priya Iyer', email: 'customer@swifttrack.com', password: 'password', role: 'customer', active: true }
         );
 
         state.roles = [
@@ -65,30 +68,52 @@
         ];
 
         /* --- UNIFIED ORDERS --- */
-        var mockCustomers = ['Rajesh Kumar', 'Priya Sharma', 'Arun Mehta', 'Suresh Pillai'];
+        var mockCustomers = ['Suresh Iyer', 'Priya Iyer', 'Arjun Menon', 'Lakshmi Menon'];
+        var hubCycle = [
+            { id: 'H001', pickup: 'Chennai Central Hub', delivery: 'T. Nagar, Chennai' },
+            { id: 'H002', pickup: 'Bengaluru Logistics Park', delivery: 'Indiranagar, Bengaluru' },
+            { id: 'H003', pickup: 'Hyderabad Logistics Hub', delivery: 'Madhapur, Hyderabad' },
+            { id: 'H004', pickup: 'Kharimnagar City Hub', delivery: 'Civil Lines, Kharimnagar' },
+            { id: 'H005', pickup: 'Visakhapatnam Port Hub', delivery: 'MVP Colony, Visakhapatnam' }
+        ];
         var statuses = ['Pending', 'Assigned', 'In Transit', 'Out for Delivery', 'Delivered', 'Cancelled'];
-        for (var i = 1; i <= 15; i++) {
-            var stat = statuses[i % 6];
-            state.orders.push({
-                order_id: 'ORD_' + i,                 // Used by Admin, Agent routing id = i
-                tracking_id: 'SWT-' + (200000 + i),   // Used by Merchant UI
-                merchant_id: 'U_MER_1',
-                customer_name: mockCustomers[i % 4],
-                customer_phone: '+91 98450 ' + (1000 + i),
-                pickup_address: 'Chennai Central Hub',
-                delivery_address: 'Flat ' + i + ', Tech Park, Chennai',
-                package_type: i % 2 === 0 ? 'Express' : 'Standard',
-                weight: parseFloat((1.5 + (i * 0.2)).toFixed(1)),
-                amount: 500 + (i * 100),
-                status: stat,                         // Global normalized status
-                created_at: new Date(Date.now() - i * 86400000).toISOString(),
-                assigned_hub: 'H001',
-                assigned_agent: stat === 'Pending' || stat === 'Cancelled' ? null : 'U_AGT_102'
-            });
-        }
+        var hubAgents = {
+            H001: 'U_AGT_102',
+            H002: 'U_AGT_201',
+            H003: 'U_AGT_301',
+            H004: 'U_AGT_401',
+            H005: 'U_AGT_501'
+        };
+        var orderIndex = 1;
+        hubCycle.forEach(function (hubMeta, hubIdx) {
+            var ordersPerHub = 7;
+            for (var j = 0; j < ordersPerHub; j++) {
+                var stat = statuses[(hubIdx + j) % statuses.length];
+                var pkgType = j % 3 === 0 ? 'Express' : 'Standard';
+                var weight = parseFloat((1.2 + (j * 0.4)).toFixed(1));
+                var amount = 650 + (j * 120) + (hubIdx * 50);
+                state.orders.push({
+                    order_id: 'ORD_' + orderIndex,
+                    tracking_id: 'SWT-' + (200000 + orderIndex),
+                    merchant_id: 'U_MER_1',
+                    customer_name: mockCustomers[(hubIdx + j) % mockCustomers.length],
+                    customer_phone: '+91 98450 ' + (1100 + orderIndex),
+                    pickup_address: hubMeta.pickup,
+                    delivery_address: 'Unit ' + (10 + j) + ', ' + hubMeta.delivery,
+                    package_type: pkgType,
+                    weight: weight,
+                    amount: amount,
+                    status: stat,
+                    created_at: new Date(Date.now() - ((hubIdx * 3 + j) * 86400000)).toISOString(),
+                    assigned_hub: hubMeta.id,
+                    assigned_agent: stat === 'Pending' || stat === 'Cancelled' ? null : hubAgents[hubMeta.id]
+                });
+                orderIndex++;
+            }
+        });
 
         /* Legacy agent profile info so settings works */
-        state.agentProfile = { name: 'Mukesh', currentStatus: 'available', performance: { completed: 271, rating: 4.6 } };
+        state.agentProfile = { name: 'Karthik', currentStatus: 'available', performance: { completed: 271, rating: 4.6 } };
 
         saveState(state);
     }

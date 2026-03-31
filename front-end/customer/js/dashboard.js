@@ -46,7 +46,7 @@ function renderOrdersTable() {
                 <td>
                     <span class="status-badge status-${stClass}">${st}</span>
                 </td>
-                <td>${order.assigned_agent === 'U_AGT_102' ? 'Mukesh' : (order.assigned_agent || 'Unassigned')}</td>
+                <td>${order.assigned_agent === 'U_AGT_102' ? 'Karthik' : (order.assigned_agent || 'Unassigned')}</td>
                 <td>
                     <div class="action-menu-wrapper">
                         <span class="action-menu-btn" onclick="toggleActionMenu(this, event)">⋮</span>

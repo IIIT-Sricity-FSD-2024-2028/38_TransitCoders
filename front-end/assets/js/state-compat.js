@@ -62,30 +62,77 @@
         get users() { return getState().users; },
         get orders() { 
             return getState().orders.map(function(o) { 
-                var fallback_hub = o.pickup_address && o.pickup_address.toLowerCase().indexOf('bangalore') !== -1 ? 'H002' : 
-                                   o.pickup_address && o.pickup_address.toLowerCase().indexOf('hyderabad') !== -1 ? 'H003' : 'H001';
+                var addr = (o.pickup_address || '').toLowerCase();
+                var fallback_hub = addr.indexOf('bengaluru') !== -1 ? 'H002' :
+                                   addr.indexOf('hyderabad') !== -1 ? 'H003' :
+                                   addr.indexOf('kharimnagar') !== -1 ? 'H004' :
+                                   addr.indexOf('visakhapatnam') !== -1 ? 'H005' : 'H001';
                 return Object.assign({}, o, { 
                     pickup_hub_id: o.assigned_hub || o.pickup_hub_id || fallback_hub 
                 }); 
             }); 
         },
         get agents() { 
-            return [{
-                agent_id: 'U_AGT_102',
-                user_id: 'U_AGT_102',
-                name: 'Mukesh',
-                role: 'Delivery Agent',
-                hub_id: 'H001',
-                status: 'Available',
-                vehicle_type: 'Van',
-                tasks_count: getState().orders.filter(function(o){ return o.assigned_agent === 'U_AGT_102' }).length
-            }];
+            return [
+                {
+                    agent_id: 'U_AGT_102',
+                    user_id: 'U_AGT_102',
+                    name: 'Karthik',
+                    role: 'Delivery Agent',
+                    hub_id: 'H001',
+                    status: 'Available',
+                    vehicle_type: 'Van',
+                    tasks_count: getState().orders.filter(function(o){ return o.assigned_agent === 'U_AGT_102' }).length
+                },
+                {
+                    agent_id: 'U_AGT_201',
+                    user_id: 'U_AGT_201',
+                    name: 'Naveen',
+                    role: 'Delivery Agent',
+                    hub_id: 'H002',
+                    status: 'Available',
+                    vehicle_type: 'Bike',
+                    tasks_count: getState().orders.filter(function(o){ return o.assigned_agent === 'U_AGT_201' }).length
+                },
+                {
+                    agent_id: 'U_AGT_301',
+                    user_id: 'U_AGT_301',
+                    name: 'Priya',
+                    role: 'Delivery Agent',
+                    hub_id: 'H003',
+                    status: 'On Delivery',
+                    vehicle_type: 'Mini Truck',
+                    tasks_count: getState().orders.filter(function(o){ return o.assigned_agent === 'U_AGT_301' }).length
+                },
+                {
+                    agent_id: 'U_AGT_401',
+                    user_id: 'U_AGT_401',
+                    name: 'Harish',
+                    role: 'Delivery Agent',
+                    hub_id: 'H004',
+                    status: 'Available',
+                    vehicle_type: 'Van',
+                    tasks_count: getState().orders.filter(function(o){ return o.assigned_agent === 'U_AGT_401' }).length
+                },
+                {
+                    agent_id: 'U_AGT_501',
+                    user_id: 'U_AGT_501',
+                    name: 'Divya',
+                    role: 'Delivery Agent',
+                    hub_id: 'H005',
+                    status: 'Available',
+                    vehicle_type: 'Bike',
+                    tasks_count: getState().orders.filter(function(o){ return o.assigned_agent === 'U_AGT_501' }).length
+                }
+            ];
         },
         get hubs() {
             return [
-                { hub_id: 'H001', name: 'Hub Central', location: 'Chennai HQ', status: 'Active' },
-                { hub_id: 'H002', name: 'Hub North', location: 'Bangalore Center', status: 'Active' },
-                { hub_id: 'H003', name: 'Hub South', location: 'Delhi Metro', status: 'Active' }
+                    { hub_id: 'H001', name: 'Chennai Central Hub', location: 'Chennai', status: 'Active' },
+                    { hub_id: 'H002', name: 'Bengaluru Hub', location: 'Bengaluru Center', status: 'Active' },
+                    { hub_id: 'H003', name: 'Hyderabad Logistics Hub', location: 'Hyderabad', status: 'Active' },
+                    { hub_id: 'H004', name: 'Kharimnagar City Hub', location: 'Kharimnagar', status: 'Active' },
+                    { hub_id: 'H005', name: 'Visakhapatnam Port Hub', location: 'Visakhapatnam', status: 'Active' }
             ];
         },
         get hubComplaints() { return getState().complaints; },
@@ -207,7 +254,7 @@
         if (!o) return null;
         var pri = o.package_type === 'Express' ? 'High' : 'Medium';
         var agentName = o.assigned_agent;
-        if (agentName === 'U_AGT_102') agentName = 'Mukesh';
+        if (agentName === 'U_AGT_102') agentName = 'Karthik';
         return {
             id: o.order_id,
             tracking_id: o.tracking_id,
@@ -241,7 +288,7 @@
                 status: d.status || 'Pending',
                 created_at: new Date().toISOString(),
                 assigned_hub: d.pickupHub, 
-                assigned_agent: d.assignedAgent === 'Unassigned' ? null : (d.assignedAgent === 'Mukesh' ? 'U_AGT_102' : d.assignedAgent)
+                assigned_agent: d.assignedAgent === 'Unassigned' ? null : (d.assignedAgent === 'Karthik' ? 'U_AGT_102' : d.assignedAgent)
             };
             s.orders.unshift(o); saveState(s);
         },
@@ -250,7 +297,7 @@
             if(o){ 
                 if (d.customerName !== undefined) o.customer_name = d.customerName;
                 if (d.assignedAgent !== undefined) {
-                    var agId = d.assignedAgent === 'Unassigned' ? null : (d.assignedAgent === 'Mukesh' ? 'U_AGT_102' : d.assignedAgent);
+                    var agId = d.assignedAgent === 'Unassigned' ? null : (d.assignedAgent === 'Karthik' ? 'U_AGT_102' : d.assignedAgent);
                     o.assigned_agent = agId;
                 }
                 if (d.pickupHub !== undefined) { o.assigned_hub = d.pickupHub; o.pickup_address = d.pickupHub; }
@@ -266,7 +313,7 @@
             s.orders = s.orders.filter(function(x) { return x.order_id !== id; });
             if (s.orders.length < len) saveState(s);
         },
-        getAgents: function(){ return getState().adminAgents && getState().adminAgents.length ? getState().adminAgents : [{id:'A1', name:'Mukesh', status:'Available', distanceAway:'2.5 km', user_id:'U_AGT_102'}]; },
+        getAgents: function(){ return getState().adminAgents && getState().adminAgents.length ? getState().adminAgents : [{id:'A1', name:'Karthik', status:'Available', distanceAway:'2.5 km', user_id:'U_AGT_102'}]; },
         getTransfers: function(){ return getState().transfers; },
         getComplaints: function(){ return getState().complaints; },
         getReports: function(){ return getState().adminReports; }

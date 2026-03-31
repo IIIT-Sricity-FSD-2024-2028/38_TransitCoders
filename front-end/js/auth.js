@@ -103,7 +103,12 @@ async function handleLogin(form) {
     if (window.AppState && window.AppState.getState) {
         let stateObj = window.AppState.getState();
         // AUTO REPAIR: If user database is outdated, forcefully re-seed it so user doesn't have to clear storage manually!
-        if (!stateObj.users || !stateObj.users.find(u => u.email === 'hm_chennai@swifttrack.com')) {
+        if (
+          !stateObj.users ||
+          !stateObj.users.find(u => u.email === 'hm_chennai@swifttrack.com') ||
+          !stateObj.users.find(u => u.email === 'hm_kharimnagar@swifttrack.com') ||
+          !stateObj.users.find(u => u.email === 'hm_visakhapatnam@swifttrack.com')
+        ) {
            localStorage.removeItem(window.AppState.STORAGE_KEY);
            location.reload(); // Instantly reload to trigger fresh database seeding!
            return;
