@@ -40,8 +40,9 @@ function performLogout() {
     } else {
         localStorage.removeItem("user");
         sessionStorage.removeItem("user");
+        sessionStorage.removeItem("st_session");
         localStorage.removeItem("userRole");
-        window.location.href = "../auth/login.html";
+        window.location.href = "../index.html";
     }
 }
 

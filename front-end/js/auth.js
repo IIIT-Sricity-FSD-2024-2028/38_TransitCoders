@@ -15,10 +15,11 @@ window.Auth = {
   logout: () => {
     localStorage.removeItem("user");
     sessionStorage.removeItem("user");
+    sessionStorage.removeItem("st_session");
     localStorage.removeItem("userRole");
-    // Determine redirect path based on current location
+    // Redirect to landing page
     const isRoot = window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/');
-    const path = (window.location.pathname.includes('/auth/') || isRoot) ? "auth/login.html" : "../auth/login.html";
+    const path = (window.location.pathname.includes('/auth/') || isRoot) ? "index.html" : "../index.html";
     window.location.href = path;
   },
   currentUser: () => {
@@ -119,15 +120,24 @@ async function handleLogin(form) {
         users = window.mockData.users; // Fallback
     }
 
-    const matchedUser = users.find(
-      (u) => String(u.email).toLowerCase() === String(email).toLowerCase() && u.password === password && u.active
+    // First check if user exists at all with correct credentials
+    const credMatch = users.find(
+      (u) => String(u.email).toLowerCase() === String(email).toLowerCase() && u.password === password
     );
 
-    if (!matchedUser) {
+    if (!credMatch) {
       console.warn("Login Failed! Tried email:", email, "| Expected one of:", users.map(u => u.email).join(', '));
       showToast("Invalid credentials", "error");
       return;
     }
+
+    // Check if account is pending approval
+    if (!credMatch.active) {
+      showToast("Your account is pending admin approval. Please wait.", "error");
+      return;
+    }
+
+    const matchedUser = credMatch;
 
     showToast("Login successful!", "success");
 
@@ -169,14 +179,22 @@ async function handleLogin(form) {
 }
 
 async function handleRegister(form) {
-  const firstName = form.querySelector("#first-name").value;
-  const lastName = form.querySelector("#last-name").value;
-  const email = form.querySelector("#email").value;
+  const firstName = form.querySelector("#first-name").value.trim();
+  const lastName = form.querySelector("#last-name").value.trim();
+  const email = form.querySelector("#email").value.trim();
+  const role = form.querySelector("#role")?.value || 'customer';
+  const company = form.querySelector("#company")?.value.trim() || "";
   const password = form.querySelector("#password").value;
+  const confirmPassword = form.querySelector("#confirm-password")?.value || "";
   const terms = form.querySelector("#terms")?.checked;
 
   if (!firstName || !lastName || !email || !password) {
     showToast("Please fill in required fields", "error");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    showToast("Passwords do not match", "error");
     return;
   }
 
@@ -185,11 +203,60 @@ async function handleRegister(form) {
     return;
   }
 
+  // Check for existing user
+  if (window.AppState && window.AppState.getState) {
+    const stateObj = window.AppState.getState();
+    const exists = stateObj.users.find(u => String(u.email).toLowerCase() === email.toLowerCase());
+    if (exists) {
+      showToast("Email already registered", "error");
+      return;
+    }
+  }
+
+  // Customers are auto-approved; all other roles need Super User approval
+  const isCustomer = (role === 'customer');
+
   showToast("Creating account...", "info");
 
   setTimeout(() => {
-    showToast("Account created! Please sign in.", "success");
-    setTimeout(() => (window.location.href = "login.html"), 1500);
+    if (window.AppState && window.AppState.getState) {
+      const stateObj = window.AppState.getState();
+      const newUser = {
+        user_id: 'U_' + Date.now().toString().slice(-6),
+        name: `${firstName} ${lastName}`,
+        email: email,
+        password: password,
+        role: role,
+        active: isCustomer  // customers: true, others: false (pending)
+      };
+      if (company) newUser.company = company;
+
+      stateObj.users.push(newUser);
+      window.AppState.saveState(stateObj);
+
+      if (isCustomer) {
+        // Auto-login and redirect to customer dashboard
+        const userData = {
+          user_id: newUser.user_id,
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role,
+          hub_id: null,
+          active: true
+        };
+        localStorage.setItem("user", JSON.stringify(userData));
+        sessionStorage.setItem("user", JSON.stringify(userData));
+        sessionStorage.setItem("st_session", JSON.stringify(userData));
+        localStorage.setItem("userRole", "customer");
+
+        showToast("Account created! Redirecting...", "success");
+        setTimeout(() => (window.location.href = "../customer/dashboard.html"), 1500);
+      } else {
+        // Needs approval
+        showToast("Account created! Awaiting admin approval.", "success");
+        setTimeout(() => (window.location.href = "login.html"), 2500);
+      }
+    }
   }, 1000);
 }
 

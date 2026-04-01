@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // HTML Gen
         userTableBody.innerHTML = filtered.length > 0 ? filtered.map(u => `
-            <tr>
+            <tr${u.status === 'Pending' ? ' style="background: rgba(245,158,11,0.06)"' : ''}>
                 <td>
                     <div class="user-name-cell">
                         <div class="user-avatar-sm">${u.name.charAt(0).toUpperCase()}</div>
@@ -61,6 +61,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <td>${u.lastLogin}</td>
                 <td class="actions-col">
                     <div class="action-buttons">
+                        ${u.status === 'Pending' ? `<button class="action-icon approve-btn" data-id="${u.id}" title="Approve" style="color:#10b981;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </button>` : ''}
                         <button class="action-icon edit-btn" data-id="${u.id}" title="Edit">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         </button>
@@ -73,8 +76,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         `).join("") : `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-subtitle)">No users found.</td></tr>`;
 
         // Attach listeners dynamically
+        document.querySelectorAll('.approve-btn').forEach(b => b.addEventListener('click', (e) => approveUser(e.currentTarget.dataset.id)));
         document.querySelectorAll('.edit-btn').forEach(b => b.addEventListener('click', (e) => openEditModal(e.currentTarget.dataset.id)));
         document.querySelectorAll('.delete-btn').forEach(b => b.addEventListener('click', (e) => deleteUser(e.currentTarget.dataset.id)));
+    }
+
+    function approveUser(id) {
+        StorageAPI.updateUser(id, { status: 'Active' });
+        if (typeof window.showToast === 'function') {
+            window.showToast('User approved successfully!', 'success');
+        }
+        renderTable();
     }
 
     // Modal Helpers

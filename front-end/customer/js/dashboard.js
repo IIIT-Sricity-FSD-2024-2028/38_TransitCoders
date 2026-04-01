@@ -126,7 +126,10 @@ function initDashboard() {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             localStorage.removeItem('user');
-            window.location.href = '../auth/login.html';
+            sessionStorage.removeItem('user');
+            sessionStorage.removeItem('st_session');
+            localStorage.removeItem('userRole');
+            window.location.href = '../index.html';
         });
     }
 

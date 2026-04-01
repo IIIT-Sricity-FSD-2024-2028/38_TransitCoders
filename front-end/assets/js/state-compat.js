@@ -358,7 +358,8 @@
         _save: function(k, d) { var s = getState(); s[k] = d; saveState(s); },
         getUsers: function() { 
             return getState().users.map(function(u){
-                return { id: u.user_id, name: u.name, email: u.email, role: u.role, status: u.active ? 'Active' : 'Inactive', lastLogin: 'Recent' };
+                var status = u.active ? 'Active' : (u.pending !== false ? 'Pending' : 'Inactive');
+                return { id: u.user_id, name: u.name, email: u.email, role: u.role, status: status, lastLogin: u.active ? 'Recent' : 'Never' };
             });
         },
         addUser: function(u) { 
