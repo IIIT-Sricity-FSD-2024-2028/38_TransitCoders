@@ -107,7 +107,8 @@ async function handleLogin(form) {
           !stateObj.users ||
           !stateObj.users.find(u => u.email === 'hm_chennai@swifttrack.com') ||
           !stateObj.users.find(u => u.email === 'hm_kharimnagar@swifttrack.com') ||
-          !stateObj.users.find(u => u.email === 'hm_visakhapatnam@swifttrack.com')
+          !stateObj.users.find(u => u.email === 'hm_visakhapatnam@swifttrack.com') ||
+          !stateObj.users.find(u => u.email === 'akhil.menon@swifttrack.com')
         ) {
            localStorage.removeItem(window.AppState.STORAGE_KEY);
            location.reload(); // Instantly reload to trigger fresh database seeding!

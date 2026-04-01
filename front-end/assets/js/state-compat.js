@@ -7,6 +7,18 @@
     var getState  = window.AppState.getState;
     var saveState = window.AppState.saveState;
 
+    // Agent name <-> ID lookup maps dynamically derived
+    function getAgentIdToName() {
+        var map = {};
+        getState().users.forEach(function(u){ if (u.role === 'delivery_agent') map[u.user_id] = u.name; });
+        return map;
+    }
+    function getAgentNameToId() {
+        var map = {};
+        getState().users.forEach(function(u){ if (u.role === 'delivery_agent') map[u.name] = u.user_id; });
+        return map;
+    }
+
     // ADAPTER: CANONICAL -> MERCHANT
     function toMerchantShipment(o) {
         if (!o) return null;
@@ -57,6 +69,14 @@
         };
     }
 
+    /* Helper: get logged-in agent's user_id from session */
+    function _getAgentId() {
+        try {
+            var sess = JSON.parse(sessionStorage.getItem('user') || sessionStorage.getItem('st_session') || '{}');
+            return sess.user_id || 'U_AGT_102';
+        } catch(e) { return 'U_AGT_102'; }
+    }
+
     /* 1. window.mockData (Hub Manager proxy) */
     window.mockData = {
         get users() { return getState().users; },
@@ -73,58 +93,18 @@
             }); 
         },
         get agents() { 
-            return [
-                {
-                    agent_id: 'U_AGT_102',
-                    user_id: 'U_AGT_102',
-                    name: 'Karthik',
+            return getState().users.filter(function(u){ return u.role === 'delivery_agent'; }).map(function(u) {
+                return {
+                    agent_id: u.user_id,
+                    user_id: u.user_id,
+                    name: u.name,
                     role: 'Delivery Agent',
-                    hub_id: 'H001',
-                    status: 'Available',
-                    vehicle_type: 'Van',
-                    tasks_count: getState().orders.filter(function(o){ return o.assigned_agent === 'U_AGT_102' }).length
-                },
-                {
-                    agent_id: 'U_AGT_201',
-                    user_id: 'U_AGT_201',
-                    name: 'Naveen',
-                    role: 'Delivery Agent',
-                    hub_id: 'H002',
-                    status: 'Available',
-                    vehicle_type: 'Bike',
-                    tasks_count: getState().orders.filter(function(o){ return o.assigned_agent === 'U_AGT_201' }).length
-                },
-                {
-                    agent_id: 'U_AGT_301',
-                    user_id: 'U_AGT_301',
-                    name: 'Priya',
-                    role: 'Delivery Agent',
-                    hub_id: 'H003',
-                    status: 'On Delivery',
-                    vehicle_type: 'Mini Truck',
-                    tasks_count: getState().orders.filter(function(o){ return o.assigned_agent === 'U_AGT_301' }).length
-                },
-                {
-                    agent_id: 'U_AGT_401',
-                    user_id: 'U_AGT_401',
-                    name: 'Harish',
-                    role: 'Delivery Agent',
-                    hub_id: 'H004',
-                    status: 'Available',
-                    vehicle_type: 'Van',
-                    tasks_count: getState().orders.filter(function(o){ return o.assigned_agent === 'U_AGT_401' }).length
-                },
-                {
-                    agent_id: 'U_AGT_501',
-                    user_id: 'U_AGT_501',
-                    name: 'Divya',
-                    role: 'Delivery Agent',
-                    hub_id: 'H005',
-                    status: 'Available',
-                    vehicle_type: 'Bike',
-                    tasks_count: getState().orders.filter(function(o){ return o.assigned_agent === 'U_AGT_501' }).length
-                }
-            ];
+                    hub_id: u.hub_id,
+                    status: u.active ? 'Available' : 'Unavailable',
+                    vehicle_type: u.vehicle || 'Van',
+                    tasks_count: getState().orders.filter(function(o){ return o.assigned_agent === u.user_id && o.status !== 'Delivered' && o.status !== 'Cancelled'; }).length
+                };
+            });
         },
         get hubs() {
             return [
@@ -207,10 +187,10 @@
         }
     };
 
-    /* 3. DeliveryData (Agent Interface Proxy) */
+    /* 3. DeliveryData (Agent Interface Proxy) — uses session-based agent ID */
     window.DeliveryData = {
-        get orders() { return getState().orders.filter(function(o){ return o.assigned_agent === 'U_AGT_102' }).map(toAgentOrder); },
-        get history() { return getState().orders.filter(function(o){ return o.assigned_agent === 'U_AGT_102' && o.status === 'Delivered' }).map(toAgentOrder); },
+        get orders() { var aid = _getAgentId(); return getState().orders.filter(function(o){ return o.assigned_agent === aid; }).map(toAgentOrder); },
+        get history() { var aid = _getAgentId(); return getState().orders.filter(function(o){ return o.assigned_agent === aid && o.status === 'Delivered'; }).map(toAgentOrder); },
         
         getOrders: function (f) {
             f = f || 'all';
@@ -244,17 +224,66 @@
                 saveState(s); return true;
             } return false;
         },
-        getProfile: function () { return getState().agentProfile; },
+        getProfile: function () { 
+            var sess = {};
+            try { sess = JSON.parse(sessionStorage.getItem('user') || sessionStorage.getItem('st_session') || '{}'); } catch(e) {}
+            var uId = sess.user_id || 'U_AGT_102';
+            
+            var s = getState();
+            var realUser = s.users.find(function(u){ return u.user_id === uId; }) || {};
+            var hubInfo = s.hubs.find(function(h){ return h.hub_id === realUser.hub_id; }) || { name: 'Swift Hub', hub_id: 'H000' };
+
+            var numericId = (realUser.user_id || '').replace(/\D/g, '') || '000';
+            
+            var p = {
+                name: realUser.name || sess.name || 'Agent',
+                agentId: 'DA' + numericId,
+                role: 'Delivery Agent',
+                phone: realUser.phone || ('+91 98' + numericId.padEnd(8, '456')),
+                email: realUser.email || sess.email || 'agent@swifttrack.com',
+                licenseNo: 'TN' + numericId.padStart(2, '0') + '2023000' + numericId,
+                joinedDate: '12 Jan 2026',
+                contractStatus: realUser.active ? 'Active' : 'Inactive',
+                currentStatus: (s.agentProfile && s.agentProfile.currentStatus) || 'available',
+                performance: { total: 210, completed: 198, failed: 12, rating: 4.6 },
+                vehicle: {
+                    number: realUser.vehicle || ('TN 09 ' + numericId.padStart(4, '0')),
+                    type: realUser.vehicle_type || 'Van',
+                    capacity: '30 kg',
+                    status: 'Active'
+                },
+                hub: {
+                    name: hubInfo.name || hubInfo.location || 'Central Hub',
+                    code: hubInfo.hub_id || 'H000',
+                    contact: '+91 44 2345 6789'
+                }
+            };
+            return p;
+        },
         updateProfileStatus: function (ns) { var s = getState(); if(s.agentProfile){ s.agentProfile.currentStatus = ns; saveState(s); } },
-        getHistory: function (p) { return this.history; }
+        getHistory: function (p) { return this.history; },
+        submitReport: function (report) {
+            var s = getState();
+            if (!s.complaints) s.complaints = [];
+            s.complaints.push({
+                id: 'RPT-' + Date.now().toString().slice(-6),
+                order_id: report.orderId || '',
+                type: report.issueType || 'other',
+                details: report.details || {},
+                status: 'Open',
+                date: new Date().toISOString()
+            });
+            saveState(s);
+            return true;
+        }
     };
 
-    // ADAPTER: CANONICAL -> ADMIN
+    // ADAPTER: CANONICAL -> ADMIN (resolves all agent IDs to display names)
     function toAdminOrder(o) {
         if (!o) return null;
         var pri = o.package_type === 'Express' ? 'High' : 'Medium';
         var agentName = o.assigned_agent;
-        if (agentName === 'U_AGT_102') agentName = 'Karthik';
+        if (agentName && getAgentIdToName()[agentName]) agentName = getAgentIdToName()[agentName];
         return {
             id: o.order_id,
             tracking_id: o.tracking_id,
@@ -268,7 +297,7 @@
         };
     }
 
-    /* 4. AdminStorage */
+    /* 4. AdminStorage (resolves all agent names to IDs) */
     window.AdminStorage = {
         init: async function(){}, _get: function(k){ return JSON.parse(localStorage.getItem('admin_'+k)||'[]'); },
         _save: function(k, d){ localStorage.setItem('admin_'+k, JSON.stringify(d)); window.AppState.notify(); },
@@ -278,7 +307,7 @@
             var o = {
                 order_id: d.id || 'ORD_' + (s.orders.length + 100),
                 tracking_id: 'SWT-' + Date.now().toString().slice(-6),
-                merchant_id: 'U_MER_1', // default for manual admin
+                merchant_id: 'U_MER_1',
                 customer_name: d.customerName,
                 customer_phone: '+91 0000 00000',
                 delivery_address: d.deliveryLocation,
@@ -288,7 +317,7 @@
                 status: d.status || 'Pending',
                 created_at: new Date().toISOString(),
                 assigned_hub: d.pickupHub, 
-                assigned_agent: d.assignedAgent === 'Unassigned' ? null : (d.assignedAgent === 'Karthik' ? 'U_AGT_102' : d.assignedAgent)
+                assigned_agent: d.assignedAgent === 'Unassigned' ? null : (getAgentNameToId()[d.assignedAgent] || d.assignedAgent)
             };
             s.orders.unshift(o); saveState(s);
         },
@@ -297,7 +326,7 @@
             if(o){ 
                 if (d.customerName !== undefined) o.customer_name = d.customerName;
                 if (d.assignedAgent !== undefined) {
-                    var agId = d.assignedAgent === 'Unassigned' ? null : (d.assignedAgent === 'Karthik' ? 'U_AGT_102' : d.assignedAgent);
+                    var agId = d.assignedAgent === 'Unassigned' ? null : (getAgentNameToId()[d.assignedAgent] || d.assignedAgent);
                     o.assigned_agent = agId;
                 }
                 if (d.pickupHub !== undefined) { o.assigned_hub = d.pickupHub; o.pickup_address = d.pickupHub; }
@@ -313,23 +342,16 @@
             s.orders = s.orders.filter(function(x) { return x.order_id !== id; });
             if (s.orders.length < len) saveState(s);
         },
-        getAgents: function(){ return getState().adminAgents && getState().adminAgents.length ? getState().adminAgents : [{id:'A1', name:'Karthik', status:'Available', distanceAway:'2.5 km', user_id:'U_AGT_102'}]; },
+        getAgents: function(){ 
+            return getState().users.filter(function(u){ return u.role === 'delivery_agent'; }).map(function(u){
+                return { id: u.user_id, name: u.name, status: u.active ? 'Available' : 'Unavailable', distanceAway: '--', user_id: u.user_id };
+            });
+        },
         getTransfers: function(){ return getState().transfers; },
         getComplaints: function(){ return getState().complaints; },
         getReports: function(){ return getState().adminReports; }
     };
 
-    /* 5. StorageAPI (Super-User) */
-    window.StorageAPI = {
-        init: async function(){},
-        _save: function(k,d){ window.AppState.saveState(getState()); },
-        getUsers: function(){ return getState().users; },
-        addUser: function(d){ var s=getState(); s.users.push(d); saveState(s); },
-        updateUser: function(id, d){ var s=getState(); var u=s.users.find(function(x){return x.user_id===id;}); if(u){Object.assign(u,d);saveState(s);} },
-        deleteUser: function(id){ var s=getState(); s.users=s.users.filter(function(x){return x.user_id!==id;}); saveState(s); },
-        getComplaints: function(){ return getState().suComplaints; },
-        getRoles: function(){ return getState().roles; }
-    };
     /* 5. StorageAPI (Super User Interface Proxy) */
     window.StorageAPI = {
         init: function() { return Promise.resolve(); },
@@ -362,9 +384,22 @@
         getZones: function() { return getState().zones || []; }
     };
 
-    /* 6. CustomerAPI (Customer Dashboard Proxy) */
+    /* 6. CustomerAPI (Customer Dashboard Proxy) — filters by logged-in user's name */
     window.CustomerAPI = {
-        getOrders: function() { return getState().orders.filter(function(o){ return o.customer_email === 'customer@swifttrack.com' || o.customer_id === 'U_CUS_1'; }); },
+        getOrders: function() {
+            var sess = null;
+            try { sess = JSON.parse(sessionStorage.getItem('user') || sessionStorage.getItem('st_session') || '{}'); } catch(e) {}
+            var userName = (sess && sess.name) ? sess.name : '';
+            return getState().orders.filter(function(o){
+                return o.customer_name === userName;
+            }).map(function(o) {
+                var newO = Object.assign({}, o);
+                if (newO.assigned_agent && getAgentIdToName()[newO.assigned_agent]) {
+                    newO.assigned_agent = getAgentIdToName()[newO.assigned_agent];
+                }
+                return newO;
+            });
+        },
         addComplaint: function(c) {
             var s = getState();
             c.id = 'CMP-' + Date.now().toString().slice(-4);
@@ -377,5 +412,50 @@
             s.feedback.push(f); saveState(s);
         }
     };
+
+    // SYSTEM-WIDE UI INJECTION (Auto-runs on all authenticated portals)
+    function populateSessionDataUI() {
+        try {
+            var userStr = sessionStorage.getItem('user') || sessionStorage.getItem('st_session');
+            if (!userStr) return;
+            var u = JSON.parse(userStr);
+            
+            // Inject Names
+            document.querySelectorAll('.user-name, #dropdown-name, .hm-user-name, .hm-navbar-user-name, .u-name, #user-name-text, .user-info-name, .user-profile .name').forEach(function(el) {
+                el.textContent = u.name;
+            });
+
+            // Special handler for profile-name to maintain active badge
+            document.querySelectorAll('#profile-name').forEach(function(el) {
+                var badge = el.querySelector('.active-badge');
+                el.innerHTML = u.name + (badge ? ' <span class="active-badge">' + badge.textContent + '</span>' : '');
+            });
+
+            // Inject Roles
+            var displayRole = (u.role || '').replace('_', ' ').replace(/\b\w/g, function(l){ return l.toUpperCase() });
+            document.querySelectorAll('.user-role, .profile-role, .hm-user-role, .user-profile .role').forEach(function(el) { el.textContent = displayRole; });
+            
+            // Inject Initials for Avatar
+            var initials = (u.name || 'User').split(' ').map(function(n){ return n[0] }).join('').substring(0,2).toUpperCase();
+            document.querySelectorAll('.sidebar-avatar, .user-avatar, .profile-avatar, .hm-avatar, .hm-navbar-avatar, .avatar-initials, #user-avatar-text').forEach(function(el) {
+                if (el.tagName !== 'IMG') el.textContent = initials;
+            });
+
+            // Clean up Welcome Headings
+            document.querySelectorAll('h1').forEach(function(h1) {
+                if (h1.textContent.trim().startsWith('Welcome, ')) {
+                    h1.textContent = 'Welcome, ' + u.name.split(' ')[0];
+                }
+            });
+        } catch (e) {
+            console.log('Error populating session UI:', e);
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', populateSessionDataUI);
+    } else {
+        populateSessionDataUI();
+    }
 
 })();
