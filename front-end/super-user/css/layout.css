@@ -7,7 +7,12 @@ body {
     display: flex;
     height: 100vh;
     overflow: hidden;
-    zoom: 0.9;
+}
+
+@media (min-width: 1024px) {
+    body {
+        zoom: 90%;
+    }
 }
 
 /* Sidebar structure */
@@ -185,9 +190,12 @@ body.dark .global-search input {
 
 /* Page Content */
 .page-container {
-    padding: 32px;
+    padding: 32px 40px;
     overflow-y: auto;
     flex-grow: 1;
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 /* Custom scrollbar for page content */
@@ -224,6 +232,11 @@ body.dark .page-container::-webkit-scrollbar-thumb {
 .page-header p {
     color: var(--text-subtitle);
     font-size: 0.875rem;
+}
+
+/* Shared spacing utility used across dashboard-style pages */
+.mt-4 {
+    margin-top: 24px;
 }
 
 /* Super-user profile modal (triggered from top-right avatar) */

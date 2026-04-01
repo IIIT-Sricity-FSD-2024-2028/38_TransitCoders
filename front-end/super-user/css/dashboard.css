@@ -8,10 +8,10 @@
 }
 
 .kpi-card {
-    padding: 24px;
+    padding: 20px 24px;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 247, 237, 0.86));
     border: 1px solid rgba(249, 115, 22, 0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -32,8 +32,8 @@ body.dark .kpi-card:hover {
 }
 
 .kpi-icon {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     border-radius: var(--radius-l);
     display: flex;
     align-items: center;
@@ -43,8 +43,8 @@ body.dark .kpi-card:hover {
 }
 
 .kpi-icon svg {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     fill: none;
     stroke: currentColor;
     stroke-width: 2;
@@ -70,14 +70,14 @@ body.dark .kpi-icon.green { background-color: rgba(22, 163, 74, 0.24); color: #8
 }
 
 .kpi-value {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 700;
     line-height: 1.2;
 }
 
 .dashboard-row {
     display: flex;
-    gap: 24px;
+    gap: 20px;
 }
 
 .dashboard-row.col-2 > div {
@@ -89,7 +89,7 @@ body.dark .kpi-icon.green { background-color: rgba(22, 163, 74, 0.24); color: #8
 }
 
 .section-card {
-    padding: 24px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
 }
@@ -126,15 +126,15 @@ body.dark .kpi-icon.green { background-color: rgba(22, 163, 74, 0.24); color: #8
 .infra-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: 12px;
     margin-top: 16px;
 }
 
 .infra-stat {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 16px;
+    gap: 6px;
+    padding: 14px;
     border: 1px solid var(--border-default);
     border-radius: var(--radius-m);
     background-color: var(--surface-default);
@@ -162,7 +162,7 @@ body.dark .infra-stat {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
+    padding: 12px;
     border-radius: var(--radius-m);
     border: 1px solid var(--border-default);
     background-color: var(--surface-default);

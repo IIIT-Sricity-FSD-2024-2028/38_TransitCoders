@@ -382,6 +382,11 @@
             if(c){ c.status = ns; saveState(s); }
         },
         getRoles: function() { return getState().roles || []; },
+        updateRolePermissions: function(roleId, perms) {
+            var s = getState();
+            var r = (s.roles || []).find(function(x) { return x.id === roleId; });
+            if (r) { r.permissions = perms; saveState(s); }
+        },
         getZones: function() { return getState().zones || []; }
     };
 

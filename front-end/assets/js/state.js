@@ -99,9 +99,103 @@
         }
 
         state.roles = [
-            { name: 'Super User', permissions: { manageUsers: true, manageComplaints: true, viewReports: true, configureSystem: true, manageDatabase: true } },
-            { name: 'Admin', permissions: { manageUsers: false, manageComplaints: true, viewReports: true, configureSystem: false, manageDatabase: false } }
-        ];
+        {
+            id: 'super_user',
+            name: 'Super User',
+            description: 'Unrestricted access to all modules and configurations.',
+            isSystem: true,
+            permissions: {
+                view_users: true, create_users: true, edit_users: true, delete_users: true, suspend_users: true, assign_roles: true,
+                view_all_shipments: true, create_shipment: true, edit_shipment: true, cancel_shipment: true, view_own_shipment_only: false,
+                view_complaints: true, resolve_complaints: true, escalate_complaints: true,
+                view_live_shipments: true, view_hub_status: true, view_delayed_deliveries: true,
+                view_reports: true, export_reports: true, revenue_analytics: true, complaint_analytics: true,
+                edit_platform_settings: true, configure_hubs: true, configure_routes: true, manage_api_integrations: true,
+                view_logs: true, export_logs: true, delete_logs: true,
+                backup_database: true, restore_database: true, clear_old_logs: true
+            }
+        },
+        {
+            id: 'admin',
+            name: 'Admin',
+            description: 'Manage most configurations except destructive core actions.',
+            isSystem: false,
+            permissions: {
+                view_users: true, create_users: true, edit_users: true, delete_users: false, suspend_users: true, assign_roles: false,
+                view_all_shipments: true, create_shipment: true, edit_shipment: true, cancel_shipment: true, view_own_shipment_only: false,
+                view_complaints: true, resolve_complaints: true, escalate_complaints: true,
+                view_live_shipments: true, view_hub_status: true, view_delayed_deliveries: true,
+                view_reports: true, export_reports: true, revenue_analytics: true, complaint_analytics: true,
+                edit_platform_settings: true, configure_hubs: true, configure_routes: true, manage_api_integrations: false,
+                view_logs: true, export_logs: true, delete_logs: false,
+                backup_database: true, restore_database: false, clear_old_logs: true
+            }
+        },
+        {
+            id: 'hub_manager',
+            name: 'Hub Manager',
+            description: 'Handles shipments and operations monitoring for their designated hub.',
+            isSystem: false,
+            permissions: {
+                view_users: false, create_users: false, edit_users: false, delete_users: false, suspend_users: false, assign_roles: false,
+                view_all_shipments: true, create_shipment: true, edit_shipment: true, cancel_shipment: true, view_own_shipment_only: false,
+                view_complaints: true, resolve_complaints: true, escalate_complaints: true,
+                view_live_shipments: true, view_hub_status: true, view_delayed_deliveries: true,
+                view_reports: true, export_reports: true, revenue_analytics: false, complaint_analytics: false,
+                edit_platform_settings: false, configure_hubs: false, configure_routes: false, manage_api_integrations: false,
+                view_logs: false, export_logs: false, delete_logs: false,
+                backup_database: false, restore_database: false, clear_old_logs: false
+            }
+        },
+        {
+            id: 'merchant',
+            name: 'Merchant',
+            description: 'Can build and track their own shipments only.',
+            isSystem: false,
+            permissions: {
+                view_users: false, create_users: false, edit_users: false, delete_users: false, suspend_users: false, assign_roles: false,
+                view_all_shipments: false, create_shipment: true, edit_shipment: true, cancel_shipment: true, view_own_shipment_only: true,
+                view_complaints: false, resolve_complaints: false, escalate_complaints: false,
+                view_live_shipments: false, view_hub_status: false, view_delayed_deliveries: false,
+                view_reports: false, export_reports: false, revenue_analytics: false, complaint_analytics: false,
+                edit_platform_settings: false, configure_hubs: false, configure_routes: false, manage_api_integrations: false,
+                view_logs: false, export_logs: false, delete_logs: false,
+                backup_database: false, restore_database: false, clear_old_logs: false
+            }
+        },
+        {
+            id: 'delivery_agent',
+            name: 'Delivery Agent',
+            description: 'Field agent dispatch tracking.',
+            isSystem: false,
+            permissions: {
+                view_users: false, create_users: false, edit_users: false, delete_users: false, suspend_users: false, assign_roles: false,
+                view_all_shipments: false, create_shipment: false, edit_shipment: true, cancel_shipment: false, view_own_shipment_only: true,
+                view_complaints: false, resolve_complaints: false, escalate_complaints: false,
+                view_live_shipments: false, view_hub_status: false, view_delayed_deliveries: false,
+                view_reports: false, export_reports: false, revenue_analytics: false, complaint_analytics: false,
+                edit_platform_settings: false, configure_hubs: false, configure_routes: false, manage_api_integrations: false,
+                view_logs: false, export_logs: false, delete_logs: false,
+                backup_database: false, restore_database: false, clear_old_logs: false
+            }
+        },
+        {
+            id: 'support_staff',
+            name: 'Support Staff',
+            description: 'Manages incoming customer complaints and general inquiries.',
+            isSystem: false,
+            permissions: {
+                view_users: true, create_users: false, edit_users: false, delete_users: false, suspend_users: false, assign_roles: false,
+                view_all_shipments: true, create_shipment: false, edit_shipment: false, cancel_shipment: false, view_own_shipment_only: false,
+                view_complaints: true, resolve_complaints: true, escalate_complaints: true,
+                view_live_shipments: false, view_hub_status: false, view_delayed_deliveries: false,
+                view_reports: true, export_reports: false, revenue_analytics: false, complaint_analytics: true,
+                edit_platform_settings: false, configure_hubs: false, configure_routes: false, manage_api_integrations: false,
+                view_logs: false, export_logs: false, delete_logs: false,
+                backup_database: false, restore_database: false, clear_old_logs: false
+            }
+        }
+    ];
 
         /* --- UNIFIED ORDERS --- */
         var mockCustomers = [

@@ -26,6 +26,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const roleInput = document.getElementById("userRole");
     const statusInput = document.getElementById("userStatus");
 
+    // RBAC: Disable Add User if lacking permission
+    if (window.Auth && !window.Auth.hasPermission('create_users')) {
+        if (openAddUserModalBtn) {
+            openAddUserModalBtn.disabled = true;
+            openAddUserModalBtn.title = "You do not have permission to create users";
+            openAddUserModalBtn.style.opacity = '0.5';
+            openAddUserModalBtn.style.cursor = 'not-allowed';
+        }
+    }
+
     let isEditing = false;
 
     // Load & Render Users
@@ -61,13 +71,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <td>${u.lastLogin}</td>
                 <td class="actions-col">
                     <div class="action-buttons">
-                        ${u.status === 'Pending' ? `<button class="action-icon approve-btn" data-id="${u.id}" title="Approve" style="color:#10b981;">
+                        ${u.status === 'Pending' ? `<button class="action-icon approve-btn" data-id="${u.id}" title="Approve" style="color:#10b981;" ${window.Auth && !window.Auth.hasPermission('edit_users') ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}>
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </button>` : ''}
-                        <button class="action-icon edit-btn" data-id="${u.id}" title="Edit">
+                        <button class="action-icon edit-btn" data-id="${u.id}" title="Edit" ${window.Auth && !window.Auth.hasPermission('edit_users') ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}>
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         </button>
-                        <button class="action-icon danger delete-btn" data-id="${u.id}" title="Delete">
+                        <button class="action-icon danger delete-btn" data-id="${u.id}" title="Delete" ${window.Auth && !window.Auth.hasPermission('delete_users') ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}>
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                         </button>
                     </div>

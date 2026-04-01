@@ -30,6 +30,34 @@ window.Auth = {
   isSuperUser: () => {
     const u = Auth.currentUser();
     return u && (u.role === 'super_user' || u.role === 'admin');
+  },
+  hasPermission: (key) => {
+    const u = Auth.currentUser();
+    let userRoleStr = (u && u.role) ? u.role : localStorage.getItem('userRole');
+    if (!userRoleStr) return false;
+    
+    // Normalize role string to match ID format (e.g. "Super User" -> "super_user")
+    let roleId = userRoleStr.toLowerCase().replace(/ /g, '_');
+    
+    // Support customer which isn't in RBAC DB explicitly for dashboard basics
+    if (roleId === 'customer') {
+      // Allow customers to view own shipments if that permission is checked manually
+      if (key === 'view_own_shipment_only') return true; 
+      return false;
+    }
+
+    // Failsafe: Super User always has complete access regardless of DB state
+    if (roleId === 'super_user') return true;
+
+    if (!window.AppState || typeof window.AppState.getState !== 'function') return false;
+    
+    const state = window.AppState.getState();
+    if (!state.roles || !Array.isArray(state.roles)) return false;
+    
+    const roleDef = state.roles.find(r => r.id === roleId);
+    if (!roleDef) return false;
+    
+    return !!roleDef.permissions[key];
   }
 };
 
