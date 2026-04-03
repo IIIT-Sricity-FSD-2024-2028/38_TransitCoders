@@ -1,0 +1,12 @@
+/* Forms dark mode enhancement */
+
+body.dark .form-control {
+    background-color: #1F2937;
+    border-color: #374151;
+    color: var(--text-body);
+}
+
+body.dark .form-control:focus {
+    border-color: var(--surface-brand);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}

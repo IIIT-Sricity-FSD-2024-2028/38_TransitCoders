@@ -1,0 +1,217 @@
+.hm-toolbar {
+        margin-bottom: var(--space-16);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: var(--space-12);
+        box-sizing: border-box;
+      }
+      .hm-toolbar-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-title);
+      }
+      .hm-toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-8);
+        margin-left: auto;
+      }
+      .hm-filter-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-8);
+        background-color: var(--surface-default);
+        border: 1px solid var(--border-default);
+        padding: var(--space-8) var(--space-16);
+        border-radius: var(--radius-m);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        color: var(--text-body);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .hm-filter-btn:hover {
+        border-color: var(--border-strong);
+        background-color: var(--surface-subtle);
+      }
+      .hm-filter-btn svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+      }
+      .hm-search-field {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface-subtle);
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-m);
+        padding: 8px 16px;
+        flex: 1;
+        min-width: 260px;
+        width: 260px;
+        margin-right: auto;
+      }
+      .hm-search-field input {
+        background: none !important;
+        border: none !important;
+        outline: none !important;
+        color: var(--text-title) !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        font-family: inherit !important;
+        min-width: 260px !important;
+        flex: 1 !important;
+      }
+      .hm-search-field svg {
+        width: 14px !important;
+        height: 14px !important;
+        fill: var(--text-subtitle) !important;
+      }
+      .hm-card-meta-row {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+        font-size: 11px;
+        color: var(--text-subtitle);
+        margin-top: var(--space-16);
+        padding-top: var(--space-16);
+        border-top: 1px dashed var(--border-lighter);
+      }
+      .hm-card-eta {
+        color: var(--text-body);
+        font-weight: 500;
+      }
+      .hm-badge-high {
+        background-color: var(--error-surface);
+        color: var(--error-border);
+        border: 1px solid var(--error-border);
+      }
+      .hm-badge-medium {
+        background-color: var(--warning-surface);
+        color: var(--warning-border);
+        border: 1px solid var(--warning-border);
+      }
+      .hm-badge-low {
+        background-color: var(--info-surface);
+        color: var(--info-border);
+        border: 1px solid var(--info-border);
+      }
+      .hm-phone {
+        display: flex;
+        align-items: center;
+        gap: var(--space-8);
+        margin-top: var(--space-12);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-title);
+      }
+      .hm-phone svg {
+        width: 14px;
+        height: 14px;
+        stroke: var(--brand-action);
+      }
+      .hm-pagination {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-8);
+        margin-top: var(--space-32);
+        color: var(--text-subtitle);
+        font-size: 12px;
+      }
+      .hm-page-nav {
+        display: flex;
+        gap: var(--space-12);
+        margin-top: 4px;
+      }
+      .hm-page-nav button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-subtitle);
+        font-weight: 600;
+        font-family: inherit;
+      }
+      .hm-page-nav button.active {
+        color: var(--brand-action);
+      }
+      .hm-page-nav button:hover {
+        color: var(--text-title);
+      }
+      .hm-brand-footer {
+        margin-top: 64px;
+        padding-top: 24px;
+        padding-bottom: 24px;
+        border-top: 1px solid var(--border-default);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+        color: var(--text-subtitle);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+      .hm-social {
+        display: flex;
+        gap: 16px;
+      }
+      .hm-social svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+        opacity: 0.7;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .hm-social svg:hover {
+        opacity: 1;
+        color: var(--brand-action);
+      }
+
+      /* Layout Parity with Dashboard */
+      .hm-main {
+        flex: 1;
+        width: calc(100% - var(--hm-sidebar-w));
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #page-content {
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 32px 40px;
+      }
+
+      .hm-order-section {
+        margin-top: var(--space-24);
+      }
+
+      .hm-order-cards {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-24);
+      }
+
+      .hm-order-card {
+        width: 100%;
+        box-sizing: border-box;
+        background: var(--surface-default);
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-m);
+        padding: var(--space-24);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-16);
+        transition:
+          border-color var(--hm-transition),
+          background-color var(--hm-transition);
+        animation: slideUp 0.4s ease-out forwards;
+        opacity: 0;
+      }

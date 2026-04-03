@@ -1,0 +1,104 @@
+/* System Config Specific CSS — Enhanced */
+
+.settings-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.settings-nav {
+    display: flex;
+    flex-direction: column;
+    width: 240px;
+    flex-shrink: 0;
+    padding: 12px;
+}
+
+.settings-tab {
+    background: transparent;
+    border: none;
+    text-align: left;
+    padding: 12px 16px;
+    border-radius: var(--radius-m);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-subtitle);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.settings-tab:hover {
+    background-color: var(--surface-subtle);
+    color: var(--text-title);
+}
+
+body.dark .settings-tab:hover {
+    background-color: #1F2937;
+}
+
+.settings-tab.active {
+    background-color: var(--surface-brand-subtle);
+    color: var(--text-brand);
+    font-weight: 600;
+    border-left-color: var(--surface-brand);
+}
+
+body.dark .settings-tab.active {
+    background-color: rgba(249, 115, 22, 0.1);
+    color: #fb923c;
+}
+
+.settings-content {
+    flex: 1;
+}
+
+.settings-panel {
+    display: none;
+    padding: 24px;
+}
+
+.settings-panel.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Zone List Styles */
+.zone-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.zone-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-default);
+    transition: background-color 0.15s;
+}
+
+.zone-item:first-child { border-top: none; }
+
+.zone-item:hover {
+    background-color: rgba(249, 115, 22, 0.04);
+}
+
+body.dark .zone-item:hover {
+    background-color: rgba(249, 115, 22, 0.06);
+}
+
+.zone-details strong {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.zone-details span {
+    font-size: 0.75rem;
+    color: var(--text-subtitle);
+}

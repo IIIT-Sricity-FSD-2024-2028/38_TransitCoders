@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Issue | SwiftTrack Agent</title>
+    <meta name="description" content="Report delivery issues — package damage, customer unavailable, refused, or other problems.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/delivery-agent.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+            <!-- ── UNIFIED SIDEBAR ── -->
+    <aside class="sidebar">
+        <a href="worklist.html" class="sidebar-logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="white"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" /></svg>
+            </div>
+            <div class="logo-name">Swift<span>Track</span></div>
+        </a>
+        <nav class="sidebar-nav">
+
+                <a href="worklist.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg><span>Worklist</span></a>
+                <a href="delivery-history.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg><span>Delivery History</span></a>
+                <a href="profile.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Profile</span></a>
+            
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="user-pill logout-btn" onclick="if(window.Auth) Auth.logout(); else { sessionStorage.clear(); localStorage.clear(); window.location.href='../index.html'; }">
+                <div class="user-avatar avatar-initials">KA</div>
+                <div class="user-info">
+                    <span class="u-name user-name">Karthik</span>
+                    <span class="u-role user-role">Delivery Agent</span>
+                </div> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--mid);margin-left:auto" title="Sign out"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
+            </a>
+        </div>
+    </aside>
+
+        <div class="main">
+                <!-- ── UNIFIED TOPBAR ── -->
+        <header class="topbar">
+        <div class="topbar-title" id="topbar-title">Delivery Agent Portal</div>
+        <div class="topbar-right">
+          <!-- Theme Toggle (exact Merchant) -->
+          <div class="theme-toggle" onclick="toggleTheme()">
+            <svg id="theme-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <span id="theme-label">Light</span>
+          </div>
+
+          <!-- Search Box -->
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input placeholder="Search" />
+          </div>
+
+          <!-- Notifications (exact Merchant) -->
+          <div class="icon-wrap">
+            <button class="icon-btn" onclick="toggleDropdown('notif-panel')" id="btn-notif">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+            </button>
+            <div class="dropdown-panel" id="notif-panel">
+              <div class="dropdown-header">
+                <div class="dropdown-title">Notifications</div>
+                <div class="dropdown-action dropdown-action-orange">Mark all as read</div>
+              </div>
+              <div class="dropdown-list">
+                <div class="notif-item">
+                  <div class="notif-icon n-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                  <div class="notif-content">
+                    <div class="notif-title-row">
+                      <div class="notif-title">New order received</div>
+                      <div class="notif-time">2m ago <div class="notif-unread-dot"></div></div>
+                    </div>
+                    <div class="notif-desc">Order #LP-8842 has been successfully placed and is ready for processing.</div>
+                  </div>
+                </div>
+                <div class="notif-item">
+                  <div class="notif-icon n-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+                  <div class="notif-content">
+                    <div class="notif-title-row">
+                      <div class="notif-title">Shipment delayed</div>
+                      <div class="notif-time">45m ago <div class="notif-unread-dot"></div></div>
+                    </div>
+                    <div class="notif-desc">Transit delay for Shipment #TRK-901 due to adverse weather conditions in North Hub.</div>
+                  </div>
+                </div>
+                <div class="notif-item">
+                  <div class="notif-icon n-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                  <div class="notif-content">
+                    <div class="notif-title-row">
+                      <div class="notif-title">Support response</div>
+                      <div class="notif-time">3h ago</div>
+                    </div>
+                    <div class="notif-desc">"Our technician is currently reviewing the API documentation for your..."</div>
+                  </div>
+                </div>
+                <div class="notif-item">
+                  <div class="notif-icon n-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+                  <div class="notif-content">
+                    <div class="notif-title-row">
+                      <div class="notif-title">System maintenance</div>
+                      <div class="notif-time">Yesterday</div>
+                    </div>
+                    <div class="notif-desc">The SwiftTrack Portal will undergo scheduled maintenance tonight at 2:00 AM IST.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="dropdown-footer">View All Notifications  ›</div>
+            </div>
+          </div>
+
+          <!-- User Profile (exact Merchant) -->
+          
+        </div>
+      </header>
+<div class="content">
+            <a href="javascript:history.back()" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+
+            <div class="da-report-wrapper">
+                <div class="report-card" id="report-card">
+                    <!-- Default: Issue Type Selector -->
+                    <h1 id="report-title">Report Issue</h1>
+                    <p class="subtitle" id="report-subtitle">Please provide details about the issue with your delivery to help us resolve it quickly.</p>
+
+                    <form class="report-form" id="report-form">
+                        <!-- Issue Type Selector -->
+                        <div class="form-group" id="issue-type-group">
+                            <label>Select Issue Type</label>
+                            <select class="form-select" id="issue-type-select">
+                                <option value="">Select Issue Type</option>
+                                <option value="package">Package Issue</option>
+                                <option value="unavailable">Customer Unavailable</option>
+                                <option value="refused">Customer Refused</option>
+                                <option value="other">Others</option>
+                            </select>
+                            <span class="field-error">Please select an issue type</span>
+                        </div>
+
+                        <!-- Dynamic Form Sections -->
+                        <div id="dynamic-form-section">
+                            <!-- Rendered based on issue type selection -->
+                        </div>
+
+                        <button type="submit" class="submit-report-btn" id="submit-report-btn" style="display:none;">Submit Report</button>
+                    </form>
+                </div>
+            </div>
+        </div></div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="report-success-modal">
+        <div class="modal-card">
+            <div class="modal-icon"><i class="fas fa-check"></i></div>
+            <h2>Report Submitted</h2>
+            <p>You can return to Dashboard</p>
+            <button class="modal-proceed-btn" id="report-proceed-btn">Proceed</button>
+        </div>
+    </div>
+
+    <footer class="da-footer">
+        <span class="da-footer-copy">© 2026 SWIFTTRACK. ALL RIGHTS RESERVED.</span>
+        <div class="da-footer-social">
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+    </footer>
+
+    <script src="../assets/js/ui-global.js"></script>
+    <script src="../assets/js/state.js"></script>
+
+    <script src="../assets/js/state-compat.js"></script>
+    <script src="js/ui-common.js"></script>
+    <script src="js/report-issue.js"></script>
+</body>
+</html>

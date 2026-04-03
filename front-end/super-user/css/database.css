@@ -1,0 +1,188 @@
+/* Database Management CSS — Fixed progress bar + enhanced styles */
+
+.storage-bar {
+    width: 100%;
+    height: 14px;
+    background-color: var(--surface-subtle);
+    border-radius: var(--radius-round);
+    overflow: hidden;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+body.dark .storage-bar {
+    background-color: #1F2937;
+    border: 1px solid #374151;
+}
+
+.storage-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--clr-orange-500), var(--clr-orange-300));
+    border-radius: var(--radius-round);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: storageFillIn 1.2s ease-out forwards;
+    position: relative;
+}
+
+.storage-fill::after {
+    content: attr(data-pct);
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+@keyframes storageFillIn {
+    from { width: 0; }
+}
+
+.storage-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: var(--text-subtitle);
+    font-weight: 500;
+}
+
+/* Backup Progress */
+.backup-progress-wrap {
+    margin-top: 16px;
+    display: none;
+}
+
+.backup-progress-wrap.active {
+    display: block;
+    animation: slideUp 0.3s ease;
+}
+
+.backup-progress-bar {
+    width: 100%;
+    height: 16px;
+    background-color: var(--surface-subtle);
+    border-radius: var(--radius-round);
+    overflow: hidden;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+body.dark .backup-progress-bar {
+    background-color: #1F2937;
+}
+
+.backup-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--clr-orange-500), var(--clr-orange-300));
+    border-radius: var(--radius-round);
+    transition: width 0.35s ease;
+    position: relative;
+}
+
+.backup-progress-fill::after {
+    content: attr(data-pct);
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+}
+
+.backup-progress-text {
+    font-size: 0.8rem;
+    color: var(--text-subtitle);
+    font-weight: 500;
+}
+
+body.dark .backup-progress-wrap {
+    background: rgba(17, 24, 39, 0.55);
+    border: 1px solid #374151;
+    padding: 12px;
+    border-radius: var(--radius-m);
+}
+
+/* Data Table Sizes Section */
+.db-tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.db-table-item {
+    padding: 16px;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-m);
+    background-color: var(--surface-default);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: background-color 0.3s, border-color 0.3s, transform 0.2s;
+}
+
+.db-table-item:hover {
+    transform: translateY(-1px);
+}
+
+body.dark .db-table-item {
+    background-color: #1F2937;
+    border-color: #374151;
+}
+
+.db-table-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-title);
+}
+
+.db-table-meta {
+    font-size: 0.75rem;
+    color: var(--text-subtitle);
+}
+
+.db-table-size {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-brand);
+}
+
+/* Log Terminal */
+.log-terminal {
+    background-color: var(--clr-neutral-900);
+    border-radius: var(--radius-m);
+    padding: 16px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: #4ade80;
+}
+
+.log-terminal::-webkit-scrollbar {
+    width: 4px;
+}
+
+.log-terminal::-webkit-scrollbar-thumb {
+    background: #374151;
+    border-radius: 2px;
+}
+
+.log-line {
+    white-space: nowrap;
+}
+
+.log-line .log-time {
+    color: #64748b;
+    margin-right: 8px;
+}
+
+.log-line .log-level-info { color: #38bdf8; }
+.log-line .log-level-warn { color: #fde047; }
+.log-line .log-level-error { color: #fca5a5; }

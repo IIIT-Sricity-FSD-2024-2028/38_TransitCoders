@@ -1,0 +1,5 @@
+[
+    { "id": "ZON-1", "name": "North Hub", "region": "Greater North", "boundaries": "ZIP 1000-1999" },
+    { "id": "ZON-2", "name": "East Coast Ops", "region": "East Metro", "boundaries": "ZIP 2000-2999" },
+    { "id": "ZON-3", "name": "Central District", "region": "Downtown", "boundaries": "ZIP 3000-3500" }
+]

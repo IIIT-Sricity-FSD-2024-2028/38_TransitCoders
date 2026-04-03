@@ -1,0 +1,62 @@
+{
+  "Radius": {
+    "$extensions": {
+      "com.figma.scopes": [
+        "CORNER_RADIUS"
+      ],
+      "com.figma.hiddenFromPublishing": false
+    },
+    "$type": "dimension",
+    "$value": "{Radius.M}"
+  },
+  "Spacing": {
+    "$extensions": {
+      "com.figma.scopes": [
+        "GAP"
+      ],
+      "com.figma.hiddenFromPublishing": false
+    },
+    "$type": "dimension",
+    "$value": "{Number scale.2's.4}"
+  },
+  "H-padding": {
+    "$extensions": {
+      "com.figma.scopes": [
+        "GAP"
+      ],
+      "com.figma.hiddenFromPublishing": false
+    },
+    "$type": "dimension",
+    "$value": "{Number scale.2's.16}"
+  },
+  "V-padding": {
+    "$extensions": {
+      "com.figma.scopes": [
+        "GAP"
+      ],
+      "com.figma.hiddenFromPublishing": false
+    },
+    "$type": "dimension",
+    "$value": "{Number scale.2's.8}"
+  },
+  "Full padding": {
+    "$extensions": {
+      "com.figma.scopes": [
+        "GAP"
+      ],
+      "com.figma.hiddenFromPublishing": false
+    },
+    "$type": "dimension",
+    "$value": "{Number scale.2's.8}"
+  },
+  "Icon size": {
+    "$extensions": {
+      "com.figma.scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "com.figma.hiddenFromPublishing": false
+    },
+    "$type": "dimension",
+    "$value": "{Number scale.2's.20}"
+  }
+}

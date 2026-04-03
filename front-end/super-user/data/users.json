@@ -1,0 +1,6 @@
+[
+    { "id": "USR-1001", "name": "Admin Control", "email": "admin@swifttrack.com", "role": "Super User", "status": "Active", "lastLogin": "2026-03-29 10:00" },
+    { "id": "USR-1002", "name": "Jane Hub", "email": "hub1@swifttrack.com", "role": "Admin", "status": "Active", "lastLogin": "2026-03-28 14:20" },
+    { "id": "USR-1003", "name": "Mike Delivery", "email": "mike@swifttrack.com", "role": "Delivery Agent", "status": "Pending", "lastLogin": "Never" },
+    { "id": "USR-1004", "name": "Sarah Store", "email": "sarah@mystore.com", "role": "Merchant", "status": "Suspended", "lastLogin": "2026-03-20 09:15" }
+]

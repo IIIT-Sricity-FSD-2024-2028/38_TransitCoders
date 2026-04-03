@@ -1,0 +1,207 @@
+/* Reports Specific Styles — Data-Driven Charts */
+
+.graph-placeholder {
+    width: 100%;
+    min-height: 200px;
+    background-color: var(--surface-subtle);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-m);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-subtitle);
+    font-size: 0.875rem;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.3s, border-color 0.3s;
+    padding: 16px;
+}
+
+body.dark .graph-placeholder {
+    background-color: #1F2937;
+    border-color: #374151;
+}
+
+/* Donut chart overrides */
+.graph-placeholder[data-type="donut"] {
+    border-radius: 50%;
+    border: none !important;
+}
+
+/* ── Vertical Bar Charts ── */
+.report-chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    padding: 8px 0;
+}
+
+.report-bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    max-width: 72px;
+}
+
+.report-bar {
+    width: 100%;
+    max-width: 36px;
+    border-radius: 6px 6px 2px 2px;
+    transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-height: 6px;
+}
+
+.report-bar-value {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-title);
+}
+
+body.dark .report-bar-value {
+    color: #f1f5f9;
+}
+
+.report-bar-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: var(--text-subtitle);
+    text-align: center;
+    line-height: 1.2;
+    max-width: 64px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Horizontal Bar Charts ── */
+.report-h-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.report-h-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.report-h-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-body);
+    min-width: 100px;
+    text-align: right;
+}
+
+body.dark .report-h-label {
+    color: #cbd5e1;
+}
+
+.report-h-track {
+    flex: 1;
+    height: 18px;
+    background: var(--surface-subtle);
+    border-radius: 9px;
+    overflow: hidden;
+}
+
+body.dark .report-h-track {
+    background: #111827;
+}
+
+.report-h-fill {
+    height: 100%;
+    border-radius: 9px;
+    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-width: 4px;
+}
+
+.report-h-count {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-title);
+    min-width: 20px;
+}
+
+body.dark .report-h-count {
+    color: #f1f5f9;
+}
+
+body.dark .report-donut-pct {
+    color: #F9FAFB;
+}
+
+/* Add missing dark mode for reports-controls */
+body.dark .reports-controls {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+/* ── Donut Chart Inner ── */
+.report-donut-inner {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--surface-default);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+}
+
+body.dark .report-donut-inner {
+    background: #1F2937;
+}
+
+.report-donut-pct {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--clr-orange-500);
+    line-height: 1;
+}
+
+.report-donut-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-subtitle);
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ── Mini Stats Grid ── */
+.report-mini-stats {
+    display: flex;
+    gap: 24px;
+    width: 100%;
+    justify-content: center;
+}
+
+.report-mini-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.report-mini-num {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.report-mini-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-subtitle);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}

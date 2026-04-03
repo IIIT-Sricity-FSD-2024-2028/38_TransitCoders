@@ -1,0 +1,196 @@
+/* Dashboard Specific Styles — Enhanced for Admin.jpg reference */
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.kpi-card {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 247, 237, 0.86));
+    border: 1px solid rgba(249, 115, 22, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.dark .kpi-card {
+    background: linear-gradient(145deg, rgba(17, 24, 39, 0.95), rgba(31, 41, 55, 0.94));
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 26px rgba(17, 24, 39, 0.16);
+}
+
+body.dark .kpi-card:hover {
+    box-shadow: 0 16px 30px rgba(2, 6, 23, 0.5);
+}
+
+.kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-l);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color 0.3s;
+}
+
+.kpi-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.kpi-icon.blue { background-color: var(--clr-blue-50); color: var(--clr-blue-500); }
+.kpi-icon.orange { background-color: var(--clr-orange-50); color: var(--clr-orange-500); }
+.kpi-icon.red { background-color: var(--clr-red-50); color: var(--clr-red-500); }
+.kpi-icon.green { background-color: var(--clr-green-50); color: var(--clr-green-500); }
+
+body.dark .kpi-icon.blue { background-color: rgba(2, 132, 199, 0.26); color: #7dd3fc; }
+body.dark .kpi-icon.orange { background-color: rgba(249, 115, 22, 0.26); color: #fdba74; }
+body.dark .kpi-icon.red { background-color: rgba(220, 38, 38, 0.24); color: #fecaca; }
+body.dark .kpi-icon.green { background-color: rgba(22, 163, 74, 0.24); color: #86efac; }
+
+.kpi-label {
+    font-size: 0.875rem;
+    color: var(--text-subtitle);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.kpi-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.dashboard-row {
+    display: flex;
+    gap: 20px;
+}
+
+.dashboard-row.col-2 > div {
+    flex: 1;
+}
+
+.dashboard-row.col-3 > div {
+    flex: 1;
+}
+
+.section-card {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-card.stretch {
+    width: 100%;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-header h3 {
+    font-size: 1.125rem;
+    margin: 0;
+}
+
+.view-all {
+    font-size: 0.875rem;
+    color: var(--surface-brand);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.view-all:hover {
+    text-decoration: underline;
+    color: var(--clr-orange-600);
+}
+
+.infra-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.infra-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-m);
+    background-color: var(--surface-default);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+body.dark .infra-stat {
+    background: linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(31, 41, 55, 0.9));
+    border-color: #374151;
+}
+
+.infra-stat span:first-child {
+    font-size: 0.875rem;
+    color: var(--text-subtitle);
+}
+
+/* Activity Lists */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-radius: var(--radius-m);
+    border: 1px solid var(--border-default);
+    background-color: var(--surface-default);
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.activity-item:hover {
+    transform: translateX(2px);
+}
+
+body.dark .activity-item {
+    background-color: #1F2937;
+    border-color: #374151;
+}
+
+.activity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.activity-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-title);
+}
+
+.activity-meta {
+    font-size: 0.75rem;
+    color: var(--text-subtitle);
+}

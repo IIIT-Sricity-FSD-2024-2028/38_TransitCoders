@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SwiftTrack – Merchant Portal</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════ -->
+  <div class="app" id="app">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar">
+      <a href="#" class="sidebar-logo" style="text-decoration:none; cursor:pointer;" onclick="document.querySelector('[data-view=\'dashboard\']').click(); return false;">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+          </svg>
+        </div>
+        <div class="logo-name">Swift<span>Track</span></div>
+      </a>
+
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main Menu</div>
+        <div class="nav-item" data-view="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+          </svg>
+          Dashboard
+        </div>
+        <div class="nav-item" data-view="book">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Book Shipment
+        </div>
+        <div class="nav-item" data-view="orders">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          My Orders
+          <span class="nav-badge">8</span>
+        </div>
+        <div class="nav-item" data-view="track">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 8v4l3 3" />
+          </svg>
+          Track Shipment
+        </div>
+        <div class="nav-label">Reports</div>
+        <div class="nav-item" data-view="analytics">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+          Analytics Report
+        </div>
+        <div class="nav-label">Help</div>
+        <div class="nav-item" data-view="support">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          Support
+        </div>
+        <!-- Super User Only -->
+        <div class="nav-label" data-superuser-only style="display:none">System</div>
+        <div class="nav-item" data-view="admin-panel" data-superuser-only style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          Admin Panel
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-pill" onclick="handleLogout()">
+          <div class="user-avatar" id="user-avatar-text">PR</div>
+          <div class="user-info">
+            <div class="u-name" id="user-name-text">Prasanna Raja</div>
+            <div class="u-role" id="user-role-text">Merchant</div>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            style="width:14px;height:14px;color:var(--mid);margin-left:auto" title="Sign out">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+          </svg>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── MAIN ── -->
+    <div class="main">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        
+        <div class="topbar-right">
+          <!-- Theme Toggle -->
+          <div class="theme-toggle" onclick="toggleTheme()">
+            <svg id="theme-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <span id="theme-label">Light</span>
+          </div>
+
+          <!-- Search Box -->
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input placeholder="Search" id="global-search" oninput="handleGlobalSearch()" />
+          </div>
+
+          <!-- Notifications Wrap -->
+          <div class="icon-wrap">
+            <button class="icon-btn" onclick="toggleDropdown('notif-panel')" id="btn-notif">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+            </button>
+            
+            <div class="dropdown-panel" id="notif-panel">
+              <div class="dropdown-header">
+                <div class="dropdown-title">Notifications</div>
+                <div class="dropdown-action dropdown-action-orange">Mark all as read</div>
+              </div>
+              <div class="dropdown-list">
+                <div class="notif-item">
+                  <div class="notif-icon n-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                  <div class="notif-content">
+                    <div class="notif-title-row">
+                      <div class="notif-title">New order received</div>
+                      <div class="notif-time">2m ago <div class="notif-unread-dot"></div></div>
+                    </div>
+                    <div class="notif-desc">Order #LP-8842 has been successfully placed and is ready for processing.</div>
+                  </div>
+                </div>
+                <div class="notif-item">
+                  <div class="notif-icon n-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+                  <div class="notif-content">
+                    <div class="notif-title-row">
+                      <div class="notif-title">Shipment delayed</div>
+                      <div class="notif-time">45m ago <div class="notif-unread-dot"></div></div>
+                    </div>
+                      <div class="notif-desc">Transit delay for Shipment #TRK-901 due to adverse weather conditions in North Hub.</div>
+                  </div>
+                </div>
+                <div class="notif-item">
+                  <div class="notif-icon n-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                  <div class="notif-content">
+                    <div class="notif-title-row">
+                      <div class="notif-title">Support response</div>
+                      <div class="notif-time">3h ago</div>
+                    </div>
+                    <div class="notif-desc">"Our technician is currently reviewing the API documentation for your..."</div>
+                  </div>
+                </div>
+                <div class="notif-item">
+                  <div class="notif-icon n-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+                  <div class="notif-content">
+                    <div class="notif-title-row">
+                      <div class="notif-title">System maintenance</div>
+                      <div class="notif-time">Yesterday</div>
+                    </div>
+                      <div class="notif-desc">The Merchant Portal will undergo scheduled maintenance tonight at 2:00 AM IST.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="dropdown-footer">View All Notifications  ›</div>
+            </div>
+          </div>
+
+          <!-- Messages Wrap -->
+          <div class="icon-wrap">
+            <button class="icon-btn" onclick="toggleDropdown('msg-panel')" id="btn-msg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </button>
+            <div class="notif-dot"></div>
+            
+            <div class="dropdown-panel" id="msg-panel" style="width:340px">
+              <div class="dropdown-header" style="padding-bottom:12px; border-bottom:none">
+                <div>
+                  <div class="dropdown-title" style="font-size:18px">Agent Updates</div>
+                  <div class="dropdown-sub" style="margin-top:2px">COMMUNICATION HUB</div>
+                </div>
+                <div class="icon-btn" style="width:28px; height:28px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+              </div>
+              <div style="padding: 0 20px 16px"><button class="btn btn-primary" style="width:100%; border-radius:12px; padding:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> New Message</button></div>
+              <div style="display:flex; justify-content:space-between; padding:0 20px 10px; border-bottom:1px solid var(--border)">
+                <div class="dropdown-action dropdown-action-orange" style="font-size:11px">Mark all as read</div>
+                <div style="font-size:11px; color:var(--mid)">3 Unread</div>
+              </div>
+              
+              <div class="dropdown-list" style="max-height:300px">
+                <div class="msg-banner">
+                  <div>
+                    <div class="msg-banner-title">Active Deliveries</div>
+                    <div class="msg-banner-sub">3 agents need attention</div>
+                  </div>
+                  <div class="msg-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+                </div>
+                
+                <div class="msg-item">
+                  <div class="msg-avatar"><img src="images/Frame20.png"/><div class="msg-status-dot"></div></div>
+                  <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <div class="notif-title">Agent Suresh</div>
+                      <div class="notif-time" style="color:var(--orange)">2m ago</div>
+                    </div>
+                    <div class="msg-label">ORDER #ORD-7242</div>
+                    <div class="notif-desc" style="color:var(--dark4)">Package picked up. Heading to the customer location now.</div>
+                  </div>
+                </div>
+                
+                <div class="msg-item">
+                  <div class="msg-avatar"><img src="images/Frame20.png"/><div class="msg-status-dot"></div></div>
+                  <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <div class="notif-title">Agent Priya</div>
+                      <div class="notif-time" style="color:var(--orange)">15m ago</div>
+                    </div>
+                    <div class="msg-label">SHIPMENT #SHP-9102</div>
+                    <div class="notif-desc" style="color:var(--dark4)">Arrived at hub. Sorting initiated for morning delivery.</div>
+                  </div>
+                </div>
+                
+                <div class="msg-item">
+                  <div class="msg-avatar"><img src="images/Frame20.png"/></div>
+                  <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <div class="notif-title">Agent Naveen</div>
+                      <div class="notif-time">1h ago</div>
+                    </div>
+                    <div class="msg-label" style="color:var(--mid)">ORDER #ORD-6631</div>
+                    <div class="notif-desc">10 min delay due to traffic on MG Road.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="msg-input-wrap">
+                <div class="msg-input-box">
+                  <input placeholder="Type your message..." />
+                  <button class="msg-send-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Plus -->
+          <div class="icon-wrap">
+            <button class="icon-btn" onclick="navigate('book')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+
+          <!-- User Profile Wrap -->
+          <div class="icon-wrap" style="margin-left: 8px;">
+            <div class="user-profile-btn" onclick="toggleDropdown('user-panel')" id="btn-user">
+              <img src="images/Frame20.png" id="topbar-avatar" />
+            </div>
+            
+            <div class="dropdown-panel user-panel" id="user-panel">
+              <div class="user-header">
+                <div class="user-avatar-lg">
+                  <img src="images/Frame20.png" id="dropdown-avatar" />
+                </div>
+                <div class="user-name-box">
+                  <div class="user-name" id="dropdown-name">Prasanna Raja R</div>
+                  <div class="user-email" id="dropdown-email">prasannaraja@logistics.com</div>
+                </div>
+              </div>
+              <div class="user-role-badge">
+                <div class="user-role-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> MERCHANT ADMIN</div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" color="var(--mid)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </div>
+              
+              <div class="user-menu">
+                <div class="user-menu-item" onclick="toggleDropdown('profile-panel'); document.getElementById('user-panel').classList.remove('open')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <span style="flex:1">My Profile</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" color="var(--border)"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="user-menu-item" onclick="Modal.open('account-settings-modal'); toggleDropdown('user-panel')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                  <span style="flex:1">Account Settings</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" color="var(--border)"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="divider" style="margin: 4px 0"></div>
+                <div class="user-menu-item logout" onclick="handleLogout()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                  <span>Log Out</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Details Dropdown (Secondary) -->
+            <div class="dropdown-panel" id="profile-panel" style="width: 440px; padding: 0 24px 24px; max-height: calc(100vh - 80px); overflow-y: auto;">
+              <div style="text-align:center; margin-bottom: 32px; padding-top:24px;">
+                <div style="display:inline-block; width:80px; height:80px; border-radius:50%; position:relative;">
+                  <img src="images/Frame20.png" style="width:100%; height:100%; object-fit:cover;" />
+                </div>
+                <div style="font-family:'Barlow Condensed', sans-serif; font-size:26px; font-weight:800; color:var(--dark); margin-top:12px;">Prasanna Raja R</div>
+                <div style="font-size:14px; color:var(--mid); margin-top:2px;">prasannaraja@logistics.com</div>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="font-size:16px; font-weight:700; color:var(--dark3);">Personal details</h3>
+                <div style="color:var(--blue); font-weight:600; font-size:13px; cursor:pointer;" onclick="Modal.open('edit-profile-modal'); toggleDropdown('profile-panel')">Edit</div>
+              </div>
+
+              <div class="card mb24" style="background:var(--bg); border:none; padding:24px; box-shadow:none;">
+                <div class="section-grid g2" style="row-gap:20px;">
+                  <div>
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Full Name</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">Prasanna Raja R</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Date of Birth</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">August 16, 2005</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Gender</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">Male</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Nationality</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">Indian</div>
+                  </div>
+                  <div style="grid-column: 1 / -1;">
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Address</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">Chennai, Tamil Nadu - India</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Phone Number</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">+91 98765 43210</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Email</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">prasannaraja@logistics.com</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-bottom:12px;">
+                <h3 style="font-size:16px; font-weight:700; color:var(--dark3);">Account Details</h3>
+              </div>
+
+              <div class="card" style="background:#EBEBEB; border:none; padding:24px; box-shadow:none;">
+                <div class="section-grid g2" style="row-gap:20px;">
+                  <div>
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Display Name</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">prasanna_raja_merchant</div>
+                  </div>
+                  <div style="text-align:right">
+                    <div style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; background:rgba(249,115,22,.2); color:var(--orange-d); border-radius:12px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Verified
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Account Created</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">March 20, 2020</div>
+                  </div>
+                  <div style="text-align:right">
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Last Login</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">August 22, 2024</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Language</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2); display:flex; align-items:center; gap:6px;">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> English
+                    </div>
+                  </div>
+                  <div style="text-align:right">
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Time Zone</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">IST (UTC+5:30)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <div class="content">
+
+        <!-- ═══════════════════════════════════
+           DASHBOARD VIEW
+      ═══════════════════════════════════ -->
+        <div class="view" id="view-dashboard">
+          <div class="page-header">
+            <div>
+              <div class="page-heading">Dashboard</div>
+              <div class="page-sub" id="dash-welcome">Welcome back · Monday, 30 Mar 2026</div>
+            </div>
+            <button class="btn btn-primary" onclick="navigate('book')">+ New Shipment</button>
+          </div>
+
+          <!-- KPI Row -->
+          <div class="section-grid g4 mb16">
+            <div class="stat-card">
+              <div class="flex items-center gap8">
+                <div class="stat-icon-wrap" style="background:#FFF0E6">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2">
+                    <path
+                      d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z" />
+                  </svg>
+                </div>
+                <div class="stat-label">Total Shipments</div>
+              </div>
+              <div class="stat-value" id="kpi-total">—</div>
+              <div class="stat-sub stat-up">▲ 14% this month</div>
+            </div>
+            <div class="stat-card">
+              <div class="flex items-center gap8">
+                <div class="stat-icon-wrap" style="background:#D1FAE5">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div class="stat-label">Delivered</div>
+              </div>
+              <div class="stat-value" id="kpi-delivered">—</div>
+              <div class="stat-sub stat-up">▲ 8% this month</div>
+            </div>
+            <div class="stat-card">
+              <div class="flex items-center gap8">
+                <div class="stat-icon-wrap" style="background:#DBEAFE">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 8v4l3 3" />
+                  </svg>
+                </div>
+                <div class="stat-label">In Transit</div>
+              </div>
+              <div class="stat-value" id="kpi-transit">—</div>
+              <div class="stat-sub stat-up">▲ 22% this month</div>
+            </div>
+            <div class="stat-card">
+              <div class="flex items-center gap8">
+                <div class="stat-icon-wrap" style="background:#FFF0E6">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2">
+                    <line x1="12" y1="1" x2="12" y2="23" />
+                    <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                  </svg>
+                </div>
+                <div class="stat-label">Total Revenue</div>
+              </div>
+              <div class="stat-value" id="kpi-revenue">—</div>
+              <div class="stat-sub stat-up">▲ 18% this month</div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="section-grid g-dash mb16">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Shipment Volume</div>
+                <div class="flex gap8">
+                  <div class="chart-legend">
+                    <div class="legend-item">
+                      <div class="legend-dot" style="background:#F97316"></div>Delivered
+                    </div>
+                    <div class="legend-item">
+                      <div class="legend-dot" style="background:#DBEAFE;border:1px solid #93C5FD"></div>In Transit
+                    </div>
+                  </div>
+                  <select class="form-input btn-sm" style="width:100px;padding:4px 8px" onchange="if(window.Dashboard) Dashboard.updateChart(this.value)">
+                    <option value="This Week">This Week</option>
+                    <option value="This Month">This Month</option>
+                  </select>
+                </div>
+              </div>
+              <div class="bar-chart" id="bar-chart"></div>
+              <div class="flex" style="gap:0;margin-top:4px" id="bar-labels"></div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Order Status</div>
+              </div>
+              <div class="donut-wrap">
+                <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="48" fill="none" stroke="#F3F4F6" stroke-width="18" />
+                  <circle cx="60" cy="60" r="48" fill="none" stroke="#F97316" stroke-width="18"
+                    stroke-dasharray="136 166" stroke-dashoffset="0" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="48" fill="none" stroke="#3B82F6" stroke-width="18"
+                    stroke-dasharray="90 212" stroke-dashoffset="-136" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="48" fill="none" stroke="#10B981" stroke-width="18"
+                    stroke-dasharray="46 256" stroke-dashoffset="-226" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="48" fill="none" stroke="#EF4444" stroke-width="18"
+                    stroke-dasharray="30 272" stroke-dashoffset="-272" transform="rotate(-90 60 60)" />
+                  <text x="60" y="56" text-anchor="middle" font-family="Barlow Condensed" font-size="16"
+                    font-weight="700" fill="#111827">—</text>
+                  <text x="60" y="70" text-anchor="middle" font-family="Barlow" font-size="8"
+                    fill="#6B7280">TOTAL</text>
+                </svg>
+                <div class="donut-legend">
+                  <div class="donut-legend-item">
+                    <div class="donut-dot" style="background:#F97316"></div><span
+                      class="donut-lbl">Delivered</span><span class="donut-pct">45%</span>
+                  </div>
+                  <div class="donut-legend-item">
+                    <div class="donut-dot" style="background:#3B82F6"></div><span class="donut-lbl">In
+                      Transit</span><span class="donut-pct">30%</span>
+                  </div>
+                  <div class="donut-legend-item">
+                    <div class="donut-dot" style="background:#10B981"></div><span class="donut-lbl">Pending</span><span
+                      class="donut-pct">15%</span>
+                  </div>
+                  <div class="donut-legend-item">
+                    <div class="donut-dot" style="background:#EF4444"></div><span
+                      class="donut-lbl">Cancelled</span><span class="donut-pct">10%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Shipments -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Recent Shipments</div>
+              <button class="btn btn-secondary btn-sm" onclick="navigate('orders')">View All</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tracking ID</th>
+                    <th>Recipient</th>
+                    <th>Origin</th>
+                    <th>Destination</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+           BOOK SHIPMENT VIEW
+      ═══════════════════════════════════ -->
+        <div class="view" id="view-book">
+          <div class="page-header">
+            <div>
+              <div class="page-heading">Book Shipment</div>
+              <div class="page-sub">Fill in details to create a new shipment</div>
+            </div>
+          </div>
+          <div class="card" style="max-width:780px;margin:0 auto">
+            <!-- Step Bar -->
+            <div class="step-bar" id="step-bar">
+              <div class="step-item active" data-step="0">
+                <div class="step-num">1</div>Pickup
+              </div>
+              <div class="step-item" data-step="1">
+                <div class="step-num">2</div>Receiver
+              </div>
+              <div class="step-item" data-step="2">
+                <div class="step-num">3</div>Package
+              </div>
+              <div class="step-item" data-step="3">
+                <div class="step-num">4</div>Schedule
+              </div>
+              <div class="step-item" data-step="4">
+                <div class="step-num">5</div>Summary
+              </div>
+              <div class="step-item" data-step="5">
+                <div class="step-num">6</div>Confirmed
+              </div>
+            </div>
+
+            <!-- Step 0: Pickup Details -->
+            <div class="step-panel active" id="panel-0">
+              <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;color:var(--dark)">Pickup Details</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Full Name *</label>
+                  <input class="form-input" id="pickup-name" placeholder="Arjun Menon" data-validate="required|min:2" />
+                  <span class="field-error"></span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone Number *</label>
+                  <input class="form-input" id="pickup-phone" placeholder="+91 98765 43210"
+                    data-validate="required|phone" />
+                  <span class="field-error"></span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input class="form-input" id="pickup-email" placeholder="arjun.menon@example.in" type="email"
+                  data-validate="email" />
+                <span class="field-error"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Pickup Address *</label>
+                <input class="form-input" id="pickup-address" placeholder="Street address"
+                  data-validate="required|min:5" />
+                <span class="field-error"></span>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">City *</label>
+                  <input class="form-input" id="pickup-city" placeholder="Chennai" data-validate="required" />
+                  <span class="field-error"></span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">State / Province</label>
+                  <input class="form-input" id="pickup-state" placeholder="Tamil Nadu" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">ZIP Code *</label>
+                  <input class="form-input" id="pickup-zip" placeholder="600001" data-validate="required|zip" />
+                  <span class="field-error"></span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Country *</label>
+                  <select class="form-input" id="pickup-country" data-validate="required">
+                    <option>India</option>
+                    <option>Sri Lanka</option>
+                    <option>Singapore</option>
+                    <option>UAE</option>
+                  </select>
+                </div>
+              </div>
+              <div class="wizard-actions">
+                <button class="btn btn-primary" onclick="nextStep()">Next: Receiver Details →</button>
+              </div>
+            </div>
+
+            <!-- Step 1: Receiver Details -->
+            <div class="step-panel" id="panel-1">
+              <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;color:var(--dark)">Receiver Details</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Full Name *</label>
+                  <input class="form-input" id="recv-name" placeholder="Divya Iyer" data-validate="required|min:2" />
+                  <span class="field-error"></span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone Number *</label>
+                  <input class="form-input" id="recv-phone" placeholder="+91 91234 56789"
+                    data-validate="required|phone" />
+                  <span class="field-error"></span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input class="form-input" id="recv-email" placeholder="divya.iyer@example.in" type="email"
+                  data-validate="email" />
+                <span class="field-error"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Delivery Address *</label>
+                <input class="form-input" id="recv-address" placeholder="Street address"
+                  data-validate="required|min:5" />
+                <span class="field-error"></span>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">City *</label>
+                  <input class="form-input" id="recv-city" placeholder="Bengaluru" data-validate="required" />
+                  <span class="field-error"></span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">State / Province</label>
+                  <input class="form-input" id="recv-state" placeholder="Karnataka" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">ZIP Code *</label>
+                  <input class="form-input" id="recv-zip" placeholder="560001" data-validate="required|zip" />
+                  <span class="field-error"></span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Country *</label>
+                  <select class="form-input" id="recv-country" data-validate="required">
+                    <option>India</option>
+                    <option>Sri Lanka</option>
+                    <option>Singapore</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Delivery Instructions</label>
+                <textarea class="form-input" id="recv-instructions" rows="2"
+                  placeholder="Leave at door, call on arrival…"></textarea>
+              </div>
+              <div class="wizard-actions">
+                <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                <button class="btn btn-primary" onclick="nextStep()">Next: Package Details →</button>
+              </div>
+            </div>
+
+            <!-- Step 2: Package Details -->
+            <div class="step-panel" id="panel-2">
+              <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;color:var(--dark)">Package Details</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Package Type *</label>
+                  <select class="form-input" id="pkg-type" data-validate="required">
+                    <option>Box</option>
+                    <option>Envelope</option>
+                    <option>Pallet</option>
+                    <option>Tube</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Category</label>
+                  <select class="form-input" id="pkg-category">
+                    <option>Electronics</option>
+                    <option>Clothing</option>
+                    <option>Documents</option>
+                    <option>Fragile</option>
+                    <option>Food</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Weight (kg) *</label>
+                  <input class="form-input" id="pkg-weight" type="number" placeholder="0.0" min="0.1" step="0.1"
+                    data-validate="required|positiveNumber" />
+                  <span class="field-error"></span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Declared Value (₹)</label>
+                  <input class="form-input" id="pkg-value" type="number" placeholder="0.00" min="0" step="0.01"
+                    data-validate="positiveNumber" />
+                  <span class="field-error"></span>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Length (cm)</label>
+                  <input class="form-input" id="pkg-length" type="number" placeholder="0" min="1" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Width (cm)</label>
+                  <input class="form-input" id="pkg-width" type="number" placeholder="0" min="1" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Height (cm)</label>
+                  <input class="form-input" id="pkg-height" type="number" placeholder="0" min="1" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Quantity *</label>
+                  <input class="form-input" id="pkg-qty" type="number" placeholder="1" min="1"
+                    data-validate="required|positiveNumber" />
+                  <span class="field-error"></span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Package Description</label>
+                <textarea class="form-input" id="pkg-desc" rows="2" placeholder="Brief description of contents…"
+                  data-validate="max:200"></textarea>
+                <span class="field-error"></span>
+              </div>
+              <div class="wizard-actions">
+                <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                <button class="btn btn-primary" onclick="nextStep()">Next: Schedule →</button>
+              </div>
+            </div>
+
+            <!-- Step 3: Schedule -->
+            <div class="step-panel" id="panel-3">
+              <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;color:var(--dark)">Schedule Details</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Pickup Date *</label>
+                  <input class="form-input" id="pickup-date" type="date" data-validate="required" />
+                  <span class="field-error"></span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Pickup Time Slot</label>
+                  <select class="form-input" id="pickup-slot">
+                    <option>08:00 – 12:00</option>
+                    <option>12:00 – 16:00</option>
+                    <option>16:00 – 20:00</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Service Type *</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px" id="service-opts">
+                  <div class="service-opt" data-val="standard" onclick="selectService(this)">
+                    <div style="font-size:13px;font-weight:700;color:var(--dark)">Standard</div>
+                    <div style="font-size:11px;color:var(--mid)">5–7 business days</div>
+                    <div style="font-size:13px;font-weight:700;color:var(--orange);margin-top:4px">₹9.99</div>
+                  </div>
+                  <div class="service-opt active" data-val="express" onclick="selectService(this)">
+                    <div style="font-size:13px;font-weight:700;color:var(--dark)">Express</div>
+                    <div style="font-size:11px;color:var(--mid)">2–3 business days</div>
+                    <div style="font-size:13px;font-weight:700;color:var(--orange);margin-top:4px">₹19.99</div>
+                  </div>
+                  <div class="service-opt" data-val="overnight" onclick="selectService(this)">
+                    <div style="font-size:13px;font-weight:700;color:var(--dark)">Overnight</div>
+                    <div style="font-size:11px;color:var(--mid)">Next business day</div>
+                    <div style="font-size:13px;font-weight:700;color:var(--orange);margin-top:4px">₹39.99</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Special Instructions</label>
+                <textarea class="form-input" id="special-instructions" rows="2"
+                  placeholder="Fragile, temperature-sensitive, etc."></textarea>
+              </div>
+              <div class="form-group">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                  <input type="checkbox" id="insurance-check" checked style="accent-color:var(--orange)" />
+                  <span class="form-label" style="margin:0">Add insurance coverage (+₹2.50)</span>
+                </label>
+              </div>
+              <div class="wizard-actions">
+                <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                <button class="btn btn-primary" onclick="nextStep()">Review Summary →</button>
+              </div>
+            </div>
+
+            <!-- Step 4: Summary -->
+            <div class="step-panel" id="panel-4">
+              <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;color:var(--dark)">Order Summary</h3>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+                <div class="card" style="border-color:var(--border)">
+                  <div
+                    style="font-size:11px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
+                    Pickup</div>
+                  <div style="font-size:13px;font-weight:600;color:var(--dark)" id="sum-pickup-name">—</div>
+                  <div style="font-size:12px;color:var(--mid);margin-top:2px" id="sum-pickup-addr">—</div>
+                  <div style="font-size:12px;color:var(--mid)" id="sum-pickup-phone">—</div>
+                </div>
+                <div class="card" style="border-color:var(--border)">
+                  <div
+                    style="font-size:11px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
+                    Receiver</div>
+                  <div style="font-size:13px;font-weight:600;color:var(--dark)" id="sum-recv-name">—</div>
+                  <div style="font-size:12px;color:var(--mid);margin-top:2px" id="sum-recv-addr">—</div>
+                  <div style="font-size:12px;color:var(--mid)" id="sum-recv-phone">—</div>
+                </div>
+              </div>
+              <div class="card" style="border-color:var(--border);margin-bottom:14px">
+                <div
+                  style="font-size:11px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">
+                  Package &amp; Service</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+                  <div>
+                    <div style="font-size:10px;color:var(--mid)">TYPE</div>
+                    <div style="font-size:12px;font-weight:600;color:var(--dark)" id="sum-pkg-type">—</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;color:var(--mid)">WEIGHT</div>
+                    <div style="font-size:12px;font-weight:600;color:var(--dark)" id="sum-pkg-weight">—</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;color:var(--mid)">SERVICE</div>
+                    <div style="font-size:12px;font-weight:600;color:var(--dark)" id="sum-service">—</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;color:var(--mid)">PICKUP DATE</div>
+                    <div style="font-size:12px;font-weight:600;color:var(--dark)" id="sum-pickup-date">—</div>
+                  </div>
+                </div>
+              </div>
+              <div class="card" style="border-color:var(--border)">
+                <div
+                  style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+                  <span style="font-size:12px;color:var(--mid)">Base rate</span><span
+                    style="font-size:12px;font-weight:600" id="sum-base-rate">₹0.00</span></div>
+                <div
+                  style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+                  <span style="font-size:12px;color:var(--mid)">Insurance</span><span
+                    style="font-size:12px;font-weight:600" id="sum-insurance">₹0.00</span></div>
+                <div
+                  style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+                  <span style="font-size:12px;color:var(--mid)">Tax (9%)</span><span
+                    style="font-size:12px;font-weight:600" id="sum-tax">₹0.00</span></div>
+                <div style="display:flex;justify-content:space-between;padding:8px 0 0"><span
+                    style="font-size:14px;font-weight:700;color:var(--dark)">Total</span><span
+                    style="font-size:14px;font-weight:700;color:var(--orange)" id="sum-total">₹0.00</span></div>
+              </div>
+              <div class="wizard-actions">
+                <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                <button class="btn btn-primary" onclick="confirmOrder()">Confirm &amp; Pay →</button>
+              </div>
+            </div>
+
+            <!-- Step 5: Confirmed -->
+            <div class="step-panel" id="panel-5">
+              <div style="text-align:center;padding:30px 20px">
+                <div
+                  style="width:64px;height:64px;background:#D1FAE5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div
+                  style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:var(--dark);margin-bottom:6px">
+                  Shipment Booked!</div>
+                <div style="font-size:13px;color:var(--mid);margin-bottom:24px">Your shipment has been confirmed. Track
+                  it with the ID below.</div>
+                <div
+                  style="background:var(--bg);border:2px dashed var(--border);border-radius:var(--r-lg);padding:20px;margin-bottom:20px">
+                  <div
+                    style="font-size:11px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">
+                    Tracking ID</div>
+                  <div class="tracking-id" id="confirmed-tracking-id" style="font-size:22px;letter-spacing:2px">—</div>
+                  <div style="font-size:11px;color:var(--mid);margin-top:6px">Pickup scheduled for <span
+                      id="confirmed-date">—</span></div>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:center">
+                  <button class="btn btn-secondary" onclick="navigate('track')">Track Shipment</button>
+                  <button class="btn btn-primary" onclick="navigate('book');resetWizard()">+ New Shipment</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+           MY ORDERS VIEW
+      ═══════════════════════════════════ -->
+        <div class="view" id="view-orders">
+          <div class="page-header">
+            <div>
+              <div class="page-heading">My Orders</div>
+              <div class="page-sub">Manage and track your shipments</div>
+            </div>
+            <button class="btn btn-primary" onclick="navigate('book')">+ New Shipment</button>
+          </div>
+
+          <div
+            style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+            <div class="filter-strip" style="margin:0">
+              <button class="filter-btn active" onclick="Orders.setFilter('all',this)">All Orders</button>
+              <button class="filter-btn" onclick="Orders.setFilter('in-transit',this)">In Transit</button>
+              <button class="filter-btn" onclick="Orders.setFilter('delivered',this)">Delivered</button>
+              <button class="filter-btn" onclick="Orders.setFilter('pending',this)">Pending</button>
+              <button class="filter-btn" onclick="Orders.setFilter('cancelled',this)">Cancelled</button>
+            </div>
+            <div class="search-box" style="width:220px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+              <input placeholder="Search orders…" id="orders-search" />
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tracking ID</th>
+                    <th>Recipient</th>
+                    <th>Route</th>
+                    <th>Service</th>
+                    <th>Weight</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+           TRACK SHIPMENT VIEW
+      ═══════════════════════════════════ -->
+        <div class="view" id="view-track">
+          <div class="page-header">
+            <div>
+              <div class="page-heading">Track Shipment</div>
+              <div class="page-sub">Real-time shipment tracking</div>
+            </div>
+          </div>
+
+          <div class="card mb16" style="display:flex;gap:10px;align-items:flex-start">
+            <div style="flex:1">
+              <input class="form-input" id="track-input" placeholder="Enter tracking ID e.g. SWT-2026-98471"
+                data-validate="required" onkeydown="if(event.key==='Enter')Tracking.doTrack()" />
+              <span class="field-error"></span>
+            </div>
+            <button class="btn btn-primary" onclick="Tracking.doTrack()">Track Now</button>
+          </div>
+
+          <div id="track-result" style="display:none">
+            <div class="section-grid g-dash mb16">
+              <!-- Map -->
+              <div>
+                <div class="map-placeholder">
+                  <svg class="map-route-svg" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="600" height="400" fill="#e8f0e8" />
+                    <path d="M0 200 Q150 180 300 220 Q450 260 600 200" fill="none" stroke="#fff" stroke-width="14"
+                      stroke-linecap="round" />
+                    <path d="M0 200 Q150 180 300 220 Q450 260 600 200" fill="none" stroke="#d4d4aa" stroke-width="3"
+                      stroke-dasharray="6,4" />
+                    <path d="M50 300 Q200 280 350 310 Q450 330 550 320" fill="none" stroke="#fff" stroke-width="10"
+                      stroke-linecap="round" />
+                    <path d="M100 100 Q200 80 400 120 Q500 140 580 100" fill="none" stroke="#fff" stroke-width="8"
+                      stroke-linecap="round" />
+                    <rect x="120" y="150" width="60" height="40" rx="3" fill="#c8d8c8" />
+                    <rect x="350" y="120" width="50" height="35" rx="3" fill="#c8d8c8" />
+                    <rect x="450" y="230" width="40" height="30" rx="3" fill="#c8d8c8" />
+                    <!-- Animated route -->
+                    <path d="M150 280 Q250 200 320 210 Q400 220 460 160" fill="none" stroke="var(--orange)"
+                      stroke-width="3" stroke-dasharray="8,5" opacity="0.8">
+                      <animate attributeName="stroke-dashoffset" values="100;0" dur="2s" repeatCount="indefinite" />
+                    </path>
+                  </svg>
+                  <!-- Pins -->
+                  <div class="map-pin origin">
+                    <div class="map-pin-inner"></div>
+                  </div>
+                  <div class="map-pin dest">
+                    <div class="map-pin-inner"></div>
+                  </div>
+                  <div class="map-pin current">
+                    <div class="map-pin-inner"></div>
+                  </div>
+                  <div class="map-overlay">
+                    <div class="map-card">
+                      <div class="map-card-title">Shipment</div>
+                      <div class="map-card-val" id="track-tid"
+                        style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--orange)">—</div>
+                    </div>
+                    <div class="map-card">
+                      <div class="map-card-title">Status</div>
+                      <div class="map-card-val" id="track-status-badge">—</div>
+                    </div>
+                    <div class="map-card">
+                      <div class="map-card-title">From → To</div>
+                      <div style="font-size:11px;color:var(--mid)"><span id="track-from">—</span> → <span
+                          id="track-to">—</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Timeline -->
+              <div class="track-detail">
+                <div style="font-size:14px;font-weight:700;color:var(--dark);margin-bottom:6px">Recipient: <span
+                    id="track-recv" style="color:var(--orange)">—</span></div>
+                <div style="font-size:12px;color:var(--mid);margin-bottom:16px">Service: <span id="track-svc">—</span>
+                </div>
+                <div class="divider" style="margin:0 0 16px"></div>
+                <div class="timeline-track">
+                  <div class="tl-item">
+                    <div class="tl-left">
+                      <div class="tl-dot done-dot"></div>
+                      <div class="tl-line-v done-line"></div>
+                    </div>
+                    <div class="tl-content">
+                      <div class="tl-title">Order Placed</div>
+                      <div class="tl-time">Mar 28, 2026 · 09:15 AM</div>
+                    </div>
+                  </div>
+                  <div class="tl-item">
+                    <div class="tl-left">
+                      <div class="tl-dot done-dot"></div>
+                      <div class="tl-line-v done-line"></div>
+                    </div>
+                    <div class="tl-content">
+                      <div class="tl-title">Picked Up</div>
+                      <div class="tl-time">Mar 28, 2026 · 02:30 PM</div>
+                    </div>
+                  </div>
+                  <div class="tl-item">
+                    <div class="tl-left">
+                      <div class="tl-dot active-dot"></div>
+                      <div class="tl-line-v"></div>
+                    </div>
+                    <div class="tl-content">
+                      <div class="tl-title">In Transit – Bengaluru Hub</div>
+                      <div class="tl-time">Mar 29, 2026 · 08:00 AM</div>
+                    </div>
+                  </div>
+                  <div class="tl-item">
+                    <div class="tl-left">
+                      <div class="tl-dot future-dot"></div>
+                      <div class="tl-line-v"></div>
+                    </div>
+                    <div class="tl-content">
+                      <div class="tl-title" style="color:var(--mid)">Out for Delivery</div>
+                      <div class="tl-time" style="color:var(--light)">Expected Mar 31</div>
+                    </div>
+                  </div>
+                  <div class="tl-item">
+                    <div class="tl-left">
+                      <div class="tl-dot future-dot"></div>
+                    </div>
+                    <div class="tl-content">
+                      <div class="tl-title" style="color:var(--mid)">Delivered</div>
+                      <div class="tl-time" style="color:var(--light)">Expected Apr 1</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+           ANALYTICS VIEW
+      ═══════════════════════════════════ -->
+        <div class="view" id="view-analytics">
+          <div class="page-header">
+            <div>
+              <div class="page-heading">Analytics Report</div>
+              <div class="page-sub">Performance overview for your account</div>
+            </div>
+            <select class="form-input btn-sm" style="width:140px">
+              <option>Last 30 Days</option>
+              <option>Last 90 Days</option>
+              <option>This Year</option>
+            </select>
+          </div>
+
+          <div class="analytics-kpi-row">
+            <div class="kpi-card">
+              <div class="kpi-value" id="ana-total">—</div>
+              <div class="kpi-label">Total Shipments</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-value" id="ana-delivered">—</div>
+              <div class="kpi-label">Delivered</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-value" id="ana-transit">—</div>
+              <div class="kpi-label">In Transit</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-value" id="ana-revenue">—</div>
+              <div class="kpi-label">Revenue</div>
+            </div>
+          </div>
+
+          <div class="section-grid g2 mb16">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Top Routes</div>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Route</th>
+                    <th>Shipments</th>
+                    <th>On-Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="table-row">
+                    <td>Chennai → Bengaluru</td>
+                    <td>1,240</td>
+                    <td><span class="badge b-delivered">98%</span></td>
+                  </tr>
+                  <tr class="table-row">
+                    <td>Hyderabad → Visakhapatnam</td>
+                    <td>890</td>
+                    <td><span class="badge b-delivered">95%</span></td>
+                  </tr>
+                  <tr class="table-row">
+                    <td>Madurai → Chennai</td>
+                    <td>640</td>
+                    <td><span class="badge b-pending">87%</span></td>
+                  </tr>
+                  <tr class="table-row">
+                    <td>Bengaluru → Hyderabad</td>
+                    <td>520</td>
+                    <td><span class="badge b-delivered">92%</span></td>
+                  </tr>
+                  <tr class="table-row">
+                    <td>Visakhapatnam → Madurai</td>
+                    <td>410</td>
+                    <td><span class="badge b-pending">82%</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Issue Summary</div>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Issue Type</th>
+                    <th>Count</th>
+                    <th>Trend</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="table-row">
+                    <td>Weather Delays</td>
+                    <td>142</td>
+                    <td class="stat-down">▼ 5%</td>
+                  </tr>
+                  <tr class="table-row">
+                    <td>Address Issues</td>
+                    <td>87</td>
+                    <td class="stat-up">▲ 2%</td>
+                  </tr>
+                  <tr class="table-row">
+                    <td>Damaged Packages</td>
+                    <td>34</td>
+                    <td class="stat-down">▼ 12%</td>
+                  </tr>
+                  <tr class="table-row">
+                    <td>Customs Held</td>
+                    <td>22</td>
+                    <td class="stat-down">▼ 8%</td>
+                  </tr>
+                  <tr class="table-row">
+                    <td>Lost Packages</td>
+                    <td>7</td>
+                    <td class="stat-down">▼ 30%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+           SUPPORT VIEW
+      ═══════════════════════════════════ -->
+        <div class="view" id="view-support">
+          <div class="page-header">
+            <div>
+              <div class="page-heading">Support Center</div>
+              <div class="page-sub">Get help with your shipments</div>
+            </div>
+            <button class="btn btn-primary" onclick="Support.openNewTicketModal()">+ New Ticket</button>
+          </div>
+
+          <div class="support-grid mb16">
+            <div class="support-card" onclick="Modal.open('live-chat-modal')">
+              <div class="support-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                </svg></div>
+              <div class="support-card-title">Live Chat</div>
+              <div class="support-card-desc">Chat with our support team in real-time. Avg. response time: 2 minutes.
+              </div>
+              <div style="margin-top:10px"><span class="tag tag-orange">● Online Now</span></div>
+            </div>
+            <div class="support-card" onclick="showToast('Opening email form…')">
+              <div class="support-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg></div>
+              <div class="support-card-title">Email Support</div>
+              <div class="support-card-desc">Submit a detailed request. We'll respond within 24 hours.</div>
+              <div style="margin-top:10px"><span class="tag"
+                  style="background:#DBEAFE;color:#2563EB">support@swifttrack.com</span></div>
+            </div>
+            <div class="support-card" onclick="showToast('Calling support…')">
+              <div class="support-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path
+                    d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.64A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
+                </svg></div>
+              <div class="support-card-title">Phone Support</div>
+                <div class="support-card-desc">Speak to an agent directly. Available Mon–Fri, 9am–6pm IST.</div>
+                <div style="margin-top:10px"><span class="tag" style="background:#D1FAE5;color:#059669">+91 (080)
+                  4000-1234</span></div>
+            </div>
+            <div class="support-card" onclick="Modal.open('faq-modal')">
+              <div class="support-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg></div>
+              <div class="support-card-title">FAQ &amp; Help Docs</div>
+              <div class="support-card-desc">Browse common questions and step-by-step guides.</div>
+              <div style="margin-top:10px"><span class="tag" style="background:#F3F4F6;color:#6B7280">200+
+                  articles</span></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">My Support Tickets</div>
+              <div class="filter-strip" style="margin:0">
+                <button class="filter-btn active btn-sm" style="padding:4px 10px;font-size:11px"
+                  onclick="Support.filterTickets('all',this)">All</button>
+                <button class="filter-btn btn-sm" style="padding:4px 10px;font-size:11px"
+                  onclick="Support.filterTickets('open',this)">Open</button>
+                <button class="filter-btn btn-sm" style="padding:4px 10px;font-size:11px"
+                  onclick="Support.filterTickets('resolved',this)">Resolved</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ticket ID</th>
+                    <th>Subject</th>
+                    <th>Tracking ID</th>
+                    <th>Priority</th>
+                    <th>Created</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="ticket-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+           ADMIN PANEL VIEW (Super User only)
+      ═══════════════════════════════════ -->
+        <div class="view" id="view-admin-panel">
+          <div class="page-header">
+            <div>
+              <div class="page-heading">Admin Panel</div>
+              <div class="page-sub" style="color:var(--orange)">Super User Access — Full System Control</div>
+            </div>
+            <span class="badge b-processing" style="font-size:12px;padding:4px 12px">SUPER USER</span>
+          </div>
+
+          <!-- Users Table -->
+          <div class="card mb16">
+            <div class="card-header">
+              <div class="card-title">All Users</div>
+              <span style="font-size:11px;color:var(--mid)">Read-only in demo — backend integration required for user
+                management</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Company</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-table"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- All Shipments -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">All Shipments (System-wide)</div>
+              <span style="font-size:11px;color:var(--mid)">Super user can update statuses across all merchants</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tracking ID</th>
+                    <th>Recipient</th>
+                    <th>Route</th>
+                    <th>Service</th>
+                    <th>Status</th>
+                    <th>Update Status</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-all-shipments"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /content -->
+    </div><!-- /main -->
+  </div><!-- /app -->
+
+  <!-- ═══════════════════════════════════════
+     MODALS
+═══════════════════════════════════════ -->
+
+  <!-- Edit Shipment Modal -->
+  <div class="modal-overlay" id="edit-shipment-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Edit Shipment</div>
+        <button class="modal-close" onclick="Modal.close('edit-shipment-modal')">✕</button>
+      </div>
+      <div id="edit-shipment-form">
+        <input type="hidden" id="edit-ship-id" />
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Recipient Name *</label>
+            <input class="form-input" id="edit-recipient" data-validate="required|min:2" />
+            <span class="field-error"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status *</label>
+            <select class="form-input" id="edit-status" data-validate="required">
+              <option value="pending">Pending</option>
+              <option value="in-transit">In Transit</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Origin *</label>
+            <input class="form-input" id="edit-origin" data-validate="required" />
+            <span class="field-error"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Destination *</label>
+            <input class="form-input" id="edit-dest" data-validate="required" />
+            <span class="field-error"></span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Service</label>
+            <select class="form-input" id="edit-service">
+              <option>Standard</option>
+              <option>Express</option>
+              <option>Overnight</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Weight (kg) *</label>
+            <input class="form-input" id="edit-weight" type="number" step="0.1" min="0.1"
+              data-validate="required|positiveNumber" />
+            <span class="field-error"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Amount (₹) *</label>
+          <input class="form-input" id="edit-amount" type="number" step="0.01" min="0"
+            data-validate="required|positiveNumber" />
+          <span class="field-error"></span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="Modal.close('edit-shipment-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="Orders.saveEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Ticket Modal -->
+  <div class="modal-overlay" id="new-ticket-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">New Support Ticket</div>
+        <button class="modal-close" onclick="Modal.close('new-ticket-modal')">✕</button>
+      </div>
+      <form id="new-ticket-form" onsubmit="event.preventDefault();">
+        <div class="form-group">
+          <label class="form-label">Subject *</label>
+          <input class="form-input" id="ticket-subject" placeholder="Brief description of your issue"
+            data-validate="required|min:5|max:100" />
+          <span class="field-error"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Related Tracking ID</label>
+          <input class="form-input" id="ticket-shipment-id" placeholder="SWT-2026-XXXXX (optional)" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority *</label>
+          <select class="form-input" id="ticket-priority" data-validate="required">
+            <option value="low">Low</option>
+            <option value="med" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description *</label>
+          <textarea class="form-input" id="ticket-description" rows="3" placeholder="Describe your issue in detail…"
+            data-validate="required|min:10"></textarea>
+          <span class="field-error"></span>
+        </div>
+      </form>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="Modal.close('new-ticket-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="Support.submitNewTicket()">Submit Ticket</button>
+
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+     EDIT PROFILE MODAL (DUMMY)
+═══════════════════════════════════════ -->
+  <div class="modal-overlay" id="edit-profile-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Edit Personal Details</div>
+        <button class="modal-close" onclick="Modal.close('edit-profile-modal')">✕</button>
+      </div>
+      <div>
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-input" value="Prasanna Raja R" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date of Birth</label>
+          <input class="form-input" type="date" value="2005-08-16" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Address</label>
+          <input class="form-input" value="Chennai, Tamil Nadu - India" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" value="prasannaraja@logistics.com" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="Modal.close('edit-profile-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="Modal.close('edit-profile-modal'); showToast('Profile details updated successfully!', 'success')">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+     ACCOUNT SETTINGS MODAL (DUMMY)
+═══════════════════════════════════════ -->
+  <div class="modal-overlay" id="account-settings-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Account Settings</div>
+        <button class="modal-close" onclick="Modal.close('account-settings-modal')">✕</button>
+      </div>
+      <div>
+        <div class="form-group">
+          <label class="form-label">Display Name</label>
+          <input class="form-input" value="prasanna_raja_merchant" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Language</label>
+          <select class="form-input">
+            <option selected>English</option>
+            <option>Hindi</option>
+            <option>Tamil</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Time Zone</label>
+          <select class="form-input">
+            <option selected>IST (Indian Standard Time)</option>
+            <option>GMT</option>
+            <option>UTC</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="Modal.close('account-settings-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="Modal.close('account-settings-modal'); showToast('Account preferences saved.', 'success')">Save Preferences</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+     SUPPORT & FAQ MODALS (DUMMY)
+═══════════════════════════════════════ -->
+  <div class="modal-overlay" id="live-chat-modal">
+    <div class="modal" style="width: 400px;">
+      <div class="modal-header">
+        <div class="modal-title">Live Support Chat</div>
+        <button class="modal-close" onclick="Modal.close('live-chat-modal')">✕</button>
+      </div>
+      <div id="chat-history" style="height: 300px; background: #f9fafb; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; color: var(--mid); margin-top:16px;">
+        <span style="display:flex; align-items:center; gap:8px;"><span class="tag-orange" style="width:8px; height:8px; background:var(--orange); border-radius:50%; display:inline-block;"></span> Connecting to an agent...</span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <input class="form-input" id="chat-input" style="flex: 1" placeholder="Type your message..." onkeypress="Chat.handleEnter(event)" />
+        <button class="btn btn-primary" onclick="Chat.send()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="faq-modal">
+    <div class="modal" style="width: 500px">
+      <div class="modal-header">
+        <div class="modal-title">FAQ & Help Docs</div>
+        <button class="modal-close" onclick="Modal.close('faq-modal')">✕</button>
+      </div>
+      <div style="margin-bottom: 16px; margin-top:16px;">
+        <div style="display:flex; gap:8px; margin-bottom:16px;">
+          <input class="form-input" style="flex:1" placeholder="Search articles (e.g., 'refunds')..." />
+          <button class="btn btn-primary" onclick="showToast('Searching database...', 'info')">Search</button>
+        </div>
+        <div class="form-group" style="padding: 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer;" onclick="showToast('Opening article...', 'info')">
+          <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px; color:var(--dark);">How do I track my shipment?</div>
+          <div style="font-size: 12px; color: var(--mid);">Learn how to use your tracking ID to monitor packages in real-time.</div>
+        </div>
+        <div class="form-group" style="padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-top: 8px; cursor: pointer;" onclick="showToast('Opening article...', 'info')">
+          <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px; color:var(--dark);">What do I do if my package is delayed?</div>
+          <div style="font-size: 12px; color: var(--mid);">Steps to contact support or navigate delayed status indicators.</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="Modal.close('faq-modal')">Close Window</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+     CONFIRM DIALOG
+═══════════════════════════════════════ -->
+  <div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-box">
+      <div class="confirm-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+      </div>
+      <div class="confirm-title" id="confirm-title">Are you sure?</div>
+      <div class="confirm-msg" id="confirm-msg">This action cannot be undone.</div>
+      <div class="confirm-btns">
+        <button class="btn btn-secondary" id="confirm-cancel">Cancel</button>
+        <button class="btn btn-danger" id="confirm-ok">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <span class="toast-icon" id="toast-icon">✓</span>
+    <span id="toast-msg"></span>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+     SCRIPTS (load order matters)
+═══════════════════════════════════════ -->
+  <script src="../assets/js/state.js"></script>
+  <script src="../assets/js/state-compat.js"></script>
+  <script src="js/utils/validation.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/utils/ui.js"></script>
+  <script src="js/auth.js?v=5"></script>
+  <script src="js/modules/dashboard.js"></script>
+  <script src="js/modules/orders.js"></script>
+  <script src="js/modules/bookShipment.js"></script>
+  <script src="js/modules/modules.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>

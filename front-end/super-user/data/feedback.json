@@ -1,0 +1,6 @@
+[
+    { "id": "FB-001", "customer": "Zane Tech", "date": "2026-03-29", "rating": 5, "comment": "Great speed and friendly driver!", "status": "Reviewed" },
+    { "id": "FB-002", "customer": "Mark M.", "date": "2026-03-28", "rating": 2, "comment": "Box was crushed on one side.", "status": "Pending" },
+    { "id": "FB-003", "customer": "Lucy K.", "date": "2026-03-27", "rating": 4, "comment": "Good tracking UI but slightly delayed.", "status": "Pending" },
+    { "id": "FB-004", "customer": "Tim H.", "date": "2026-03-26", "rating": 1, "comment": "Driver tossed it over the fence.", "status": "Reviewed" }
+]

@@ -1,0 +1,112 @@
+/* Roles & Permissions Specific CSS — Enhanced */
+
+.full-container {
+    padding: 0;
+    overflow: hidden;
+    background-color: var(--surface-default);
+    transition: background-color 0.3s;
+}
+
+body.dark .full-container {
+    background-color: rgba(17, 24, 39, 0.8);
+}
+
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.matrix-table th, 
+.matrix-table td {
+    padding: 20px 16px;
+    border-bottom: 1px solid var(--border-default);
+}
+
+.matrix-table th {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--text-subtitle);
+    background-color: var(--surface-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+body.dark .matrix-table th {
+    background-color: #111827;
+}
+
+.matrix-table .role-col {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-title);
+    background-color: var(--surface-subtle);
+    font-size: 0.95rem;
+    width: 250px;
+}
+
+body.dark .matrix-table .role-col {
+    background-color: #111827;
+}
+
+.matrix-table tbody td {
+    border-left: 1px solid var(--border-default);
+}
+.matrix-table tbody td:first-child {
+    border-left: none;
+}
+
+/* Toggle Switch Styles */
+.switch {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background-color: var(--clr-neutral-300);
+    border-radius: var(--radius-round);
+    transition: 0.3s;
+}
+
+body.dark .slider {
+    background-color: #374151;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+    box-shadow: var(--shadow-sm);
+}
+
+.switch input:checked + .slider {
+    background-color: var(--surface-brand);
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(20px);
+}
+
+.switch input:disabled + .slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

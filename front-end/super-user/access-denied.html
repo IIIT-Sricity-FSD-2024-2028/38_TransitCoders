@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Denied | SwiftTrack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/layout.css?v=3">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--surface-subtle);
+        }
+        .denied-card {
+            background-color: var(--surface-default);
+            padding: 48px;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-premium);
+            text-align: center;
+            max-width: 480px;
+        }
+        .denied-icon {
+            color: var(--clr-red-500);
+            margin-bottom: 24px;
+        }
+        .denied-card h1 {
+            color: var(--text-title);
+            margin-bottom: 12px;
+        }
+        .denied-card p {
+            color: var(--text-subtitle);
+            margin-bottom: 32px;
+        }
+        .btn-full {
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="animate-reveal">
+    <div class="denied-card">
+        <svg class="denied-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="64" height="64"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="9" y1="12" x2="15" y2="12"></line></svg>
+        <h1>Access Denied</h1>
+        <p>You do not have the required "Super User" permissions to view this module. If you believe this is an error, contact technical support.</p>
+        <button class="btn btn-primary btn-full" onclick="window.history.back()">Go Back</button>
+    </div>
+
+    <!-- Account Settings Modal -->
+    <div class="modal-overlay" id="account-settings-modal">
+      <div class="modal-box">
+        <button class="modal-close-btn" onclick="closeAccountSettings()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div class="modal-title">Account Settings</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Email Notifications</div>
+            <div class="settings-desc">Receive email alerts for important updates</div>
+          </div>
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Push Notifications</div>
+            <div class="settings-desc">Enable browser push notifications</div>
+          </div>
+          <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Two-Factor Authentication</div>
+            <div class="settings-desc">Add an extra layer of security to your account</div>
+          </div>
+          <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Language</div>
+            <div class="settings-desc">Choose your preferred language</div>
+          </div>
+          <div class="settings-value">English</div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Time Zone</div>
+            <div class="settings-desc">Set your local time zone</div>
+          </div>
+          <div class="settings-value">IST (UTC+5:30)</div>
+        </div>
+      </div>
+    </div>
+    <script>
+      function openAccountSettings() {
+        var m = document.getElementById('account-settings-modal');
+        if (m) m.classList.add('active');
+      }
+      function closeAccountSettings() {
+        var m = document.getElementById('account-settings-modal');
+        if (m) m.classList.remove('active');
+      }
+    </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+{
+  "Input field": {
+    "radius": {
+      "$extensions": {
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ],
+        "com.figma.hiddenFromPublishing": false
+      },
+      "$type": "dimension",
+      "$value": "{Radius.M}"
+    },
+    "Spacing": {
+      "$extensions": {
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.hiddenFromPublishing": false
+      },
+      "$type": "dimension",
+      "$value": "{Number scale.2's.8}"
+    },
+    "H padding": {
+      "$extensions": {
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.hiddenFromPublishing": false
+      },
+      "$type": "dimension",
+      "$value": "{Number scale.2's.16}"
+    },
+    "V padding": {
+      "$extensions": {
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.hiddenFromPublishing": false
+      },
+      "$type": "dimension",
+      "$value": "{Number scale.2's.8}"
+    },
+    "Icon size": {
+      "$extensions": {
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ],
+        "com.figma.hiddenFromPublishing": false
+      },
+      "$type": "dimension",
+      "$value": "{Number scale.2's.24}"
+    }
+  },
+  "Checkbox": {
+    "Radius": {
+      "$extensions": {
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ],
+        "com.figma.hiddenFromPublishing": false
+      },
+      "$type": "dimension",
+      "$value": "{Radius.S}"
+    },
+    "Size": {
+      "$extensions": {
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ],
+        "com.figma.hiddenFromPublishing": false
+      },
+      "$type": "dimension",
+      "$value": "{Number scale.2's.24}"
+    },
+    "Full padding": {
+      "$extensions": {
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.hiddenFromPublishing": false
+      },
+      "$type": "dimension",
+      "$value": "{Number scale.2's.2}"
+    }
+  },
+  "Radio": {
+    "Full padding": {
+      "$extensions": {
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.hiddenFromPublishing": false
+      },
+      "$type": "dimension",
+      "$value": "{Number scale.2's.4}"
+    },
+    "Size": {
+      "$extensions": {
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ],
+        "com.figma.hiddenFromPublishing": false
+      },
+      "$type": "dimension",
+      "$value": "{Number scale.2's.24}"
+    },
+    "Radius": {
+      "$extensions": {
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ],
+        "com.figma.hiddenFromPublishing": false
+      },
+      "$type": "dimension",
+      "$value": "{Radius.FULL}"
+    }
+  }
+}

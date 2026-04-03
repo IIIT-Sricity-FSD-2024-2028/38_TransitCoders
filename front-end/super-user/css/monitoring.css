@@ -1,0 +1,45 @@
+/* Monitoring CSS — Enhanced */
+
+.service-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.service-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-m);
+    background-color: var(--surface-default);
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.service-item:hover {
+    transform: translateX(2px);
+}
+
+body.dark .service-item {
+    background-color: #1F2937;
+    border-color: #374151;
+}
+
+.service-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.service-info strong {
+    font-weight: 600;
+    color: var(--text-title);
+    font-size: 0.95rem;
+}
+
+.service-info span {
+    font-size: 0.75rem;
+    color: var(--text-subtitle);
+}
