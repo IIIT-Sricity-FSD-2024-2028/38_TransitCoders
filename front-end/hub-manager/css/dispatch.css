@@ -1,0 +1,178 @@
+/* ---- Layout Parity with Dashboard ---- */
+.hm-main {
+  flex: 1;
+  width: calc(100% - var(--hm-sidebar-w));
+}
+#page-content {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 40px;
+}
+
+/* ---- Dispatch Stats Grid ---- */
+.hm-dispatch-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-24);
+  margin-bottom: var(--space-32);
+}
+
+/* ---- Stat Card ---- */
+.hm-dstat-card {
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-l);
+  padding: var(--space-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  animation: slideUp 0.5s ease-out forwards;
+  opacity: 0;
+  transition: border-color var(--hm-transition), background-color var(--hm-transition), transform 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+.hm-dstat-card:hover {
+  border-color: var(--brand-action);
+  transform: translateY(-2px);
+}
+.hm-dstat-card:nth-child(1) { animation-delay: 0.1s; }
+.hm-dstat-card:nth-child(2) { animation-delay: 0.2s; }
+.hm-dstat-card:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hm-dstat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-s);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-8);
+}
+.hm-dstat-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
+.hm-dstat-icon.blue   { background: var(--info-surface);    color: var(--info-fill); }
+.hm-dstat-icon.orange  { background: var(--brand-surface-default); color: var(--brand-action); }
+.hm-dstat-icon.red     { background: var(--error-surface);   color: var(--error-fill); }
+
+.hm-dstat-title { font-size: 14px; font-weight: 500; color: var(--text-title); }
+.hm-dstat-val   { font-size: 28px; font-weight: 700; color: var(--text-title); }
+.hm-dstat-sub   { font-size: 12px; font-weight: 500; color: var(--text-subtitle); }
+
+/* ---- Section Header ---- */
+.hm-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-16);
+}
+.hm-section-title { font-size: 18px; font-weight: 700; color: var(--text-title); }
+.hm-section-link  { font-size: 13px; font-weight: 600; color: var(--brand-action); text-decoration: none; }
+.hm-section-link:hover { text-decoration: underline; }
+
+/* ---- Attention Order Card — FULL WIDTH ---- */
+.hm-attn-card {
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-l) var(--radius-l) 0 0;
+  padding: var(--space-32);
+  box-shadow: 0 2px 8px rgba(31, 41, 55, 0.06);
+  border-bottom: none;
+  animation: slideUp 0.4s ease-out forwards;
+  transition: border-color var(--hm-transition), background-color var(--hm-transition);
+}
+.hm-attn-card:hover { border-color: var(--border-strong); }
+
+.hm-attn-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  margin-bottom: var(--space-16);
+  flex-wrap: wrap;
+}
+.hm-attn-id { font-size: 18px; font-weight: 700; color: var(--brand-action); }
+
+.hm-pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.hm-pill-pending { background: var(--surface-disabled); color: var(--text-subtitle); border: 1px solid var(--border-strong); }
+.hm-pill-high    { background: var(--error-surface); color: var(--error-fill); border: 1px solid var(--error-border); }
+
+.hm-attn-details { font-size: 15px; font-weight: 600; color: var(--text-title); line-height: 1.7; margin-bottom: var(--space-24); }
+.hm-attn-details span { color: var(--text-subtitle); font-size: 13px; font-weight: 500; }
+
+/* ---- Timeline ---- */
+.hm-timeline { display: flex; flex-direction: column; gap: var(--space-16); margin-bottom: var(--space-24); }
+.hm-tl-row   { display: flex; align-items: flex-start; gap: var(--space-12); }
+.hm-tl-icon  { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; }
+.hm-tl-icon svg { width: 16px; height: 16px; stroke: var(--brand-action); fill: none; stroke-width: 2; }
+.hm-tl-label { font-size: 11px; font-weight: 600; color: var(--text-caption); text-transform: uppercase; letter-spacing: 0.04em; }
+.hm-tl-value { font-size: 13px; font-weight: 600; color: var(--text-title); }
+
+/* ---- Action Buttons ---- */
+.hm-attn-actions {
+  display: flex;
+  gap: var(--space-12);
+  padding-top: var(--space-24);
+  border-top: 1px solid var(--border-default);
+}
+.hm-btn-rounded {
+  padding: var(--space-8) var(--space-24);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  border: 1px solid transparent;
+  transition: all var(--hm-transition);
+}
+.hm-btn-rounded:active { transform: scale(0.96); }
+.hm-btn-rounded.primary { background: var(--brand-action); color: #fff; border-color: var(--brand-action); }
+.hm-btn-rounded.primary:hover { background: var(--brand-action-hover); box-shadow: var(--elevation-xs); }
+.hm-btn-rounded.outline { background: transparent; color: var(--text-subtitle); border-color: var(--border-strong); }
+.hm-btn-rounded.outline:hover { border-color: var(--brand-action); color: var(--brand-action); }
+
+/* ---- Map Container — FULL WIDTH ---- */
+.hm-dispatch-map {
+  margin-top: 0;
+  border-radius: 0 0 var(--radius-l) var(--radius-l);
+  border: 1px solid var(--border-default);
+  border-top: none;
+  overflow: hidden;
+  background: var(--surface-subtle);
+  display: flex; /* prevents default inline space */
+}
+.hm-dispatch-map img { 
+  width: 100%; 
+  height: auto; 
+  display: block; 
+}
+
+/* ---- Footer ---- */
+.hm-brand-footer {
+  margin-top: 64px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  border-top: 1px solid var(--border-default);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text-subtitle);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.hm-social { display: flex; gap: 16px; }
+.hm-social svg { width: 16px; height: 16px; fill: currentColor; opacity: 0.7; cursor: pointer; transition: 0.2s; }
+.hm-social svg:hover { opacity: 1; color: var(--brand-action); }
+
+/* ---- Dark ---- */
+body.dark .hm-dstat-card { background: var(--surface-subtle); border-color: var(--border-default); }
+body.dark .hm-attn-card  { background: var(--surface-subtle); border-color: var(--border-default); }

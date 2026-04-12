@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | SwiftTrack Customer</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar Navigation -->
+            <!-- ── UNIFIED SIDEBAR ── -->
+    <aside class="sidebar">
+        <a href="dashboard.html" class="sidebar-logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="white"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" /></svg>
+            </div>
+            <div class="logo-name">Swift<span>Track</span></div>
+        </a>
+        <nav class="sidebar-nav">
+
+                <a href="dashboard.html" class="nav-item active">
+                    
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg><span>Dashboard</span>
+                </a>
+                <a href="tracking.html" class="nav-item">
+                    
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg><span>Tracking</span>
+                </a>
+                <a href="orders.html" class="nav-item">
+                    
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg><span>My Orders</span>
+                </a>
+            
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="user-pill logout-btn" onclick="if(window.Auth) Auth.logout(); else { sessionStorage.clear(); localStorage.clear(); window.location.href='../index.html'; }">
+                <div class="user-avatar avatar-initials">AJ</div>
+                <div class="user-info">
+                    <span class="u-name user-name">Ajay Prakash</span>
+                    <span class="u-role user-role">Customer</span>
+                </div> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--mid);margin-left:auto" title="Sign out"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
+            </a>
+        </div>
+    </aside>
+
+        <!-- Main Content -->
+        <div class="main">
+                <!-- ── UNIFIED TOPBAR ── -->
+        <header class="topbar">
+        <div class="topbar-title" id="topbar-title">Customer Portal</div>
+        <div class="topbar-right">
+          <!-- Theme Toggle (exact Merchant) -->
+          <div class="theme-toggle" onclick="toggleTheme()">
+            <svg id="theme-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <span id="theme-label">Light</span>
+          </div>
+
+          <!-- Search Box -->
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input placeholder="Search" />
+          </div>
+
+          <!-- Notifications (exact Merchant) -->
+          <div class="icon-wrap">
+            <button class="icon-btn" onclick="toggleDropdown('notif-panel')" id="btn-notif">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+            </button>
+            <div class="dropdown-panel" id="notif-panel">
+              <div class="dropdown-header">
+                <div class="dropdown-title">Notifications</div>
+                <div class="dropdown-action dropdown-action-orange">Mark all as read</div>
+              </div>
+              <div class="dropdown-list">
+                <div class="notif-item">
+                  <div class="notif-icon n-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                  <div class="notif-content">
+                    <div class="notif-title-row">
+                      <div class="notif-title">New order received</div>
+                      <div class="notif-time">2m ago <div class="notif-unread-dot"></div></div>
+                    </div>
+                    <div class="notif-desc">Order #LP-8842 has been successfully placed and is ready for processing.</div>
+                  </div>
+                </div>
+                <div class="notif-item">
+                  <div class="notif-icon n-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+                  <div class="notif-content">
+                    <div class="notif-title-row">
+                      <div class="notif-title">Shipment delayed</div>
+                      <div class="notif-time">45m ago <div class="notif-unread-dot"></div></div>
+                    </div>
+                    <div class="notif-desc">Transit delay for Shipment #TRK-901 due to adverse weather conditions in North Hub.</div>
+                  </div>
+                </div>
+                <div class="notif-item">
+                  <div class="notif-icon n-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                  <div class="notif-content">
+                    <div class="notif-title-row">
+                      <div class="notif-title">Support response</div>
+                      <div class="notif-time">3h ago</div>
+                    </div>
+                    <div class="notif-desc">"Our technician is currently reviewing the API documentation for your..."</div>
+                  </div>
+                </div>
+                <div class="notif-item">
+                  <div class="notif-icon n-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+                  <div class="notif-content">
+                    <div class="notif-title-row">
+                      <div class="notif-title">System maintenance</div>
+                      <div class="notif-time">Yesterday</div>
+                    </div>
+                    <div class="notif-desc">The SwiftTrack Portal will undergo scheduled maintenance tonight at 2:00 AM IST.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="dropdown-footer">View All Notifications  ›</div>
+            </div>
+          </div>
+
+          <!-- User Profile (exact Merchant) -->
+          <div class="icon-wrap" style="margin-left: 8px;">
+            <div class="user-profile-btn" onclick="toggleDropdown('user-panel')" id="btn-user">
+              <div class="user-avatar avatar-initials" id="topbar-avatar-initials" style="width:100%;height:100%;border-radius:50%;background:var(--orange);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;">U</div>
+            </div>
+            <div class="dropdown-panel user-panel" id="user-panel">
+              <div class="user-header">
+                <div class="user-avatar-lg" id="dropdown-avatar-initials">U</div>
+                <div class="user-name-box">
+                  <div class="user-name" id="dropdown-name">User</div>
+                  <div class="user-email" id="dropdown-email">user@swifttrack.com</div>
+                </div>
+              </div>
+              <div class="user-role-badge">
+                <div class="user-role-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> <span id="dropdown-role-label">USER</span></div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" color="var(--mid)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </div>
+              <div class="user-menu">
+                <div class="user-menu-item" onclick="toggleDropdown('profile-panel'); document.getElementById('user-panel').classList.remove('open')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <span style="flex:1">My Profile</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" color="var(--border)"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="user-menu-item" onclick="openAccountSettings(); toggleDropdown('user-panel')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                  <span style="flex:1">Account Settings</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" color="var(--border)"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="divider" style="margin: 4px 0"></div>
+                <div class="user-menu-item logout" onclick="handleLogout()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                  <span>Log Out</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Details Dropdown (Secondary) -->
+            <div class="dropdown-panel" id="profile-panel" style="width: 440px; padding: 0 24px 24px; max-height: calc(100vh - 80px); overflow-y: auto;">
+              <div style="text-align:center; margin-bottom: 32px; padding-top:24px;">
+                <div style="display:inline-flex; width:80px; height:80px; border-radius:50%; background:var(--orange); color:#fff; font-size:28px; font-weight:800; align-items:center; justify-content:center;">
+                  <span id="profile-avatar-initials">U</span>
+                </div>
+                <div style="font-family:'Barlow Condensed','Poppins',sans-serif; font-size:26px; font-weight:800; color:var(--dark); margin-top:12px;" id="profile-name">User</div>
+                <div style="font-size:14px; color:var(--mid); margin-top:2px;" id="profile-email">user@swifttrack.com</div>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="font-size:16px; font-weight:700; color:var(--dark3);">Personal details</h3>
+              </div>
+              <div style="background:var(--bg); border:none; padding:24px; border-radius:12px; box-shadow:none;">
+                <div class="section-grid g2" style="row-gap:20px;">
+                  <div>
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Full Name</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)" id="profile-fullname">User</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Phone Number</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)" id="profile-phone">+91 98765 43210</div>
+                  </div>
+                  <div style="grid-column: 1 / -1;">
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Email</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)" id="profile-email-detail">user@swifttrack.com</div>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top:20px; margin-bottom:12px;">
+                <h3 style="font-size:16px; font-weight:700; color:var(--dark3);">Account Details</h3>
+              </div>
+              <div style="background:#EBEBEB; border:none; padding:24px; border-radius:12px; box-shadow:none;">
+                <div class="section-grid g2" style="row-gap:20px;">
+                  <div>
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Account Created</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">March 20, 2026</div>
+                  </div>
+                  <div style="text-align:right">
+                    <div style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; background:rgba(249,115,22,.2); color:var(--orange-d); border-radius:12px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Verified
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Language</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2); display:flex; align-items:center; gap:6px;">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> English
+                    </div>
+                  </div>
+                  <div style="text-align:right">
+                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Time Zone</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">IST (UTC+5:30)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+<div class="content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="header-meta">
+                    <h1>Dashboard</h1>
+                    <p>Welcome back! Here's an overview of your shipments.</p>
+                </div>
+            </header>
+
+            <!-- Live Tracking Hero -->
+            <section class="tracking-hero animate-reveal">
+                <div class="hero-status-tag">
+                    <i></i>
+                    LIVE TRACKING
+                </div>
+                <h2 class="hero-title">Order #AD345JK</h2>
+                <p class="hero-route">Chennai Central → Bengaluru Port</p>
+                
+                <div class="hero-stats">
+                    <div class="hero-stat-item">
+                        <span class="label">SPEED</span>
+                        <div class="value">60 <span class="unit">km/h</span></div>
+                    </div>
+                    <div class="hero-stat-item">
+                        <span class="label">DISTANCE</span>
+                        <div class="value text-brand">340 <span class="unit">km</span></div>
+                    </div>
+                    <div class="hero-stat-item">
+                        <span class="label">ETA</span>
+                        <div class="value">Mar 10</div>
+                    </div>
+                </div>
+
+                <div class="tracking-progress-container">
+                    <div class="progress-labels">
+                        <span>Chennai</span>
+                        <span>Karimnagar</span>
+                        <span>Bengaluru</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 32px;">
+                    <a href="tracking.html" class="btn btn-primary" style="border-radius: 50px; padding: 12px 32px;">
+                        Track Now <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="activity-section animate-reveal" style="animation-delay: 0.2s;">
+                <div class="section-header">
+                    <h2>Recent Activity</h2>
+                    <a href="#" class="view-all-link">View All</a>
+                </div>
+                
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-content">
+                            <div class="dot dot-orange"></div>
+                            <div class="activity-details">
+                                <h4>Karimnagar Checkpoint, TS</h4>
+                                <p>Currently in transit to destination</p>
+                            </div>
+                        </div>
+                        <span class="activity-time">08:45 AM</span>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-content">
+                            <div class="dot dot-orange"></div>
+                            <div class="activity-details">
+                                <h4>Chennai Hub</h4>
+                                <p>Dispatched from primary sorting</p>
+                            </div>
+                        </div>
+                        <span class="activity-time">10:30 AM</span>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-content">
+                            <div class="dot dot-white"></div>
+                            <div class="activity-details">
+                                <h4>Order #TC-2026-9012 Created</h4>
+                                <p>New shipment from Hyderabad Hub to Chennai Port</p>
+                            </div>
+                        </div>
+                        <span class="activity-time">Yesterday</span>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-content">
+                            <div class="dot dot-green"></div>
+                            <div class="activity-details">
+                                <h4>Order #TC-2026-2490 Delivered</h4>
+                                <p>Successfully delivered to Hyderabad Depot</p>
+                            </div>
+                        </div>
+                        <span class="activity-time">Mar 2</span>
+                    </div>
+                </div>
+            </section>
+        </div></div>
+    </div>
+
+    <!-- Footer Integration -->
+    <footer class="dashboard-footer">
+        <div class="footer-copyright">
+            © 2026 SwiftTrack. All rights reserved.
+        </div>
+        <div class="social-links">
+            <i class="fab fa-github"></i>
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-linkedin"></i>
+            <i class="fab fa-twitter"></i>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../assets/js/ui-global.js"></script>
+    <script src="../assets/js/state.js"></script>
+    <script src="../assets/js/state-compat.js"></script>
+    <script src="js/dashboard.js"></script>
+
+    <!-- Account Settings Modal -->
+    <div class="modal-overlay" id="account-settings-modal">
+      <div class="modal-box">
+        <button class="modal-close-btn" onclick="closeAccountSettings()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div class="modal-title">Account Settings</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Email Notifications</div>
+            <div class="settings-desc">Receive email alerts for important updates</div>
+          </div>
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Push Notifications</div>
+            <div class="settings-desc">Enable browser push notifications</div>
+          </div>
+          <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Two-Factor Authentication</div>
+            <div class="settings-desc">Add an extra layer of security to your account</div>
+          </div>
+          <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Language</div>
+            <div class="settings-desc">Choose your preferred language</div>
+          </div>
+          <div class="settings-value">English</div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Time Zone</div>
+            <div class="settings-desc">Set your local time zone</div>
+          </div>
+          <div class="settings-value">IST (UTC+5:30)</div>
+        </div>
+      </div>
+    </div>
+    <script>
+      function openAccountSettings() {
+        var m = document.getElementById('account-settings-modal');
+        if (m) m.classList.add('active');
+      }
+      function closeAccountSettings() {
+        var m = document.getElementById('account-settings-modal');
+        if (m) m.classList.remove('active');
+      }
+    </script>
+</body>
+</html>

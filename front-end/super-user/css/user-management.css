@@ -1,0 +1,178 @@
+/* User Management Table Styles — Enhanced with dark mode + Admin.jpg reference */
+
+.full-container {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+}
+
+.table-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-default);
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.search-wrap {
+    position: relative;
+    flex: 1;
+    max-width: 320px;
+}
+
+.search-wrap svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--text-subtitle);
+    pointer-events: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+.search-wrap input {
+    padding-left: 36px;
+}
+
+.filters {
+    display: flex;
+    gap: 12px;
+}
+
+.filters select {
+    width: 160px;
+}
+
+/* Data Table Container */
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.data-table th,
+.data-table td {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border-default);
+}
+
+.data-table th {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--text-subtitle);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: var(--surface-subtle);
+    position: sticky;
+    top: 0;
+}
+
+body.dark .data-table th {
+    background-color: #111827;
+}
+
+.data-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.data-table tbody tr:nth-child(odd) {
+    background-color: rgba(17, 24, 39, 0.01);
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.015);
+}
+
+body.dark .data-table tbody tr:nth-child(odd) {
+    background-color: rgba(148, 163, 184, 0.04);
+}
+
+body.dark .data-table tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.data-table tbody tr:hover {
+    background-color: rgba(249, 115, 22, 0.04);
+}
+
+body.dark .data-table tbody tr:hover {
+    background-color: rgba(249, 115, 22, 0.1);
+}
+
+.user-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--clr-blue-100);
+    color: var(--clr-blue-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+
+body.dark .user-avatar-sm {
+    background-color: rgba(2, 132, 199, 0.2);
+    color: #7dd3fc;
+}
+
+.user-name-text {
+    font-weight: 500;
+    color: var(--text-title);
+    display: block;
+}
+
+.user-id-text {
+    font-size: 0.75rem;
+    color: var(--text-subtitle);
+}
+
+.actions-col {
+    width: 140px;
+    text-align: right;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Status Badges reusing existing classes */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: var(--radius-round);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-active { background-color: var(--clr-green-50); color: var(--clr-green-700); }
+.badge-inactive { background-color: var(--clr-neutral-100); color: var(--clr-neutral-500); }
+.badge-pending { background-color: var(--clr-orange-50); color: var(--clr-orange-700); }
+.badge-suspended { background-color: var(--clr-red-50); color: var(--clr-red-700); }
+
+body.dark .badge-active { background-color: rgba(22, 163, 74, 0.15); color: #4ade80; }
+body.dark .badge-inactive { background-color: rgba(100, 116, 139, 0.15); color: #94a3b8; }
+body.dark .badge-pending { background-color: rgba(249, 115, 22, 0.15); color: #fb923c; }
+body.dark .badge-suspended { background-color: rgba(220, 38, 38, 0.15); color: #fca5a5; }

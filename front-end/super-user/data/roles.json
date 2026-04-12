@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Super User",
+        "permissions": { "manageUsers": true, "manageComplaints": true, "viewReports": true, "configureSystem": true, "manageDatabase": true }
+    },
+    {
+        "name": "Admin",
+        "permissions": { "manageUsers": true, "manageComplaints": true, "viewReports": true, "configureSystem": false, "manageDatabase": false }
+    },
+    {
+        "name": "Merchant",
+        "permissions": { "manageUsers": false, "manageComplaints": true, "viewReports": false, "configureSystem": false, "manageDatabase": false }
+    },
+    {
+        "name": "Delivery Agent",
+        "permissions": { "manageUsers": false, "manageComplaints": false, "viewReports": false, "configureSystem": false, "manageDatabase": false }
+    },
+    {
+        "name": "Customer",
+        "permissions": { "manageUsers": false, "manageComplaints": false, "viewReports": false, "configureSystem": false, "manageDatabase": false }
+    }
+]

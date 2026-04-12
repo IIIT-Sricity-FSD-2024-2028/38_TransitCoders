@@ -1,0 +1,471 @@
+/* ==========================================================================
+   Roles & Permissions Specific Styles
+   ========================================================================== */
+
+/* Page Level container */
+.roles-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    height: 100%;
+}
+
+/* Overview Config Stats */
+.roles-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.role-stat-card {
+    background: var(--bg-glass, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.role-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: rgba(255, 92, 2, 0.1);
+    color: var(--primary, #ff5c02);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.role-stat-info h3 {
+    font-size: 13px;
+    color: var(--text-muted, #6b7280);
+    margin: 0 0 4px 0;
+    font-weight: 500;
+}
+
+.role-stat-info p {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-dark, #111827);
+    margin: 0;
+}
+
+/* Toolbar */
+.roles-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.toolbar-filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-input {
+    min-width: 200px;
+    padding: 10px 14px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--bg-main, #ffffff);
+    color: var(--text-dark, #111827);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.filter-input:focus {
+    border-color: var(--primary, #ff5c02);
+    box-shadow: 0 0 0 3px rgba(255, 92, 2, 0.1);
+}
+
+.filter-select {
+    padding: 10px 36px 10px 14px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--bg-main, #ffffff) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') no-repeat right 12px center;
+    appearance: none;
+    outline: none;
+    cursor: pointer;
+}
+
+/* Two-column layout for Matrix + Sidebar */
+.roles-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .roles-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Permission Matrix */
+.matrix-container {
+    background: var(--bg-glass, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.matrix-header-scroll {
+    overflow-x: auto;
+}
+
+.permission-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+    text-align: left;
+}
+
+.permission-matrix th {
+    background: #f9fafb;
+    padding: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted, #6b7280);
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.col-perm-name {
+    width: 250px;
+    position: sticky;
+    left: 0;
+    background: #f9fafb;
+    z-index: 11;
+}
+
+/* Module Group Header */
+.module-group-header {
+    background: rgba(243, 244, 246, 0.5);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+}
+
+.module-group-header:hover {
+    background: #f3f4f6;
+}
+
+.module-group-header td {
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text-dark, #111827);
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.group-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.group-toggle-icon {
+    transition: transform 0.3s ease;
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted, #6b7280);
+}
+
+.module-group-header.collapsed .group-toggle-icon {
+    transform: rotate(-90deg);
+}
+
+/* Permission Row */
+.permission-row {
+    transition: background 0.2s;
+}
+
+.permission-row:hover {
+    background: rgba(249, 250, 251, 0.8);
+}
+
+.permission-row.hidden {
+    display: none;
+}
+
+.permission-row td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    vertical-align: middle;
+}
+
+.perm-label-cell {
+    position: sticky;
+    left: 0;
+    background: inherit;
+    z-index: 5;
+    padding-left: 40px !important;
+    font-size: 14px;
+    color: var(--text-subtitle, #374151);
+    border-right: 1px solid var(--border-color, #e5e7eb);
+}
+
+.permission-row:hover .perm-label-cell {
+    background: #f9fafb;
+}
+
+/* Custom Checkbox / Toggle */
+.permission-toggle {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.permission-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #cbd5e1;
+    transition: .3s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.permission-toggle input:checked + .toggle-slider {
+    background-color: var(--primary, #ff5c02);
+}
+
+.permission-toggle input:focus + .toggle-slider {
+    box-shadow: 0 0 1px var(--primary, #ff5c02);
+}
+
+.permission-toggle input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+}
+
+.permission-toggle input:disabled + .toggle-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Role Summary Sidebar */
+.role-summary-card {
+    background: var(--bg-glass, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 90px;
+}
+
+.role-summary-header {
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+}
+
+.tag-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(255, 92, 2, 0.1);
+    color: var(--primary, #ff5c02);
+    margin-bottom: 12px;
+}
+
+.role-summary-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-dark, #111827);
+    margin: 0 0 8px 0;
+}
+
+.role-summary-desc {
+    font-size: 13px;
+    color: var(--text-subtitle, #4b5563);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.role-summary-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.rss-item {
+    text-align: center;
+}
+
+.rss-item span {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted, #6b7280);
+    margin-bottom: 4px;
+}
+
+.rss-item strong {
+    display: block;
+    font-size: 18px;
+    color: var(--text-dark, #111827);
+}
+
+.role-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-full {
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--border-color, #d1d5db);
+    color: var(--text-dark, #374151);
+}
+
+.btn-outline:hover:not(:disabled) {
+    background: #f3f4f6;
+}
+
+/* Recent Changes List */
+.recent-changes-card {
+    background: var(--bg-glass, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 24px;
+}
+
+.recent-changes-card h3 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+}
+
+.changes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.change-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.change-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.change-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #4b5563;
+}
+
+.change-content p {
+    margin: 0 0 4px 0;
+    font-size: 13px;
+    color: var(--text-dark, #111827);
+}
+
+.change-meta {
+    font-size: 11px;
+    color: var(--text-muted, #6b7280);
+}
+
+/* ==========================================================================
+   Dark Mode Overrides
+   ========================================================================== */
+body.dark .role-stat-card,
+body.dark .filter-input,
+body.dark .filter-select,
+body.dark .matrix-container,
+body.dark .role-summary-card,
+body.dark .recent-changes-card,
+body.dark .btn-outline {
+    background: #1F2937;
+    border-color: #374151;
+    color: #F9FAFB;
+}
+
+body.dark .role-stat-info p,
+body.dark .role-summary-title,
+body.dark .rss-item strong,
+body.dark .module-group-header td,
+body.dark .change-content p {
+    color: #F9FAFB;
+}
+
+body.dark .permission-matrix th,
+body.dark .col-perm-name,
+body.dark .role-summary-stats,
+body.dark .change-icon {
+    background: #111827;
+    border-color: #374151;
+    color: #9CA3AF;
+}
+
+body.dark .permission-row td,
+body.dark .module-group-header td,
+body.dark .perm-label-cell,
+body.dark .role-summary-header,
+body.dark .change-item {
+    border-color: #374151;
+}
+
+body.dark .permission-row:hover,
+body.dark .module-group-header:hover,
+body.dark .permission-row:hover .perm-label-cell {
+    background: #374151;
+}
+
+body.dark .module-group-header {
+    background: rgba(31, 41, 55, 0.5);
+}
