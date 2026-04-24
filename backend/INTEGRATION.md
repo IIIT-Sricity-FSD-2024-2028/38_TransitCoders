@@ -110,3 +110,50 @@ import { OrderStatus, VALID_TRANSITIONS } from '../common/constants/statuses.con
 
 ## Notes for VK (UsersRepository owner)
 `src/users/users.repository.ts` is currently a stub with identical method signatures. When your authoritative implementation is ready, simply replace this file — `UsersService` and `AuthGuard` will work without any other changes.
+
+## Frontend UI Integration (New Adapter Layer)
+As part of connecting the static site logic to the NestJS APIs, a central adapter layer has been created in `front-end/js/api.js`. This allows the team to build feature UIs against real backend routes without hardcoding `fetch` everywhere.
+
+### 1. `window.API` Adapter
+All HTTP calls to the backend (`http://localhost:3001` or deployed URL) should route through the `API` object rather than raw `fetch()`. The adapter automatically injects the `x-auth-token` header if the user is authenticated. 
+
+**Example Usage in your JS logic:**
+```javascript
+// Fetch shipments (Teammate component)
+async function loadShipments() {
+  try {
+    const rawData = await window.API.shipments.getAll();
+    renderShipments(rawData);
+  } catch (error) {
+    console.error("Backend failed, falling back to mock..", error);
+  }
+}
+```
+
+### 2. How to Add Your Endpoints (`front-end/js/api.js`)
+If you build the Orders module API, you must expose it in `api.js`:
+```javascript
+  // ── Orders ──────────────────────────────────────────────────────────────
+  orders: {
+    async getAll() {
+      const res = await apiFetch('/orders');
+      return res.data;
+    },
+    async create(payload) {
+      const res = await apiFetch('/orders', { method: 'POST', body: JSON.stringify(payload) });
+      return res.data;
+    }
+  },
+```
+
+### 3. File Inclusion Setup
+Ensure the updated script block operates in all of your HTML files so auth logic connects dynamically:
+
+```html
+    <!-- Insert before ui-global.js or your custom logic scripts -->
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../assets/js/ui-global.js"></script>
+```
+
+Testing Note: The `window.API.auth` controller natively uses `/auth/login` and handles storing session payload on success. It gracefully falls back to `MockDB` / `StorageAPI` if the backend port isn't accessible, letting frontend developers still preview views standalone.

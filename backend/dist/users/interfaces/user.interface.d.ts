@@ -13,3 +13,4 @@ export interface IUser {
     createdAt: Date;
     updatedAt: Date;
 }
+export type ISafeUser = Omit<IUser, 'password' | 'authToken'>;

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { ComplaintsModule } from './complaints/complaints.module';
@@ -18,7 +19,7 @@ import { SeedModule } from './seed/seed.module';
  */
 @Module({
   imports: [
-    // SM-owned modules
+    AuthModule,
     UsersModule,
     TicketsModule,
     ComplaintsModule,

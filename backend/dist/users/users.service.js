@@ -51,14 +51,18 @@ let UsersService = class UsersService {
     constructor(usersRepository) {
         this.usersRepository = usersRepository;
     }
+    sanitize(user) {
+        const { password: _pw, authToken: _t, ...safe } = user;
+        return safe;
+    }
     findAll() {
-        return this.usersRepository.findAll();
+        return this.usersRepository.findAll().map(u => this.sanitize(u));
     }
     findById(id) {
         const user = this.usersRepository.findById(id);
         if (!user)
             throw new common_1.NotFoundException('User not found');
-        return user;
+        return this.sanitize(user);
     }
     async create(dto) {
         const existing = this.usersRepository.findByEmail(dto.email);
@@ -66,11 +70,11 @@ let UsersService = class UsersService {
             throw new common_1.ConflictException('Email is already registered');
         }
         const hashedPassword = await bcrypt.hash(dto.password, 10);
-        return this.usersRepository.create({
+        return this.sanitize(this.usersRepository.create({
             ...dto,
             password: hashedPassword,
             isActive: false,
-        });
+        }));
     }
     async update(id, dto) {
         this.findById(id);
@@ -78,7 +82,7 @@ let UsersService = class UsersService {
         if (dto.password) {
             changes.password = await bcrypt.hash(dto.password, 10);
         }
-        return this.usersRepository.update(id, changes);
+        return this.sanitize(this.usersRepository.update(id, changes));
     }
     delete(id, requesterId) {
         if (id === requesterId) {
@@ -88,11 +92,13 @@ let UsersService = class UsersService {
         this.usersRepository.delete(id);
     }
     approve(id) {
-        const user = this.findById(id);
+        const user = this.usersRepository.findById(id);
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
         if (user.isActive) {
             throw new common_1.BadRequestException('User is already active');
         }
-        return this.usersRepository.update(id, { isActive: true });
+        return this.sanitize(this.usersRepository.update(id, { isActive: true }));
     }
 };
 exports.UsersService = UsersService;

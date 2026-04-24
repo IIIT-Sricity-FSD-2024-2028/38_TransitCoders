@@ -71,13 +71,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ── Load & Render Users ────────────────────────────────────────────
-    function renderTable() {
-        const users   = StorageAPI.getUsers();
+    async function loadAndRender() {
+        let users = [];
+        try {
+            users = await window.API.users.getAll();
+            // Normalize backend shape → table shape
+            users = users.map(u => ({
+                id: u.id,
+                name: u.name,
+                email: u.email,
+                role: u.role,
+                status: u.isActive ? 'Active' : 'Pending',
+                lastLogin: '—',
+                password: '***',
+                _raw: u,
+            }));
+        } catch (_) {
+            users = StorageAPI?.getUsers?.() || [];
+        }
+        renderTable(users);
+    }
+
+    function renderTable(users) {
         const search  = searchInput.value.toLowerCase();
         const fRole   = roleFilter.value;
         const fStatus = statusFilter.value;
 
-        // Normalise role for filter comparison
         const normaliseRole = (r) => {
             r = (r || '').toLowerCase();
             if (r === 'hub_manager' || r === 'hub manager') return 'hub manager';
@@ -89,8 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const matchesSearch  = u.name.toLowerCase().includes(search) ||
                                    u.email.toLowerCase().includes(search) ||
                                    (u.id || '').toLowerCase().includes(search);
-            const matchesRole    = fRole === "All" ||
-                                   normaliseRole(u.role) === fRole.toLowerCase();
+            const matchesRole    = fRole === "All" || normaliseRole(u.role) === fRole.toLowerCase();
             const matchesStatus  = fStatus === "All" || u.status === fStatus;
             return matchesSearch && matchesRole && matchesStatus;
         });
@@ -131,15 +149,20 @@ document.addEventListener("DOMContentLoaded", () => {
         : `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-subtitle)">No users found.</td></tr>`;
 
         document.querySelectorAll('.approve-btn').forEach(b => b.addEventListener('click', e => approveUser(e.currentTarget.dataset.id)));
-        document.querySelectorAll('.edit-btn').forEach(b => b.addEventListener('click', e => openEditModal(e.currentTarget.dataset.id)));
+        document.querySelectorAll('.edit-btn').forEach(b => b.addEventListener('click', e => openEditModal(e.currentTarget.dataset.id, users)));
         document.querySelectorAll('.delete-btn').forEach(b => b.addEventListener('click', e => deleteUser(e.currentTarget.dataset.id)));
     }
 
-    function approveUser(id) {
-        StorageAPI.updateUser(id, { status: 'Active' });
-        if (typeof window.showToast === 'function') window.showToast('User approved successfully!', 'success');
-        renderTable();
+    async function approveUser(id) {
+        try {
+            await window.API.users.approve(id);
+        } catch (_) {
+            StorageAPI?.updateUser?.(id, { status: 'Active' });
+        }
+        if (typeof window.showToast === 'function') window.showToast('User approved!', 'success');
+        loadAndRender();
     }
+
 
     // ── Modal Helpers ──────────────────────────────────────────────────
     function openModal() {
@@ -179,10 +202,14 @@ document.addEventListener("DOMContentLoaded", () => {
         openModal();
     }
 
-    function deleteUser(id) {
+    async function deleteUser(id) {
         if (confirm(`Are you sure you want to delete user ${id}?`)) {
-            StorageAPI.deleteUser(id);
-            renderTable();
+            try {
+                await window.API.users.delete(id);
+            } catch (_) {
+                StorageAPI?.deleteUser?.(id);
+            }
+            loadAndRender();
         }
     }
 
@@ -236,9 +263,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ── Event Listeners ────────────────────────────────────────────────
-    searchInput.addEventListener("input", renderTable);
-    roleFilter.addEventListener("change", renderTable);
-    statusFilter.addEventListener("change", renderTable);
+    searchInput.addEventListener("input", loadAndRender);
+    roleFilter.addEventListener("change", loadAndRender);
+    statusFilter.addEventListener("change", loadAndRender);
 
     openAddUserModalBtn.addEventListener('click', () => {
         isEditing = false;
@@ -318,7 +345,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ── Initial Render ─────────────────────────────────────────────────
-    renderTable();
+    loadAndRender();
 
-    window.addEventListener('appStateChanged', renderTable);
+    window.addEventListener('appStateChanged', loadAndRender);
 });

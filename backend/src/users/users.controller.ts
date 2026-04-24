@@ -24,7 +24,7 @@ import type { IApiResponse } from '../common/interfaces/api-response.interface';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import type { IUser } from './interfaces/user.interface';
+import type { IUser, ISafeUser } from './interfaces/user.interface';
 
 // ODDT-247 — Build controller routes
 @ApiTags('Users')
@@ -38,7 +38,7 @@ export class UsersController {
   @Roles(Role.SUPER_USER, Role.HUB_MANAGER)
   @ApiOperation({ summary: 'List all users' })
   @ApiResponse({ status: 200, description: 'Returns all users' })
-  findAll(): IApiResponse<IUser[]> {
+  findAll(): IApiResponse<ISafeUser[]> {
     return { success: true, data: this.usersService.findAll() };
   }
 
@@ -46,7 +46,7 @@ export class UsersController {
   @Roles(Role.SUPER_USER, Role.HUB_MANAGER)
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  findById(@Param('id') id: string): IApiResponse<IUser> {
+  findById(@Param('id') id: string): IApiResponse<ISafeUser> {
     return { success: true, data: this.usersService.findById(id) };
   }
 
@@ -54,7 +54,7 @@ export class UsersController {
   @Roles(Role.SUPER_USER, Role.HUB_MANAGER)
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({ status: 409, description: 'Email already registered' })
-  async create(@Body() dto: CreateUserDto): Promise<IApiResponse<IUser>> {
+  async create(@Body() dto: CreateUserDto): Promise<IApiResponse<ISafeUser>> {
     return { success: true, data: await this.usersService.create(dto) };
   }
 
@@ -64,7 +64,7 @@ export class UsersController {
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateUserDto,
-  ): Promise<IApiResponse<IUser>> {
+  ): Promise<IApiResponse<ISafeUser>> {
     return { success: true, data: await this.usersService.update(id, dto) };
   }
 
@@ -84,7 +84,7 @@ export class UsersController {
   @Roles(Role.SUPER_USER, Role.HUB_MANAGER)
   @ApiOperation({ summary: 'Approve a pending user account' })
   @ApiResponse({ status: 400, description: 'User is already active' })
-  approve(@Param('id') id: string): IApiResponse<IUser> {
+  approve(@Param('id') id: string): IApiResponse<ISafeUser> {
     return { success: true, data: this.usersService.approve(id) };
   }
 }
