@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UsersRepository } from '../users/users.repository';
 import { RolesRepository } from '../roles/roles.repository';
+import { AgentsRepository } from '../agents/agents.repository';
 
 /**
  * SeedService — ODDT-315
@@ -17,6 +18,7 @@ export class SeedService implements OnModuleInit {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly rolesRepository: RolesRepository,
+    private readonly agentsRepository: AgentsRepository,
   ) {}
 
   async onModuleInit() {
@@ -264,7 +266,19 @@ export class SeedService implements OnModuleInit {
       },
     ];
 
-    users.forEach((u) => this.usersRepository.create(u as any));
+    const createdUsers = users.map((u) => this.usersRepository.create(u as any));
+    
+    createdUsers.forEach(u => {
+      if (u.role === 'delivery_agent') {
+        this.agentsRepository.create({
+          userId: u.id,
+          hubId: u.hubId,
+          availabilityStatus: 'Available',
+          currentTasksCount: 0
+        });
+      }
+    });
+
     console.log('✅ Seeded 9 users');
   }
 }

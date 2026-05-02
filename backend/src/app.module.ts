@@ -6,6 +6,8 @@ import { ComplaintsModule } from './complaints/complaints.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { RolesModule } from './roles/roles.module';
 import { SeedModule } from './seed/seed.module';
+import { OrdersModule } from './orders/orders.module';
+import { AgentsModule } from './agents/agents.module';
 
 /**
  * AppModule — Root module wiring all SM-owned feature modules.
@@ -26,8 +28,9 @@ import { SeedModule } from './seed/seed.module';
     FeedbackModule,
     RolesModule,
     SeedModule,
-    // TODO: Add AuthModule, OrdersModule, ShipmentsModule, HubsModule, AgentsModule
-    // when those branches are merged. Module stubs can be added as needed.
+    OrdersModule,
+    AgentsModule,
+    // TODO: Add ShipmentsModule, HubsModule when those branches are merged.
   ],
 })
 export class AppModule {}
