@@ -19,11 +19,14 @@ export class ShipmentsService {
     if (user.role === Role.MERCHANT) {
       return this.shipmentsRepository.findByMerchant(user.id);
     }
-    return this.shipmentsRepository.findAll();
+    if (user.role === Role.SUPER_USER || user.role === Role.HUB_MANAGER) {
+      return this.shipmentsRepository.findAll();
+    }
+    throw new ForbiddenException('You do not have permission to view shipments');
   }
 
   findById(id: string): IShipment {
-    const shipment = this.shipmentsRepository.findById(id);
+    const shipment = this.shipmentsRepository.findById(id) ?? this.shipmentsRepository.findByShipmentId(id);
     if (!shipment) throw new NotFoundException(`Shipment ${id} not found`);
     return shipment;
   }
@@ -46,6 +49,7 @@ export class ShipmentsService {
     return this.shipmentsRepository.create({
       shipmentId,
       merchantId,
+      recipient: dto.recipient,
       originHubId: dto.originHubId,
       destinationHubId: dto.destinationHubId,
       serviceType: dto.serviceType,
@@ -68,7 +72,21 @@ export class ShipmentsService {
     if (shipment.merchantId !== user.id && user.role !== Role.SUPER_USER) {
       throw new ForbiddenException('You do not have permission to update this shipment');
     }
-    return this.shipmentsRepository.update(id, dto)!;
+
+    let amount = shipment.amount;
+    if (dto.weight !== undefined || dto.serviceType !== undefined) {
+      const rateMap: Record<string, number> = {
+        standard: 50,
+        express: 100,
+        'same-day': 200,
+      };
+      const serviceType = dto.serviceType ?? shipment.serviceType;
+      const weight = dto.weight ?? shipment.weight;
+      const rate = rateMap[serviceType] ?? 50;
+      amount = Math.max(weight * rate, 100);
+    }
+
+    return this.shipmentsRepository.update(shipment.id, { ...dto, amount })!;
   }
 
   cancel(id: string, user: IUser): IShipment {
@@ -79,7 +97,7 @@ export class ShipmentsService {
     if (!['pending', 'processing'].includes(shipment.status)) {
       throw new BadRequestException(`Cannot cancel a shipment with status "${shipment.status}"`);
     }
-    return this.shipmentsRepository.update(id, { status: 'cancelled' })!;
+    return this.shipmentsRepository.update(shipment.id, { status: 'cancelled' })!;
   }
 
   getTracking(id: string): IShipment['trackingTimeline'] {

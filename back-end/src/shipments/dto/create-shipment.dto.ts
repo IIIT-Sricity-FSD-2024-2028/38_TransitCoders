@@ -2,6 +2,11 @@ import { IsString, IsNotEmpty, IsOptional, IsNumber, IsEnum, Min } from 'class-v
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateShipmentDto {
+  @ApiProperty({ required: false, description: 'Name of the recipient' })
+  @IsString()
+  @IsOptional()
+  recipient?: string;
+
   @ApiProperty() @IsString() @IsNotEmpty()
   originHubId: string;
 

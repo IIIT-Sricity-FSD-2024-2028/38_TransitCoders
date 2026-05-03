@@ -1187,6 +1187,46 @@
         ]
       }
     },
+    "/hubs/{id}/agents": {
+      "get": {
+        "operationId": "HubsController_getAgentsForHub",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Agents retrieved for hub"
+          },
+          "404": {
+            "description": "Hub not found"
+          }
+        },
+        "security": [
+          {
+            "x-auth-token": []
+          }
+        ],
+        "summary": "List delivery agents for a specific hub",
+        "tags": [
+          "Hubs"
+        ]
+      }
+    },
     "/hubs/{id}": {
       "get": {
         "operationId": "HubsController_findOne",
@@ -1269,7 +1309,7 @@
             "x-auth-token": []
           }
         ],
-        "summary": "Update hub",
+        "summary": "Update hub (Super User only)",
         "tags": [
           "Hubs"
         ]
@@ -1385,9 +1425,9 @@
         ]
       }
     },
-    "/shipments/{id}/track": {
+    "/shipments/{id}": {
       "get": {
-        "operationId": "ShipmentsController_getTracking",
+        "operationId": "ShipmentsController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -1408,7 +1448,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Tracking timeline"
+            "description": "Shipment found"
           },
           "404": {
             "description": "Shipment not found"
@@ -1419,13 +1459,11 @@
             "x-auth-token": []
           }
         ],
-        "summary": "Get tracking timeline for a shipment",
+        "summary": "Get shipment by ID",
         "tags": [
           "Shipments"
         ]
-      }
-    },
-    "/shipments/{id}": {
+      },
       "put": {
         "operationId": "ShipmentsController_update",
         "parameters": [
@@ -1514,6 +1552,46 @@
           }
         ],
         "summary": "Delete a shipment (Super User only)",
+        "tags": [
+          "Shipments"
+        ]
+      }
+    },
+    "/shipments/{id}/track": {
+      "get": {
+        "operationId": "ShipmentsController_getTracking",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tracking timeline"
+          },
+          "404": {
+            "description": "Shipment not found"
+          }
+        },
+        "security": [
+          {
+            "x-auth-token": []
+          }
+        ],
+        "summary": "Get tracking timeline for a shipment",
         "tags": [
           "Shipments"
         ]
@@ -1896,6 +1974,10 @@
       "CreateShipmentDto": {
         "type": "object",
         "properties": {
+          "recipient": {
+            "type": "string",
+            "description": "Name of the recipient"
+          },
           "originHubId": {
             "type": "string"
           },

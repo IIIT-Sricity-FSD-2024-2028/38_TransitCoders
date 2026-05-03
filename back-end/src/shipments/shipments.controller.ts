@@ -43,6 +43,15 @@ export class ShipmentsController {
     return { success: true, data: this.shipmentsService.findAll(user) };
   }
 
+  @Get(':id')
+  @ApiOperation({ summary: 'Get shipment by ID' })
+  @ApiHeader({ name: 'x-auth-token', required: true })
+  @ApiResponse({ status: 200, description: 'Shipment found' })
+  @ApiResponse({ status: 404, description: 'Shipment not found' })
+  findOne(@Param('id') id: string): IApiResponse<IShipment> {
+    return { success: true, data: this.shipmentsService.findById(id) };
+  }
+
   @Get(':id/track')
   @ApiOperation({ summary: 'Get tracking timeline for a shipment' })
   @ApiHeader({ name: 'x-auth-token', required: true })

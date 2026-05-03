@@ -15,6 +15,10 @@ export class ShipmentsRepository {
     return this.shipments.get(id);
   }
 
+  findByShipmentId(shipmentId: string): IShipment | undefined {
+    return Array.from(this.shipments.values()).find(s => s.shipmentId === shipmentId);
+  }
+
   findByMerchant(merchantId: string): IShipment[] {
     return this.findAll().filter(s => s.merchantId === merchantId);
   }

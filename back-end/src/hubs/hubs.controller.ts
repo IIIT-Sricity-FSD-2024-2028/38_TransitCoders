@@ -39,6 +39,17 @@ export class HubsController {
     return { success: true, data: this.hubsService.findAll() };
   }
 
+  @Get(':id/agents')
+  @UseGuards(RolesGuard)
+  @Roles(Role.HUB_MANAGER, Role.SUPER_USER)
+  @ApiOperation({ summary: 'List delivery agents for a specific hub' })
+  @ApiHeader({ name: 'x-auth-token', required: true })
+  @ApiResponse({ status: 200, description: 'Agents retrieved for hub' })
+  @ApiResponse({ status: 404, description: 'Hub not found' })
+  getAgentsForHub(@Param('id') id: string) {
+    return { success: true, data: this.hubsService.getAgentsForHub(id) };
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get hub by ID or hubId (e.g. H001)' })
   @ApiHeader({ name: 'x-auth-token', required: true })
@@ -62,8 +73,8 @@ export class HubsController {
 
   @Put(':id')
   @UseGuards(RolesGuard)
-  @Roles(Role.SUPER_USER, Role.HUB_MANAGER)
-  @ApiOperation({ summary: 'Update hub' })
+  @Roles(Role.SUPER_USER)
+  @ApiOperation({ summary: 'Update hub (Super User only)' })
   @ApiHeader({ name: 'x-auth-token', required: true })
   @ApiBody({ type: UpdateHubDto })
   @ApiResponse({ status: 200, description: 'Hub updated' })
@@ -85,3 +96,4 @@ export class HubsController {
     return { success: true, message: 'Hub deleted' };
   }
 }
+
