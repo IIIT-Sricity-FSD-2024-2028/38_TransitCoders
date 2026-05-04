@@ -414,7 +414,17 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ComplaintResponseDto"
+                  }
+                }
+              }
+            }
           }
         },
         "summary": "List complaints (customer sees own, super_user sees all)",
@@ -512,7 +522,17 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FeedbackResponseDto"
+                  }
+                }
+              }
+            }
           }
         },
         "summary": "List feedback (customer sees own, super_user sees all)",
@@ -1819,6 +1839,53 @@
           }
         }
       },
+      "ComplaintResponseDto": {
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string",
+            "example": "cmp-0001"
+          },
+          "id": {
+            "type": "string",
+            "example": "42099a94-8c60-4f94-b408-908238188aa5"
+          },
+          "customerName": {
+            "type": "string",
+            "example": "Priya Iyer"
+          },
+          "orderId": {
+            "type": "string",
+            "example": "ORD-2024-0006"
+          },
+          "description": {
+            "type": "string",
+            "example": "Ordered Sony headphones but received wrong brand."
+          },
+          "status": {
+            "type": "string",
+            "example": "In Progress"
+          },
+          "createdAt": {
+            "type": "object",
+            "example": "May 5"
+          },
+          "updatedAt": {
+            "type": "object",
+            "example": "May 6"
+          }
+        },
+        "required": [
+          "reference",
+          "id",
+          "customerName",
+          "orderId",
+          "description",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "CreateComplaintDto": {
         "type": "object",
         "properties": {
@@ -1847,6 +1914,48 @@
             ]
           }
         }
+      },
+      "FeedbackResponseDto": {
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string",
+            "example": "fbk-0001"
+          },
+          "id": {
+            "type": "string",
+            "example": "8f3b2a1d-9c4a-4a7c-9d3c-1b2a3c4d5e6f"
+          },
+          "customerName": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4
+          },
+          "comment": {
+            "type": "string",
+            "example": "Delivery was fast and courteous."
+          },
+          "status": {
+            "type": "string",
+            "example": "New"
+          },
+          "createdAt": {
+            "type": "object",
+            "example": "May 5"
+          }
+        },
+        "required": [
+          "reference",
+          "id",
+          "customerName",
+          "rating",
+          "comment",
+          "status",
+          "createdAt"
+        ]
       },
       "CreateFeedbackDto": {
         "type": "object",

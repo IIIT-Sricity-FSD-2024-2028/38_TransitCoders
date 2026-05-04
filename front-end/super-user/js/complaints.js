@@ -11,24 +11,52 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let complaints = [];
 
-  // Load from backend, fall back to StorageAPI
+  function getUsersById() {
+    const users = window.AppState?.getState?.().users || [];
+    return new Map(users.map((user) => [user.user_id || user.id, user]));
+  }
+
+  function buildReference(prefix, index) {
+    return `${prefix}-${String(index + 1).padStart(4, "0")}`;
+  }
+
+  // Load from backend and local Storage; merge and normalize so UI never shows literal 'undefined'
   async function loadComplaints() {
+    const usersById = getUsersById();
+    const safe = (v, fallback) => {
+      if (v === undefined || v === null) return fallback;
+      if (typeof v === 'string' && v.trim().toLowerCase() === 'undefined') return fallback;
+      return v;
+    };
+
+    // Try backend first; if backend is reachable use it, but always merge local Storage entries
+    let backendList = [];
     try {
-      complaints = await window.API.complaints.getAll();
-      // Normalize backend shape → table shape
-      complaints = complaints.map(c => ({
-        id: c.id,
-        customer: c.userId || 'Customer',
-        type: c.description || '—',
-        priority: 'Medium',  // backend doesn't have priority on complaints
-        status: c.status || 'Open',
-        date: new Date(c.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric' }),
-        _raw: c,
-      }));
-    } catch (_) {
-      // fallback
-      complaints = (StorageAPI?.getComplaints?.() || []);
+      backendList = await window.API.complaints.getAll() || [];
+    } catch (e) {
+      backendList = [];
     }
+
+    // Local stored complaints (may include newly created ones when offline)
+    const localList = (StorageAPI?.getComplaints?.() || []);
+
+    // Merge, preferring backend entries, dedupe by id
+    const merged = [...backendList];
+    for (const l of localList) {
+      if (!merged.find(b => b && (b.id === l.id || b.id === l._id))) merged.push(l);
+    }
+
+    // Normalize merged shape → table shape
+    complaints = merged.map((c, index) => ({
+      id: safe(c.id || c._id, 'CMP-' + Date.now().toString().slice(-6)),
+      reference: safe(c.reference, buildReference('CMP', index)),
+      customer: safe(c.customerName, safe(c.customer, usersById.get(c.userId)?.name || c.userId || 'Customer')),
+      type: safe(c.description, c.type || '—'),
+      priority: safe(c.priority, 'Medium'),
+      status: safe(c.status, 'Open'),
+      date: c.date ? new Date(c.date).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : (c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : ''),
+      _raw: c,
+    }));
   }
 
   function renderTable() {
@@ -37,7 +65,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const fStatus   = statusFilter.value;
 
     const filtered = complaints.filter(c => {
-      const matchSearch   = c.id.toLowerCase().includes(search) ||
+      const matchSearch   = c.reference.toLowerCase().includes(search) ||
+                            c.id.toLowerCase().includes(search) ||
                             (c.customer || '').toLowerCase().includes(search) ||
                             (c.type || '').toLowerCase().includes(search);
       const matchPriority = fPriority === "All" || c.priority === fPriority;
@@ -47,7 +76,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     tableBody.innerHTML = filtered.length > 0 ? filtered.map(c => `
       <tr>
-        <td><span class="user-name-text">${c.id}</span></td>
+        <td><span class="user-name-text">${c.reference || ''}</span><span class="user-id-text">${c.id || ''}</span></td>
         <td>
           <span class="user-name-text">${c.customer}</span>
           <span class="user-id-text">${c.date || ''}</span>

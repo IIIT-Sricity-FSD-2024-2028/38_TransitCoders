@@ -15,6 +15,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Role } from '../common/constants/roles.constant';
 import type { IApiResponse } from '../common/interfaces/api-response.interface';
 import { FeedbackService } from './feedback.service';
+import { FeedbackResponseDto } from './dto/feedback-response.dto';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import type { IFeedback } from './interfaces/feedback.interface';
@@ -31,7 +32,8 @@ export class FeedbackController {
   @Get()
   @Roles(Role.CUSTOMER, Role.SUPER_USER)
   @ApiOperation({ summary: 'List feedback (customer sees own, super_user sees all)' })
-  findAll(@CurrentUser() user: IUser): IApiResponse<IFeedback[]> {
+  @ApiResponse({ status: 200, type: [FeedbackResponseDto] })
+  findAll(@CurrentUser() user: IUser): IApiResponse<FeedbackResponseDto[]> {
     return { success: true, data: this.feedbackService.findAll(user) };
   }
 
@@ -42,7 +44,7 @@ export class FeedbackController {
   create(
     @Body() dto: CreateFeedbackDto,
     @CurrentUser() user: IUser,
-  ): IApiResponse<IFeedback> {
+  ): IApiResponse<FeedbackResponseDto> {
     return { success: true, data: this.feedbackService.create(dto, user) };
   }
 
@@ -53,7 +55,7 @@ export class FeedbackController {
     @Param('id') id: string,
     @Body() dto: UpdateFeedbackDto,
     @CurrentUser() user: IUser,
-  ): IApiResponse<IFeedback> {
+  ): IApiResponse<FeedbackResponseDto> {
     return { success: true, data: this.feedbackService.update(id, dto, user) };
   }
 }

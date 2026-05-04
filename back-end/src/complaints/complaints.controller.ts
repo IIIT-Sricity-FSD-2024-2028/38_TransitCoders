@@ -15,6 +15,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Role } from '../common/constants/roles.constant';
 import type { IApiResponse } from '../common/interfaces/api-response.interface';
 import { ComplaintsService } from './complaints.service';
+import { ComplaintResponseDto } from './dto/complaint-response.dto';
 import { CreateComplaintDto } from './dto/create-complaint.dto';
 import { UpdateComplaintDto } from './dto/update-complaint.dto';
 import type { IComplaint } from './interfaces/complaint.interface';
@@ -31,7 +32,8 @@ export class ComplaintsController {
   @Get()
   @Roles(Role.CUSTOMER, Role.SUPER_USER)
   @ApiOperation({ summary: 'List complaints (customer sees own, super_user sees all)' })
-  findAll(@CurrentUser() user: IUser): IApiResponse<IComplaint[]> {
+  @ApiResponse({ status: 200, type: [ComplaintResponseDto] })
+  findAll(@CurrentUser() user: IUser): IApiResponse<ComplaintResponseDto[]> {
     return { success: true, data: this.complaintsService.findAll(user) };
   }
 
@@ -41,7 +43,7 @@ export class ComplaintsController {
   create(
     @Body() dto: CreateComplaintDto,
     @CurrentUser() user: IUser,
-  ): IApiResponse<IComplaint> {
+  ): IApiResponse<ComplaintResponseDto> {
     return { success: true, data: this.complaintsService.create(dto, user) };
   }
 
@@ -53,7 +55,7 @@ export class ComplaintsController {
     @Param('id') id: string,
     @Body() dto: UpdateComplaintDto,
     @CurrentUser() user: IUser,
-  ): IApiResponse<IComplaint> {
+  ): IApiResponse<ComplaintResponseDto> {
     return { success: true, data: this.complaintsService.update(id, dto, user) };
   }
 }
