@@ -28,6 +28,10 @@ export class AuthService {
     if (!passwordMatches)
       throw new UnauthorizedException('Invalid email or password');
 
+    if (!user.isActive) {
+      throw new UnauthorizedException('Account pending approval');
+    }
+
     // Generate a UUID token and persist it so AuthGuard can look it up
     const token = uuidv4();
     this.usersRepository.update(user.id, { authToken: token });
