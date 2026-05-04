@@ -8,21 +8,24 @@ function initPage() {
     renderSidebar("inter-hub-transfer.html");
     renderNavbar("Inter-Hub Transfer");
     loadTransferData();
+
+    // Live reactivity
+    window.addEventListener('appStateChanged', loadTransferData);
 }
 
 function loadTransferData() {
     currentOrders = filterOrdersByHub(window.mockData.orders || []);
     transferCandidates = currentOrders
-        .filter(function (o) { return o.status !== "Delivered"; })
+        .filter(function (o) { return o.status !== window.SwiftTrackEnums.OrderStatus.DELIVERED; })
         .sort(function (a, b) { return new Date(b.updated_at) - new Date(a.updated_at); });
     renderTransferStats();
     renderTransferList();
 }
 
 function renderTransferStats() {
-    var pending = transferCandidates.filter(function (o) { return o.status === "Pending"; }).length;
-    var inTransit = transferCandidates.filter(function (o) { return o.status === "In Transit" || o.status === "Out for Delivery"; }).length;
-    var delivered = currentOrders.filter(function (o) { return o.status === "Delivered"; }).length;
+    var pending = transferCandidates.filter(function (o) { return o.status === window.SwiftTrackEnums.OrderStatus.PENDING; }).length;
+    var inTransit = transferCandidates.filter(function (o) { return o.status === window.SwiftTrackEnums.OrderStatus.IN_TRANSIT || o.status === window.SwiftTrackEnums.OrderStatus.OUT_FOR_DELIVERY; }).length;
+    var delivered = currentOrders.filter(function (o) { return o.status === window.SwiftTrackEnums.OrderStatus.DELIVERED; }).length;
 
     var el = document.getElementById("statPending");
     if (el) el.textContent = pending < 10 ? "0" + pending : String(pending);
@@ -94,7 +97,7 @@ function approveTransfer(id) {
 
     document.getElementById("at-shipment-id").textContent = order.order_id;
     document.getElementById("at-cargo-type").textContent = (order.package_type || "General") + " Package";
-    document.getElementById("at-priority").textContent = order.status === "Pending" ? "High" : "Medium";
+    document.getElementById("at-priority").textContent = order.status === window.SwiftTrackEnums.OrderStatus.PENDING ? "High" : "Medium";
     document.getElementById("at-transit-time").textContent = meta.etaText;
     openModal("approveTransferModal");
 }
@@ -105,10 +108,14 @@ function confirmTransferAction() {
     setActionLoading(btn, true, "Confirming...");
     setTimeout(function () {
         setActionLoading(btn, false);
-        var order = getOrderById(activeTransferOrderId);
-        if (order) {
-            order.status = "In Transit";
-            order.updated_at = new Date().toISOString();
+        if (window.AppState) {
+            var state = window.AppState.getState();
+            var canonical = state.orders.find(function(o) { return o.order_id === activeTransferOrderId; });
+            if (canonical) {
+                canonical.status = window.SwiftTrackEnums.OrderStatus.IN_TRANSIT;
+                canonical.updated_at = new Date().toISOString();
+            }
+            window.AppState.saveState(state);
         }
         closeModal("approveTransferModal");
         showSuccessTick("Transfer approved");
@@ -119,10 +126,14 @@ function confirmTransferAction() {
 }
 
 function quickApprove(id) {
-    var order = getOrderById(id);
-    if (!order) return;
-    order.status = "In Transit";
-    order.updated_at = new Date().toISOString();
+    if (window.AppState) {
+        var state = window.AppState.getState();
+        var canonical = state.orders.find(function(o) { return o.order_id === id; });
+        if (!canonical) return;
+        canonical.status = window.SwiftTrackEnums.OrderStatus.IN_TRANSIT;
+        canonical.updated_at = new Date().toISOString();
+        window.AppState.saveState(state);
+    }
     showSuccessTick("Quick approved");
     showToast("Transfer " + id + " quick-approved", "success");
     loadTransferData();
@@ -144,7 +155,7 @@ function openTransferRequestsModal(e) {
             return (
                 '<div class="hm-transfer-row">' +
                     '<div><div class="hm-transfer-id">' + o.order_id + '</div><div class="hm-transfer-sub">' + o.package_type + ' · ' + getHubName(o.pickup_hub_id) + "</div></div>" +
-                    '<div><span class="hm-badge ' + (o.status === "Pending" ? "hm-badge-pending" : "hm-badge-in-transit") + '">' + o.status + "</span></div>" +
+                    '<div><span class="hm-badge ' + (o.status === window.SwiftTrackEnums.OrderStatus.PENDING ? "hm-badge-pending" : "hm-badge-in-transit") + '">' + o.status + "</span></div>" +
                     '<div class="hm-transfer-sub">' + meta.distanceKm + " km</div>" +
                     '<div class="hm-transfer-sub">' + meta.etaText + "</div>" +
                     '<div style="display:flex;gap:8px;"><button class="hm-btn hm-btn-ghost hm-btn-sm" onclick="openChangeDestinationModal(\'' + o.order_id + '\')">Change</button><button class="hm-btn hm-btn-primary hm-btn-sm" onclick="approveTransfer(\'' + o.order_id + '\');closeModal(\'allTransferRequestsModal\')">Approve</button></div>' +

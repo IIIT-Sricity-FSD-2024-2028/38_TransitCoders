@@ -29,11 +29,11 @@ function loadQueue() {
 }
 
 function calculatePriority(order) {
-  if (order.status === "Pending") {
+  if (order.status === window.SwiftTrackEnums.OrderStatus.PENDING) {
     var created = new Date(order.created_at);
     if ((Date.now() - created.getTime()) / 3600000 > 2) return "HIGH";
   }
-  if (order.status === "Assigned" || order.status === "In Transit") return "MEDIUM";
+  if (order.status === window.SwiftTrackEnums.OrderStatus.ASSIGNED || order.status === window.SwiftTrackEnums.OrderStatus.IN_TRANSIT) return "MEDIUM";
   return "LOW";
 }
 
@@ -84,7 +84,7 @@ function renderOrdersGrid() {
     var priority = calculatePriority(order);
     var pClass = priority === "HIGH" ? "hm-badge-high" : priority === "MEDIUM" ? "hm-badge-medium" : "hm-badge-low";
     var progress = getProgressPercent(order.status);
-    var canTransfer = order.status !== "In Transit";
+    var canTransfer = order.status !== window.SwiftTrackEnums.OrderStatus.IN_TRANSIT;
     var meta = deriveOrderMeta(order);
 
     return (
@@ -96,7 +96,7 @@ function renderOrdersGrid() {
       '<span class="hm-badge ' + pClass + '">' + priority + "</span>" +
       "</div>" +
       '<div class="hm-order-card-actions" style="display:flex;gap:12px;">' +
-      (order.status === "Pending" ? '<button class="hm-btn hm-btn-outline hm-btn-sm" onclick="openAgentModal(\'' + order.order_id + '\')">Assign Agent</button>' : "") +
+      (order.status === window.SwiftTrackEnums.OrderStatus.PENDING ? '<button class="hm-btn hm-btn-outline hm-btn-sm" onclick="openAgentModal(\'' + order.order_id + '\')">Assign Agent</button>' : "") +
       '<button class="hm-btn hm-btn-outline hm-btn-sm" ' + (canTransfer ? 'onclick="openTransferModal(\'' + order.order_id + '\')"' : "disabled") + '>Transfer Hub</button>' +
       '<button class="hm-btn hm-btn-ghost hm-btn-sm" onclick="viewOrder(\'' + order.order_id + '\')">View</button>' +
       "</div></div>" +
@@ -138,7 +138,7 @@ function goToPage(page) {
 
 function openAgentModal(orderId) {
   var order = getOrderById(orderId);
-  if (!order || order.status !== "Pending") {
+  if (!order || order.status !== window.SwiftTrackEnums.OrderStatus.PENDING) {
     showToast("Only pending orders can be assigned", "error");
     return;
   }
@@ -151,7 +151,7 @@ function openAgentModal(orderId) {
 }
 
 function assignAgentDirect(orderId, agentId) {
-  if (!setOrderAssignment(orderId, agentId, "Assigned")) return;
+  if (!setOrderAssignment(orderId, agentId, window.SwiftTrackEnums.OrderStatus.ASSIGNED)) return;
   closeModal("agentModal");
   showSuccessTick("Agent assigned");
   showToast("Agent assigned to " + orderId, "success");

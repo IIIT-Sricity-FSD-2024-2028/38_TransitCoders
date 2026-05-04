@@ -46,13 +46,17 @@
     function toAgentOrder(o) {
         if (!o) return null;
         var st = String(o.status).toLowerCase();
-        if (st.indexOf('transit') !== -1 || st.indexOf('delivery') !== -1) st = 'in-transit';
-        else if (st.indexOf('deliv') !== -1) st = 'delivered';
+        if (st.indexOf('out for') !== -1) st = 'in-transit';
+        else if (st.indexOf('transit') !== -1) st = 'in-transit';
+        else if (st === 'delivered') st = 'delivered';
+        else if (st === 'assigned' || st === 'picked up') st = 'pending';
+        else if (st === 'cancelled') st = 'delivered'; // hide cancelled from agent worklist
         else st = 'pending';
 
         var pri = o.package_type === 'Express' ? 'High' : 'Medium';
+        var numId = parseInt(o.order_id.replace(/\D/g,'')) || 0;
         return {
-            id: parseInt(o.order_id.replace('ORD_','')) || 0,
+            id: numId,
             _ref: o.order_id,
             customer: o.customer_name,
             phone: o.customer_phone,
@@ -62,10 +66,15 @@
             destination: o.delivery_address,
             destinationFull: o.delivery_address,
             eta: '02:00 PM',
-            etaMinutes: 20,
-            distance: '5 km',
+            etaMinutes: 12 + (numId % 35),
+            distanceKm: parseFloat((2.4 + ((numId % 28) / 5)).toFixed(1)),
+            distance: parseFloat((2.4 + ((numId % 28) / 5)).toFixed(1)) + ' km',
             amount: o.amount,
-            weight: o.weight + ' kg'
+            weight: o.weight + ' kg',
+            volume: (30 + (numId % 50)) + 'x' + (20 + (numId % 40)) + 'x' + (10 + (numId % 30)) + ' cm',
+            fragile: o.package_type === 'Express',
+            packageId: 4400 + numId,
+            paymentMode: numId % 3 === 0 ? 'COD' : 'Prepaid'
         };
     }
 
@@ -93,7 +102,14 @@
             }); 
         },
         get agents() { 
-            return getState().users.filter(function(u){ return u.role === 'delivery_agent'; }).map(function(u) {
+            var state = getState();
+            var activeCounts = {};
+            state.orders.forEach(function(o) {
+                if (o.assigned_agent && o.status !== window.SwiftTrackEnums.OrderStatus.DELIVERED && o.status !== window.SwiftTrackEnums.OrderStatus.CANCELLED) {
+                    activeCounts[o.assigned_agent] = (activeCounts[o.assigned_agent] || 0) + 1;
+                }
+            });
+            return state.users.filter(function(u){ return u.role === 'delivery_agent'; }).map(function(u) {
                 return {
                     agent_id: u.user_id,
                     user_id: u.user_id,
@@ -102,18 +118,12 @@
                     hub_id: u.hub_id,
                     status: u.active ? 'Available' : 'Unavailable',
                     vehicle_type: u.vehicle || 'Van',
-                    tasks_count: getState().orders.filter(function(o){ return o.assigned_agent === u.user_id && o.status !== 'Delivered' && o.status !== 'Cancelled'; }).length
+                    tasks_count: activeCounts[u.user_id] || 0
                 };
             });
         },
         get hubs() {
-            return [
-                    { hub_id: 'H001', name: 'Chennai Central Hub', location: 'Chennai', status: 'Active' },
-                    { hub_id: 'H002', name: 'Bengaluru Hub', location: 'Bengaluru Center', status: 'Active' },
-                    { hub_id: 'H003', name: 'Hyderabad Logistics Hub', location: 'Hyderabad', status: 'Active' },
-                    { hub_id: 'H004', name: 'Karimnagar City Hub', location: 'Karimnagar', status: 'Active' },
-                    { hub_id: 'H005', name: 'Visakhapatnam Port Hub', location: 'Visakhapatnam', status: 'Active' }
-            ];
+            return getState().hubs;
         },
         get hubComplaints() { return getState().complaints; },
         get alerts() { return []; },
@@ -123,6 +133,16 @@
     /* 2. MockDB (Merchant Portal Proxy) */
     window.MockDB = {
         get shipments() { return getState().orders.map(toMerchantShipment); },
+        getShipmentsPaginated: function(page, limit) {
+            var all = this.shipments;
+            var start = (page - 1) * limit;
+            return {
+                data: all.slice(start, start + limit),
+                total: all.length,
+                page: page,
+                totalPages: Math.ceil(all.length / limit)
+            };
+        },
         get tickets()   { return getState().merchantTickets; },
         get users()     { return getState().users; },
 
@@ -154,6 +174,15 @@
             var sess = JSON.parse(sessionStorage.getItem('st_session') || '{}');
             var s = getState();
             var nId = 'ORD_' + (s.orders.length + 100);
+            
+            // Map origin to a hub ID
+            var originLower = (d.origin || '').toLowerCase();
+            var hubId = 'H001'; // Default: Chennai
+            if (originLower.includes('bengaluru') || originLower.includes('bangalore')) hubId = 'H002';
+            else if (originLower.includes('hyderabad')) hubId = 'H003';
+            else if (originLower.includes('karimnagar')) hubId = 'H004';
+            else if (originLower.includes('visakhapatnam') || originLower.includes('vizag')) hubId = 'H005';
+
             var o = {
                 order_id: nId,
                 tracking_id: 'SWT-' + Date.now().toString().slice(-6),
@@ -165,9 +194,11 @@
                 package_type: d.service,
                 weight: parseFloat(d.weight)||1.0,
                 amount: parseFloat(d.amount.replace('₹',''))||0,
-                status: 'Pending',
+                status: window.SwiftTrackEnums.OrderStatus.PENDING,
                 created_at: new Date().toISOString(),
-                assigned_hub: null, assigned_agent: null
+                assigned_hub: null, 
+                assigned_agent: null,
+                pickup_hub_id: hubId
             };
             s.orders.unshift(o); saveState(s);
             return toMerchantShipment(o);
@@ -331,6 +362,16 @@
         init: async function(){}, _get: function(k){ return JSON.parse(localStorage.getItem('admin_'+k)||'[]'); },
         _save: function(k, d){ localStorage.setItem('admin_'+k, JSON.stringify(d)); window.AppState.notify(); },
         getOrders: function(){ return getState().orders.map(toAdminOrder); },
+        getOrdersPaginated: function(page, limit) {
+            var all = this.getOrders();
+            var start = (page - 1) * limit;
+            return {
+                data: all.slice(start, start + limit),
+                total: all.length,
+                page: page,
+                totalPages: Math.ceil(all.length / limit)
+            };
+        },
         addOrder: function(d) {
             var s = getState();
             var o = {
@@ -388,7 +429,7 @@
         getUsers: function() { 
             return getState().users.map(function(u){
                 var status = u.active ? 'Active' : (u.pending !== false ? 'Pending' : 'Inactive');
-                return { id: u.user_id, name: u.name, email: u.email, role: u.role, status: status, lastLogin: u.active ? 'Recent' : 'Never', password: u.password };
+                return { id: u.user_id, name: u.name, email: u.email, role: u.role, status: status, lastLogin: u.active ? 'Recent' : 'Never' }; // Password stripped
             });
         },
         addUser: function(u) { 

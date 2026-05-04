@@ -70,11 +70,11 @@ const Support = (() => {
         <td><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--orange)">${t.tid}</span></td>
         <td><span class="priority-dot p-${t.priority.slice(0,3)}"></span>${prioLabel[t.priority] || t.priority}</td>
         <td style="color:var(--mid)">${t.date}</td>
-        <td>${t.status === 'open' ? '<span class="badge b-in-transit">Open</span>' : '<span class="badge b-delivered">Resolved</span>'}</td>
+        <td>${t.status === window.SwiftTrackEnums.TicketStatus.OPEN ? '<span class="badge b-in-transit">Open</span>' : '<span class="badge b-delivered">Resolved</span>'}</td>
         <td>
           <div style="display:flex;gap:6px">
             <button class="btn btn-secondary btn-sm" onclick="Support.toggleStatus('${t.id}')">
-              ${t.status === 'open' ? 'Resolve' : 'Reopen'}
+              ${t.status === window.SwiftTrackEnums.TicketStatus.OPEN ? 'Resolve' : 'Reopen'}
             </button>
             ${canDelete ? `<button class="btn btn-danger btn-sm" onclick="Support.confirmDeleteTicket('${t.id}')">Delete</button>` : ''}
           </div>
@@ -91,7 +91,7 @@ const Support = (() => {
   function toggleStatus(id) {
     const t = MockDB.tickets.find(t => t.id === id);
     if (!t) return;
-    const newStatus = t.status === 'open' ? 'resolved' : 'open';
+    const newStatus = t.status === window.SwiftTrackEnums.TicketStatus.OPEN ? window.SwiftTrackEnums.TicketStatus.RESOLVED : window.SwiftTrackEnums.TicketStatus.OPEN;
     MockDB.updateTicket(id, { status: newStatus });
     renderTickets();
     showToast(`Ticket ${id} marked as ${newStatus}.`);

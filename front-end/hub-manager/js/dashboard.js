@@ -48,14 +48,14 @@ function renderStats() {
   if (!g) return;
   var total = currentOrders.length;
   var pending = currentOrders.filter(function (o) {
-    return o.status === "Pending";
+    return o.status === window.SwiftTrackEnums.OrderStatus.PENDING;
   }).length;
   var avail = currentAgents.filter(function (a) {
     return a.availability_status === "Available";
   }).length;
   var delivering = currentAgents.length - avail;
   var delivered = currentOrders.filter(function (o) {
-    return o.status === "Delivered";
+    return o.status === window.SwiftTrackEnums.OrderStatus.DELIVERED;
   }).length;
   var avgTime = total ? Math.max(22, 50 - delivered) : 0;
 
@@ -185,8 +185,8 @@ function renderOrderCards() {
     '<div class="hm-order-cards">' +
     display
       .map(function (order) {
-        var isPending = order.status === "Pending";
-        var isInTransit = order.status === "In Transit";
+        var isPending = order.status === window.SwiftTrackEnums.OrderStatus.PENDING;
+        var isInTransit = order.status === window.SwiftTrackEnums.OrderStatus.IN_TRANSIT;
         var progress = getProgressPercent(order.status);
         var meta = deriveOrderMeta(order);
         return (
@@ -257,7 +257,7 @@ function renderOrderCards() {
 
 function openTransferModal(orderId) {
   var order = getOrderById(orderId);
-  if (!order || order.status !== "Pending") {
+  if (!order || order.status !== window.SwiftTrackEnums.OrderStatus.PENDING) {
     showToast("Only pending orders can be transferred", "error");
     return;
   }
@@ -305,7 +305,7 @@ function confirmTransfer() {
 
 function openAssignModal(orderId) {
   var order = getOrderById(orderId);
-  if (!order || order.status !== "Pending") {
+  if (!order || order.status !== window.SwiftTrackEnums.OrderStatus.PENDING) {
     showToast("Only pending orders can be assigned", "error");
     return;
   }
@@ -460,11 +460,11 @@ function iconPhone() {
 }
 
 function calculatePriority(order) {
-  if (order.status === "Pending") {
+  if (order.status === window.SwiftTrackEnums.OrderStatus.PENDING) {
     var created = new Date(order.created_at);
     if ((Date.now() - created.getTime()) / 3600000 > 2) return "HIGH";
   }
-  if (order.status === "Assigned" || order.status === "In Transit")
+  if (order.status === window.SwiftTrackEnums.OrderStatus.ASSIGNED || order.status === window.SwiftTrackEnums.OrderStatus.IN_TRANSIT)
     return "MEDIUM";
   return "LOW";
 }

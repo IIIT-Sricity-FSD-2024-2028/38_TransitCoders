@@ -86,6 +86,34 @@ function bindVerificationActions() {
             document.getElementById('send-otp-btn').textContent = 'RESEND OTP';
             document.querySelectorAll('.otp-input')[0].focus();
         }
+
+        if (window.AppState) {
+            var state = window.AppState.getState();
+            var orderId = getUrlParam('id');
+            var order = state.orders.find(o => o.order_id === orderId || o.tracking_id === orderId);
+            if (order) {
+                var hash = 0;
+                var str = String(orderId);
+                for (var i = 0; i < str.length; i++) {
+                    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                    hash |= 0;
+                }
+                var otpCode = String(Math.abs(hash) % 10000).padStart(4, '0');
+                
+                if (!state.notifications) state.notifications = [];
+                state.notifications.unshift({
+                    id: 'NOTIF_' + Date.now(),
+                    type: 'otp',
+                    title: 'Delivery OTP Required',
+                    message: 'Your delivery agent has arrived. Your OTP for order ' + orderId + ' is ' + otpCode + '.',
+                    order_id: orderId,
+                    customer_name: order.customer_name,
+                    timestamp: new Date().toISOString(),
+                    unread: true
+                });
+                window.AppState.saveState(state);
+            }
+        }
     });
 
     // Authenticate

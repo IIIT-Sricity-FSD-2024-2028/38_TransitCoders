@@ -5,6 +5,40 @@
  */
 (function () {
     'use strict';
+    
+    // Global Enums
+    window.SwiftTrackEnums = {
+        OrderStatus: {
+            PENDING: 'Pending',
+            ASSIGNED: 'Assigned',
+            IN_TRANSIT: 'In Transit',
+            OUT_FOR_DELIVERY: 'Out for Delivery',
+            DELIVERED: 'Delivered',
+            FAILED: 'Failed',
+            CANCELLED: 'Cancelled'
+        },
+        UserStatus: {
+            ACTIVE: 'Active',
+            PENDING: 'Pending',
+            INACTIVE: 'Inactive',
+            SUSPENDED: 'Suspended'
+        },
+        ComplaintStatus: {
+            OPEN: 'Open',
+            IN_PROGRESS: 'In Progress',
+            RESOLVED: 'Resolved',
+            ESCALATED: 'Escalated'
+        },
+        TicketStatus: {
+            OPEN: 'open',
+            RESOLVED: 'resolved'
+        },
+        FeedbackStatus: {
+            PENDING: 'Pending',
+            REVIEWED: 'Reviewed'
+        }
+    };
+
     var STORAGE_KEY = 'swifttrack_central_state';
 
     var defaultState = {
@@ -83,7 +117,8 @@
             { user_id: 'U_HM_4', name: 'Manoj Menon', email: 'hm_karimnagar@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H004', active: true },
             { user_id: 'U_HM_5', name: 'Harish Kumar', email: 'hm_visakhapatnam@swifttrack.com', password: 'password123', role: 'hub_manager', hub_id: 'H005', active: true },
             { user_id: 'U_SUPER_1', name: 'Super User Admin', email: 'superuser@swifttrack.com', password: 'super123', role: 'super_user', active: true },
-            { user_id: 'U_CUS_1', name: 'Priya Iyer', email: 'customer@swifttrack.com', password: 'password', role: 'customer', active: true }
+            { user_id: 'U_CUS_1', name: 'Priya Iyer', email: 'customer@swifttrack.com', password: 'password', role: 'customer', active: true },
+            { user_id: 'U_CUS_JOHNDOE', name: 'John Doe', email: 'johndoe@mail.com', password: 'password', role: 'customer', active: true }
         );
 
         // 25 dynamically generated Delivery Agents
@@ -106,13 +141,23 @@
             }
         });
 
-        // 50 dynamically generated Customers
-        var custNames = ['Aarav', 'Vihaan', 'Vivaan', 'Ananya', 'Diya', 'Aditya', 'Aryan', 'Kavya', 'Sai', 'Arjun', 'Siddharth', 'Riya', 'Aadhya', 'Krishna', 'Ishaan', 'Shaurya', 'Ayaan', 'Navya', 'Dhruv', 'Kabir', 'Ritika', 'Anushka', 'Rudra', 'Anika', 'Prisha', 'Atharv', 'Ojas', 'Zara', 'Meera', 'Rohan', 'Neha', 'Maya', 'Nithin', 'Sneha', 'Varun', 'Kiran', 'Nisha', 'Ravi', 'Pooja', 'Anjali', 'Kunal', 'Shruti', 'Vikram', 'Pranav', 'Mohit', 'Swati', 'Sanjay', 'Divya', 'Suresh', 'Lakshmi'];
-        for (var c = 0; c < 50; c++) {
+        // Generate customers based on the exact names used in mock orders
+        var mockCustomers = [
+            'Asha Nair', 'Kiran Reddy', 'Deepa Iyer', 'Manoj Menon', 'Harish Kumar',
+            'Divya Rao', 'Naveen Reddy', 'Suresh Iyer', 'Lakshmi Menon', 'Arjun Menon',
+            'Priya Iyer', 'Vijay Kumar', 'Meena Nair', 'Rohit Menon', 'Anita Rao',
+            'Karthik Reddy', 'Shreya Iyer', 'Ganesh Nair', 'Keerthi Menon', 'Rahul Kumar',
+            'Sindhu Rao', 'Ajay Prakash', 'Bhavya Iyer', 'Sanjay Kumar', 'Pooja Nair',
+            'Siddharth Menon', 'Anil Reddy', 'Kavya Rao', 'Nithya Iyer', 'Hari Menon',
+            'Revathi Nair', 'Gopal Reddy', 'Suman Rao', 'Vikas Kumar', 'Anu Iyer'
+        ];
+        
+        for (var c = 0; c < mockCustomers.length; c++) {
+            var formattedName = mockCustomers[c].toLowerCase().replace(/\s+/g, '');
             state.users.push({
                 user_id: 'U_CUS_GEN_' + c,
-                name: custNames[c],
-                email: custNames[c].toLowerCase() + c + '@mail.com',
+                name: mockCustomers[c],
+                email: formattedName + '@mail.com',
                 password: 'password',
                 role: 'customer',
                 active: true
@@ -219,15 +264,7 @@
     ];
 
         /* --- UNIFIED ORDERS --- */
-        var mockCustomers = [
-            'Asha Nair', 'Kiran Reddy', 'Deepa Iyer', 'Manoj Menon', 'Harish Kumar',
-            'Divya Rao', 'Naveen Reddy', 'Suresh Iyer', 'Lakshmi Menon', 'Arjun Menon',
-            'Priya Iyer', 'Vijay Kumar', 'Meena Nair', 'Rohit Menon', 'Anita Rao',
-            'Karthik Reddy', 'Shreya Iyer', 'Ganesh Nair', 'Keerthi Menon', 'Rahul Kumar',
-            'Sindhu Rao', 'Ajay Prakash', 'Bhavya Iyer', 'Sanjay Kumar', 'Pooja Nair',
-            'Siddharth Menon', 'Anil Reddy', 'Kavya Rao', 'Nithya Iyer', 'Hari Menon',
-            'Revathi Nair', 'Gopal Reddy', 'Suman Rao', 'Vikas Kumar', 'Anu Iyer'
-        ];
+        // mockCustomers array is now defined at the top of the function to generate credentials
         var hubCycle = [
             { id: 'H001', pickup: 'Chennai Central Hub', delivery: ['T. Nagar, Chennai', 'Adyar, Chennai', 'Anna Nagar, Chennai', 'Velachery, Chennai', 'Mylapore, Chennai', 'Tambaram, Chennai', 'Guindy, Chennai'] },
             { id: 'H002', pickup: 'Bengaluru Logistics Park', delivery: ['Indiranagar, Bengaluru', 'Whitefield, Bengaluru', 'Koramangala, Bengaluru', 'Jayanagar, Bengaluru', 'Malleshwaram, Bengaluru', 'HSR Layout, Bengaluru', 'Rajajinagar, Bengaluru'] },
@@ -244,7 +281,14 @@
             '+91 98452 8757', '+91 98452 9868', '+91 98453 1079', '+91 98453 2180', '+91 98453 3291',
             '+91 98453 4302', '+91 98453 5413', '+91 98453 6524', '+91 98453 7635', '+91 98453 8746'
         ];
-        var statuses = ['Pending', 'Assigned', 'In Transit', 'Out for Delivery', 'Delivered', 'Cancelled'];
+        var statuses = [
+            window.SwiftTrackEnums.OrderStatus.PENDING, 
+            window.SwiftTrackEnums.OrderStatus.ASSIGNED, 
+            window.SwiftTrackEnums.OrderStatus.IN_TRANSIT, 
+            window.SwiftTrackEnums.OrderStatus.OUT_FOR_DELIVERY, 
+            window.SwiftTrackEnums.OrderStatus.DELIVERED, 
+            window.SwiftTrackEnums.OrderStatus.CANCELLED
+        ];
         var hubAgents = {
             H001: 'U_AGT_102', // Karthik
             H002: 'U_AGT_104', // Meera Iyer
@@ -268,6 +312,7 @@
                     customer_name: mockCustomers[(orderIndex - 1) % mockCustomers.length],
                     customer_phone: phonePool[(orderIndex - 1) % phonePool.length],
                     pickup_address: hubMeta.pickup,
+                    pickup_hub_id: hubMeta.id,
                     delivery_address: 'Unit ' + (10 + j) + ', ' + deliveryArea,
                     package_type: pkgType,
                     weight: weight,
@@ -275,7 +320,7 @@
                     status: stat,
                     created_at: new Date(Date.now() - ((hubIdx * 3 + j) * 86400000)).toISOString(),
                     assigned_hub: hubMeta.id,
-                    assigned_agent: stat === 'Pending' || stat === 'Cancelled' ? null : hubAgents[hubMeta.id]
+                    assigned_agent: (stat === window.SwiftTrackEnums.OrderStatus.PENDING || stat === window.SwiftTrackEnums.OrderStatus.CANCELLED) ? null : hubAgents[hubMeta.id]
                 });
                 orderIndex++;
             }
@@ -287,15 +332,35 @@
             order_id: 'ORD_EDGE_1', tracking_id: 'SWT-999001', merchant_id: 'U_MER_1',
             customer_name: 'Rahul Kumar', customer_phone: '+91 98450 1111',
             pickup_address: 'Chennai Central Hub', delivery_address: 'Alwarpet, Chennai',
-            package_type: 'Standard', weight: 1.5, amount: 450, status: 'In Transit',
+            pickup_hub_id: 'H001',
+            package_type: 'Standard', weight: 1.5, amount: 450, status: window.SwiftTrackEnums.OrderStatus.IN_TRANSIT,
             created_at: new Date(Date.now() - 86400000).toISOString(), assigned_hub: 'H001', assigned_agent: 'U_AGT_103'
         });
         state.orders.push({
             order_id: 'ORD_EDGE_2', tracking_id: 'SWT-999002', merchant_id: 'U_MER_1',
             customer_name: 'Sindhu Rao', customer_phone: '+91 98450 2222',
             pickup_address: 'Chennai Central Hub', delivery_address: 'BTM Layout, Chennai',
-            package_type: 'Express', weight: 0.8, amount: 750, status: 'Delivered',
+            pickup_hub_id: 'H001',
+            package_type: 'Express', weight: 0.8, amount: 750, status: window.SwiftTrackEnums.OrderStatus.DELIVERED,
             created_at: new Date(Date.now() - 172800000).toISOString(), assigned_hub: 'H001', assigned_agent: 'U_AGT_103'
+        });
+        
+        // Orders for John Doe
+        state.orders.push({
+            order_id: 'ORD_JOHNDOE_1', tracking_id: 'SWT-777001', merchant_id: 'U_MER_1',
+            customer_name: 'John Doe', customer_phone: '+91 98450 9999',
+            pickup_address: 'Bengaluru Logistics Park', delivery_address: 'Indiranagar, Bengaluru',
+            pickup_hub_id: 'H002',
+            package_type: 'Express', weight: 2.0, amount: 850, status: window.SwiftTrackEnums.OrderStatus.IN_TRANSIT,
+            created_at: new Date(Date.now() - 43200000).toISOString(), assigned_hub: 'H002', assigned_agent: 'U_AGT_104'
+        });
+        state.orders.push({
+            order_id: 'ORD_JOHNDOE_2', tracking_id: 'SWT-777002', merchant_id: 'U_MER_1',
+            customer_name: 'John Doe', customer_phone: '+91 98450 9999',
+            pickup_address: 'Bengaluru Logistics Park', delivery_address: 'Koramangala, Bengaluru',
+            pickup_hub_id: 'H002',
+            package_type: 'Standard', weight: 5.5, amount: 1200, status: window.SwiftTrackEnums.OrderStatus.DELIVERED,
+            created_at: new Date(Date.now() - 259200000).toISOString(), assigned_hub: 'H002', assigned_agent: 'U_AGT_104'
         });
 
         /* Legacy agent profile info so settings works */
@@ -362,4 +427,16 @@
     window.addEventListener('storage', function(e) {
         if (e.key === STORAGE_KEY) { notify(); }
     });
+
+    // Fallback for file:/// protocol where 'storage' events don't reliably fire across tabs
+    if (window.location.protocol === 'file:') {
+        var lastStateStr = localStorage.getItem(STORAGE_KEY);
+        setInterval(function() {
+            var currentStr = localStorage.getItem(STORAGE_KEY);
+            if (currentStr !== lastStateStr) {
+                lastStateStr = currentStr;
+                notify();
+            }
+        }, 800);
+    }
 })();

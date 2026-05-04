@@ -4,6 +4,9 @@ function initPage() {
     renderSidebar("reports.html");
     renderNavbar("Operational Intelligence");
     hydrateReportFromData();
+
+    // Live reactivity
+    window.addEventListener('appStateChanged', hydrateReportFromData);
 }
 
 function hydrateReportFromData() {
@@ -18,9 +21,9 @@ function hydrateReportFromData() {
 }
 
 function hydrateHeaderStats(orders) {
-    var delivered = orders.filter(function (o) { return o.status === "Delivered"; }).length;
-    var active = orders.filter(function (o) { return o.status !== "Delivered" && o.status !== "Failed"; }).length;
-    var delayed = orders.filter(function (o) { return o.status === "Failed"; }).length;
+    var delivered = orders.filter(function (o) { return o.status === window.SwiftTrackEnums.OrderStatus.DELIVERED; }).length;
+    var active = orders.filter(function (o) { return o.status !== window.SwiftTrackEnums.OrderStatus.DELIVERED && o.status !== window.SwiftTrackEnums.OrderStatus.FAILED; }).length;
+    var delayed = orders.filter(function (o) { return o.status === window.SwiftTrackEnums.OrderStatus.FAILED; }).length;
     var onTime = orders.length ? Math.round((delivered / orders.length) * 100) : 0;
 
     var vals = document.querySelectorAll(".hm-rstat-val");
@@ -114,16 +117,16 @@ function renderAgentPerformance(agents) {
 function renderIssuesTable(orders) {
     var tbody = document.querySelector(".hm-itable tbody");
     if (!tbody) return;
-    var problematic = orders.filter(function (o) { return o.status === "Failed" || o.status === "Pending"; }).slice(0, 4);
+    var problematic = orders.filter(function (o) { return o.status === window.SwiftTrackEnums.OrderStatus.FAILED || o.status === window.SwiftTrackEnums.OrderStatus.PENDING; }).slice(0, 4);
     if (!problematic.length) return;
     tbody.innerHTML = problematic.map(function (o) {
-        var cls = o.status === "Failed" ? "ibadge-err" : "ibadge-warn";
-        var txt = o.status === "Failed" ? "Delayed" : "Attention";
+        var cls = o.status === window.SwiftTrackEnums.OrderStatus.FAILED ? "ibadge-err" : "ibadge-warn";
+        var txt = o.status === window.SwiftTrackEnums.OrderStatus.FAILED ? "Delayed" : "Attention";
         return (
             "<tr>" +
                 "<td>" + o.order_id + "</td>" +
                 "<td>Order needs operational review at " + getHubName(o.pickup_hub_id) + "</td>" +
-                "<td>" + (getAgentName(o.agent_id) || "Unassigned") + "</td>" +
+                "<td>" + (getAgentName(o.assigned_agent) || "Unassigned") + "</td>" +
                 '<td><span class="hm-ibadge ' + cls + '">' + txt + "</span></td>" +
             "</tr>"
         );
@@ -137,7 +140,7 @@ function renderHubPerformance() {
     var orders = window.mockData.orders || [];
     grid.innerHTML = hubs.map(function (hub) {
         var hubOrders = orders.filter(function (o) { return o.pickup_hub_id === hub.hub_id; });
-        var delivered = hubOrders.filter(function (o) { return o.status === "Delivered"; }).length;
+        var delivered = hubOrders.filter(function (o) { return o.status === window.SwiftTrackEnums.OrderStatus.DELIVERED; }).length;
         var active = hubOrders.length - delivered;
         var capacity = Math.min(95, 35 + hubOrders.length * 3);
         return (

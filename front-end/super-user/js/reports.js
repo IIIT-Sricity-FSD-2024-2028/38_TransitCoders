@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const donutChart = document.querySelector('[data-type="donut"]');
     if (donutChart) {
         const totalUsers = users.length;
-        const activeUsers = users.filter(u => u.status === 'Active').length;
+        const activeUsers = users.filter(u => u.status === window.SwiftTrackEnums.UserStatus.ACTIVE).length;
         const pct = totalUsers > 0 ? Math.round((activeUsers / totalUsers) * 100) : 0;
         // Use conic-gradient for a real donut
         donutChart.style.background = `conic-gradient(var(--clr-orange-500) 0% ${pct}%, var(--clr-neutral-200) ${pct}% 100%)`;
@@ -87,9 +87,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // === 4. Uptime Analytics — Mini stats ===
     const uptimeChart = document.querySelector('[data-type="line-mini"]');
     if (uptimeChart) {
-        const openComplaints = complaints.filter(c => c.status === 'Open').length;
-        const escalated = complaints.filter(c => c.status === 'Escalated').length;
-        const resolved = complaints.filter(c => c.status === 'Resolved').length;
+        const openComplaints = complaints.filter(c => c.status === window.SwiftTrackEnums.ComplaintStatus.OPEN).length;
+        const escalated = complaints.filter(c => c.status === window.SwiftTrackEnums.ComplaintStatus.ESCALATED).length;
+        const resolved = complaints.filter(c => c.status === window.SwiftTrackEnums.ComplaintStatus.RESOLVED).length;
         uptimeChart.innerHTML = `
             <div class="report-mini-stats">
                 <div class="report-mini-stat">

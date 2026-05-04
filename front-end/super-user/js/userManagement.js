@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         userTableBody.innerHTML = filtered.length > 0
             ? filtered.map(u => `
-            <tr${u.status === 'Pending' ? ' style="background: rgba(245,158,11,0.06)"' : ''}>
+            <tr${u.status === window.SwiftTrackEnums.UserStatus.PENDING ? ' style="background: rgba(245,158,11,0.06)"' : ''}>
                 <td>
                     <div class="user-name-cell">
                         <div class="user-avatar-sm">${u.name.charAt(0).toUpperCase()}</div>
@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td>${u.lastLogin}</td>
                 <td class="actions-col">
                     <div class="action-buttons">
-                        ${u.status === 'Pending' ? `<button class="action-icon approve-btn" data-id="${u.id}" title="Approve" style="color:#10b981;">
+                        ${u.status === window.SwiftTrackEnums.UserStatus.PENDING ? `<button class="action-icon approve-btn" data-id="${u.id}" title="Approve" style="color:#10b981;">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </button>` : ''}
                         <button class="action-icon edit-btn" data-id="${u.id}" title="Edit">

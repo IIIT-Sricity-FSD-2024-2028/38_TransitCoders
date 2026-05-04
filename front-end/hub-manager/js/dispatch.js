@@ -7,6 +7,9 @@ function initPage() {
   renderSidebar("dispatch.html");
   renderNavbar("Dispatch & Assignment Control");
   loadDispatchData();
+
+  // Live reactivity
+  window.addEventListener('appStateChanged', loadDispatchData);
 }
 
 function loadDispatchData() {
@@ -20,7 +23,7 @@ function renderDispatchStats() {
   var g = document.getElementById("dispatchStats");
   if (!g) return;
   var total = currentOrders.length;
-  var pending = currentOrders.filter(function (o) { return o.status === "Pending"; }).length;
+  var pending = currentOrders.filter(function (o) { return o.status === window.SwiftTrackEnums.OrderStatus.PENDING; }).length;
   var highPriority = currentOrders.filter(function (o) { return calculatePriority(o) === "HIGH"; }).length;
   var autoAssigned = total - pending;
 
@@ -37,7 +40,7 @@ function renderDispatchStats() {
 function renderAttentionCard() {
   var c = document.getElementById("attentionContainer");
   if (!c) return;
-  var order = currentOrders.find(function (o) { return o.status === "Pending"; });
+  var order = currentOrders.find(function (o) { return o.status === window.SwiftTrackEnums.OrderStatus.PENDING; });
   if (!order) {
     c.innerHTML = '<div class="hm-empty-state"><div class="hm-empty-title">No Pending Orders</div><div class="hm-empty-msg">All orders have been assigned.</div></div>';
     return;
@@ -46,7 +49,7 @@ function renderAttentionCard() {
   c.innerHTML =
     '<div class="hm-attn-card">' +
       '<div class="hm-attn-header"><span class="hm-attn-id">' + order.order_id + '</span><span class="hm-pill hm-pill-pending">• ' + order.status.toUpperCase() + '</span><span class="hm-pill hm-pill-high">' + calculatePriority(order) + "</span></div>" +
-      '<div class="hm-attn-details">Customer: ' + order.customer_name + '<br><span>Assigned Agent: ' + getAgentName(order.agent_id) + " · " + meta.etaText + "</span></div>" +
+      '<div class="hm-attn-details">Customer: ' + order.customer_name + '<br><span>Assigned Agent: ' + getAgentName(order.assigned_agent) + " · " + meta.etaText + "</span></div>" +
       '<div class="hm-timeline">' +
         '<div class="hm-tl-row"><div class="hm-tl-icon">' + iconMapPin() + '</div><div><div class="hm-tl-label">Pick Up Hub</div><div class="hm-tl-value">' + getHubName(order.pickup_hub_id) + "</div></div></div>" +
         '<div class="hm-tl-row"><div class="hm-tl-icon">' + iconNavigation() + '</div><div><div class="hm-tl-label">Delivery Location</div><div class="hm-tl-value">' + order.delivery_address + "</div></div></div>" +
@@ -57,8 +60,8 @@ function renderAttentionCard() {
 }
 
 function calculatePriority(order) {
-  if (order.status === "Pending") return "HIGH";
-  if (order.status === "Assigned" || order.status === "In Transit") return "MEDIUM";
+  if (order.status === window.SwiftTrackEnums.OrderStatus.PENDING) return "HIGH";
+  if (order.status === window.SwiftTrackEnums.OrderStatus.ASSIGNED || order.status === window.SwiftTrackEnums.OrderStatus.IN_TRANSIT) return "MEDIUM";
   return "LOW";
 }
 

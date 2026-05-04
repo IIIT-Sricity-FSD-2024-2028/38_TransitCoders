@@ -1,21 +1,24 @@
 /**
- * Dashboard Logic
+ * Dashboard Logic — Now with live state reactivity
  */
 
-document.addEventListener("DOMContentLoaded", async () => {
+async function renderDashboard() {
     await StorageAPI.init();
     // Load KPI Data
     const users = StorageAPI.getUsers();
     const complaints = StorageAPI.getComplaints();
     const feedback = StorageAPI.getFeedback();
 
-    document.getElementById("kpi-users").innerText = users.length;
+    const kpiUsers = document.getElementById("kpi-users");
+    if (kpiUsers) kpiUsers.innerText = users.length;
     
     const openComplaints = complaints.filter(c => c.status !== "Resolved").length;
-    document.getElementById("kpi-complaints").innerText = openComplaints;
+    const kpiComplaints = document.getElementById("kpi-complaints");
+    if (kpiComplaints) kpiComplaints.innerText = openComplaints;
 
-    const pendingFeedback = feedback.filter(f => f.status === "Pending").length;
-    document.getElementById("kpi-feedback").innerText = pendingFeedback;
+    const pendingFeedback = feedback.filter(f => f.status === window.SwiftTrackEnums.FeedbackStatus.PENDING).length;
+    const kpiFeedback = document.getElementById("kpi-feedback");
+    if (kpiFeedback) kpiFeedback.innerText = pendingFeedback;
 
     // Render Recent Users
     const recentUsersList = document.getElementById("recentUsersList");
@@ -28,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <span class="activity-title">${user.name}</span>
                     <span class="activity-meta">${user.email} • ${user.role}</span>
                 </div>
-                <span class="status-badge ${user.status === 'Active' ? 'success' : 'warning'}">${user.status}</span>
+                <span class="status-badge ${user.status === window.SwiftTrackEnums.UserStatus.ACTIVE ? 'success' : 'warning'}">${user.status}</span>
             </div>
         `).join("");
     }
@@ -47,4 +50,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
         `).join("");
     }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    renderDashboard();
+
+    // Live reactivity: re-render when any actor changes state
+    window.addEventListener('appStateChanged', renderDashboard);
 });

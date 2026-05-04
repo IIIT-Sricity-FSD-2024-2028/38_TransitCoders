@@ -62,8 +62,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             </button>
             <div class="action-menu">
               ${c.status !== 'Resolved' ? `<button class="quick-status-btn" data-id="${c._raw?.id || c.id}" data-new-status="Resolved">Mark Resolved</button>` : ''}
-              ${c.status === 'Open' ? `<button class="quick-status-btn" data-id="${c._raw?.id || c.id}" data-new-status="In Progress">Mark In Progress</button>` : ''}
-              ${c.status === 'Resolved' ? `<button class="quick-status-btn" data-id="${c._raw?.id || c.id}" data-new-status="Open">Reopen</button>` : ''}
+              ${c.status === window.SwiftTrackEnums.ComplaintStatus.OPEN ? `<button class="quick-status-btn" data-id="${c._raw?.id || c.id}" data-new-status="In Progress">Mark In Progress</button>` : ''}
+              ${c.status === window.SwiftTrackEnums.ComplaintStatus.RESOLVED ? `<button class="quick-status-btn" data-id="${c._raw?.id || c.id}" data-new-status="Open">Reopen</button>` : ''}
             </div>
           </div>
         </td>
