@@ -77,10 +77,29 @@ window.API = {
     },
     async create(data) {
       const res = await apiFetch('/users', { method: 'POST', body: JSON.stringify(data) });
+      if (window.AppState) {
+          const s = window.AppState.getState();
+          s.users.push({ 
+              ...data, 
+              user_id: res.data.id, 
+              hub_id: data.hubId || null, 
+              active: true 
+          });
+          window.AppState.saveState(s);
+      }
       return res.data;
     },
     async update(id, data) {
       const res = await apiFetch(`/users/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+      if (window.AppState) {
+          const s = window.AppState.getState();
+          const u = s.users.find(x => x.user_id === id);
+          if (u) { 
+              Object.assign(u, data); 
+              if (data.hubId !== undefined) u.hub_id = data.hubId;
+              window.AppState.saveState(s); 
+          }
+      }
       return res.data;
     },
     async delete(id) {
@@ -100,10 +119,20 @@ window.API = {
     },
     async create(data) {
       const res = await apiFetch('/tickets', { method: 'POST', body: JSON.stringify(data) });
+      if (window.AppState) {
+          const s = window.AppState.getState();
+          s.tickets.push({ ...data, id: res.data.id });
+          window.AppState.saveState(s);
+      }
       return res.data;
     },
     async update(id, data) {
       const res = await apiFetch(`/tickets/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+      if (window.AppState) {
+          const s = window.AppState.getState();
+          const t = s.tickets.find(x => x.id === id);
+          if (t) { Object.assign(t, data); window.AppState.saveState(s); }
+      }
       return res.data;
     },
     async delete(id) {
@@ -119,10 +148,20 @@ window.API = {
     },
     async create(data) {
       const res = await apiFetch('/complaints', { method: 'POST', body: JSON.stringify(data) });
+      if (window.AppState) {
+          const s = window.AppState.getState();
+          s.complaints.push({ ...data, id: res.data.id });
+          window.AppState.saveState(s);
+      }
       return res.data;
     },
     async update(id, data) {
       const res = await apiFetch(`/complaints/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+      if (window.AppState) {
+          const s = window.AppState.getState();
+          const c = s.complaints.find(x => x.id === id);
+          if (c) { Object.assign(c, data); window.AppState.saveState(s); }
+      }
       return res.data;
     },
   },
@@ -135,10 +174,20 @@ window.API = {
     },
     async create(data) {
       const res = await apiFetch('/feedback', { method: 'POST', body: JSON.stringify(data) });
+      if (window.AppState) {
+          const s = window.AppState.getState();
+          s.feedback.push({ ...data, id: res.data.id });
+          window.AppState.saveState(s);
+      }
       return res.data;
     },
     async update(id, data) {
       const res = await apiFetch(`/feedback/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+      if (window.AppState) {
+          const s = window.AppState.getState();
+          const f = s.feedback.find(x => x.id === id);
+          if (f) { Object.assign(f, data); window.AppState.saveState(s); }
+      }
       return res.data;
     },
   },

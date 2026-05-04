@@ -130,8 +130,12 @@ export class SeedService implements OnModuleInit {
 
     const users = [
       { name: 'Super Admin', email: 'super@swifttrack.com', password: await hash('password123'), role: 'super_user' as const, isActive: true },
-      { name: 'Hub Manager Delhi', email: 'hm1@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H001', isActive: true },
-      { name: 'Hub Manager Mumbai', email: 'hm2@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H002', isActive: true },
+      { name: 'Hub Manager Chennai', email: 'hm_chennai@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H001', isActive: true },
+      { name: 'Hub Manager Mumbai', email: 'hm_mumbai@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H002', isActive: true },
+      { name: 'Hub Manager Delhi', email: 'hm_delhi@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H003', isActive: true },
+      { name: 'Hub Manager Bengaluru', email: 'hm_bengaluru@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H004', isActive: true },
+      { name: 'Hub Manager Kolkata', email: 'hm_kolkata@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H005', isActive: true },
+      { name: 'Hub Manager Hyderabad', email: 'hm_hyderabad@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H006', isActive: true },
       { name: 'Merchant One', email: 'merchant1@example.com', password: await hash('password123'), role: 'merchant' as const, company: 'Acme Corp', isActive: true },
       { name: 'Merchant Two', email: 'merchant2@example.com', password: await hash('password123'), role: 'merchant' as const, company: 'Beta Goods', isActive: true },
       { name: 'Agent One', email: 'agent1@swifttrack.com', password: await hash('password123'), role: 'delivery_agent' as const, hubId: 'H001', isActive: true },

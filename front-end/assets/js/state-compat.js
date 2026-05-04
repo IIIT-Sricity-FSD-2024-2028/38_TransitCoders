@@ -91,13 +91,20 @@
         get users() { return getState().users; },
         get orders() { 
             return getState().orders.map(function(o) { 
-                var addr = (o.pickup_address || '').toLowerCase();
-                var fallback_hub = addr.indexOf('bengaluru') !== -1 ? 'H002' :
+                var addr = ((o.pickup_address || '') + ' ' + (o.delivery_address || '')).toLowerCase();
+                var fallback_hub = (addr.indexOf('bengaluru') !== -1 || addr.indexOf('bangalore') !== -1 || addr.indexOf('banglore') !== -1) ? 'H002' :
                                    addr.indexOf('hyderabad') !== -1 ? 'H003' :
                                    addr.indexOf('karimnagar') !== -1 ? 'H004' :
-                                   addr.indexOf('visakhapatnam') !== -1 ? 'H005' : 'H001';
+                                   (addr.indexOf('visakhapatnam') !== -1 || addr.indexOf('vizag') !== -1) ? 'H005' : 'H001';
+                
+                var current_hub = o.assigned_hub || o.pickup_hub_id;
+                // Correct default assignments if user typed a specific destination during testing
+                if ((!current_hub || current_hub === 'H001') && fallback_hub !== 'H001') {
+                    current_hub = fallback_hub;
+                }
+                
                 return Object.assign({}, o, { 
-                    pickup_hub_id: o.assigned_hub || o.pickup_hub_id || fallback_hub 
+                    pickup_hub_id: current_hub 
                 }); 
             }); 
         },
@@ -176,12 +183,12 @@
             var nId = 'ORD_' + (s.orders.length + 100);
             
             // Map origin to a hub ID
-            var originLower = (d.origin || '').toLowerCase();
+            var addressSearch = ((d.origin || '') + ' ' + (d.dest || '')).toLowerCase();
             var hubId = 'H001'; // Default: Chennai
-            if (originLower.includes('bengaluru') || originLower.includes('bangalore')) hubId = 'H002';
-            else if (originLower.includes('hyderabad')) hubId = 'H003';
-            else if (originLower.includes('karimnagar')) hubId = 'H004';
-            else if (originLower.includes('visakhapatnam') || originLower.includes('vizag')) hubId = 'H005';
+            if (addressSearch.includes('bengaluru') || addressSearch.includes('bangalore') || addressSearch.includes('banglore')) hubId = 'H002';
+            else if (addressSearch.includes('hyderabad')) hubId = 'H003';
+            else if (addressSearch.includes('karimnagar')) hubId = 'H004';
+            else if (addressSearch.includes('visakhapatnam') || addressSearch.includes('vizag')) hubId = 'H005';
 
             var o = {
                 order_id: nId,

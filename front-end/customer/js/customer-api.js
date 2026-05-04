@@ -14,20 +14,39 @@ window.CustomerAPI = {
     const user = this.getCurrentUser();
     if (!user) return [];
 
+    let backendOrders = [];
     try {
       if (window.API && window.API.orders) {
         const res = await window.API.orders.getAll();
-        if (res) return res.filter(o => o.customer_name === user.name || o.customerId === user.user_id);
+        if (res) {
+          backendOrders = res.map(o => ({
+            ...o,
+            order_id: o.orderId || o.order_id,
+            tracking_id: o.trackingId || o.tracking_id,
+            created_at: o.createdAt || o.created_at,
+            customer_name: o.customerName || o.customer_name,
+            delivery_address: o.deliveryAddress || o.delivery_address,
+            package_type: o.packageType || o.package_type
+          })).filter(o => o.customer_name === user.name || o.customerId === user.user_id || o.customerId === user.id);
+        }
       }
     } catch (e) { console.warn("API fallback to AppState for orders"); }
 
-    // Fallback to state
+    let stateOrders = [];
     if (window.AppState) {
       const state = window.AppState.getState();
-      return state.orders.filter(o => o.customer_name === user.name || o.customerId === user.user_id)
-                         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      stateOrders = state.orders.filter(o => o.customer_name === user.name || o.customerId === user.user_id);
     }
-    return [];
+
+    // Merge and deduplicate by tracking_id or order_id
+    const combined = [...backendOrders];
+    stateOrders.forEach(so => {
+      if (!combined.find(bo => (bo.tracking_id && bo.tracking_id === so.tracking_id) || (bo.order_id && bo.order_id === so.order_id))) {
+        combined.push(so);
+      }
+    });
+
+    return combined.sort((a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0));
   },
 
   async getComplaints() {
@@ -66,15 +85,22 @@ window.CustomerAPI = {
     if (!user) throw new Error("Not authenticated");
 
     const payload = {
-      id: 'CMP-' + Math.floor(Math.random() * 10000),
       customer: user.name,
-      userId: user.id,
+      userId: user.id || user.user_id,
       date: new Date().toISOString(),
       status: 'Open',
       ...data
     };
 
+    try {
+      if (window.API && window.API.complaints) {
+        const res = await window.API.complaints.create(payload);
+        return { success: true, data: res };
+      }
+    } catch (e) { console.warn("API fallback to AppState for submitting complaint"); }
+
     if (window.AppState) {
+      payload.id = 'CMP-' + Math.floor(Math.random() * 10000);
       const state = window.AppState.getState();
       state.complaints.push(payload);
       window.AppState.saveState(state);
@@ -88,15 +114,22 @@ window.CustomerAPI = {
     if (!user) throw new Error("Not authenticated");
 
     const payload = {
-      id: 'FB-' + Math.floor(Math.random() * 10000),
       customer: user.name,
-      userId: user.id,
+      userId: user.id || user.user_id,
       date: new Date().toISOString(),
       status: 'Pending',
       ...data
     };
 
+    try {
+      if (window.API && window.API.feedback) {
+        const res = await window.API.feedback.create(payload);
+        return { success: true, data: res };
+      }
+    } catch (e) { console.warn("API fallback to AppState for submitting feedback"); }
+
     if (window.AppState) {
+      payload.id = 'FB-' + Math.floor(Math.random() * 10000);
       const state = window.AppState.getState();
       state.feedback.push(payload);
       window.AppState.saveState(state);
