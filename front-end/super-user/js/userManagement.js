@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     let isEditing = false;
+    let cachedUsers = []; // populated by loadAndRender(), used by edit/validate
 
     // ── Populate zones dropdown from state ─────────────────────────────
     function populateZones() {
@@ -89,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (_) {
             users = StorageAPI?.getUsers?.() || [];
         }
+        cachedUsers = users; // cache for edit/validate
         renderTable(users);
     }
 
@@ -180,15 +182,15 @@ document.addEventListener("DOMContentLoaded", () => {
     function openEditModal(id) {
         isEditing = true;
         modalTitle.innerText = "Edit User";
-        const user = StorageAPI.getUsers().find(u => u.id === id);
+        const user = cachedUsers.find(u => u.id === id);
         if (!user) return;
 
         idInput.value       = user.id;
         nameInput.value     = user.name;
         emailInput.value    = user.email;
-        passwordInput.value = user.password || "***";
+        passwordInput.value = "***";
         roleInput.value     = user.role;
-        statusInput.value   = user.status;
+        statusInput.value   = user.status || (user._raw?.isActive ? 'Active' : 'Pending');
 
         // Handle zone field visibility on edit
         if (user.role === 'delivery_agent') {
@@ -233,7 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
             emailInput.closest('.form-group').classList.add('has-error');
             valid = false;
         } else {
-            const existing = StorageAPI.getUsers().find(u => u.email === emailInput.value && u.id !== idInput.value);
+            const existing = cachedUsers.find(u => u.email === emailInput.value && u.id !== idInput.value);
             if (existing) {
                 const grp = emailInput.closest('.form-group');
                 grp.classList.add('has-error');
@@ -290,58 +292,49 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ── Save User ───────────────────────────────────────────────────────
-    saveBtn.addEventListener('click', e => {
+    saveBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
-
-        // Build role-aware numeric ID suffix for a new user
-        const rolePrefix = {
-            hub_manager:    'U_HM_',
-            merchant:       'U_MER_',
-            delivery_agent: 'U_AGT_',
-            customer:       'U_CUS_'
-        };
 
         const data = {
             name:    nameInput.value.trim(),
             email:   emailInput.value.trim(),
             role:    roleInput.value,
-            status:  statusInput.value,
-            active:  statusInput.value === 'Active'
         };
 
         if (roleInput.value === 'delivery_agent') {
-            data.zone_id = zoneInput.value;
-            // Derive hub from zone
-            const zones = StorageAPI.getZones();
-            const selectedZone = zones.find(z => z.id === zoneInput.value);
-            if (selectedZone) data.hub_id = selectedZone.hub_id;
+            data.hubId = zoneInput.value || undefined;
         }
 
+        // Only send password if user typed a new one
         if (passwordInput.value.trim() !== "******" &&
             passwordInput.value.trim() !== "***" &&
             passwordInput.value.trim() !== "") {
             data.password = passwordInput.value.trim();
         }
 
-        if (isEditing) {
-            StorageAPI.updateUser(idInput.value, data);
-            if (typeof window.showToast === 'function') window.showToast('User updated successfully!', 'success');
-        } else {
-            // Generate a stable user_id based on role
-            const prefix = rolePrefix[data.role] || 'USR_';
-            const s = window.AppState.getState();
-            const roleCount = s.users.filter(u => u.role === data.role).length;
-            data.user_id = prefix + (roleCount + 200 + Math.floor(Math.random() * 9) + 1);
-            s.users.push(data);
-            window.AppState.saveState(s);
-            if (typeof window.showToast === 'function') {
-                window.showToast(`User "${data.name}" created! They can log in with: ${data.email} / ${data.password || '(no password set)'}`, 'success');
+        try {
+            if (isEditing) {
+                await window.API.users.update(idInput.value, data);
+                if (typeof window.showToast === 'function') window.showToast('User updated successfully!', 'success');
+            } else {
+                // New user — password is required
+                if (!data.password) {
+                    if (typeof window.showToast === 'function') window.showToast('Password is required for new users', 'error');
+                    return;
+                }
+                await window.API.users.create(data);
+                if (typeof window.showToast === 'function') {
+                    window.showToast(`User "${data.name}" created successfully!`, 'success');
+                }
             }
+        } catch (err) {
+            if (typeof window.showToast === 'function') window.showToast(err.message || 'Operation failed', 'error');
+            return;
         }
 
         closeModal();
-        renderTable();
+        await loadAndRender();
     });
 
     // ── Initial Render ─────────────────────────────────────────────────
