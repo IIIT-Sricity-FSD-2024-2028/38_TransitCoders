@@ -363,6 +363,55 @@
             created_at: new Date(Date.now() - 259200000).toISOString(), assigned_hub: 'H002', assigned_agent: 'U_AGT_104'
         });
 
+        // ── Dedicated orders for test customer: Priya Iyer (customer@swifttrack.com) ──
+        var priyaOrders = [
+            { id: 'ORD_PI_1', tid: 'SWT-880001', addr: 'MG Road, Bengaluru', hub: 'H002', status: 'In Transit', pkg: 'Express', wt: 1.2, amt: 980, days: 1, agent: 'U_AGT_104' },
+            { id: 'ORD_PI_2', tid: 'SWT-880002', addr: 'Koramangala 5th Block, Bengaluru', hub: 'H002', status: 'Out for Delivery', pkg: 'Standard', wt: 3.5, amt: 1450, days: 2, agent: 'U_AGT_104' },
+            { id: 'ORD_PI_3', tid: 'SWT-880003', addr: 'Anna Nagar, Chennai', hub: 'H001', status: 'Delivered', pkg: 'Express', wt: 0.8, amt: 650, days: 5, agent: 'U_AGT_102' },
+            { id: 'ORD_PI_4', tid: 'SWT-880004', addr: 'T. Nagar, Chennai', hub: 'H001', status: 'Delivered', pkg: 'Standard', wt: 2.1, amt: 820, days: 8, agent: 'U_AGT_102' },
+            { id: 'ORD_PI_5', tid: 'SWT-880005', addr: 'Madhapur, Hyderabad', hub: 'H003', status: 'Pending', pkg: 'Express', wt: 4.0, amt: 1750, days: 0, agent: null },
+            { id: 'ORD_PI_6', tid: 'SWT-880006', addr: 'Banjara Hills, Hyderabad', hub: 'H003', status: 'Assigned', pkg: 'Standard', wt: 1.5, amt: 550, days: 1, agent: 'U_AGT_105' },
+            { id: 'ORD_PI_7', tid: 'SWT-880007', addr: 'Velachery, Chennai', hub: 'H001', status: 'Delivered', pkg: 'Express', wt: 0.5, amt: 420, days: 15, agent: 'U_AGT_102' },
+            { id: 'ORD_PI_8', tid: 'SWT-880008', addr: 'Whitefield, Bengaluru', hub: 'H002', status: 'Cancelled', pkg: 'Standard', wt: 6.0, amt: 2200, days: 10, agent: null }
+        ];
+        priyaOrders.forEach(function(po) {
+            state.orders.push({
+                order_id: po.id, tracking_id: po.tid, merchant_id: 'U_MER_1',
+                customer_name: 'Priya Iyer', customer_phone: '+91 98450 7777',
+                pickup_address: state.hubs.find(function(h){ return h.hub_id === po.hub; }).name,
+                delivery_address: po.addr, pickup_hub_id: po.hub,
+                package_type: po.pkg, weight: po.wt, amount: po.amt, status: po.status,
+                created_at: new Date(Date.now() - (po.days * 86400000)).toISOString(),
+                assigned_hub: po.hub, assigned_agent: po.agent
+            });
+        });
+
+        // ── Extra orders for John Doe ──
+        state.orders.push({
+            order_id: 'ORD_JOHNDOE_3', tracking_id: 'SWT-777003', merchant_id: 'U_MER_1',
+            customer_name: 'John Doe', customer_phone: '+91 98450 9999',
+            pickup_address: 'Chennai Central Hub', delivery_address: 'Adyar, Chennai',
+            pickup_hub_id: 'H001',
+            package_type: 'Express', weight: 1.0, amount: 620, status: window.SwiftTrackEnums.OrderStatus.PENDING,
+            created_at: new Date(Date.now() - 7200000).toISOString(), assigned_hub: 'H001', assigned_agent: null
+        });
+        state.orders.push({
+            order_id: 'ORD_JOHNDOE_4', tracking_id: 'SWT-777004', merchant_id: 'U_MER_1',
+            customer_name: 'John Doe', customer_phone: '+91 98450 9999',
+            pickup_address: 'Hyderabad Logistics Hub', delivery_address: 'Gachibowli, Hyderabad',
+            pickup_hub_id: 'H003',
+            package_type: 'Standard', weight: 3.2, amount: 1100, status: window.SwiftTrackEnums.OrderStatus.OUT_FOR_DELIVERY,
+            created_at: new Date(Date.now() - 172800000).toISOString(), assigned_hub: 'H003', assigned_agent: 'U_AGT_105'
+        });
+        state.orders.push({
+            order_id: 'ORD_JOHNDOE_5', tracking_id: 'SWT-777005', merchant_id: 'U_MER_1',
+            customer_name: 'John Doe', customer_phone: '+91 98450 9999',
+            pickup_address: 'Bengaluru Logistics Park', delivery_address: 'HSR Layout, Bengaluru',
+            pickup_hub_id: 'H002',
+            package_type: 'Express', weight: 0.6, amount: 380, status: window.SwiftTrackEnums.OrderStatus.DELIVERED,
+            created_at: new Date(Date.now() - 604800000).toISOString(), assigned_hub: 'H002', assigned_agent: 'U_AGT_104'
+        });
+
         /* Legacy agent profile info so settings works */
         state.agentProfile = { name: 'Karthik', currentStatus: 'available', performance: { completed: 271, rating: 4.6 } };
 

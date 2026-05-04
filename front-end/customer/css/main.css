@@ -1,0 +1,110 @@
+/* ═══════════════════════════════════════════
+   SWIFTTRACK CUSTOMER-V2 – MAIN TOKENS
+   Uses the team's standard design tokens
+═══════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  /* Team Standard – Design Tokens */
+  --orange:    #F97316;
+  --orange-d:  #EA6C0A;
+  --orange-l:  #FFF0E6;
+  --dark:      #111827;
+  --dark2:     #1F2937;
+  --dark3:     #374151;
+  --dark4:     #4B5563;
+  --mid:       #6B7280;
+  --light:     #9CA3AF;
+  --border:    #E5E7EB;
+  --border-d:  #374151;
+  --bg:        #F3F4F6;
+  --white:     #FFFFFF;
+  --green:     #10B981;
+  --red:       #EF4444;
+  --blue:      #3B82F6;
+  --yellow:    #F59E0B;
+  --r:         8px;
+  --r-lg:      12px;
+  --r-xl:      16px;
+  --shadow:    0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+
+  /* Aliases for customer component layer (mapped to team tokens) */
+  --primary: var(--orange);
+  --primary-hover: var(--orange-d);
+  --text-primary: var(--dark);
+  --text-secondary: var(--mid);
+  --text-muted: var(--light);
+  --bg-main: var(--bg);
+  --bg-surface: var(--white);
+  --border-light: var(--border);
+  --success: var(--green);
+  --warning: var(--yellow);
+  --danger: var(--red);
+  --info: var(--blue);
+
+  --radius-md: var(--r);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+  --radius-full: 9999px;
+}
+
+/* ── Dark Theme ── */
+body.dark {
+  --bg:        #111827;
+  --white:     #1F2937;
+  --border:    #374151;
+  --dark:      #F9FAFB;
+  --dark2:     #F3F4F6;
+  --dark3:     #E5E7EB;
+  --dark4:     #D1D5DB;
+  --mid:       #9CA3AF;
+  --light:     #6B7280;
+  --shadow:    0 1px 3px rgba(0,0,0,.4);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.4);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,.5);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--dark);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--dark);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+a {
+  color: var(--orange);
+  text-decoration: none;
+  transition: color .15s;
+}
+
+a:hover { color: var(--orange-d); }
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  background: none;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  outline: none;
+}
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

@@ -108,7 +108,7 @@ async function handleLogin(form) {
       super_user:     "../super-user/dashboard.html",
       hub_manager:    "../hub-manager/dashboard.html",
       merchant:       "../merchant/merchant.html",
-      customer:       "../customer/dashboard.html",
+      customer:       "../customer/index.html",
       delivery_agent: "../delivery-agent/worklist.html",
     };
     setTimeout(() => { window.location.href = routeMap[user.role] || "../index.html"; }, 1500);
@@ -139,7 +139,7 @@ function _mockLoginFallback(email, password) {
   localStorage.setItem("userRole", match.role);
   showToast("Login successful! (offline mode)", "success");
 
-  const routeMap = { super_user:"../super-user/dashboard.html", hub_manager:"../hub-manager/dashboard.html", merchant:"../merchant/merchant.html", customer:"../customer/dashboard.html", delivery_agent:"../delivery-agent/worklist.html", admin:"../hub-manager/dashboard.html" };
+  const routeMap = { super_user:"../super-user/dashboard.html", hub_manager:"../hub-manager/dashboard.html", merchant:"../merchant/merchant.html", customer:"../customer/index.html", delivery_agent:"../delivery-agent/worklist.html", admin:"../hub-manager/dashboard.html" };
   setTimeout(() => { window.location.href = routeMap[match.role] || "../index.html"; }, 1500);
 }
 

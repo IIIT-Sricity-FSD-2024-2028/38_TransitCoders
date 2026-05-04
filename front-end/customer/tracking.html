@@ -1,698 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracking | SwiftTrack Customer</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="css/dashboard.css">
-    <style>
-        .tracking-layout {
-            display: flex;
-            height: 764px;
-            border-radius: 12px;
-            overflow: hidden;
-            background: var(--surface-default);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .map-area {
-            flex: 1;
-            background: linear-gradient(158deg, #e8f0e4 0%, #d4e4ce 50%, #e8f0e4 100%);
-            position: relative;
-            background-image: url('../assets/map-bg.png'); /* Fallback to image if available */
-            background-size: cover;
-            background-position: center;
-        }
-
-        .map-overlay-pin {
-            position: absolute;
-            bottom: 24px;
-            left: 24px;
-            background: var(--surface-default);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: var(--shadow-lg);
-            width: 300px;
-            z-index: 10;
-        }
-
-        .pin-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-
-        .pin-icon {
-            background: rgba(255, 107, 43, 0.08);
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--clr-orange-500);
-        }
-
-        .pin-codes {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-        }
-
-        .pin-digit {
-            flex: 1;
-            height: 56px;
-            background: rgba(255, 107, 43, 0.04);
-            border: 2px solid var(--clr-orange-500);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--clr-orange-500);
-        }
-
-        .right-panel {
-            width: 320px;
-            background: var(--surface-default);
-            border-left: 1px solid var(--border-default);
-            padding: 28px 24px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 28px;
-        }
-
-        .driver-card {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-default);
-        }
-
-        .driver-avatar {
-            width: 48px;
-            height: 48px;
-            flex-shrink: 0; /* Prevents squishing into an oval */
-            background: var(--surface-subtle);
-            border: 2px solid var(--clr-orange-500);
-            border-radius: 50%;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .driver-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .driver-actions {
-            display: flex;
-            gap: 10px;
-            margin-left: auto;
-        }
-
-        .action-btn {
-            width: 36px;
-            height: 36px;
-            background: #f0f2f5;
-            border: 1px solid var(--border-default);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-title);
-        }
-
-        /* Premium Aesthetics */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-            border-radius: 12px;
-        }
-
-        .agent-profile-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 16px 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-            border: 1px solid var(--border-default);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .agent-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--orange));
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: 700;
-            box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.3);
-        }
-
-        .agent-info {
-            flex: 1;
-        }
-
-        .agent-info h4 {
-            margin: 0 0 4px;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-title);
-        }
-
-        .agent-info p {
-            margin: 0;
-            font-size: 13px;
-            color: var(--text-subtitle);
-            font-weight: 500;
-        }
-
-        .agent-contact {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--surface-default);
-            border: 1px solid var(--border-default);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-icon:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .timeline {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            position: relative;
-        }
-
-        .timeline-item {
-            display: flex;
-            gap: 16px;
-            position: relative;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: 7px; /* (16px dot / 2) - (2px line / 2) = 7px */
-            top: 24px;
-            bottom: -24px;
-            width: 2px;
-            background: var(--border-default);
-        }
-
-        .timeline-item:last-child::before {
-            display: none;
-        }
-
-        .timeline-dot {
-            width: 16px;
-            height: 16px;
-            min-width: 16px;
-            border-radius: 50%;
-            z-index: 2;
-            margin-top: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .dot-fill { background: var(--clr-orange-500); border: 2px solid var(--clr-orange-500); }
-        .dot-outline { background: var(--surface-default); border: 2px solid var(--clr-orange-500); }
-        .dot-inactive { background: var(--surface-default); border: 2px solid var(--clr-neutral-400); }
-
-        .timeline-content {
-            flex: 1;
-        }
-
-        .timeline-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 2px;
-        }
-
-        .timeline-header h4 {
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .timeline-header .time {
-            font-size: 11px;
-            color: var(--text-subtitle);
-        }
-
-        .speed-overlay {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            background: var(--surface-default);
-            padding: 16px 24px;
-            border-radius: 8px;
-            box-shadow: var(--shadow-md);
-            display: flex;
-            gap: 24px;
-            z-index: 10;
-        }
-
-        .map-marker {
-            position: absolute;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transform: translate(-50%, -50%);
-        }
-
-        .marker-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            border: 3px solid #f0f2f5;
-        }
-
-        .marker-label {
-            background: white;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 600;
-            box-shadow: var(--shadow-sm);
-            white-space: nowrap;
-            margin-top: 6px;
-            color: #1a1f36;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Shipment | SwiftTrack Customer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
 </head>
 <body>
-    <div class="app">
-        <!-- Sidebar Navigation -->
-            <!-- ── UNIFIED SIDEBAR ── -->
+  
+  <div class="app-container">
+    
+    <!-- Sidebar -->
     <aside class="sidebar">
-        <a href="dashboard.html" class="sidebar-logo">
-            <div class="logo-icon">
-                <svg viewBox="0 0 24 24" fill="white"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" /></svg>
-            </div>
-            <div class="logo-name">Swift<span>Track</span></div>
-        </a>
-        <nav class="sidebar-nav">
-
-                <a href="dashboard.html" class="nav-item">
-                    
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg><span>Dashboard</span>
-                </a>
-                <a href="tracking.html" class="nav-item active">
-                    
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg><span>Tracking</span>
-                </a>
-                <a href="orders.html" class="nav-item">
-                    
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg><span>My Orders</span>
-                </a>
-            
-        </nav>
-        <div class="sidebar-footer">
-            <a href="#" class="user-pill logout-btn" onclick="if(window.Auth) Auth.logout(); else { sessionStorage.clear(); localStorage.clear(); window.location.href='../index.html'; }">
-                <div class="user-avatar avatar-initials">AJ</div>
-                <div class="user-info">
-                    <span class="u-name user-name">Ajay Prakash</span>
-                    <span class="u-role user-role">Customer</span>
-                </div> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--mid);margin-left:auto" title="Sign out"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
-            </a>
+      <div class="sidebar-header">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
         </div>
+        <div class="logo-text">Swift<span>Track</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="index.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a></li>
+          <li><a href="tracking.html" class="nav-item active"><i class="fa-solid fa-location-crosshairs"></i> Tracking</a></li>
+          <li><a href="orders.html" class="nav-item"><i class="fa-solid fa-box-open"></i> My Orders</a></li>
+          <li><a href="support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Help & Support</a></li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-profile-sm">
+          <div class="user-avatar">US</div>
+          <div class="user-info">
+            <div class="user-name">Loading...</div>
+            <div class="user-role">Customer</div>
+          </div>
+          <button class="icon-btn" onclick="window.logout()" title="Logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
     </aside>
 
-        <!-- Main Content -->
-        <div class="main">
-                <!-- ── UNIFIED TOPBAR ── -->
-        <header class="topbar">
-        <div class="topbar-title" id="topbar-title">Tracking</div>
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-title">Tracking</div>
         <div class="topbar-right">
-          <!-- Theme Toggle (exact Merchant) -->
-          <div class="theme-toggle" onclick="toggleTheme()">
+          <div class="theme-toggle" id="theme-toggle">
             <svg id="theme-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
             <span id="theme-label">Light</span>
           </div>
-
-          <!-- Search Box -->
           <div class="search-box">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input placeholder="Search tracking ID..." onkeydown="if(event.key==='Enter' && this.value.trim()) window.location.href='tracking.html?id='+encodeURIComponent(this.value.trim())" />
+            <input placeholder="Search tracking ID..." id="global-search"/>
           </div>
-
-          <!-- Notifications (exact Merchant) -->
-          <div class="icon-wrap">
-            <button class="icon-btn" onclick="toggleDropdown('notif-panel')" id="btn-notif">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
-            </button>
-            <div class="dropdown-panel" id="notif-panel">
-              <div class="dropdown-header">
-                <div class="dropdown-title">Notifications</div>
-                <div class="dropdown-action dropdown-action-orange">Mark all as read</div>
-              </div>
-              <div class="dropdown-list">
-                <div class="notif-item">
-                  <div class="notif-icon n-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-                  <div class="notif-content">
-                    <div class="notif-title-row">
-                      <div class="notif-title">New order received</div>
-                      <div class="notif-time">2m ago <div class="notif-unread-dot"></div></div>
-                    </div>
-                    <div class="notif-desc">Order #LP-8842 has been successfully placed and is ready for processing.</div>
-                  </div>
-                </div>
-                <div class="notif-item">
-                  <div class="notif-icon n-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-                  <div class="notif-content">
-                    <div class="notif-title-row">
-                      <div class="notif-title">Shipment delayed</div>
-                      <div class="notif-time">45m ago <div class="notif-unread-dot"></div></div>
-                    </div>
-                    <div class="notif-desc">Transit delay for Shipment #TRK-901 due to adverse weather conditions in North Hub.</div>
-                  </div>
-                </div>
-                <div class="notif-item">
-                  <div class="notif-icon n-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
-                  <div class="notif-content">
-                    <div class="notif-title-row">
-                      <div class="notif-title">Support response</div>
-                      <div class="notif-time">3h ago</div>
-                    </div>
-                    <div class="notif-desc">"Our technician is currently reviewing the API documentation for your..."</div>
-                  </div>
-                </div>
-                <div class="notif-item">
-                  <div class="notif-icon n-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
-                  <div class="notif-content">
-                    <div class="notif-title-row">
-                      <div class="notif-title">System maintenance</div>
-                      <div class="notif-time">Yesterday</div>
-                    </div>
-                    <div class="notif-desc">The SwiftTrack Portal will undergo scheduled maintenance tonight at 2:00 AM IST.</div>
-                  </div>
-                </div>
-              </div>
-              <div class="dropdown-footer">View All Notifications  ›</div>
-            </div>
+          <div class="icon-wrap" id="notif-wrap">
+            <button class="icon-btn" title="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button>
+            <div class="notif-dot"></div>
           </div>
-
-          <!-- User Profile (exact Merchant) -->
-          <div class="icon-wrap" style="margin-left: 8px;">
-            <div class="user-profile-btn" onclick="toggleDropdown('user-panel')" id="btn-user">
-              <div class="user-avatar avatar-initials" id="topbar-avatar-initials" style="width:100%;height:100%;border-radius:50%;background:var(--orange);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;">U</div>
-            </div>
-            <div class="dropdown-panel user-panel" id="user-panel">
-              <div class="user-header">
-                <div class="user-avatar-lg" id="dropdown-avatar-initials">U</div>
-                <div class="user-name-box">
-                  <div class="user-name" id="dropdown-name">User</div>
-                  <div class="user-email" id="dropdown-email">user@swifttrack.com</div>
-                </div>
-              </div>
-              <div class="user-role-badge">
-                <div class="user-role-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> <span id="dropdown-role-label">USER</span></div>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" color="var(--mid)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-              </div>
-              <div class="user-menu">
-                <div class="user-menu-item" onclick="toggleDropdown('profile-panel'); document.getElementById('user-panel').classList.remove('open')">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                  <span style="flex:1">My Profile</span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" color="var(--border)"><polyline points="9 18 15 12 9 6"/></svg>
-                </div>
-                <div class="user-menu-item" onclick="openAccountSettings(); toggleDropdown('user-panel')">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-                  <span style="flex:1">Account Settings</span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" color="var(--border)"><polyline points="9 18 15 12 9 6"/></svg>
-                </div>
-                <div class="divider" style="margin: 4px 0"></div>
-                <div class="user-menu-item logout" onclick="handleLogout()">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-                  <span>Log Out</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Profile Details Dropdown (Secondary) -->
-            <div class="dropdown-panel" id="profile-panel" style="width: 440px; padding: 0 24px 24px; max-height: calc(100vh - 80px); overflow-y: auto;">
-              <div style="text-align:center; margin-bottom: 32px; padding-top:24px;">
-                <div style="display:inline-flex; width:80px; height:80px; border-radius:50%; background:var(--orange); color:#fff; font-size:28px; font-weight:800; align-items:center; justify-content:center;">
-                  <span id="profile-avatar-initials">U</span>
-                </div>
-                <div style="font-family:'Barlow Condensed','Poppins',sans-serif; font-size:26px; font-weight:800; color:var(--dark); margin-top:12px;" id="profile-name">User</div>
-                <div style="font-size:14px; color:var(--mid); margin-top:2px;" id="profile-email">user@swifttrack.com</div>
-              </div>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="font-size:16px; font-weight:700; color:var(--dark3);">Personal details</h3>
-              </div>
-              <div style="background:var(--bg); border:none; padding:24px; border-radius:12px; box-shadow:none;">
-                <div class="section-grid g2" style="row-gap:20px;">
-                  <div>
-                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Full Name</div>
-                    <div style="font-size:14px; font-weight:600; color:var(--dark2)" id="profile-fullname">User</div>
-                  </div>
-                  <div>
-                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Phone Number</div>
-                    <div style="font-size:14px; font-weight:600; color:var(--dark2)" id="profile-phone">+91 98765 43210</div>
-                  </div>
-                  <div style="grid-column: 1 / -1;">
-                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Email</div>
-                    <div style="font-size:14px; font-weight:600; color:var(--dark2)" id="profile-email-detail">user@swifttrack.com</div>
-                  </div>
-                </div>
-              </div>
-              <div style="margin-top:20px; margin-bottom:12px;">
-                <h3 style="font-size:16px; font-weight:700; color:var(--dark3);">Account Details</h3>
-              </div>
-              <div style="background:#EBEBEB; border:none; padding:24px; border-radius:12px; box-shadow:none;">
-                <div class="section-grid g2" style="row-gap:20px;">
-                  <div>
-                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Account Created</div>
-                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">March 20, 2026</div>
-                  </div>
-                  <div style="text-align:right">
-                    <div style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; background:rgba(249,115,22,.2); color:var(--orange-d); border-radius:12px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Verified
-                    </div>
-                  </div>
-                  <div>
-                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Language</div>
-                    <div style="font-size:14px; font-weight:600; color:var(--dark2); display:flex; align-items:center; gap:6px;">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> English
-                    </div>
-                  </div>
-                  <div style="text-align:right">
-                    <div style="font-size:10px; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Time Zone</div>
-                    <div style="font-size:14px; font-weight:600; color:var(--dark2)">IST (UTC+5:30)</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="icon-wrap" id="avatar-wrap" style="margin-left: 8px;">
+            <div class="user-profile-btn" id="topbar-avatar"><span class="topbar-initials">JD</span><div class="user-status-dot"></div></div>
           </div>
         </div>
       </header>
-<div class="content">
-            <!-- Header -->
-            <header class="page-header">
-                <div class="header-meta">
-                    <h1>Track Shipment</h1>
-                    <p>Welcome back! track you shipment swiftly.</p>
-                </div>
-            </header>
 
-            <div class="card mb16 animate-reveal" style="display:flex;gap:10px;align-items:flex-start">
-              <div style="flex:1">
-                <input class="form-input" id="track-input" placeholder="Enter tracking ID e.g. SWT-2026-98471"
-                  onkeydown="if(event.key==='Enter')doTrackCustomer()" />
-                <span class="field-error" id="track-error" style="display:none; color:var(--danger); font-size:12px; margin-top:4px;">Tracking ID not found.</span>
-              </div>
-              <button class="btn btn-primary" onclick="doTrackCustomer()">Track Now</button>
-            </div>
+      <div class="content-area">
 
-            <!-- Premium Tracking Layout -->
-            <div id="track-result" style="display:none" class="animate-reveal" style="animation-delay: 0.1s;">
-              
-              <!-- Agent Profile Card -->
-              <div class="agent-profile-card mb16" id="agent-profile-card" style="display:none;">
-                  <div class="agent-avatar" id="agent-avatar-text">--</div>
-                  <div class="agent-info">
-                      <h4 id="agent-name">Assigned Agent</h4>
-                      <p>Delivery Executive &bull; <span id="agent-vehicle">Vehicle info</span></p>
-                  </div>
-                  <div class="agent-contact">
-                      <button class="btn-icon"><i class="fas fa-phone"></i></button>
-                      <button class="btn-icon"><i class="fas fa-comment"></i></button>
-                  </div>
-              </div>
+        <!-- Search Bar -->
+        <div class="page-header">
+          <div>
+            <div class="page-heading">Track Shipment</div>
+            <div class="page-sub">Welcome back! Track your shipment swiftly.</div>
+          </div>
+        </div>
 
-              <div class="section-grid g-dash mb16" id="customer-tracking-grid">
-              <!-- Map -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <input type="text" id="tracking-input" class="form-control" placeholder="Enter tracking ID e.g. SWT-" style="flex: 1; padding: 12px 16px; font-size: 1rem; border: 1.5px solid var(--border);">
+            <button class="btn btn-primary" id="btn-track" style="padding: 12px 24px; white-space: nowrap;">
+              <i class="fa-solid fa-magnifying-glass"></i> Track Now
+            </button>
+          </div>
+        </div>
+
+        <!-- Tracking Result (hidden by default) -->
+        <div id="tracking-result" style="display: none;">
+
+          <!-- Shipment Overview Card -->
+          <div class="card" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
               <div>
-                <div class="map-placeholder" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
-                  <svg class="map-route-svg" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="600" height="400" fill="#f8fafc" />
-                    <!-- Roads -->
-                    <path d="M-50 200 Q150 180 300 220 Q450 260 650 200" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round" />
-                    <path d="M50 350 Q200 280 350 310 Q450 330 650 320" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" />
-                    <path d="M100 50 Q200 80 400 120 Q500 140 650 100" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" />
-                    <!-- Buildings -->
-                    <rect x="120" y="150" width="60" height="40" rx="6" fill="#e2e8f0" />
-                    <rect x="350" y="120" width="50" height="35" rx="6" fill="#e2e8f0" />
-                    <rect x="450" y="230" width="40" height="30" rx="6" fill="#e2e8f0" />
-                    <!-- Animated route -->
-                    <path d="M150 280 Q250 200 320 210 Q400 220 460 160" fill="none" stroke="var(--primary)" stroke-width="4" stroke-dasharray="10,8">
-                      <animate attributeName="stroke-dashoffset" values="100;0" dur="2s" repeatCount="indefinite" />
-                    </path>
-                  </svg>
-                  
-                  <!-- Glassmorphic Map Overlay -->
-                  <div class="map-overlay glass-panel">
-                    <div class="map-card">
-                      <div class="map-card-title">Shipment ID</div>
-                      <div class="map-card-val text-brand" id="track-tid" style="font-family:'Space Grotesk',sans-serif;font-size:14px;">—</div>
-                    </div>
-                    <div class="map-card">
-                      <div class="map-card-title">Status</div>
-                      <div class="map-card-val" id="track-status-badge" style="font-size:13px;">—</div>
-                    </div>
-                    <div class="map-card">
-                      <div class="map-card-title">Route</div>
-                      <div style="font-size:12px;color:var(--text-subtitle);font-weight:500;"><span id="track-from">—</span> <i class="fas fa-arrow-right" style="margin:0 4px;font-size:10px;color:var(--primary);"></i> <span id="track-to">—</span></div>
-                    </div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--light); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px;">Tracking ID</div>
+                <h2 id="track-id" style="font-size: 1.5rem; color: var(--orange);">SWT-XXXXXX</h2>
+              </div>
+              <span class="badge" id="track-badge">Pending</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+              <div>
+                <div style="font-size: 10px; font-weight: 700; color: var(--light); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 2px;">Origin</div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--dark);" id="track-origin">—</div>
+              </div>
+              <div>
+                <div style="font-size: 10px; font-weight: 700; color: var(--light); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 2px;">Destination</div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--dark);" id="track-destination">—</div>
+              </div>
+              <div>
+                <div style="font-size: 10px; font-weight: 700; color: var(--light); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 2px;">Package</div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--dark);" id="track-package">Standard</div>
+              </div>
+              <div>
+                <div style="font-size: 10px; font-weight: 700; color: var(--light); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 2px;">Date</div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--dark);" id="track-date">—</div>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="sc-progress-wrapper">
+              <div class="sc-progress-bar" style="height: 8px;">
+                <div class="sc-progress-fill" id="track-progress" style="width: 0%;"></div>
+              </div>
+              <div class="sc-progress-labels" style="margin-top: 8px;">
+                <span>Placed</span>
+                <span>In Transit</span>
+                <span>Delivered</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline + Actions -->
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
+            
+            <!-- Tracking Timeline -->
+            <div class="card">
+              <h3 style="font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 20px;">Shipment Timeline</h3>
+              <div id="tracking-timeline" class="tracking-timeline">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div>
+              <div class="card" style="margin-bottom: 16px;">
+                <h3 style="font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 16px;">Delivery Agent</h3>
+                <div id="track-agent-info" style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;" id="track-agent-avatar">—</div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 600; color: var(--dark);" id="track-agent-name">Not Assigned</div>
+                    <div style="font-size: 11px; color: var(--mid);" id="track-agent-phone">—</div>
                   </div>
                 </div>
               </div>
 
-              <!-- Timeline -->
-              <div class="track-detail glass-panel-light" style="border-radius: 16px; padding: 24px; background: #ffffff; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid var(--border-default);">
-                <div style="font-size:16px;font-weight:700;color:var(--text-title);margin-bottom:4px">Recipient Details</div>
-                <div style="font-size:14px;color:var(--text-subtitle);margin-bottom:20px">Delivering to <span id="track-recv" style="color:var(--primary);font-weight:600;">—</span> via <span id="track-svc" style="font-weight:500;">—</span></div>
-                <div class="divider" style="margin:0 0 24px"></div>
-                <div class="timeline-track" id="dynamic-timeline-track">
-                   <!-- dynamic JS content -->
-                </div>
+              <div class="card">
+                <h3 style="font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 16px;">Need Help?</h3>
+                <button class="btn btn-primary" id="btn-report-issue" style="width: 100%; margin-bottom: 8px;">
+                  <i class="fa-solid fa-triangle-exclamation"></i> Report Issue
+                </button>
+                <button class="btn btn-secondary" style="width: 100%;" onclick="window.location.href='support.html'">
+                  <i class="fa-solid fa-headset"></i> Contact Support
+                </button>
               </div>
             </div>
-            </div>
 
-            <!-- Footer Buttons -->
-            <div style="display: flex; gap: 60px; justify-content: center; margin-top: 20px;">
-                <a href="complaint.html" class="btn btn-primary" style="border-radius: 50px;">Complaint</a>
-                <a href="feedback.html" class="btn btn-primary" style="border-radius: 50px;">Feedback</a>
-            </div>
-        </div></div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="dashboard-footer">
-        <div class="footer-copyright">
-            © 2026 SwiftTrack. All rights reserved.
-        </div>
-        <div class="social-links">
-            <i class="fab fa-github"></i>
-            <i class="fab fa-instagram"></i>
-            <i class="fab fa-linkedin"></i>
-            <i class="fab fa-twitter"></i>
-        </div>
-    </footer>
-
-    <script src="../js/api.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../assets/js/ui-global.js"></script>
-    <script src="../assets/js/state.js"></script>
-
-    <script src="../assets/js/state-compat.js"></script>
-
-    <script src="js/dashboard.js"></script>
-    <script src="js/tracking.js"></script>
-
-    <!-- Account Settings Modal -->
-    <div class="modal-overlay" id="account-settings-modal">
-      <div class="modal-box">
-        <button class="modal-close-btn" onclick="closeAccountSettings()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-        <div class="modal-title">Account Settings</div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Email Notifications</div>
-            <div class="settings-desc">Receive email alerts for important updates</div>
           </div>
-          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+
         </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Push Notifications</div>
-            <div class="settings-desc">Enable browser push notifications</div>
+
+        <!-- No Result Message -->
+        <div id="tracking-empty" style="display: none;">
+          <div class="card" style="text-align: center; padding: 48px;">
+            <i class="fa-solid fa-magnifying-glass" style="font-size: 3rem; color: var(--border); margin-bottom: 16px;"></i>
+            <h3 style="color: var(--dark); margin-bottom: 8px;">No shipment found</h3>
+            <p style="color: var(--mid); font-size: 13px;">Please check the tracking ID and try again.</p>
           </div>
-          <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
         </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Two-Factor Authentication</div>
-            <div class="settings-desc">Add an extra layer of security to your account</div>
-          </div>
-          <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Language</div>
-            <div class="settings-desc">Choose your preferred language</div>
-          </div>
-          <div class="settings-value">English</div>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Time Zone</div>
-            <div class="settings-desc">Set your local time zone</div>
-          </div>
-          <div class="settings-value">IST (UTC+5:30)</div>
-        </div>
+
       </div>
-    </div>
-    <script>
-      function openAccountSettings() {
-        var m = document.getElementById('account-settings-modal');
-        if (m) m.classList.add('active');
-      }
-      function closeAccountSettings() {
-        var m = document.getElementById('account-settings-modal');
-        if (m) m.classList.remove('active');
-      }
-    </script>
+    </main>
+
+  </div>
+
+  <!-- Shared Scripts -->
+  <script src="../assets/js/state.js"></script>
+  <script src="js/customer-api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/views/tracking.js"></script>
+
+  <style>
+    @media (max-width: 768px) {
+      #mobile-menu-toggle { display: flex !important; margin-right: 16px; }
+      .topbar-left { display: flex; align-items: center; }
+    }
+  </style>
 </body>
 </html>
