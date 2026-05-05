@@ -22,65 +22,135 @@ Traditional logistics often suffer from fragmented communication and manual disp
 
 ---
 
-# Planned Features – Actor wise
+# Implemented Features – Actor wise
 
 ## Merchant 
 
-- Create single or bulk shipment orders  
+- Create, edit, and cancel delivery orders  
 - Enter product and package details  
 - Calculate delivery price and ETA  
-- Schedule pickups  
-- Generate barcode / QR code for shipments  
 - Track shipment status end-to-end  
 - Cancel shipment before dispatch  
-- View order history and submit reviews  
+- View order history with analytics and charts  
+- Support ticket creation and management  
 
 ---
 
 ## Hub Manager
 
-- Track shipments within the hub  
-- Monitor inter-hub shipment movement  
-- Manually override routing decisions  
-- Assign or reassign delivery agents  
-- Contact drivers and other hubs  
+- Dashboard with hub-level KPIs  
+- Order queue management and dispatch  
+- Agent assignment and reassignment  
+- Inter-hub transfer management  
+- Operational reports and analytics  
 - Update shipment status and details  
-- Organize hub operations  
 
 ---
 
 ## Delivery Agent 
 
 - View assigned deliveries (worklist)  
-- Scan barcode / QR to fetch shipment details  
-- Update delivery status (delivered, failed, delayed)  
+- Delivery acceptance workflow  
+- Package verification (barcode / details)  
+- Delivery confirmation with proof-of-delivery  
 - Report mishaps or delivery issues  
-- Upload Proof of Delivery (POD)  
 - View delivery history  
-- Local Delivery Partner
+- Profile management and availability toggle  
 
 ---
 
 ## Customer
 
-### Sending
-- Calculate shipment price  
-- Schedule pickup  
-- Track shipment  
-
-### Receiving
-- Track delivery status in real time  
-- Receive delivery notifications  
+- Dashboard with active order overview  
+- Order listing and detail view  
+- Track delivery status in real time with timeline  
+- Complaints submission  
+- Feedback and ratings  
 
 ---
 
-## Admin
+## Admin (Super User)
 
-- Manage users and roles  
-- Configure business rules  
-- View system logs  
-- Manage access control  
+- User management (CRUD, approval workflow)  
+- Role and permissions management (5 system roles with granular permissions)  
 - System configuration  
+- Database management overview  
+- Complaints management and resolution  
+- Feedback review and actioning  
+- Operations monitoring  
+- Reports and analytics  
+- Security logs and access control  
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Frontend** | Vanilla HTML, CSS, JavaScript |
+| **Backend** | NestJS (TypeScript) on Node.js |
+| **Data Store** | In-memory repositories |
+| **Auth** | UUID token-based (`x-auth-token`) with bcrypt |
+| **API Docs** | Swagger UI at `/api/docs` |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- **Node.js** v18+
+- **npm** (included with Node.js)
+
+### 1. Clone the Repository
+
+```bash
+git clone -b toTest --single-branch https://github.com/IIIT-Sricity-FSD-2024-2028/38_TransitCoders.git
+cd 38_TransitCoders
+```
+
+### 2. Start the Backend
+
+```bash
+cd back-end
+npm install
+npm run start:dev
+```
+
+- **API:** `http://localhost:3001`
+- **Swagger Docs:** `http://localhost:3001/api/docs`
+
+### 3. Start the Frontend
+
+```bash
+npx -y live-server ./front-end
+```
+
+Opens at `http://localhost:8080`.
+
+> **Note:** The backend uses in-memory storage. Data resets on restart. Clear `localStorage` and re-login if you see a token error.
+
+---
+
+## Test Credentials
+
+All accounts use password: **`password123`**
+
+| Role | Name | Email |
+|---|---|---|
+| Super User | Super Admin | `super@swifttrack.com` |
+| Hub Manager | HM Chennai | `hm_chennai@swifttrack.com` |
+| Hub Manager | HM Mumbai | `hm_mumbai@swifttrack.com` |
+| Hub Manager | HM Delhi | `hm_delhi@swifttrack.com` |
+| Hub Manager | HM Bengaluru | `hm_bengaluru@swifttrack.com` |
+| Hub Manager | HM Kolkata | `hm_kolkata@swifttrack.com` |
+| Hub Manager | HM Hyderabad | `hm_hyderabad@swifttrack.com` |
+| Merchant | Merchant One | `merchant1@example.com` |
+| Merchant | Merchant Two | `merchant2@example.com` |
+| Delivery Agent | Agent One | `agent1@swifttrack.com` |
+| Delivery Agent | Agent Two | `agent2@swifttrack.com` |
+| Customer | Customer One | `customer1@example.com` |
+| Customer | Customer Two | `customer2@example.com` |
 
 ---
 
