@@ -5,6 +5,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     initCommon();
     loadConfirmation();
+    bindUpload();
     bindReturn();
 });
 
@@ -48,4 +49,50 @@ function bindReturn() {
 
 
 // React to centralized state changes
-window.addEventListener('appStateChanged', initConfirmation);
+window.addEventListener('appStateChanged', () => {
+    // Only reload if we're actually on the page to prevent errors
+    if(document.getElementById('conf-recipient')) {
+        loadConfirmation();
+    }
+});
+
+function bindUpload() {
+    const btn = document.getElementById('upload-pod-btn');
+    const input = document.getElementById('pod-upload');
+    
+    if(!btn || !input) return;
+
+    btn.addEventListener('click', async () => {
+        if (!input.files || input.files.length === 0) {
+            showToast('Please select a photo first', 'error');
+            return;
+        }
+
+        const file = input.files[0];
+        
+        // Agent ID could be retrieved from current user state, assuming a mock ID if missing
+        const user = window.Auth ? window.Auth.getUser() : JSON.parse(localStorage.getItem('user') || '{}');
+        const agentId = user.id || 'AG1001'; // Fallback for demo
+        
+        try {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            btn.disabled = true;
+            
+            // Call the real backend API
+            if (window.API && window.API.agents) {
+                const response = await window.API.agents.uploadPhoto(agentId, file);
+                showToast(response.message || 'Photo uploaded successfully', 'success');
+                btn.innerHTML = '<i class="fas fa-check"></i> Uploaded';
+                btn.style.borderColor = 'var(--success)';
+                btn.style.color = 'var(--success)';
+            } else {
+                throw new Error('API not initialized');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            showToast(error.message || 'Upload failed', 'error');
+            btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Try Again';
+            btn.disabled = false;
+        }
+    });
+}

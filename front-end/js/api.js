@@ -211,6 +211,26 @@ window.API = {
     },
   },
 
+  // ── Agents ─────────────────────────────────────────────────────────────────
+  agents: {
+    async uploadPhoto(id, file) {
+      const token = Token.get();
+      const formData = new FormData();
+      formData.append('photo', file);
+      
+      const res = await fetch(`${API_BASE}/agents/${id}/delivery-photo`, {
+        method: 'POST',
+        headers: { 'x-auth-token': token }, // FormData automatically sets multipart/form-data with boundary
+        body: formData
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(json.error || json.message || 'Upload failed');
+      }
+      return json;
+    }
+  },
+
   // ── Shipments (placeholder — owned by teammate) ───────────────────────────
   shipments: {
     async getAll() {

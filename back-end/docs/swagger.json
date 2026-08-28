@@ -17,7 +17,13 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "Account created"
+          },
+          "409": {
+            "description": "Email already registered"
+          },
+          "429": {
+            "description": "Too many requests — rate limit exceeded"
           }
         },
         "summary": "Register a new user account",
@@ -41,8 +47,14 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "Login successful, returns token"
+          },
+          "401": {
+            "description": "Invalid credentials or account pending approval"
+          },
+          "429": {
+            "description": "Too many requests — rate limit exceeded"
           }
         },
         "summary": "Login — returns x-auth-token for subsequent requests",
@@ -65,8 +77,8 @@
           }
         ],
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "Logged out successfully"
           }
         },
         "summary": "Invalidate auth token (logout)",
@@ -836,6 +848,68 @@
           }
         },
         "summary": "Update agent availability status",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/agents/{id}/delivery-photo": {
+      "post": {
+        "operationId": "AgentsController_uploadDeliveryPhoto",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Proof-of-delivery photo (JPG, PNG, WebP, GIF — max 5 MB)",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "photo"
+                ],
+                "properties": {
+                  "photo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Image file"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Photo uploaded successfully"
+          },
+          "400": {
+            "description": "Invalid file type or no file provided"
+          },
+          "403": {
+            "description": "Forbidden — can only upload for own assignments"
+          },
+          "404": {
+            "description": "Agent not found"
+          }
+        },
+        "summary": "Upload proof-of-delivery photo (Delivery Agent)",
         "tags": [
           "Agents"
         ]
