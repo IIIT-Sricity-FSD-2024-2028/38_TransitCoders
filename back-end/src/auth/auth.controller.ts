@@ -1,7 +1,10 @@
-import { Body, Controller, Headers, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { AuthGuard } from './guards/auth.guard';
+import { CurrentUser } from './decorators/current-user.decorator';
 import { AuthService } from './auth.service';
+import type { IUser } from '../users/interfaces/user.interface';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import type { IApiResponse } from '../common/interfaces/api-response.interface';
@@ -36,6 +39,7 @@ export class AuthController {
 
   // ODDT-234 — Login: validates credentials, returns auth token
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(ThrottlerGuard)
   @ApiOperation({ summary: 'Login — returns x-auth-token for subsequent requests' })
   @ApiResponse({ status: 200, description: 'Login successful, returns token' })
@@ -48,8 +52,20 @@ export class AuthController {
     return { success: true, data: result };
   }
 
+  // Session validation — used by the frontend to restore/verify sessions
+  @Get('me')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Get the currently authenticated user (session check)' })
+  @ApiResponse({ status: 200, description: 'Authenticated user returned' })
+  @ApiResponse({ status: 401, description: 'Invalid or missing token' })
+  me(@CurrentUser() user: IUser): IApiResponse<object> {
+    const { password: _pw, authToken: _t, ...safeUser } = user;
+    return { success: true, data: safeUser };
+  }
+
   // ODDT-235 — Logout: invalidates the current token
   @Post('logout')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Invalidate auth token (logout)' })
   @ApiResponse({ status: 200, description: 'Logged out successfully' })
   logout(

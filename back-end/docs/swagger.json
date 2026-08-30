@@ -1,76 +1,48 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/auth/register": {
+    "/pricing/quote": {
       "post": {
-        "operationId": "AuthController_register",
-        "parameters": [],
+        "operationId": "PricingController_quote",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RegisterDto"
+                "$ref": "#/components/schemas/QuoteDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Account created"
-          },
-          "409": {
-            "description": "Email already registered"
-          },
-          "429": {
-            "description": "Too many requests — rate limit exceeded"
+            "description": "Quote calculated"
           }
         },
-        "summary": "Register a new user account",
+        "summary": "Calculate an authoritative shipping price quote",
         "tags": [
-          "Auth"
+          "Pricing"
         ]
       }
     },
-    "/auth/login": {
-      "post": {
-        "operationId": "AuthController_login",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Login successful, returns token"
-          },
-          "401": {
-            "description": "Invalid credentials or account pending approval"
-          },
-          "429": {
-            "description": "Too many requests — rate limit exceeded"
-          }
-        },
-        "summary": "Login — returns x-auth-token for subsequent requests",
-        "tags": [
-          "Auth"
-        ]
-      }
-    },
-    "/auth/logout": {
-      "post": {
-        "operationId": "AuthController_logout",
+    "/pricing/config": {
+      "get": {
+        "operationId": "PricingController_getConfig",
         "parameters": [
           {
             "name": "x-auth-token",
-            "required": true,
             "in": "header",
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -78,12 +50,678 @@
         ],
         "responses": {
           "200": {
-            "description": "Logged out successfully"
+            "description": "Pricing config returned"
           }
         },
-        "summary": "Invalidate auth token (logout)",
+        "summary": "Get current pricing configuration",
         "tags": [
-          "Auth"
+          "Pricing"
+        ]
+      },
+      "put": {
+        "operationId": "PricingController_updateConfig",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePricingConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pricing config updated"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "summary": "Update pricing rules (Super User only)",
+        "tags": [
+          "Pricing"
+        ]
+      }
+    },
+    "/payments/order/{orderId}": {
+      "get": {
+        "operationId": "PaymentsController_findByOrder",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payments returned"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Order not found"
+          }
+        },
+        "summary": "Payment records for an order (owner or staff)",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/orders": {
+      "get": {
+        "operationId": "OrdersController_findAll",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by status",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orders returned"
+          }
+        },
+        "summary": "List orders (role-filtered)",
+        "tags": [
+          "Orders"
+        ]
+      },
+      "post": {
+        "operationId": "OrdersController_create",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order created"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "summary": "Create a new order (Merchant only — backend computes the price)",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "operationId": "OrdersController_findById",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order found"
+          },
+          "403": {
+            "description": "No access to this order"
+          },
+          "404": {
+            "description": "Order not found"
+          }
+        },
+        "summary": "Get order details (object-level access enforced)",
+        "tags": [
+          "Orders"
+        ]
+      },
+      "put": {
+        "operationId": "OrdersController_update",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order updated"
+          }
+        },
+        "summary": "Update an order (financial fields are not editable)",
+        "tags": [
+          "Orders"
+        ]
+      },
+      "delete": {
+        "operationId": "OrdersController_remove",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order deleted"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "summary": "Delete an order (Super User only)",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}/barcode": {
+      "get": {
+        "operationId": "OrdersController_getBarcode",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SVG barcode"
+          }
+        },
+        "summary": "Barcode (Code 128 SVG) for order identification",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}/status": {
+      "patch": {
+        "operationId": "OrdersController_updateStatus",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status updated"
+          },
+          "400": {
+            "description": "Invalid status transition"
+          },
+          "403": {
+            "description": "Not your order / not your hub"
+          }
+        },
+        "summary": "Update order status (state machine + ownership enforced)",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}/assign": {
+      "patch": {
+        "operationId": "OrdersController_assignAgent",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignAgentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent assigned"
+          },
+          "400": {
+            "description": "Order not Pending / invalid agent"
+          }
+        },
+        "summary": "Assign a delivery agent to a Pending order (own hub only)",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}/auto-assign": {
+      "patch": {
+        "operationId": "OrdersController_autoAssign",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Agent auto-assigned"
+          },
+          "400": {
+            "description": "No available agents / order not Pending"
+          }
+        },
+        "summary": "Dispatch automation: assign least-loaded available agent in hub",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}/cancel": {
+      "patch": {
+        "operationId": "OrdersController_cancelOrder",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order cancelled"
+          },
+          "400": {
+            "description": "Cannot cancel at this stage"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "summary": "Cancel a Pending/Assigned order (owner merchant or Super User; triggers refund)",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}/transfer": {
+      "patch": {
+        "operationId": "OrdersController_transfer",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order transferred"
+          }
+        },
+        "summary": "Send order to a different hub (SRS: inter-hub routing)",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}/return": {
+      "patch": {
+        "operationId": "OrdersController_authorizeReturn",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return authorized + refund issued"
+          },
+          "400": {
+            "description": "Order not Delivered"
+          }
+        },
+        "summary": "Authorize return/refund for a Delivered order (SRS)",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}/mishap": {
+      "post": {
+        "operationId": "OrdersController_reportMishap",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MishapDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Mishap recorded, order marked Failed"
+          },
+          "403": {
+            "description": "Not your delivery"
+          }
+        },
+        "summary": "Report a delivery mishap (agent, own order only)",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}/pickup": {
+      "patch": {
+        "operationId": "OrdersController_schedulePickup",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchedulePickupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pickup scheduled"
+          }
+        },
+        "summary": "Schedule a pickup for a Pending order (SRS: pickup scheduling)",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}/confirm": {
+      "patch": {
+        "operationId": "OrdersController_confirmDelivery",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delivery confirmed"
+          },
+          "400": {
+            "description": "Order not Delivered yet"
+          }
+        },
+        "summary": "Customer confirms delivery receipt (SRS: delivery confirmation)",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/tracking/{trackingId}": {
+      "get": {
+        "operationId": "TrackingController_track",
+        "parameters": [
+          {
+            "name": "trackingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tracking timeline returned"
+          },
+          "404": {
+            "description": "Unknown tracking ID"
+          }
+        },
+        "summary": "Public shipment tracking by tracking ID (no auth)",
+        "tags": [
+          "Tracking"
         ]
       }
     },
@@ -283,6 +921,489 @@
         ]
       }
     },
+    "/agents": {
+      "get": {
+        "operationId": "AgentsController_findAll",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "List all agents",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/agents/{id}": {
+      "get": {
+        "operationId": "AgentsController_findById",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get agent profile",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/agents/{id}/worklist": {
+      "get": {
+        "operationId": "AgentsController_getWorklist",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get assigned orders for an agent",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/agents/{id}/availability": {
+      "patch": {
+        "operationId": "AgentsController_updateAvailability",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAvailabilityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update agent availability status",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/agents/{id}/delivery-photo": {
+      "post": {
+        "operationId": "AgentsController_uploadDeliveryPhoto",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Proof-of-delivery photo (JPG, PNG, WebP, GIF — max 5 MB)",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "photo"
+                ],
+                "properties": {
+                  "photo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Image file"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Photo uploaded successfully"
+          },
+          "400": {
+            "description": "Invalid file type or no file provided"
+          },
+          "403": {
+            "description": "Forbidden — can only upload for own assignments"
+          },
+          "404": {
+            "description": "Agent not found"
+          }
+        },
+        "summary": "Upload proof-of-delivery photo (Delivery Agent)",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/notifications": {
+      "get": {
+        "operationId": "NotificationsController_findAll",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notifications returned"
+          }
+        },
+        "summary": "My notifications (auto-generated worklist signals)",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/unread-count": {
+      "get": {
+        "operationId": "NotificationsController_unreadCount",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Unread notification count",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationsController_markRead",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Mark a notification as read",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/read-all": {
+      "patch": {
+        "operationId": "NotificationsController_markAllRead",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Mark all my notifications as read",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/reports/revenue": {
+      "get": {
+        "operationId": "ReportsController_revenue",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Revenue summary returned"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "summary": "Revenue summary (gross / refunds / net, by level, hub, day)",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/reports/operations": {
+      "get": {
+        "operationId": "ReportsController_operations",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Operations monitoring snapshot",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/reports/payments": {
+      "get": {
+        "operationId": "ReportsController_payments",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Payment ledger audit view",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created"
+          },
+          "409": {
+            "description": "Email already registered"
+          },
+          "429": {
+            "description": "Too many requests — rate limit exceeded"
+          }
+        },
+        "summary": "Register a new user account",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful, returns token"
+          },
+          "401": {
+            "description": "Invalid credentials or account pending approval"
+          },
+          "429": {
+            "description": "Too many requests — rate limit exceeded"
+          }
+        },
+        "summary": "Login — returns x-auth-token for subsequent requests",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Authenticated user returned"
+          },
+          "401": {
+            "description": "Invalid or missing token"
+          }
+        },
+        "summary": "Get the currently authenticated user (session check)",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logged out successfully"
+          }
+        },
+        "summary": "Invalidate auth token (logout)",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/tickets": {
       "get": {
         "operationId": "TicketsController_findAll",
@@ -439,7 +1560,7 @@
             }
           }
         },
-        "summary": "List complaints (customer sees own, super_user sees all)",
+        "summary": "List complaints (customer sees own, hub manager + super_user see all)",
         "tags": [
           "Complaints"
         ]
@@ -510,10 +1631,10 @@
         },
         "responses": {
           "403": {
-            "description": "Not super_user"
+            "description": "Not authorized"
           }
         },
-        "summary": "Update complaint status (super_user only)",
+        "summary": "Update complaint status (hub manager or super_user — SRS: hub managers resolve complaints)",
         "tags": [
           "Complaints"
         ]
@@ -720,495 +1841,6 @@
         "summary": "Update role permissions (permissions only — name/roleId immutable)",
         "tags": [
           "Roles"
-        ]
-      }
-    },
-    "/agents": {
-      "get": {
-        "operationId": "AgentsController_findAll",
-        "parameters": [
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "List all agents",
-        "tags": [
-          "Agents"
-        ]
-      }
-    },
-    "/agents/{id}": {
-      "get": {
-        "operationId": "AgentsController_findById",
-        "parameters": [
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "Get agent profile",
-        "tags": [
-          "Agents"
-        ]
-      }
-    },
-    "/agents/{id}/worklist": {
-      "get": {
-        "operationId": "AgentsController_getWorklist",
-        "parameters": [
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "Get assigned orders for an agent",
-        "tags": [
-          "Agents"
-        ]
-      }
-    },
-    "/agents/{id}/availability": {
-      "patch": {
-        "operationId": "AgentsController_updateAvailability",
-        "parameters": [
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateAvailabilityDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "Update agent availability status",
-        "tags": [
-          "Agents"
-        ]
-      }
-    },
-    "/agents/{id}/delivery-photo": {
-      "post": {
-        "operationId": "AgentsController_uploadDeliveryPhoto",
-        "parameters": [
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "description": "Proof-of-delivery photo (JPG, PNG, WebP, GIF — max 5 MB)",
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "photo"
-                ],
-                "properties": {
-                  "photo": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "Image file"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Photo uploaded successfully"
-          },
-          "400": {
-            "description": "Invalid file type or no file provided"
-          },
-          "403": {
-            "description": "Forbidden — can only upload for own assignments"
-          },
-          "404": {
-            "description": "Agent not found"
-          }
-        },
-        "summary": "Upload proof-of-delivery photo (Delivery Agent)",
-        "tags": [
-          "Agents"
-        ]
-      }
-    },
-    "/orders": {
-      "get": {
-        "operationId": "OrdersController_findAll",
-        "parameters": [
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Orders returned"
-          }
-        },
-        "summary": "List orders (role-filtered)",
-        "tags": [
-          "Orders"
-        ]
-      },
-      "post": {
-        "operationId": "OrdersController_create",
-        "parameters": [
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateOrderDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Order created"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "summary": "Create a new order (Merchant only)",
-        "tags": [
-          "Orders"
-        ]
-      }
-    },
-    "/orders/{id}": {
-      "get": {
-        "operationId": "OrdersController_findById",
-        "parameters": [
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Order found"
-          },
-          "404": {
-            "description": "Order not found"
-          }
-        },
-        "summary": "Get order details",
-        "tags": [
-          "Orders"
-        ]
-      },
-      "put": {
-        "operationId": "OrdersController_update",
-        "parameters": [
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateOrderDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Order updated"
-          }
-        },
-        "summary": "Update an order",
-        "tags": [
-          "Orders"
-        ]
-      },
-      "delete": {
-        "operationId": "OrdersController_remove",
-        "parameters": [
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Order deleted"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "summary": "Delete an order (Super User only)",
-        "tags": [
-          "Orders"
-        ]
-      }
-    },
-    "/orders/{id}/status": {
-      "patch": {
-        "operationId": "OrdersController_updateStatus",
-        "parameters": [
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Status updated"
-          },
-          "400": {
-            "description": "Invalid status transition"
-          }
-        },
-        "summary": "Update order status",
-        "tags": [
-          "Orders"
-        ]
-      }
-    },
-    "/orders/{id}/assign": {
-      "patch": {
-        "operationId": "OrdersController_assignAgent",
-        "parameters": [
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AssignAgentDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Agent assigned"
-          },
-          "400": {
-            "description": "Order not in Pending status"
-          }
-        },
-        "summary": "Assign a delivery agent to a Pending order",
-        "tags": [
-          "Orders"
-        ]
-      }
-    },
-    "/orders/{id}/cancel": {
-      "patch": {
-        "operationId": "OrdersController_cancelOrder",
-        "parameters": [
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-auth-token",
-            "in": "header",
-            "description": "Auth token from login",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Order cancelled"
-          },
-          "400": {
-            "description": "Cannot cancel at this stage"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Order not found"
-          }
-        },
-        "summary": "Cancel a Pending order (Merchant or Super User only)",
-        "tags": [
-          "Orders"
         ]
       }
     },
@@ -1709,72 +2341,278 @@
       }
     },
     "schemas": {
-      "RegisterDto": {
+      "QuoteDto": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "example": "Shreesaanth R"
-          },
-          "email": {
-            "type": "string",
-            "example": "shreesaanth@example.com"
-          },
-          "password": {
-            "type": "string",
-            "example": "password123",
-            "minLength": 6,
-            "description": "Minimum 6 characters"
-          },
-          "role": {
+          "serviceLevel": {
             "type": "string",
             "enum": [
-              "super_user",
-              "hub_manager",
-              "merchant",
-              "delivery_agent",
-              "customer"
+              "standard",
+              "express",
+              "same-day"
             ],
-            "example": "customer",
-            "description": "Role for the new account"
+            "example": "express"
           },
-          "phone": {
-            "type": "string",
-            "example": "+91-9876543210"
+          "weightKg": {
+            "type": "number",
+            "example": 2.5,
+            "description": "Package weight in kg"
           },
-          "company": {
+          "paymentMode": {
             "type": "string",
-            "example": "Acme Corp",
-            "description": "Required when role is merchant"
-          },
-          "hubId": {
-            "type": "string",
-            "example": "H001",
-            "description": "Required when role is hub_manager or delivery_agent"
+            "enum": [
+              "Prepaid",
+              "COD"
+            ],
+            "example": "Prepaid"
           }
         },
         "required": [
-          "name",
-          "email",
-          "password",
-          "role"
+          "serviceLevel",
+          "weightKg"
         ]
       },
-      "LoginDto": {
+      "UpdatePricingConfigDto": {
         "type": "object",
         "properties": {
-          "email": {
-            "type": "string",
-            "example": "super@swifttrack.com"
+          "baseFee": {
+            "type": "number",
+            "example": 40
           },
-          "password": {
+          "perKgStandard": {
+            "type": "number",
+            "example": 25
+          },
+          "perKgExpress": {
+            "type": "number",
+            "example": 45
+          },
+          "perKgSameDay": {
+            "type": "number",
+            "example": 80
+          },
+          "codFee": {
+            "type": "number",
+            "example": 30
+          },
+          "discountPercent": {
+            "type": "number",
+            "example": 0
+          },
+          "taxPercent": {
+            "type": "number",
+            "example": 5
+          },
+          "minCharge": {
+            "type": "number",
+            "example": 60
+          }
+        }
+      },
+      "CreateOrderDto": {
+        "type": "object",
+        "properties": {
+          "customerId": {
             "type": "string",
-            "example": "password123"
+            "description": "Customer UUID receiving the delivery"
+          },
+          "deliveryAddress": {
+            "type": "string",
+            "description": "Full delivery address"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "Low",
+              "Medium",
+              "High"
+            ]
+          },
+          "pickupAddress": {
+            "type": "string",
+            "description": "Where the package is picked up from"
+          },
+          "pickupHubId": {
+            "type": "string",
+            "description": "Pickup hub id, e.g. H001"
+          },
+          "deliveryHubId": {
+            "type": "string",
+            "description": "Destination hub id, e.g. H003"
+          },
+          "packageType": {
+            "type": "string",
+            "description": "Product/package category"
+          },
+          "weight": {
+            "type": "number",
+            "example": 2.5,
+            "description": "Weight in kg (pricing input)"
+          },
+          "serviceLevel": {
+            "type": "string",
+            "enum": [
+              "standard",
+              "express",
+              "same-day"
+            ],
+            "default": "standard",
+            "description": "Service level (pricing input)"
+          },
+          "paymentMode": {
+            "type": "string",
+            "enum": [
+              "Prepaid",
+              "COD"
+            ],
+            "default": "Prepaid"
+          },
+          "pickupScheduledAt": {
+            "type": "string",
+            "description": "ISO datetime to schedule the pickup"
+          },
+          "estimatedDelivery": {
+            "type": "string",
+            "description": "ISO datetime estimated delivery"
+          },
+          "amount": {
+            "type": "number",
+            "description": "IGNORED — backend computes the price"
           }
         },
         "required": [
-          "email",
-          "password"
+          "customerId",
+          "deliveryAddress",
+          "priority"
+        ]
+      },
+      "UpdateOrderDto": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "Customer UUID receiving the delivery"
+          },
+          "deliveryAddress": {
+            "type": "string",
+            "description": "Full delivery address"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "Low",
+              "Medium",
+              "High"
+            ]
+          },
+          "pickupAddress": {
+            "type": "string",
+            "description": "Where the package is picked up from"
+          },
+          "pickupHubId": {
+            "type": "string",
+            "description": "Pickup hub id, e.g. H001"
+          },
+          "deliveryHubId": {
+            "type": "string",
+            "description": "Destination hub id, e.g. H003"
+          },
+          "packageType": {
+            "type": "string",
+            "description": "Product/package category"
+          },
+          "weight": {
+            "type": "number",
+            "example": 2.5,
+            "description": "Weight in kg (pricing input)"
+          },
+          "serviceLevel": {
+            "type": "string",
+            "enum": [
+              "standard",
+              "express",
+              "same-day"
+            ],
+            "default": "standard",
+            "description": "Service level (pricing input)"
+          },
+          "paymentMode": {
+            "type": "string",
+            "enum": [
+              "Prepaid",
+              "COD"
+            ],
+            "default": "Prepaid"
+          },
+          "pickupScheduledAt": {
+            "type": "string",
+            "description": "ISO datetime to schedule the pickup"
+          },
+          "estimatedDelivery": {
+            "type": "string",
+            "description": "ISO datetime estimated delivery"
+          },
+          "amount": {
+            "type": "number",
+            "description": "IGNORED — backend computes the price"
+          }
+        }
+      },
+      "AssignAgentDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "TransferOrderDto": {
+        "type": "object",
+        "properties": {
+          "toHubId": {
+            "type": "string",
+            "example": "H003",
+            "description": "Destination hub to send the order to"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Destination hub overloaded"
+          }
+        },
+        "required": [
+          "toHubId"
+        ]
+      },
+      "MishapDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "vehicle_breakdown",
+              "address_not_found",
+              "customer_unavailable",
+              "package_damaged",
+              "other"
+            ],
+            "example": "customer_unavailable"
+          },
+          "description": {
+            "type": "string",
+            "example": "Customer did not answer the door after 3 attempts"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "SchedulePickupDto": {
+        "type": "object",
+        "properties": {
+          "pickupAt": {
+            "type": "string",
+            "example": "2026-09-02T10:30:00.000Z",
+            "description": "Requested pickup date/time (ISO)"
+          }
+        },
+        "required": [
+          "pickupAt"
         ]
       },
       "CreateUserDto": {
@@ -1864,6 +2702,78 @@
             "example": "Acme Corp"
           }
         }
+      },
+      "UpdateAvailabilityDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Shreesaanth R"
+          },
+          "email": {
+            "type": "string",
+            "example": "shreesaanth@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "minLength": 6,
+            "description": "Minimum 6 characters"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "super_user",
+              "hub_manager",
+              "merchant",
+              "delivery_agent",
+              "customer"
+            ],
+            "example": "customer",
+            "description": "Role for the new account"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+91-9876543210"
+          },
+          "company": {
+            "type": "string",
+            "example": "Acme Corp",
+            "description": "Required when role is merchant"
+          },
+          "hubId": {
+            "type": "string",
+            "example": "H001",
+            "description": "Required when role is hub_manager or delivery_agent"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password",
+          "role"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "super@swifttrack.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
       },
       "CreateTicketDto": {
         "type": "object",
@@ -2082,22 +2992,6 @@
         "required": [
           "permissions"
         ]
-      },
-      "UpdateAvailabilityDto": {
-        "type": "object",
-        "properties": {}
-      },
-      "CreateOrderDto": {
-        "type": "object",
-        "properties": {}
-      },
-      "UpdateOrderDto": {
-        "type": "object",
-        "properties": {}
-      },
-      "AssignAgentDto": {
-        "type": "object",
-        "properties": {}
       },
       "CreateHubDto": {
         "type": "object",

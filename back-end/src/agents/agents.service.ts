@@ -20,7 +20,9 @@ export class AgentsService {
   }
 
   findById(id: string): IAgentProfile {
-    const agent = this.agentsRepository.findById(id);
+    // Accept either the agent-profile id or the underlying user id —
+    // the frontend session only knows the user id.
+    const agent = this.agentsRepository.findById(id) ?? this.agentsRepository.findByUserId(id);
     if (!agent) throw new NotFoundException('Agent not found');
     return agent;
   }

@@ -1,49 +1,96 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+import { DatabaseService } from '../common/database/database.service';
 import { ITicket } from './interfaces/ticket.interface';
 
-// ODDT-301 — TicketsRepository
+/**
+ * TicketsRepository — durable SQLite-backed ticket store.
+ * Same method contract as the previous in-memory implementation.
+ */
 @Injectable()
 export class TicketsRepository {
-  private readonly tickets = new Map<string, ITicket>();
-  private ticketCounter = 1000;
+  constructor(private readonly db: DatabaseService) {}
+
+  private toTicket(row: any): ITicket {
+    return {
+      id: row.id,
+      ticketId: row.ticketId,
+      merchantId: row.merchantId,
+      subject: row.subject,
+      trackingId: row.trackingId ?? undefined,
+      priority: row.priority ?? 'med',
+      status: row.status ?? 'open',
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+    };
+  }
 
   findAll(): ITicket[] {
-    return Array.from(this.tickets.values());
+    return this.db.query('SELECT * FROM tickets ORDER BY createdAt DESC').map((r) => this.toTicket(r));
   }
 
   findById(id: string): ITicket | undefined {
-    return this.tickets.get(id);
+    const row = this.db.queryOne('SELECT * FROM tickets WHERE id = ?', [id]);
+    return row ? this.toTicket(row) : undefined;
   }
 
   findByMerchant(merchantId: string): ITicket[] {
-    return Array.from(this.tickets.values()).filter(
-      (t) => t.merchantId === merchantId,
-    );
+    return this.db
+      .query('SELECT * FROM tickets WHERE merchantId = ? ORDER BY createdAt DESC', [merchantId])
+      .map((r) => this.toTicket(r));
   }
 
   create(data: Omit<ITicket, 'id' | 'ticketId' | 'createdAt' | 'updatedAt'>): ITicket {
-    this.ticketCounter++;
+    const id = uuidv4();
+    const now = new Date();
+    // Sequential ticket number based on current row count
+    const countRow = this.db.queryOne<{ n: number }>('SELECT COUNT(*) AS n FROM tickets');
+    const ticketId = `TKT-${1000 + (countRow ? Number(countRow.n) : 0) + 1}`;
     const ticket: ITicket = {
       ...data,
-      id: uuidv4(),
-      ticketId: `TKT-${this.ticketCounter}`,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      id,
+      ticketId,
+      createdAt: now,
+      updatedAt: now,
     };
-    this.tickets.set(ticket.id, ticket);
+    this.db.run(
+      `INSERT INTO tickets (id, ticketId, merchantId, subject, trackingId, priority, status, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        ticket.id,
+        ticket.ticketId,
+        ticket.merchantId,
+        ticket.subject,
+        ticket.trackingId ?? null,
+        ticket.priority ?? 'med',
+        ticket.status ?? 'open',
+        ticket.createdAt.toISOString(),
+        ticket.updatedAt.toISOString(),
+      ],
+    );
     return ticket;
   }
 
   update(id: string, changes: Partial<ITicket>): ITicket | undefined {
-    const ticket = this.tickets.get(id);
-    if (!ticket) return undefined;
-    const updated = { ...ticket, ...changes, updatedAt: new Date() };
-    this.tickets.set(id, updated);
-    return updated;
+    const existing = this.findById(id);
+    if (!existing) return undefined;
+    const merged: ITicket = { ...existing, ...changes, updatedAt: new Date() };
+    this.db.run(
+      `UPDATE tickets SET subject = ?, trackingId = ?, priority = ?, status = ?, updatedAt = ? WHERE id = ?`,
+      [
+        merged.subject,
+        merged.trackingId ?? null,
+        merged.priority ?? 'med',
+        merged.status ?? 'open',
+        merged.updatedAt.toISOString(),
+        id,
+      ],
+    );
+    return merged;
   }
 
   delete(id: string): boolean {
-    return this.tickets.delete(id);
+    const result = this.db.run('DELETE FROM tickets WHERE id = ?', [id]);
+    return result.changes > 0;
   }
 }

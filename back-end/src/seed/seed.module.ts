@@ -9,9 +9,11 @@ import { ShipmentsModule } from '../shipments/shipments.module';
 import { TicketsModule } from '../tickets/tickets.module';
 import { ComplaintsModule } from '../complaints/complaints.module';
 import { FeedbackModule } from '../feedback/feedback.module';
+import { PricingModule } from '../pricing/pricing.module';
 
 @Module({
   imports: [
+    PricingModule,
     UsersModule,
     RolesModule,
     AgentsModule,

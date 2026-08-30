@@ -12,6 +12,11 @@ import { AgentsModule } from './agents/agents.module';
 import { HubsModule } from './hubs/hubs.module';
 import { ShipmentsModule } from './shipments/shipments.module';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
+import { DatabaseModule } from './common/database/database.module';
+import { PricingModule } from './pricing/pricing.module';
+import { PaymentsModule } from './payments/payments.module';
+import { ReportsModule } from './reports/reports.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -24,6 +29,11 @@ import { LoggingMiddleware } from './common/middleware/logging.middleware';
         limit: 60,   // 60 requests per window
       },
     ]),
+    DatabaseModule,
+    PricingModule,
+    PaymentsModule,
+    ReportsModule,
+    NotificationsModule,
     AuthModule,
     UsersModule,
     TicketsModule,
