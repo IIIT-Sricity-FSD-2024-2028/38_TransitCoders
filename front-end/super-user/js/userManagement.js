@@ -48,14 +48,15 @@ document.addEventListener("DOMContentLoaded", () => {
     let isEditing = false;
     let cachedUsers = []; // populated by loadAndRender(), used by edit/validate
 
-    // ── Populate zones dropdown from state ─────────────────────────────
+    // ── Populate zones dropdown from AppState hubs ─────────────────────────
     function populateZones() {
-        const zones = StorageAPI.getZones();
-        zoneInput.innerHTML = '<option value="">Select a zone...</option>';
-        zones.forEach(z => {
+        // Hubs are the backend equivalent of 'zones' (zones table not in schema)
+        const hubs = (window.AppState ? window.AppState.getState().hubs : []) || [];
+        zoneInput.innerHTML = '<option value="">Select a hub/zone...</option>';
+        hubs.forEach(h => {
             const opt = document.createElement('option');
-            opt.value = z.id;
-            opt.textContent = `${z.name} (${z.region})`;
+            opt.value = h.id;
+            opt.textContent = `${h.name} (${h.city || h.location || 'Hub'})`;
             zoneInput.appendChild(opt);
         });
     }
@@ -87,10 +88,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 password: '***',
                 _raw: u,
             }));
-        } catch (_) {
-            users = StorageAPI?.getUsers?.() || [];
+        } catch (err) {
+            console.error('[userManagement] Failed to fetch users:', err?.message || err);
+            if (typeof window.showToast === 'function') {
+                window.showToast('Failed to load users. Is the backend running?', 'error');
+            }
         }
-        cachedUsers = users; // cache for edit/validate
+        cachedUsers = users;
         renderTable(users);
     }
 
@@ -158,10 +162,11 @@ document.addEventListener("DOMContentLoaded", () => {
     async function approveUser(id) {
         try {
             await window.API.users.approve(id);
-        } catch (_) {
-            StorageAPI?.updateUser?.(id, { status: 'Active' });
+            if (typeof window.showToast === 'function') window.showToast('User approved!', 'success');
+        } catch (err) {
+            console.error('[userManagement] Failed to approve user:', err?.message || err);
+            if (typeof window.showToast === 'function') window.showToast('Failed to approve user.', 'error');
         }
-        if (typeof window.showToast === 'function') window.showToast('User approved!', 'success');
         loadAndRender();
     }
 
@@ -208,8 +213,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (confirm(`Are you sure you want to delete user ${id}?`)) {
             try {
                 await window.API.users.delete(id);
-            } catch (_) {
-                StorageAPI?.deleteUser?.(id);
+            } catch (err) {
+                console.error('[userManagement] Failed to delete user:', err?.message || err);
+                if (typeof window.showToast === 'function') window.showToast('Failed to delete user.', 'error');
+                return;
             }
             loadAndRender();
         }

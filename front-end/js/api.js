@@ -1,14 +1,16 @@
 /**
  * SwiftTrack API Client
  * Single source of truth for all HTTP calls to the backend.
- * Base URL: http://localhost:3001
+ * Base URL defaults to http://localhost:3001 but can be overridden by setting
+ * window.SWIFTTRACK_API_BASE before this script loads (e.g. for staging/prod).
  *
  * Usage:
  *   const users = await API.users.getAll();
  *   const token = await API.auth.login(email, password);
  */
 
-const API_BASE = 'http://localhost:3001';
+// Allow deployment-time override: <script>window.SWIFTTRACK_API_BASE='https://api.example.com'</script>
+const API_BASE = (typeof window !== 'undefined' && window.SWIFTTRACK_API_BASE) || 'http://localhost:3001';
 
 // ─── Token helpers ──────────────────────────────────────────────────────────
 const Token = {
@@ -237,7 +239,10 @@ window.API = {
       try {
         const res = await apiFetch('/shipments');
         return res.data || [];
-      } catch (_) { return null; }
+      } catch (err) {
+        console.error('[API.shipments.getAll] Failed to fetch shipments:', err?.message || err);
+        return null;
+      }
     },
     async create(data) {
       const res = await apiFetch('/shipments', { method: 'POST', body: JSON.stringify(data) });
@@ -259,7 +264,10 @@ window.API = {
       try {
         const res = await apiFetch('/orders');
         return res.data || [];
-      } catch (_) { return null; }
+      } catch (err) {
+        console.error('[API.orders.getAll] Failed to fetch orders:', err?.message || err);
+        return null;
+      }
     },
     async getById(id) {
       const res = await apiFetch(`/orders/${id}`);

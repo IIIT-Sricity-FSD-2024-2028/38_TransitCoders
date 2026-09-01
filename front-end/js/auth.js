@@ -35,10 +35,10 @@ window.Auth = {
     if (window.API) {
       await window.API.auth.logout();
     } else {
-      window.API.Token.clear();
+      // Fallback when api.js is not loaded — clear session manually
+      localStorage.removeItem('x-auth-token');
       localStorage.removeItem('user');
       sessionStorage.removeItem('user');
-      sessionStorage.removeItem('st_session');
       localStorage.removeItem('userRole');
     }
     const isRoot = window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/');
@@ -99,7 +99,7 @@ async function handleLogin(form) {
     };
     localStorage.setItem("user", JSON.stringify(userData));
     sessionStorage.setItem("user", JSON.stringify(userData));
-    sessionStorage.setItem("st_session", JSON.stringify(userData));
+    // st_session removed — sessionStorage('user') is the canonical session key
     localStorage.setItem("userRole", user.role);
 
     showToast("Login successful!", "success");

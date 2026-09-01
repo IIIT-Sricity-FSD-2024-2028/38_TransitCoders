@@ -425,14 +425,14 @@ export class OrdersService {
     const history: IStatusEvent[] = [
       ...(order.statusHistory ?? []),
       {
-        status: 'Returned',
+        status: OrderStatus.RETURNED,
         timestamp: new Date().toISOString(),
         note: reason ? `Return authorized: ${reason}` : 'Return authorized by hub manager',
         by: user.id,
       },
     ];
     const updated = this.ordersRepository.update(order.id, {
-      status: 'Returned',
+      status: OrderStatus.RETURNED,
       statusHistory: history,
     })!;
 
@@ -473,14 +473,14 @@ export class OrdersService {
     const history: IStatusEvent[] = [
       ...(order.statusHistory ?? []),
       {
-        status: 'Failed',
+        status: OrderStatus.FAILED,
         timestamp: new Date().toISOString(),
         note: `Mishap (${type}): ${description || 'no details'}`,
         by: user.id,
       },
     ];
     const updated = this.ordersRepository.update(order.id, {
-      status: 'Failed',
+      status: OrderStatus.FAILED,
       statusHistory: history,
     })!;
 
@@ -525,7 +525,7 @@ export class OrdersService {
     if (user.role === Role.HUB_MANAGER && (!user.hubId || (order.pickupHubId && order.pickupHubId !== user.hubId))) {
       throw new ForbiddenException('You can only transfer orders currently at your hub');
     }
-    if (['Delivered', 'Cancelled', 'Returned'].includes(order.status)) {
+    if ([OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.RETURNED, OrderStatus.FAILED].includes(order.status as OrderStatus)) {
       throw new BadRequestException(`Order in status ${order.status} cannot be transferred`);
     }
     if (!toHubId || toHubId === order.pickupHubId) {

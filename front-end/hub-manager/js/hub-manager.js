@@ -609,34 +609,41 @@ function adjustAgentTaskCounts(oldAgentId, newAgentId) {
     }
 }
 
-function setOrderAssignment(orderId, agentId, nextStatus) {
-    if (!window.AppState) return false;
-    var state = window.AppState.getState();
+async function setOrderAssignment(orderId, agentId, nextStatus) {
+    if (!window.API || !window.API.orders) return false;
+    // Find the canonical order to get its real UUID (order_id = backend orderId)
+    var state = window.AppState ? window.AppState.getState() : { orders: [] };
     var order = state.orders.find(function(o) { return o.order_id === orderId; });
-    if (!order) return false;
-    
-    var previousAgent = order.assigned_agent || null;
-    order.assigned_agent = agentId;
-    order.status = nextStatus || "Assigned";
-    order.updated_at = new Date().toISOString();
-    
-    window.AppState.saveState(state);
-    adjustAgentTaskCounts(previousAgent, agentId);
-    return true;
+    var backendId = order ? (order.id || orderId) : orderId;
+
+    try {
+        await window.API.orders.assign(backendId, agentId);
+        showSuccessTick('Agent assigned');
+        if (window.AppState) window.AppState.refresh();
+        return true;
+    } catch (err) {
+        console.error('[HubMgr] assign failed:', err?.message || err);
+        showToast('Failed to assign agent — ' + (err?.message || 'server error'), 'error');
+        return false;
+    }
 }
 
-function setOrderHub(orderId, hubId) {
-    if (!window.AppState) return false;
-    var state = window.AppState.getState();
+async function setOrderHub(orderId, hubId, reason) {
+    if (!window.API || !window.API.orders) return false;
+    var state = window.AppState ? window.AppState.getState() : { orders: [] };
     var order = state.orders.find(function(o) { return o.order_id === orderId; });
-    if (!order) return false;
-    
-    order.assigned_hub = hubId;
-    order.pickup_address = hubId;
-    order.updated_at = new Date().toISOString();
-    
-    window.AppState.saveState(state);
-    return true;
+    var backendId = order ? (order.id || orderId) : orderId;
+
+    try {
+        await window.API.orders.transfer(backendId, hubId, reason || 'Hub reassignment by manager');
+        showSuccessTick('Hub updated');
+        if (window.AppState) window.AppState.refresh();
+        return true;
+    } catch (err) {
+        console.error('[HubMgr] transfer failed:', err?.message || err);
+        showToast('Failed to update hub — ' + (err?.message || 'server error'), 'error');
+        return false;
+    }
 }
 
 function setActionLoading(buttonEl, isLoading, label) {
@@ -764,12 +771,12 @@ function openChangeDestinationModal(orderId) {
     openModal('changeDestModal');
 }
 
-function confirmChangeDestinationAction() {
+async function confirmChangeDestinationAction() {
     var hubSelect = document.getElementById('cd-hub-select');
     var reasonSelect = document.getElementById('cd-reason-select');
     if (!hubSelect || !reasonSelect) return;
 
-    var hubId = hubSelect.value;
+    var hubId  = hubSelect.value;
     var reason = reasonSelect.value;
 
     if (!hubId || !reason) {
@@ -777,17 +784,21 @@ function confirmChangeDestinationAction() {
         return;
     }
 
-    if (setOrderHub(window._cdOrderId, hubId)) {
-        showSuccessTick('Destination updated');
-        showToast('Destination hub updated successfully', 'success');
-    }
+    var confirmBtn = document.getElementById('cd-confirm-btn');
+    if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = 'Updating...'; }
 
+    var ok = await setOrderHub(window._cdOrderId, hubId, reason);
+    if (ok) showToast('Destination hub updated successfully', 'success');
+
+    if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = 'Confirm'; }
     closeModal('changeDestModal');
 
-    // Re-render current page
-    if (typeof loadDashboard === 'function') loadDashboard();
-    if (typeof filterAndRender === 'function') filterAndRender(); // Order Queue
-    if (typeof loadDispatchData === 'function') loadDispatchData();
+    // Re-render current page after AppState.refresh() resolves
+    setTimeout(function() {
+        if (typeof loadDashboard    === 'function') loadDashboard();
+        if (typeof filterAndRender  === 'function') filterAndRender();
+        if (typeof loadDispatchData === 'function') loadDispatchData();
+    }, 600);
 }
 
 function openDeliveryMap(orderId) {

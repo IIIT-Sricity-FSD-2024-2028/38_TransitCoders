@@ -1,13 +1,15 @@
 /**
- * Complaints Management — wired to backend API
- * Falls back to StorageAPI if backend is offline.
+ * Complaints Management — wired to backend API exclusively.
+ * Bug Fix F11: Removed StorageAPI fallback. All data now comes from the
+ * NestJS backend via window.API.complaints.*. Network errors are logged and
+ * shown to the user instead of silently merging stale localStorage data.
  */
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const tableBody     = document.getElementById("complaintsTableBody");
-  const searchInput   = document.getElementById("searchInput");
+  const tableBody      = document.getElementById("complaintsTableBody");
+  const searchInput    = document.getElementById("searchInput");
   const priorityFilter = document.getElementById("priorityFilter");
-  const statusFilter  = document.getElementById("statusFilter");
+  const statusFilter   = document.getElementById("statusFilter");
 
   let complaints = [];
 
@@ -20,7 +22,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     return `${prefix}-${String(index + 1).padStart(4, "0")}`;
   }
 
-  // Load from backend and local Storage; merge and normalize so UI never shows literal 'undefined'
   async function loadComplaints() {
     const usersById = getUsersById();
     const safe = (v, fallback) => {
@@ -29,34 +30,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       return v;
     };
 
-    // Try backend first; if backend is reachable use it, but always merge local Storage entries
-    let backendList = [];
     try {
-      backendList = await window.API.complaints.getAll() || [];
-    } catch (e) {
-      backendList = [];
+      const backendList = await window.API.complaints.getAll() || [];
+      complaints = backendList.map((c, index) => ({
+        id:        safe(c.id, 'CMP-' + index),
+        reference: safe(c.reference, buildReference('CMP', index)),
+        customer:  safe(c.customerName, usersById.get(c.userId)?.name || c.userId || 'Customer'),
+        type:      safe(c.description, c.type || '—'),
+        priority:  safe(c.priority, 'Medium'),
+        status:    safe(c.status, 'Open'),
+        date:      c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : '—',
+        _raw:      c,
+      }));
+    } catch (err) {
+      console.error('[complaints.js] Failed to fetch complaints from backend:', err?.message || err);
+      if (typeof window.showToast === 'function') {
+        window.showToast('Failed to load complaints. Is the backend running?', 'error');
+      }
+      complaints = [];
     }
-
-    // Local stored complaints (may include newly created ones when offline)
-    const localList = (StorageAPI?.getComplaints?.() || []);
-
-    // Merge, preferring backend entries, dedupe by id
-    const merged = [...backendList];
-    for (const l of localList) {
-      if (!merged.find(b => b && (b.id === l.id || b.id === l._id))) merged.push(l);
-    }
-
-    // Normalize merged shape → table shape
-    complaints = merged.map((c, index) => ({
-      id: safe(c.id || c._id, 'CMP-' + Date.now().toString().slice(-6)),
-      reference: safe(c.reference, buildReference('CMP', index)),
-      customer: safe(c.customerName, safe(c.customer, usersById.get(c.userId)?.name || c.userId || 'Customer')),
-      type: safe(c.description, c.type || '—'),
-      priority: safe(c.priority, 'Medium'),
-      status: safe(c.status, 'Open'),
-      date: c.date ? new Date(c.date).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : (c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : ''),
-      _raw: c,
-    }));
   }
 
   function renderTable() {
@@ -91,8 +83,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             </button>
             <div class="action-menu">
               ${c.status !== 'Resolved' ? `<button class="quick-status-btn" data-id="${c._raw?.id || c.id}" data-new-status="Resolved">Mark Resolved</button>` : ''}
-              ${c.status === window.SwiftTrackEnums.ComplaintStatus.OPEN ? `<button class="quick-status-btn" data-id="${c._raw?.id || c.id}" data-new-status="In Progress">Mark In Progress</button>` : ''}
-              ${c.status === window.SwiftTrackEnums.ComplaintStatus.RESOLVED ? `<button class="quick-status-btn" data-id="${c._raw?.id || c.id}" data-new-status="Open">Reopen</button>` : ''}
+              ${c.status === 'Open' ? `<button class="quick-status-btn" data-id="${c._raw?.id || c.id}" data-new-status="In Progress">Mark In Progress</button>` : ''}
+              ${c.status === 'Resolved' ? `<button class="quick-status-btn" data-id="${c._raw?.id || c.id}" data-new-status="Open">Reopen</button>` : ''}
             </div>
           </div>
         </td>
@@ -104,8 +96,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const status = e.currentTarget.dataset.newStatus;
       try {
         await window.API.complaints.update(id, { status });
-      } catch (_) {
-        StorageAPI?.updateComplaintStatus?.(id, status);
+      } catch (err) {
+        console.error('[complaints.js] Failed to update complaint status:', err?.message || err);
+        if (typeof window.showToast === 'function') window.showToast('Failed to update complaint.', 'error');
       }
       await loadComplaints();
       renderTable();

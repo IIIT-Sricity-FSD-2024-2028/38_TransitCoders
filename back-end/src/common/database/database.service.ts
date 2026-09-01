@@ -273,8 +273,21 @@ export class DatabaseService implements OnModuleDestroy {
     return this.pool.transaction(fn);
   }
 
-  /** Number of rows in a table — used by the seed service for idempotency. */
+  /**
+   * Number of rows in a table — used by the seed service for idempotency.
+   * Table name is validated against an explicit whitelist to prevent SQL injection
+   * via string interpolation (no parameterized queries for DDL identifiers).
+   */
+  private static readonly ALLOWED_TABLES: ReadonlySet<string> = new Set([
+    'users', 'roles', 'agents', 'hubs', 'orders', 'shipments',
+    'tickets', 'complaints', 'feedback', 'payments', 'notifications',
+    'hub_transfers', 'mishaps', 'pricing_config',
+  ]);
+
   count(table: string): number {
+    if (!DatabaseService.ALLOWED_TABLES.has(table)) {
+      throw new Error(`count(): unknown table '${table}' — must be one of the schema tables`);
+    }
     const row = this.queryOne<{ n: number }>(`SELECT COUNT(*) AS n FROM ${table}`);
     return row ? Number(row.n) : 0;
   }

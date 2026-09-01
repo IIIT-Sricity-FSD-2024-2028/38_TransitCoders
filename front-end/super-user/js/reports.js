@@ -1,13 +1,18 @@
 /**
  * Reports & Analytics — Data-Driven Charts
- * Renders real analytics from StorageAPI data using pure CSS/JS bar charts and stats.
+ * Bug Fix F6: Replaced StorageAPI with window.AppState.getState() which is
+ * hydrated from the NestJS backend. All chart data now comes from live API data.
  */
-document.addEventListener("DOMContentLoaded", () => {
-    // StorageAPI.init() no longer needed; state managed centrally
+document.addEventListener("DOMContentLoaded", async () => {
+    // Ensure state is hydrated before rendering
+    if (window.AppState && typeof window.AppState.hydrate === 'function') {
+        await window.AppState.hydrate();
+    }
 
-    const users = StorageAPI.getUsers();
-    const complaints = StorageAPI.getComplaints();
-    const feedback = StorageAPI.getFeedback();
+    const state      = window.AppState ? window.AppState.getState() : {};
+    const users      = state.users      || [];
+    const complaints = state.complaints || [];
+    const feedback   = state.feedback   || [];
 
     // === 1. User Growth Trends — Bar chart by role ===
     const userChart = document.querySelector('[data-type="line"]');
@@ -42,12 +47,13 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
     }
 
-    // === 2. Complaint Volume — Horizontal chart by type ===
+    // === 2. Complaint Volume — Horizontal chart by status ===
     const complaintChart = document.querySelector('[data-type="bar"]');
     if (complaintChart) {
         const typeCounts = {};
         complaints.forEach(c => {
-            typeCounts[c.type] = (typeCounts[c.type] || 0) + 1;
+            const key = c.status || 'Open';
+            typeCounts[key] = (typeCounts[key] || 0) + 1;
         });
         const maxType = Math.max(...Object.values(typeCounts), 1);
         const typeColors = ['var(--clr-red-500)', 'var(--clr-orange-500)', 'var(--clr-amber-500)', 'var(--clr-blue-500)', 'var(--clr-blue-700)', 'var(--clr-green-300)', 'var(--clr-green-500)'];
@@ -67,13 +73,12 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
     }
 
-    // === 3. Platform Usage — Donut-like stat ===
+    // === 3. Platform Usage — Active vs Total Users donut ===
     const donutChart = document.querySelector('[data-type="donut"]');
     if (donutChart) {
-        const totalUsers = users.length;
-        const activeUsers = users.filter(u => u.status === window.SwiftTrackEnums.UserStatus.ACTIVE).length;
+        const totalUsers  = users.length;
+        const activeUsers = users.filter(u => u.isActive !== false && u.active !== false).length;
         const pct = totalUsers > 0 ? Math.round((activeUsers / totalUsers) * 100) : 0;
-        // Use conic-gradient for a real donut
         donutChart.style.background = `conic-gradient(var(--clr-orange-500) 0% ${pct}%, var(--clr-neutral-200) ${pct}% 100%)`;
         donutChart.style.border = 'none';
         donutChart.innerHTML = `
@@ -84,12 +89,12 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
     }
 
-    // === 4. Uptime Analytics — Mini stats ===
+    // === 4. Complaint Status Mini Stats ===
     const uptimeChart = document.querySelector('[data-type="line-mini"]');
     if (uptimeChart) {
-        const openComplaints = complaints.filter(c => c.status === window.SwiftTrackEnums.ComplaintStatus.OPEN).length;
-        const escalated = complaints.filter(c => c.status === window.SwiftTrackEnums.ComplaintStatus.ESCALATED).length;
-        const resolved = complaints.filter(c => c.status === window.SwiftTrackEnums.ComplaintStatus.RESOLVED).length;
+        const openComplaints = complaints.filter(c => (c.status || '').toLowerCase() === 'open').length;
+        const escalated      = complaints.filter(c => (c.status || '').toLowerCase() === 'escalated').length;
+        const resolved       = complaints.filter(c => (c.status || '').toLowerCase() === 'resolved').length;
         uptimeChart.innerHTML = `
             <div class="report-mini-stats">
                 <div class="report-mini-stat">
@@ -108,12 +113,13 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
     }
 
-    // === 5. Database IO — Feedback ratings summary ===
+    // === 5. Feedback Rating Distribution ===
     const dbChart = document.querySelector('[data-type="bar-mini"]');
     if (dbChart) {
         const ratingDist = [0, 0, 0, 0, 0];
         feedback.forEach(f => {
-            if (f.rating >= 1 && f.rating <= 5) ratingDist[f.rating - 1]++;
+            const r = Number(f.rating);
+            if (r >= 1 && r <= 5) ratingDist[r - 1]++;
         });
         const maxR = Math.max(...ratingDist, 1);
         const starColors = ['var(--clr-red-500)', 'var(--clr-orange-500)', 'var(--clr-amber-500)', 'var(--clr-green-300)', 'var(--clr-green-500)'];

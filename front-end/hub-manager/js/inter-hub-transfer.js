@@ -102,41 +102,55 @@ function approveTransfer(id) {
     openModal("approveTransferModal");
 }
 
-function confirmTransferAction() {
+async function confirmTransferAction() {
     if (!activeTransferOrderId) return;
     var btn = document.querySelector("#approveTransferModal .hm-btn-primary");
     setActionLoading(btn, true, "Confirming...");
-    setTimeout(function () {
-        setActionLoading(btn, false);
-        if (window.AppState) {
-            var state = window.AppState.getState();
-            var canonical = state.orders.find(function(o) { return o.order_id === activeTransferOrderId; });
-            if (canonical) {
-                canonical.status = window.SwiftTrackEnums.OrderStatus.IN_TRANSIT;
-                canonical.updated_at = new Date().toISOString();
-            }
-            window.AppState.saveState(state);
+
+    var state = window.AppState ? window.AppState.getState() : { orders: [] };
+    var canonical = state.orders.find(function(o) { return o.order_id === activeTransferOrderId; });
+    var backendId = canonical ? (canonical.id || activeTransferOrderId) : activeTransferOrderId;
+
+    // Find the hub select value from the modal (if shown), or use existing destination hub
+    var hubSelect = document.getElementById('at-dest-hub');
+    var toHubId = (hubSelect && hubSelect.value) || (canonical && canonical.delivery_hub_id) || '';
+
+    try {
+        if (window.API && window.API.orders && backendId) {
+            await window.API.orders.transfer(backendId, toHubId || undefined, 'Inter-hub transfer approved by manager');
+            if (window.AppState) window.AppState.refresh();
         }
+        setActionLoading(btn, false);
         closeModal("approveTransferModal");
         showSuccessTick("Transfer approved");
         showToast("Transfer request approved and scheduled", "success");
-        loadTransferData();
-        activeTransferOrderId = null;
-    }, 650);
+        setTimeout(loadTransferData, 600);
+    } catch (err) {
+        console.error('[Transfer] confirmTransfer failed:', err?.message || err);
+        setActionLoading(btn, false);
+        showToast('Transfer failed \u2014 ' + (err?.message || 'server error'), 'error');
+    }
+    activeTransferOrderId = null;
 }
 
-function quickApprove(id) {
-    if (window.AppState) {
-        var state = window.AppState.getState();
-        var canonical = state.orders.find(function(o) { return o.order_id === id; });
-        if (!canonical) return;
-        canonical.status = window.SwiftTrackEnums.OrderStatus.IN_TRANSIT;
-        canonical.updated_at = new Date().toISOString();
-        window.AppState.saveState(state);
+async function quickApprove(id) {
+    var state = window.AppState ? window.AppState.getState() : { orders: [] };
+    var canonical = state.orders.find(function(o) { return o.order_id === id; });
+    if (!canonical) return;
+    var backendId = canonical.id || id;
+
+    try {
+        if (window.API && window.API.orders) {
+            await window.API.orders.transfer(backendId, undefined, 'Quick-approved inter-hub transfer');
+            if (window.AppState) window.AppState.refresh();
+        }
+        showSuccessTick("Quick approved");
+        showToast("Transfer " + id + " quick-approved", "success");
+        setTimeout(loadTransferData, 600);
+    } catch (err) {
+        console.error('[Transfer] quickApprove failed:', err?.message || err);
+        showToast('Quick-approve failed \u2014 ' + (err?.message || 'server error'), 'error');
     }
-    showSuccessTick("Quick approved");
-    showToast("Transfer " + id + " quick-approved", "success");
-    loadTransferData();
 }
 
 function openTransferRequestsModal(e) {

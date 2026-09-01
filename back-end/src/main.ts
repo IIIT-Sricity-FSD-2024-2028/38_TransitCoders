@@ -14,11 +14,24 @@ async function bootstrap() {
   // X-Frame-Options, X-Content-Type-Options, X-DNS-Prefetch-Control, etc.
   app.use((helmet as any).default ? (helmet as any).default() : (helmet as any)());
 
-  // ── CORS — allow only the frontend origin in dev ──────────────────────────
+  // ── CORS — allow localhost, 127.0.0.1 (any port), and file:// origins ──────
+  // File:// origins appear as 'null' in the browser CORS header.
   app.enableCors({
-    origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
+    origin: (origin, callback) => {
+      // Allow: no origin (curl/Postman), file://, localhost:*, 127.0.0.1:*
+      if (
+        !origin ||
+        origin === 'null' ||
+        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS: origin '${origin}' not allowed`));
+      }
+    },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'x-auth-token'],
+    credentials: true,
   });
 
   // ── Global validation pipe — validates all DTOs automatically ─────────────

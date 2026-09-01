@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bindReturn();
 });
 
-function loadConfirmation() {
+async function loadConfirmation() {
     const orderId = getUrlParam('id');
     if (!orderId) {
         window.location.href = 'worklist.html';
@@ -23,9 +23,17 @@ function loadConfirmation() {
         return;
     }
 
-    // Ensure it's marked delivered
-    if (order.status !== 'delivered') {
-        DeliveryData.updateOrderStatus(orderId, 'delivered');
+    // Mark delivered via real backend API if not already delivered
+    if (order.status !== 'delivered' && order._ref) {
+        try {
+            if (window.API && window.API.orders) {
+                await window.API.orders.confirmDelivery(order._ref);
+                if (window.AppState) window.AppState.refresh();
+            }
+        } catch (err) {
+            console.error('[Delivery] confirmDelivery failed:', err?.message || err);
+            showToast('Warning: could not confirm delivery on server', 'error');
+        }
     }
 
     document.getElementById('conf-recipient').textContent = order.customer;
@@ -70,9 +78,15 @@ function bindUpload() {
 
         const file = input.files[0];
         
-        // Agent ID could be retrieved from current user state, assuming a mock ID if missing
-        const user = window.Auth ? window.Auth.getUser() : JSON.parse(localStorage.getItem('user') || '{}');
-        const agentId = user.id || 'AG1001'; // Fallback for demo
+        // Agent ID from real session — no hardcoded fallback
+        const user = window.Auth ? window.Auth.getUser()
+            : JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user') || '{}');
+        const agentId = user.id || user.user_id || '';
+
+        if (!agentId) {
+            showToast('Session error — cannot identify agent', 'error');
+            return;
+        }
         
         try {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';

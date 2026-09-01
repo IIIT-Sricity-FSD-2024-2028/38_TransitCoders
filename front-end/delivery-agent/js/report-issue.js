@@ -227,7 +227,7 @@ function bindRecalibrate() {
 
 function bindFormSubmit() {
     const form = document.getElementById('report-form');
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async e => {
         e.preventDefault();
 
         const issueType = document.getElementById('issue-type-select').value;
@@ -273,8 +273,29 @@ function bindFormSubmit() {
             details: collectFormDetails(issueType)
         };
 
-        DeliveryData.submitReport(report);
-        showModal('report-success-modal');
+        // Submit to real backend
+        const numericId = report.orderId; // URL param (synthetic numeric ID)
+        // Look up the real backend UUID via DeliveryData
+        const orderRef = DeliveryData.getOrderById(numericId);
+        const backendOrderId = orderRef ? orderRef._ref : null;
+
+        const issueType   = report.issueType;
+        const description = JSON.stringify(report.details); // serialise sub-fields as description
+
+        if (backendOrderId && window.API && window.API.orders) {
+            try {
+                await window.API.orders.reportMishap(backendOrderId, issueType, description);
+                if (window.AppState) window.AppState.refresh();
+                showModal('report-success-modal');
+            } catch (err) {
+                console.error('[Report] reportMishap failed:', err?.message || err);
+                showToast('Could not submit report — ' + (err?.message || 'server error'), 'error');
+            }
+        } else {
+            // No backend order ID available (e.g. order not yet in state) — show modal anyway
+            console.warn('[Report] no backend order ID; report not persisted');
+            showModal('report-success-modal');
+        }
     });
 }
 

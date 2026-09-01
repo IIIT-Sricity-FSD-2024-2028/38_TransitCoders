@@ -9,18 +9,23 @@ export enum OrderStatus {
   OUT_FOR_DELIVERY = 'OutForDelivery',
   DELIVERED = 'Delivered',
   CANCELLED = 'Cancelled',
+  RETURNED = 'Returned',   // Hub-manager authorized post-delivery return (with refund)
+  FAILED = 'Failed',       // Agent mishap report during active transit
 }
 
 /**
  * Defines which statuses can follow each status.
  * OrdersService checks this map before applying any status update.
+ * RETURNED and FAILED are terminal — no further transitions are permitted.
  */
 export const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  [OrderStatus.PENDING]: [OrderStatus.ASSIGNED, OrderStatus.CANCELLED],
-  [OrderStatus.ASSIGNED]: [OrderStatus.PICKED_UP, OrderStatus.CANCELLED],
-  [OrderStatus.PICKED_UP]: [OrderStatus.IN_TRANSIT],
-  [OrderStatus.IN_TRANSIT]: [OrderStatus.OUT_FOR_DELIVERY],
-  [OrderStatus.OUT_FOR_DELIVERY]: [OrderStatus.DELIVERED],
-  [OrderStatus.DELIVERED]: [],
-  [OrderStatus.CANCELLED]: [],
+  [OrderStatus.PENDING]:          [OrderStatus.ASSIGNED, OrderStatus.CANCELLED],
+  [OrderStatus.ASSIGNED]:         [OrderStatus.PICKED_UP, OrderStatus.CANCELLED],
+  [OrderStatus.PICKED_UP]:        [OrderStatus.IN_TRANSIT, OrderStatus.FAILED],
+  [OrderStatus.IN_TRANSIT]:       [OrderStatus.OUT_FOR_DELIVERY, OrderStatus.FAILED],
+  [OrderStatus.OUT_FOR_DELIVERY]: [OrderStatus.DELIVERED, OrderStatus.FAILED],
+  [OrderStatus.DELIVERED]:        [OrderStatus.RETURNED],
+  [OrderStatus.CANCELLED]:        [],
+  [OrderStatus.RETURNED]:         [],   // terminal
+  [OrderStatus.FAILED]:           [],   // terminal
 };

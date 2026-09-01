@@ -257,7 +257,7 @@
 
             var H = { 'Content-Type': 'application/json' };
             if (token) H['x-auth-token'] = token;
-            var BASE = (window.API && window.API_BASE) || 'http://localhost:3001';
+            var BASE = window.SWIFTTRACK_API_BASE || 'http://localhost:3001';
 
             async function get(path) {
                 try {

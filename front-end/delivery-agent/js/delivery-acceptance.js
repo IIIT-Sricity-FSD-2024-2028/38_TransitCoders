@@ -51,18 +51,28 @@ function bindActions() {
     const orderId = getUrlParam('id');
 
     // Start Delivery
-    document.getElementById('start-delivery-btn').addEventListener('click', () => {
+    document.getElementById('start-delivery-btn').addEventListener('click', async () => {
         const order = DeliveryData.getOrderById(orderId);
         if (!order) return;
 
         if (order.status === 'pending') {
-            DeliveryData.updateOrderStatus(orderId, 'in-transit');
-            showToast('Delivery started!', 'success');
+            try {
+                // order._ref is the real backend UUID (mapped in state-compat.js toAgentOrder)
+                if (window.API && window.API.orders && order._ref) {
+                    await window.API.orders.updateStatus(order._ref, 'InTransit');
+                    if (window.AppState) window.AppState.refresh();
+                }
+                showToast('Delivery started!', 'success');
+            } catch (err) {
+                console.error('[Delivery] status update failed:', err?.message || err);
+                showToast('Could not update status — ' + (err?.message || 'server error'), 'error');
+                return; // Don't navigate if the backend rejected it
+            }
         }
 
         setTimeout(() => {
             window.location.href = `verification.html?id=${orderId}`;
-        }, 800);
+        }, 600);
     });
 
     // Open Maps (mock)

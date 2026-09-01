@@ -1404,6 +1404,34 @@
         ]
       }
     },
+    "/auth/forgot-password": {
+      "post": {
+        "operationId": "AuthController_forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset request acknowledged"
+          },
+          "429": {
+            "description": "Too many requests — rate limit exceeded"
+          }
+        },
+        "summary": "Request a password reset link (acknowledged, no email sent in demo)",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/tickets": {
       "get": {
         "operationId": "TicketsController_findAll",
@@ -2773,6 +2801,19 @@
         "required": [
           "email",
           "password"
+        ]
+      },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "Registered email address"
+          }
+        },
+        "required": [
+          "email"
         ]
       },
       "CreateTicketDto": {

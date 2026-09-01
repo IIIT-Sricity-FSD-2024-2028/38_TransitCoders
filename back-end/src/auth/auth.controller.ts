@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { AuthGuard } from './guards/auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import type { IUser } from '../users/interfaces/user.interface';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import type { IApiResponse } from '../common/interfaces/api-response.interface';
 
 /**
@@ -73,5 +74,29 @@ export class AuthController {
   ): IApiResponse<null> {
     this.authService.logout(token);
     return { success: true, message: 'Logged out successfully' };
+  }
+
+  /**
+   * POST /auth/forgot-password
+   * Accepts an email, validates it exists, and acknowledges the request.
+   * A real implementation would queue an email with a reset link.
+   * For security, always returns the same response regardless of whether
+   * the email is registered (prevents user enumeration).
+   */
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(ThrottlerGuard)
+  @ApiOperation({ summary: 'Request a password reset link (acknowledged, no email sent in demo)' })
+  @ApiBody({ type: ForgotPasswordDto })
+  @ApiResponse({ status: 200, description: 'Reset request acknowledged' })
+  @ApiResponse({ status: 429, description: 'Too many requests — rate limit exceeded' })
+  forgotPassword(@Body() dto: ForgotPasswordDto): IApiResponse<null> {
+    // Intentionally fire-and-forget: authService validates the email and logs
+    // the event, but the response is always the same (no user enumeration).
+    this.authService.forgotPassword(dto.email);
+    return {
+      success: true,
+      message: 'If that email address is in our system, a reset link has been sent.',
+    };
   }
 }

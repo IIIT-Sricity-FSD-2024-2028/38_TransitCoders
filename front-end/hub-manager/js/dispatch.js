@@ -88,16 +88,18 @@ function selectOverrideAgent(el, agentId) {
   window._overrideAgentId = agentId;
 }
 
-function confirmOverride() {
+async function confirmOverride() {
   if (!window._overrideOrderId || !window._overrideAgentId) {
     showToast("Select an agent first", "error");
     return;
   }
-  setOrderAssignment(window._overrideOrderId, window._overrideAgentId, "Assigned");
   closeModal("overrideModal");
-  showSuccessTick("Assignment overridden");
-  showToast("Agent overridden for " + window._overrideOrderId, "success");
-  loadDispatchData();
+  var ok = await setOrderAssignment(window._overrideOrderId, window._overrideAgentId, "Assigned");
+  if (ok) {
+    showSuccessTick("Assignment overridden");
+    showToast("Agent overridden for " + window._overrideOrderId, "success");
+    setTimeout(loadDispatchData, 600);
+  }
 }
 
 function viewOrderDetail(orderId) {
