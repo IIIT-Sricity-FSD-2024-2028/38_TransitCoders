@@ -30,7 +30,7 @@ export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) {}
 
   @Get()
-  @Roles(Role.MERCHANT, Role.SUPER_USER)
+  @Roles(Role.MERCHANT, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'List tickets (merchant sees own, super_user sees all)' })
   findAll(@CurrentUser() user: IUser): IApiResponse<ITicket[]> {
     return { success: true, data: this.ticketsService.findAll(user) };
@@ -47,7 +47,7 @@ export class TicketsController {
   }
 
   @Put(':id')
-  @Roles(Role.MERCHANT, Role.SUPER_USER)
+  @Roles(Role.MERCHANT, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Update ticket status or priority' })
   @ApiResponse({ status: 403, description: 'Not ticket owner' })
   update(

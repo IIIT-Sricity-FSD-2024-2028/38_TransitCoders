@@ -29,7 +29,7 @@ export class AgentsService {
 
   getWorklist(id: string, user: IUser): IOrder[] {
     const agent = this.findById(id);
-    if (user.id !== agent.userId && user.role !== Role.SUPER_USER && user.role !== Role.HUB_MANAGER) {
+    if (user.id !== agent.userId && ![Role.SUPER_USER, Role.ADMIN, Role.HUB_MANAGER].includes(user.role)) {
       throw new ForbiddenException('You can only view your own worklist');
     }
     return this.ordersRepository.findByAgent(agent.userId);

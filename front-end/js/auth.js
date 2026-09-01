@@ -106,6 +106,7 @@ async function handleLogin(form) {
 
     const routeMap = {
       super_user:     "../super-user/dashboard.html",
+      admin:          "../super-user/dashboard.html",
       hub_manager:    "../hub-manager/dashboard.html",
       merchant:       "../merchant/merchant.html",
       customer:       "../customer/index.html",

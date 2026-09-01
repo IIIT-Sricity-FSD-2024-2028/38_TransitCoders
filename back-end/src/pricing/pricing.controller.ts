@@ -44,7 +44,7 @@ export class PricingController {
   }
 
   @Put('config')
-  @Roles(Role.SUPER_USER)
+  @Roles(Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Update pricing rules (Super User only)' })
   @ApiBody({ type: UpdatePricingConfigDto })
   @ApiResponse({ status: 200, description: 'Pricing config updated' })

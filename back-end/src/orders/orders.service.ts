@@ -69,6 +69,7 @@ export class OrdersService {
       case Role.DELIVERY_AGENT:
         return this.ordersRepository.findByAgent(user.id);
       case Role.SUPER_USER:
+      case Role.ADMIN:
         return this.ordersRepository.findAll();
       default:
         return [];
@@ -86,6 +87,7 @@ export class OrdersService {
 
     switch (user.role) {
       case Role.SUPER_USER:
+      case Role.ADMIN:
         return order;
       case Role.MERCHANT:
         if (order.merchantId === user.id) return order;
@@ -427,8 +429,8 @@ export class OrdersService {
    */
   authorizeReturn(orderId: string, user: IUser, reason?: string): IOrder {
     const order = this.getAuthorizedOrder(orderId, user);
-    if (user.role !== Role.HUB_MANAGER && user.role !== Role.SUPER_USER) {
-      throw new ForbiddenException('Only hub managers can authorize returns');
+    if (user.role !== Role.HUB_MANAGER && user.role !== Role.SUPER_USER && user.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only hub managers, super users, and admins can authorize returns');
     }
     if (order.status !== OrderStatus.DELIVERED) {
       throw new BadRequestException('Only delivered orders can be returned');

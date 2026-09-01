@@ -63,8 +63,8 @@ export class ComplaintsService {
 
   update(id: string, dto: UpdateComplaintDto, user: IUser): ComplaintResponseDto {
     this.complaintsRepository.findById(id); // throws NotFoundException if missing
-    if (user.role !== Role.SUPER_USER) {
-      throw new ForbiddenException('Only super_user can update complaint status');
+    if (![Role.SUPER_USER, Role.ADMIN, Role.HUB_MANAGER].includes(user.role)) {
+      throw new ForbiddenException('Only admin-level users can update complaint status');
     }
     const updated = this.complaintsRepository.update(id, dto)!;
     return this.toResponse(updated, 0);

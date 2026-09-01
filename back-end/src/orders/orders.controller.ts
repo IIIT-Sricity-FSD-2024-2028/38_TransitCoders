@@ -62,7 +62,7 @@ export class OrdersController {
   }
 
   @Get(':id/barcode')
-  @Roles(Role.MERCHANT, Role.HUB_MANAGER, Role.SUPER_USER, Role.DELIVERY_AGENT)
+  @Roles(Role.MERCHANT, Role.HUB_MANAGER, Role.SUPER_USER, Role.ADMIN, Role.DELIVERY_AGENT)
   @ApiOperation({ summary: 'Barcode (Code 128 SVG) for order identification' })
   @ApiResponse({ status: 200, description: 'SVG barcode' })
   getBarcode(@Param('id') id: string, @CurrentUser() user: IUser, @Res() res: Response): void {
@@ -83,7 +83,7 @@ export class OrdersController {
   }
 
   @Put(':id')
-  @Roles(Role.MERCHANT, Role.HUB_MANAGER, Role.SUPER_USER)
+  @Roles(Role.MERCHANT, Role.HUB_MANAGER, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Update an order (financial fields are not editable)' })
   @ApiBody({ type: UpdateOrderDto })
   @ApiResponse({ status: 200, description: 'Order updated' })
@@ -92,7 +92,7 @@ export class OrdersController {
   }
 
   @Patch(':id/status')
-  @Roles(Role.HUB_MANAGER, Role.DELIVERY_AGENT, Role.SUPER_USER)
+  @Roles(Role.HUB_MANAGER, Role.DELIVERY_AGENT, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Update order status (state machine + ownership enforced)' })
   @ApiResponse({ status: 200, description: 'Status updated' })
   @ApiResponse({ status: 400, description: 'Invalid status transition' })
@@ -106,7 +106,7 @@ export class OrdersController {
   }
 
   @Patch(':id/assign')
-  @Roles(Role.HUB_MANAGER, Role.SUPER_USER)
+  @Roles(Role.HUB_MANAGER, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Assign a delivery agent to a Pending order (own hub only)' })
   @ApiBody({ type: AssignAgentDto })
   @ApiResponse({ status: 200, description: 'Agent assigned' })
@@ -116,7 +116,7 @@ export class OrdersController {
   }
 
   @Patch(':id/auto-assign')
-  @Roles(Role.HUB_MANAGER, Role.SUPER_USER)
+  @Roles(Role.HUB_MANAGER, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Dispatch automation: assign least-loaded available agent in hub' })
   @ApiResponse({ status: 200, description: 'Agent auto-assigned' })
   @ApiResponse({ status: 400, description: 'No available agents / order not Pending' })
@@ -125,7 +125,7 @@ export class OrdersController {
   }
 
   @Patch(':id/cancel')
-  @Roles(Role.MERCHANT, Role.SUPER_USER)
+  @Roles(Role.MERCHANT, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Cancel a Pending/Assigned order (owner merchant or Super User; triggers refund)' })
   @ApiResponse({ status: 200, description: 'Order cancelled' })
   @ApiResponse({ status: 400, description: 'Cannot cancel at this stage' })
@@ -136,7 +136,7 @@ export class OrdersController {
   }
 
   @Patch(':id/transfer')
-  @Roles(Role.HUB_MANAGER, Role.SUPER_USER)
+  @Roles(Role.HUB_MANAGER, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Send order to a different hub (SRS: inter-hub routing)' })
   @ApiBody({ type: TransferOrderDto })
   @ApiResponse({ status: 200, description: 'Order transferred' })
@@ -149,7 +149,7 @@ export class OrdersController {
   }
 
   @Patch(':id/return')
-  @Roles(Role.HUB_MANAGER, Role.SUPER_USER)
+  @Roles(Role.HUB_MANAGER, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Authorize return/refund for a Delivered order (SRS)' })
   @ApiResponse({ status: 200, description: 'Return authorized + refund issued' })
   @ApiResponse({ status: 400, description: 'Order not Delivered' })
@@ -179,7 +179,7 @@ export class OrdersController {
   }
 
   @Patch(':id/pickup')
-  @Roles(Role.MERCHANT, Role.CUSTOMER, Role.SUPER_USER)
+  @Roles(Role.MERCHANT, Role.CUSTOMER, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Schedule a pickup for a Pending order (SRS: pickup scheduling)' })
   @ApiBody({ type: SchedulePickupDto })
   @ApiResponse({ status: 200, description: 'Pickup scheduled' })

@@ -29,6 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Role display name map (internal -> display)
     const ROLE_LABELS = {
+        super_user:     'Super Admin',
+        admin:          'Business Admin',
         hub_manager:    'Hub Manager',
         merchant:       'Merchant',
         delivery_agent: 'Delivery Agent',
@@ -44,6 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
             openAddUserModalBtn.style.cursor = 'not-allowed';
         }
     }
+
+    const currentRole = String(localStorage.getItem("userRole") || "").toLowerCase();
+    const isSuperUser = currentRole === 'super_user';
 
     let isEditing = false;
     let cachedUsers = []; // populated by loadAndRender(), used by edit/validate
@@ -105,8 +110,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const normaliseRole = (r) => {
             r = (r || '').toLowerCase();
-            if (r === 'hub_manager' || r === 'hub manager') return 'hub manager';
-            if (r === 'delivery_agent' || r === 'delivery agent') return 'delivery agent';
+            if (r === 'super_user' || r === 'super admin') return 'super_user';
+            if (r === 'admin' || r === 'business admin') return 'admin';
+            if (r === 'hub_manager' || r === 'hub manager') return 'hub_manager';
+            if (r === 'delivery_agent' || r === 'delivery agent') return 'delivery_agent';
             return r;
         };
 
@@ -114,7 +121,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const matchesSearch  = u.name.toLowerCase().includes(search) ||
                                    u.email.toLowerCase().includes(search) ||
                                    (u.id || '').toLowerCase().includes(search);
-            const matchesRole    = fRole === "All" || normaliseRole(u.role) === fRole.toLowerCase();
+            
+            // Only match against normaliseRole(u.role) which corresponds to the internal key
+            const matchesRole    = fRole === "All" || normaliseRole(u.role) === normaliseRole(fRole);
             const matchesStatus  = fStatus === "All" || u.status === fStatus;
             return matchesSearch && matchesRole && matchesStatus;
         });
@@ -122,7 +131,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const roleLabel = (r) => ROLE_LABELS[r] || r;
 
         userTableBody.innerHTML = filtered.length > 0
-            ? filtered.map(u => `
+            ? filtered.map(u => {
+                const isTargetAdmin = u.role === 'super_user' || u.role === 'admin';
+                const canEdit = isSuperUser || !isTargetAdmin;
+                
+                return `
             <tr${u.status === window.SwiftTrackEnums.UserStatus.PENDING ? ' style="background: rgba(245,158,11,0.06)"' : ''}>
                 <td>
                     <div class="user-name-cell">
@@ -142,16 +155,17 @@ document.addEventListener("DOMContentLoaded", () => {
                         ${u.status === window.SwiftTrackEnums.UserStatus.PENDING ? `<button class="action-icon approve-btn" data-id="${u.id}" title="Approve" style="color:#10b981;">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </button>` : ''}
+                        ${canEdit ? `
                         <button class="action-icon edit-btn" data-id="${u.id}" title="Edit">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         </button>
                         <button class="action-icon danger delete-btn" data-id="${u.id}" title="Delete">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                        </button>
+                        </button>` : ''}
                     </div>
                 </td>
             </tr>
-        `).join("")
+        `}).join("")
         : `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-subtitle)">No users found.</td></tr>`;
 
         document.querySelectorAll('.approve-btn').forEach(b => b.addEventListener('click', e => approveUser(e.currentTarget.dataset.id)));

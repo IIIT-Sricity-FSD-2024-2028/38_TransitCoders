@@ -60,8 +60,8 @@ export class FeedbackService {
 
   update(id: string, dto: UpdateFeedbackDto, user: IUser): FeedbackResponseDto {
     this.findById(id);
-    if (user.role !== Role.SUPER_USER) {
-      throw new ForbiddenException('Only super_user can update feedback status');
+    if (![Role.SUPER_USER, Role.ADMIN].includes(user.role)) {
+      throw new ForbiddenException('Only admin-level users can update feedback status');
     }
     const updated = this.feedbackRepository.update(id, dto)!;
     return this.toResponse(updated, 0);

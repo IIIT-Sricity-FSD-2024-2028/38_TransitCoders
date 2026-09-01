@@ -81,28 +81,28 @@ export class AgentsController {
   constructor(private readonly agentsService: AgentsService) {}
 
   @Get()
-  @Roles(Role.HUB_MANAGER, Role.SUPER_USER)
+  @Roles(Role.HUB_MANAGER, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'List all agents' })
   findAll(): IApiResponse<IAgentProfile[]> {
     return { success: true, data: this.agentsService.findAll() };
   }
 
   @Get(':id')
-  @Roles(Role.HUB_MANAGER, Role.SUPER_USER, Role.DELIVERY_AGENT)
+  @Roles(Role.HUB_MANAGER, Role.SUPER_USER, Role.ADMIN, Role.DELIVERY_AGENT)
   @ApiOperation({ summary: 'Get agent profile' })
   findById(@Param('id') id: string): IApiResponse<IAgentProfile> {
     return { success: true, data: this.agentsService.findById(id) };
   }
 
   @Get(':id/worklist')
-  @Roles(Role.DELIVERY_AGENT, Role.HUB_MANAGER, Role.SUPER_USER)
+  @Roles(Role.DELIVERY_AGENT, Role.HUB_MANAGER, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Get assigned orders for an agent' })
   getWorklist(@Param('id') id: string, @CurrentUser() user: IUser): IApiResponse<IOrder[]> {
     return { success: true, data: this.agentsService.getWorklist(id, user) };
   }
 
   @Patch(':id/availability')
-  @Roles(Role.DELIVERY_AGENT)
+  @Roles(Role.DELIVERY_AGENT, Role.HUB_MANAGER, Role.SUPER_USER)
   @ApiOperation({ summary: 'Update agent availability status' })
   updateAvailability(
     @Param('id') id: string,
@@ -130,7 +130,7 @@ export class AgentsController {
    * @param user — Authenticated delivery agent
    */
   @Post(':id/delivery-photo')
-  @Roles(Role.DELIVERY_AGENT, Role.HUB_MANAGER, Role.SUPER_USER)
+  @Roles(Role.DELIVERY_AGENT, Role.HUB_MANAGER, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Upload proof-of-delivery photo (Delivery Agent)' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({

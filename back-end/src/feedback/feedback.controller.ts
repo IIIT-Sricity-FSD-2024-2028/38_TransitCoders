@@ -30,7 +30,7 @@ export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 
   @Get()
-  @Roles(Role.CUSTOMER, Role.SUPER_USER)
+  @Roles(Role.CUSTOMER, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'List feedback (customer sees own, super_user sees all)' })
   @ApiResponse({ status: 200, type: [FeedbackResponseDto] })
   findAll(@CurrentUser() user: IUser): IApiResponse<FeedbackResponseDto[]> {
@@ -49,7 +49,7 @@ export class FeedbackController {
   }
 
   @Put(':id')
-  @Roles(Role.SUPER_USER)
+  @Roles(Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Update feedback review status (super_user only)' })
   update(
     @Param('id') id: string,

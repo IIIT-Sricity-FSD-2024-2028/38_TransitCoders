@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const roleFromLegacyKey = String(localStorage.getItem("userRole") || "").toLowerCase();
     const currentRole = roleFromUser || roleFromLegacyKey;
 
-    const allowedRoles = ["super_user", "super-user", "superuser"];
+    const allowedRoles = ["super_user", "super-user", "superuser", "admin"];
     if (!allowedRoles.includes(currentRole)) {
         window.location.replace("access-denied.html");
         return;
@@ -21,6 +21,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Keep legacy key in sync for pages/scripts that still read userRole directly.
     localStorage.setItem("userRole", currentRole);
+
+    // ADMIN Role restrictions: hide system elements and redirect if on system page
+    document.body.setAttribute('data-role', currentRole);
+    if (currentRole === "admin") {
+        const restrictedElements = document.querySelectorAll('[data-role-restrict="super_user"]');
+        restrictedElements.forEach(el => el.style.display = 'none');
+        
+        // System pages that ADMIN shouldn't access directly
+        const systemPages = ["roles-permissions.html", "system-configuration.html", "database-management.html", "security-logs.html"];
+        const currentPage = window.location.pathname.split("/").pop();
+        if (systemPages.includes(currentPage)) {
+            window.location.replace("dashboard.html");
+            return;
+        }
+    }
 
     initProfileModal(user);
     

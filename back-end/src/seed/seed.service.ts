@@ -131,25 +131,45 @@ export class SeedService implements OnModuleInit {
           view_roles: false, update_roles: false,
         },
       },
+      {
+        roleId: 'admin',
+        name: 'Admin',
+        description: 'Business and operations oversight',
+        isSystem: true,
+        permissions: {
+          view_users: true, create_users: true, update_users: true, delete_users: false, approve_users: true,
+          view_orders: true, create_orders: false, update_orders: true, delete_orders: false, assign_agents: true,
+          view_shipments: true, view_hubs: true, create_hubs: false, update_hubs: false,
+          view_agents: true, view_tickets: true, update_tickets: true,
+          view_complaints: true, update_complaints: true,
+          view_feedback: true, update_feedback: true,
+          view_roles: false, update_roles: false,
+          view_reports: true, revenue_analytics: true,
+        },
+      },
     ];
 
     roles.forEach((r) => this.rolesRepository.create(r as any));
-    console.log('✅ Seeded 5 system roles');
+    console.log('✅ Seeded 6 system roles');
   }
 
   // ── Base users so the app is testable from day one ────────────────────────
   private async seedUsers() {
     if (this.db.count('users') > 0) return;
     const hash = (pw: string) => bcrypt.hash(pw, 10);
+    const hashedPassword = await hash('password123');
 
     const users = [
-      { name: 'Super Admin', email: 'super@swifttrack.com', password: await hash('password123'), role: 'super_user' as const, isActive: true },
-      { name: 'Hub Manager Chennai', email: 'hm_chennai@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H001', isActive: true },
-      { name: 'Hub Manager Mumbai', email: 'hm_mumbai@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H002', isActive: true },
-      { name: 'Hub Manager Delhi', email: 'hm_delhi@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H003', isActive: true },
-      { name: 'Hub Manager Bengaluru', email: 'hm_bengaluru@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H004', isActive: true },
-      { name: 'Hub Manager Kolkata', email: 'hm_kolkata@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H005', isActive: true },
-      { name: 'Hub Manager Hyderabad', email: 'hm_hyderabad@swifttrack.com', password: await hash('password123'), role: 'hub_manager' as const, hubId: 'H006', isActive: true },
+      ...(process.env.NODE_ENV !== 'production' ? [
+        { name: 'Super Admin', email: 'super@swifttrack.com', password: hashedPassword, role: 'super_user' as const, isActive: true },
+        { name: 'Business Admin', email: 'admin@swifttrack.com', password: hashedPassword, role: 'admin' as const, isActive: true },
+      ] : []),
+      { name: 'Hub Manager Chennai', email: 'hm_chennai@swifttrack.com', password: hashedPassword, role: 'hub_manager' as const, hubId: 'H001', isActive: true },
+      { name: 'Hub Manager Mumbai', email: 'hm_mumbai@swifttrack.com', password: hashedPassword, role: 'hub_manager' as const, hubId: 'H002', isActive: true },
+      { name: 'Hub Manager Delhi', email: 'hm_delhi@swifttrack.com', password: hashedPassword, role: 'hub_manager' as const, hubId: 'H003', isActive: true },
+      { name: 'Hub Manager Bengaluru', email: 'hm_bengaluru@swifttrack.com', password: hashedPassword, role: 'hub_manager' as const, hubId: 'H004', isActive: true },
+      { name: 'Hub Manager Kolkata', email: 'hm_kolkata@swifttrack.com', password: hashedPassword, role: 'hub_manager' as const, hubId: 'H005', isActive: true },
+      { name: 'Hub Manager Hyderabad', email: 'hm_hyderabad@swifttrack.com', password: hashedPassword, role: 'hub_manager' as const, hubId: 'H006', isActive: true },
       { name: 'Merchant One', email: 'merchant1@example.com', password: await hash('password123'), role: 'merchant' as const, company: 'Acme Corp', isActive: true },
       { name: 'Merchant Two', email: 'merchant2@example.com', password: await hash('password123'), role: 'merchant' as const, company: 'Beta Goods', isActive: true },
       { name: 'Agent One', email: 'agent1@swifttrack.com', password: await hash('password123'), role: 'delivery_agent' as const, hubId: 'H001', isActive: true },

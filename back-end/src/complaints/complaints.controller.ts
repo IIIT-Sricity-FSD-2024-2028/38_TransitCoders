@@ -30,7 +30,7 @@ export class ComplaintsController {
   constructor(private readonly complaintsService: ComplaintsService) {}
 
   @Get()
-  @Roles(Role.CUSTOMER, Role.SUPER_USER, Role.HUB_MANAGER)
+  @Roles(Role.CUSTOMER, Role.SUPER_USER, Role.ADMIN, Role.HUB_MANAGER)
   @ApiOperation({ summary: 'List complaints (customer sees own, hub manager + super_user see all)' })
   @ApiResponse({ status: 200, type: [ComplaintResponseDto] })
   findAll(@CurrentUser() user: IUser): IApiResponse<ComplaintResponseDto[]> {
@@ -48,7 +48,7 @@ export class ComplaintsController {
   }
 
   @Put(':id')
-  @Roles(Role.SUPER_USER, Role.HUB_MANAGER)
+  @Roles(Role.SUPER_USER, Role.ADMIN, Role.HUB_MANAGER)
   @ApiOperation({ summary: 'Update complaint status (hub manager or super_user — SRS: hub managers resolve complaints)' })
   @ApiResponse({ status: 403, description: 'Not authorized' })
   update(

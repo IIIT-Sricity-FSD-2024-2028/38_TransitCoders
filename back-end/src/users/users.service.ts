@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -9,6 +10,7 @@ import { UsersRepository } from './users.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { IUser, ISafeUser } from './interfaces/user.interface';
+import { Role } from '../common/constants/roles.constant';
 
 @Injectable()
 export class UsersService {
@@ -31,7 +33,12 @@ export class UsersService {
   }
 
   // ODDT-243 — create with duplicate email check + bcrypt
-  async create(dto: CreateUserDto): Promise<ISafeUser> {
+  async create(dto: CreateUserDto, currentUser?: IUser): Promise<ISafeUser> {
+    if (currentUser && currentUser.role !== Role.SUPER_USER) {
+      if (dto.role === Role.SUPER_USER || dto.role === Role.ADMIN) {
+        throw new ForbiddenException('Only super_user can create admin-level accounts');
+      }
+    }
     const existing = this.usersRepository.findByEmail(dto.email);
     if (existing) {
       throw new ConflictException('Email is already registered');
@@ -45,8 +52,20 @@ export class UsersService {
   }
 
   // ODDT-244 — update
-  async update(id: string, dto: UpdateUserDto): Promise<ISafeUser> {
-    this.findById(id); // throws NotFoundException if missing
+  async update(id: string, dto: UpdateUserDto, currentUser?: IUser): Promise<ISafeUser> {
+    if (currentUser && currentUser.role !== Role.SUPER_USER && dto.role) {
+      if (dto.role === Role.SUPER_USER || dto.role === Role.ADMIN) {
+        throw new ForbiddenException('Only super_user can assign admin-level roles');
+      }
+    }
+    const targetUser = this.findById(id); // throws NotFoundException if missing
+    
+    if (currentUser && currentUser.role !== Role.SUPER_USER) {
+      if (targetUser.role === Role.SUPER_USER || targetUser.role === Role.ADMIN) {
+        throw new ForbiddenException('You do not have permission to modify admin-level accounts');
+      }
+    }
+
     const changes: Partial<IUser> = { ...dto };
     if (dto.password) {
       changes.password = await bcrypt.hash(dto.password, 10);
@@ -55,11 +74,18 @@ export class UsersService {
   }
 
   // ODDT-245 — delete with self-delete prevention
-  delete(id: string, requesterId: string): void {
+  delete(id: string, requesterId: string, currentUser?: IUser): void {
     if (id === requesterId) {
       throw new BadRequestException('You cannot delete your own account');
     }
-    this.findById(id); // throws NotFoundException if missing
+    const targetUser = this.findById(id); // throws NotFoundException if missing
+    
+    if (currentUser && currentUser.role !== Role.SUPER_USER) {
+      if (targetUser.role === Role.SUPER_USER || targetUser.role === Role.ADMIN) {
+        throw new ForbiddenException('You do not have permission to delete admin-level accounts');
+      }
+    }
+
     this.usersRepository.delete(id);
   }
 

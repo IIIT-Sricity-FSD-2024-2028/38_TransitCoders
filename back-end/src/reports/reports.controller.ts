@@ -18,7 +18,7 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Get('revenue')
-  @Roles(Role.SUPER_USER)
+  @Roles(Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Revenue summary (gross / refunds / net, by level, hub, day)' })
   @ApiResponse({ status: 200, description: 'Revenue summary returned' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -27,14 +27,14 @@ export class ReportsController {
   }
 
   @Get('operations')
-  @Roles(Role.SUPER_USER)
+  @Roles(Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Operations monitoring snapshot' })
   operations(): IApiResponse<unknown> {
     return { success: true, data: this.reportsService.getOperationsSummary() };
   }
 
   @Get('payments')
-  @Roles(Role.SUPER_USER)
+  @Roles(Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'Payment ledger audit view' })
   payments(@Query('limit') limit?: string): IApiResponse<unknown> {
     const n = Math.min(Math.max(parseInt(limit || '200', 10) || 200, 1), 500);

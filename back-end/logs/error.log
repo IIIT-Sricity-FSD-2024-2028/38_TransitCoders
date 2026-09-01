@@ -232,3 +232,4 @@ TypeError: Cannot read properties of undefined (reading 'role')
     at handle (/Users/shazil/stuff/fsd/38_TransitCoders/back-end/node_modules/router/index.js:435:11)
     at Layer.handleRequest (/Users/shazil/stuff/fsd/38_TransitCoders/back-end/node_modules/router/lib/layer.js:152:17)
 [2026-09-01 22:01:51] [ERROR] GET /expenses 500 0ms | {"ip":"::1","userId":"anonymous","role":"-","status":500,"elapsed":0}
+[2026-09-02 01:44:43] [ERROR] PUT /pricing/config 500 16ms | {"ip":"::ffff:127.0.0.1","userId":"user_admin","role":"admin","status":500,"elapsed":16}

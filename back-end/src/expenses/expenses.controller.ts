@@ -12,7 +12,7 @@ export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
   @Post()
-  @Roles(Role.SUPER_USER)
+  @Roles(Role.SUPER_USER, Role.ADMIN)
   create(@Body() dto: CreateExpenseDto) {
     return {
       status: 'success',
@@ -22,7 +22,7 @@ export class ExpensesController {
   }
 
   @Get()
-  @Roles(Role.SUPER_USER)
+  @Roles(Role.SUPER_USER, Role.ADMIN)
   findAll() {
     return {
       status: 'success',
@@ -31,7 +31,7 @@ export class ExpensesController {
   }
 
   @Get(':id')
-  @Roles(Role.SUPER_USER)
+  @Roles(Role.SUPER_USER, Role.ADMIN)
   findById(@Param('id') id: string) {
     return {
       status: 'success',
@@ -40,7 +40,7 @@ export class ExpensesController {
   }
 
   @Put(':id')
-  @Roles(Role.SUPER_USER)
+  @Roles(Role.SUPER_USER, Role.ADMIN)
   update(@Param('id') id: string, @Body() dto: UpdateExpenseDto) {
     return {
       status: 'success',
@@ -50,7 +50,7 @@ export class ExpensesController {
   }
 
   @Delete(':id')
-  @Roles(Role.SUPER_USER)
+  @Roles(Role.SUPER_USER, Role.ADMIN)
   delete(@Param('id') id: string) {
     this.expensesService.delete(id);
     return {
