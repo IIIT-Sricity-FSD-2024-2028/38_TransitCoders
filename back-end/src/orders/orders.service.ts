@@ -265,6 +265,18 @@ export class OrdersService {
     // COD collection on successful delivery
     if (newStatus === OrderStatus.DELIVERED) {
       this.paymentsService.markCollectedOnDelivery(updated);
+
+      // Idempotent payout creation
+      if (updated.assignedAgentId) {
+        const now = new Date().toISOString();
+        const payoutAmount = updated.pricingBreakdown?.agentPayoutAmount || 0;
+        this.db.run(
+          `INSERT OR IGNORE INTO payouts (id, orderId, agentId, amount, status, createdAt, updatedAt)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [uuidv4(), updated.id, updated.assignedAgentId, payoutAmount, 'pending', now, now]
+        );
+      }
+
       this.notificationsService.notify(
         updated.customerId,
         'order',

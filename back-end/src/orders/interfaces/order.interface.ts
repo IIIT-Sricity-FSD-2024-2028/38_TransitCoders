@@ -17,6 +17,7 @@ export interface IPricingBreakdown {
   discount: number;
   tax: number;
   total: number;
+  agentPayoutAmount: number;
   serviceLevel: ServiceLevel;
   weightKg: number;
   configSnapshotAt: string;

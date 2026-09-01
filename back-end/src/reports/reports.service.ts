@@ -13,9 +13,16 @@ import { DatabaseService } from '../common/database/database.service';
  *   PENDING (COD)  = Σ charge.amount where status = 'pending' (COD awaiting collection)
  */
 export interface IRevenueSummary {
-  grossRevenue: number;
+  grossCollections: number;
   refunds: number;
+  netCollections: number;
+  totalTax: number;
   netRevenue: number;
+  totalAgentPayouts: number;
+  totalOperatingExpenses: number;
+  operatingProfit: number;
+  profitMargin: number;
+
   pendingCodAmount: number;
   totalOrders: number;
   deliveredOrders: number;
@@ -35,7 +42,7 @@ export class ReportsService {
     // ── Financial ledger aggregates ────────────────────────────────────────
     const charges = this.db.queryOne<any>(`
       SELECT
-        COALESCE(SUM(CASE WHEN status = 'paid'    THEN amount ELSE 0 END), 0) AS gross,
+        COALESCE(SUM(CASE WHEN status IN ('paid', 'refunded') THEN amount ELSE 0 END), 0) AS gross,
         COALESCE(SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END), 0) AS pendingCod
       FROM payments WHERE type = 'charge'
     `);
@@ -44,9 +51,39 @@ export class ReportsService {
       FROM payments WHERE type = 'refund' AND status = 'refunded'
     `);
 
-    const grossRevenue = Number(charges?.gross || 0);
+    const grossCollections = Number(charges?.gross || 0);
     const refundTotal = Number(refunds?.total || 0);
+    const netCollections = grossCollections - refundTotal;
     const pendingCodAmount = Number(charges?.pendingCod || 0);
+
+    // ── Tax Calculation ────────────────────────────────────────────────────
+    // Only count tax for orders that remain 'paid'. Refunded orders don't contribute to net revenue.
+    const ordersWithBreakdown = this.db.query<{ pricingBreakdown: string }>(
+      `SELECT pricingBreakdown FROM orders WHERE paymentStatus = 'paid' AND pricingBreakdown IS NOT NULL`
+    );
+    let totalTax = 0;
+    for (const row of ordersWithBreakdown) {
+      try {
+        const breakdown = JSON.parse(row.pricingBreakdown);
+        if (breakdown.tax) {
+          totalTax += Number(breakdown.tax);
+        }
+      } catch (e) {
+        // ignore invalid json
+      }
+    }
+
+    const netRevenue = netCollections - totalTax;
+
+    // ── Expenses & Payouts ─────────────────────────────────────────────────
+    const payoutsRow = this.db.queryOne<any>('SELECT COALESCE(SUM(amount), 0) AS total FROM payouts');
+    const totalAgentPayouts = Number(payoutsRow?.total || 0);
+
+    const expensesRow = this.db.queryOne<any>('SELECT COALESCE(SUM(amount), 0) AS total FROM expenses');
+    const totalOperatingExpenses = Number(expensesRow?.total || 0);
+
+    const operatingProfit = netRevenue - totalAgentPayouts - totalOperatingExpenses;
+    const profitMargin = netRevenue > 0 ? (operatingProfit / netRevenue) * 100 : 0;
 
     // ── Order status counts ────────────────────────────────────────────────
     const statusRows = this.db.query<{ status: string; n: number }>(
@@ -94,9 +131,15 @@ export class ReportsService {
     const totalOrders = Object.values(statusCounts).reduce((a, b) => a + b, 0);
 
     return {
-      grossRevenue,
+      grossCollections,
       refunds: refundTotal,
-      netRevenue: grossRevenue - refundTotal,
+      netCollections,
+      totalTax,
+      netRevenue,
+      totalAgentPayouts,
+      totalOperatingExpenses,
+      operatingProfit,
+      profitMargin,
       pendingCodAmount,
       totalOrders,
       deliveredOrders: statusCounts['Delivered'] || 0,

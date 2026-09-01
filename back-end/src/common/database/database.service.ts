@@ -201,6 +201,27 @@ CREATE TABLE IF NOT EXISTS notifications (
 );
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications (userId);
 
+CREATE TABLE IF NOT EXISTS expenses (
+  id TEXT PRIMARY KEY,
+  description TEXT NOT NULL,
+  amount REAL NOT NULL,
+  category TEXT NOT NULL,
+  date TEXT NOT NULL,
+  createdAt TEXT NOT NULL,
+  updatedAt TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS payouts (
+  id TEXT PRIMARY KEY,
+  orderId TEXT NOT NULL UNIQUE,
+  agentId TEXT NOT NULL,
+  amount REAL NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'pending',
+  createdAt TEXT NOT NULL,
+  updatedAt TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_payouts_agent ON payouts (agentId);
+
 CREATE TABLE IF NOT EXISTS hub_transfers (
   id TEXT PRIMARY KEY,
   orderId TEXT NOT NULL,
@@ -232,6 +253,7 @@ CREATE TABLE IF NOT EXISTS pricing_config (
   discountPercent REAL NOT NULL DEFAULT 0,
   taxPercent REAL NOT NULL DEFAULT 0,
   minCharge REAL NOT NULL,
+  agentPayoutFlat REAL NOT NULL DEFAULT 50,
   updatedAt TEXT NOT NULL
 );
 `;

@@ -2350,6 +2350,117 @@
           "Shipments"
         ]
       }
+    },
+    "/expenses": {
+      "post": {
+        "operationId": "ExpensesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExpenseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Expenses"
+        ]
+      },
+      "get": {
+        "operationId": "ExpensesController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Expenses"
+        ]
+      }
+    },
+    "/expenses/{id}": {
+      "get": {
+        "operationId": "ExpensesController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Expenses"
+        ]
+      },
+      "put": {
+        "operationId": "ExpensesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExpenseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Expenses"
+        ]
+      },
+      "delete": {
+        "operationId": "ExpensesController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Expenses"
+        ]
+      }
     }
   },
   "info": {
@@ -3125,6 +3236,14 @@
         ]
       },
       "UpdateShipmentDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateExpenseDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateExpenseDto": {
         "type": "object",
         "properties": {}
       }

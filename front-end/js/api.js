@@ -25,7 +25,8 @@ async function apiFetch(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
   if (token) headers['x-auth-token'] = token;
 
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const fetchOptions = { cache: 'no-store', ...options, headers };
+  const res = await fetch(`${API_BASE}${path}`, fetchOptions);
   const json = await res.json().catch(() => ({}));
 
   if (!res.ok) {
@@ -365,17 +366,45 @@ window.API = {
 
   // ── Reports (Super User) ───────────────────────────────────────────────────
   reports: {
-    async revenue() {
+    async getRevenue() {
       const res = await apiFetch('/reports/revenue');
       return res.data;
     },
-    async operations() {
+    async getOperations() {
       const res = await apiFetch('/reports/operations');
       return res.data;
     },
-    async payments(limit = 200) {
+    async getPayments(limit = 100) {
       const res = await apiFetch(`/reports/payments?limit=${limit}`);
+      return res.data || [];
+    },
+  },
+
+  // ── Expenses ──────────────────────────────────────────────────────────────
+  expenses: {
+    async getAll() {
+      const res = await apiFetch('/expenses');
+      return res.data || [];
+    },
+    async create(data) {
+      const res = await apiFetch('/expenses', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
       return res.data;
+    },
+    async update(id, data) {
+      const res = await apiFetch(`/expenses/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+      return res.data;
+    },
+    async remove(id) {
+      const res = await apiFetch(`/expenses/${id}`, {
+        method: 'DELETE',
+      });
+      return res.message;
     },
   },
 

@@ -28,6 +28,7 @@ export interface IPricingConfig {
   discountPercent: number;
   taxPercent: number;
   minCharge: number;
+  agentPayoutFlat: number;
 }
 
 export const DEFAULT_PRICING_CONFIG: IPricingConfig = {
@@ -39,6 +40,7 @@ export const DEFAULT_PRICING_CONFIG: IPricingConfig = {
   discountPercent: 0,
   taxPercent: 5,
   minCharge: 60,
+  agentPayoutFlat: 50,
 };
 
 export interface QuoteInput {
@@ -56,8 +58,8 @@ export class PricingService {
     const row = this.db.queryOne<any>('SELECT * FROM pricing_config WHERE id = 1');
     if (!row) {
       this.db.run(
-        `INSERT INTO pricing_config (id, baseFee, perKgStandard, perKgExpress, perKgSameDay, codFee, discountPercent, taxPercent, minCharge, updatedAt)
-         VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO pricing_config (id, baseFee, perKgStandard, perKgExpress, perKgSameDay, codFee, discountPercent, taxPercent, minCharge, agentPayoutFlat, updatedAt)
+         VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           DEFAULT_PRICING_CONFIG.baseFee,
           DEFAULT_PRICING_CONFIG.perKgStandard,
@@ -67,6 +69,7 @@ export class PricingService {
           DEFAULT_PRICING_CONFIG.discountPercent,
           DEFAULT_PRICING_CONFIG.taxPercent,
           DEFAULT_PRICING_CONFIG.minCharge,
+          DEFAULT_PRICING_CONFIG.agentPayoutFlat,
           new Date().toISOString(),
         ],
       );
@@ -81,6 +84,7 @@ export class PricingService {
       discountPercent: Number(row.discountPercent),
       taxPercent: Number(row.taxPercent),
       minCharge: Number(row.minCharge),
+      agentPayoutFlat: Number(row.agentPayoutFlat || 50),
     };
   }
 
@@ -97,8 +101,8 @@ export class PricingService {
     const existing = this.db.queryOne('SELECT id FROM pricing_config WHERE id = 1');
     if (!existing) {
       this.db.run(
-        `INSERT INTO pricing_config (id, baseFee, perKgStandard, perKgExpress, perKgSameDay, codFee, discountPercent, taxPercent, minCharge, updatedAt)
-         VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO pricing_config (id, baseFee, perKgStandard, perKgExpress, perKgSameDay, codFee, discountPercent, taxPercent, minCharge, agentPayoutFlat, updatedAt)
+         VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           merged.baseFee,
           merged.perKgStandard,
@@ -108,12 +112,13 @@ export class PricingService {
           merged.discountPercent,
           merged.taxPercent,
           merged.minCharge,
+          merged.agentPayoutFlat,
           new Date().toISOString(),
         ],
       );
     } else {
       this.db.run(
-        `UPDATE pricing_config SET baseFee = ?, perKgStandard = ?, perKgExpress = ?, perKgSameDay = ?, codFee = ?, discountPercent = ?, taxPercent = ?, minCharge = ?, updatedAt = ?
+        `UPDATE pricing_config SET baseFee = ?, perKgStandard = ?, perKgExpress = ?, perKgSameDay = ?, codFee = ?, discountPercent = ?, taxPercent = ?, minCharge = ?, agentPayoutFlat = ?, updatedAt = ?
          WHERE id = 1`,
         [
           merged.baseFee,
@@ -124,6 +129,7 @@ export class PricingService {
           merged.discountPercent,
           merged.taxPercent,
           merged.minCharge,
+          merged.agentPayoutFlat,
           new Date().toISOString(),
         ],
       );
@@ -174,6 +180,7 @@ export class PricingService {
       discount,
       tax,
       total,
+      agentPayoutAmount: cfg.agentPayoutFlat,
       serviceLevel,
       weightKg,
       configSnapshotAt: new Date().toISOString(),
