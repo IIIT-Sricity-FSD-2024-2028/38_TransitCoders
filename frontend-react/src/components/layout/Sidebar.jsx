@@ -11,10 +11,10 @@ export default function Sidebar({ user, children }) {
     const [expanded, setExpanded] = useState(true);
     
     return (
-        <aside className="h-screen flex-shrink-0">
+        <aside className="sticky top-0 h-screen flex-shrink-0 z-40">
             <nav className={`h-full flex flex-col bg-white border-r shadow-sm transition-all duration-300 ${expanded ? 'w-64' : 'w-20'}`}>
                 
-                <div className="p-4 pb-2 flex justify-between items-center">
+                <div className="p-4 pb-2 flex justify-between items-center flex-shrink-0">
                     <img src={Container} className="w-8 h-8 mr-2 flex-shrink-0" alt="Logo" />
                     <div className={`flex items-center overflow-hidden transition-all ${expanded ? 'w-32' : 'w-0'}`}>
                          <span className="font-bold text-xl">SwiftTrack</span>
@@ -29,7 +29,9 @@ export default function Sidebar({ user, children }) {
                 </div>
                 
                 <SidebarContext.Provider value={{ expanded }}>
-                    <ul className="flex-1 px-3 mt-4 space-y-1">{children}</ul>
+                    <ul className={`flex-1 min-h-0 px-3 py-2 space-y-1 mt-4 ${expanded ? 'overflow-y-auto' : 'overflow-visible'}`}>
+                        {children}
+                    </ul>
                 </SidebarContext.Provider>
 
                 <div className="border-t flex p-3 items-center">
