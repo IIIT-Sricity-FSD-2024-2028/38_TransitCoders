@@ -28,7 +28,7 @@ export class FeedbackService {
       id: feedback.id,
       customerName: user ? user.name : feedback.userId,
       rating: (feedback as any).rating,
-      comment: (feedback as any).comment,
+      comment: feedback.comments,
       status: feedback.status,
       createdAt: feedback.createdAt,
     } as FeedbackResponseDto;

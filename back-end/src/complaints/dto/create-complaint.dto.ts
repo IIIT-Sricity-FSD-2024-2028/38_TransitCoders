@@ -1,14 +1,24 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsIn } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import type { ComplaintPriority } from '../interfaces/complaint.interface';
 
-// ODDT-302 — CreateComplaintDto
 export class CreateComplaintDto {
-  @ApiProperty({ example: 'My order was damaged on delivery' })
+  @ApiProperty({ example: 'Damaged Package' })
   @IsNotEmpty()
   @IsString()
-  description: string;
+  type!: string;
 
-  @ApiPropertyOptional({ example: 'ORD_5' })
+  @ApiPropertyOptional({ enum: ['Low', 'Medium', 'High', 'Critical'], example: 'Medium' })
+  @IsOptional()
+  @IsIn(['Low', 'Medium', 'High', 'Critical'])
+  priority?: ComplaintPriority;
+
+  @ApiProperty({ example: 'Ordered Sony headphones but received wrong brand.' })
+  @IsNotEmpty()
+  @IsString()
+  description!: string;
+
+  @ApiPropertyOptional({ example: 'ORD-2024-0006' })
   @IsOptional()
   @IsString()
   orderId?: string;

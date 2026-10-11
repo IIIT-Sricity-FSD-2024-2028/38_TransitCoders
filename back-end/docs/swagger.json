@@ -2997,47 +2997,81 @@
             "type": "string",
             "example": "ORD-2024-0006"
           },
+          "type": {
+            "type": "string",
+            "example": "Damaged Package"
+          },
+          "priority": {
+            "type": "string",
+            "example": "Medium",
+            "enum": [
+              "Low",
+              "Medium",
+              "High",
+              "Critical"
+            ]
+          },
           "description": {
             "type": "string",
             "example": "Ordered Sony headphones but received wrong brand."
           },
           "status": {
             "type": "string",
-            "example": "In Progress"
+            "example": "In Progress",
+            "enum": [
+              "Open",
+              "In Progress",
+              "Resolved"
+            ]
           },
           "createdAt": {
             "type": "object",
-            "example": "May 5"
+            "example": "2026-09-01T10:30:00.000Z"
           },
           "updatedAt": {
             "type": "object",
-            "example": "May 6"
+            "example": "2026-09-01T12:00:00.000Z"
           }
         },
         "required": [
           "reference",
           "id",
           "customerName",
-          "orderId",
+          "type",
+          "priority",
           "description",
           "status",
-          "createdAt",
-          "updatedAt"
+          "createdAt"
         ]
       },
       "CreateComplaintDto": {
         "type": "object",
         "properties": {
+          "type": {
+            "type": "string",
+            "example": "Damaged Package"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "Low",
+              "Medium",
+              "High",
+              "Critical"
+            ],
+            "example": "Medium"
+          },
           "description": {
             "type": "string",
-            "example": "My order was damaged on delivery"
+            "example": "Ordered Sony headphones but received wrong brand."
           },
           "orderId": {
             "type": "string",
-            "example": "ORD_5"
+            "example": "ORD-2024-0006"
           }
         },
         "required": [
+          "type",
           "description"
         ]
       },
@@ -3051,6 +3085,19 @@
               "In Progress",
               "Resolved"
             ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "Low",
+              "Medium",
+              "High",
+              "Critical"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "example": "Updated investigation notes"
           }
         }
       },
