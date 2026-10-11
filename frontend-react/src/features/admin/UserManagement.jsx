@@ -2,6 +2,7 @@ import { useState, useEffect,useMemo } from "react";
 import { Search, Plus, ChevronDown, Pencil,Trash } from "react-bootstrap-icons";
 import { API } from "../../services/api";
 import AddOrEditUserModal from './AddOrEditUserModal';
+import AdminTable from "../../components/admin/AdminTable";
 
 const UserManagement=() => {
     const [modalState, setModalState] = useState({ isOpen: false, user: null });
@@ -29,12 +30,15 @@ const UserManagement=() => {
         }
         loadUsers();
     },[]);
+
     const handleOpenAdd = () => {
         setModalState({ isOpen: true, user: null });
     };
+
     const handleOpenEdit = (user) => {
         setModalState({ isOpen: true, user });
     };
+    
     const handleSuccess = (userResult, action) => {
         if (action === 'create') {
             setUsers((prev) => [ ...prev, userResult]);
@@ -43,6 +47,82 @@ const UserManagement=() => {
         } 
     };
 
+    const userColumns = [
+        {
+            header: "Name",
+            render: (user) => {
+                const initial = user.name ? user.name.charAt(0).toUpperCase() : '?';
+                return (
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 font-semibold flex items-center justify-center text-xs flex-shrink-0 border border-orange-200/50">
+                            {initial}
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                            <span className="font-semibold text-gray-900 text-sm whitespace-nowrap">
+                                {user.name}
+                            </span>
+                            <span className="text-[11px] font-mono text-gray-400 truncate max-w-[150px]" title={user.id}>
+                                {user.id}
+                            </span>
+                        </div>
+                    </div>
+                )
+            }
+        },
+        {
+            header: "Email",
+            accessor: "email",
+            cellClassName: 'whitespace-nowrap'
+        },
+        {
+            header: "Role",
+            render: (user) => {
+                const formattedRole = user.role ? user.role.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : '-'
+                return (
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${roleBadges[user.role] || 'bg-gray-50 text-gray-600 border-gray-200'}`}>
+                        {formattedRole}
+                    </span>
+                )
+            }
+        },
+        {
+            header: "Status",
+            render: (user) => (
+                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${
+                user.isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/50' : 'bg-rose-50 text-rose-700 border border-rose-200/50'
+                }`}>
+                    {user.isActive ? 'Active' : 'Inactive'}
+                </span>
+            )
+        },{
+            header: "Last Login",
+            render: (user) => (
+                <span className="text-gray-500 whitespace-nowrap text-xs">
+                    {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : '—'}
+                </span>
+            )
+        },{
+            header: "Actions",
+            headerAlign: "text-right",
+            cellClassName: "text-right whitespace-nowrap",
+            render: (user) => (
+                <div className="flex items-center justify-end gap-1">
+                    <button
+                        title="Edit User"
+                        onClick={()=> handleOpenEdit(user)}
+                        className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors">
+                        <Pencil size={14} />
+                    </button>
+                    <button
+                        title="Delete User"
+                        onClick={() => deleteUser(user.id)}
+                        className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+                        <Trash size={14} />
+                    </button>  
+                </div>
+            )
+        }
+    ]
 
     const filteredUsers = useMemo(() =>{
         return users.filter((user) => {
@@ -148,108 +228,14 @@ const UserManagement=() => {
                 </div>
 
                 {/* Table */}
-                <div className="w-full overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="border-t border-b border-gray-100 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-                                <th className="py-3 px-6">Name</th>
-                                <th className="py-3 px-6">Email</th>
-                                <th className="py-3 px-6">Role</th>
-                                <th className="py-3 px-6">Status</th>
-                                <th className="py-3 px-6">Last Login</th>
-                                <th className="py-3 px-6 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50 text-sm text-gray-600">
-                            { loading ? (
-                                <tr>
-                                    <td colSpan={6} className="text-center py-20 text-gray-400">
-                                        Loading users...
-                                    </td>
-                                </tr>
-                            ): error ? (
-                                <tr>
-                                    <td colSpan={6} className="text-center py-20 text-red-500">
-                                        {error}
-                                    </td>
-                                </tr>
-                            ): filteredUsers.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="text-center py-20 text-gray-400 font-normal">
-                                        No users found.
-                                    </td>
-                                </tr>
-                            ) : (
-                                filteredUsers.map((user)=>{
-                                    const initial = user.name ? user.name.charAt(0).toUpperCase() : '?';
-                                    const formattedRole = user.role ?
-                                    user.role.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-                                    : '-';
-                                    return (
-                                        <tr key={user.id} className="hover:bg-gray-50/70 transition-colors">
-                                            <td className="py-3.5 px-6">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 font-semibold flex items-center justify-center text-xs flex-shrink-0 border border-orange-200/50">
-                                                        {initial}
-                                                    </div>
-                                                    <div className="flex flex-col min-w-0">
-                                                        <span className="font-semibold text-gray-900 text-sm whitespace-nowrap">
-                                                            {user.name}
-                                                        </span>
-                                                        <span className="text-[11px] font-mono text-gray-400 truncate max-w-[150px]" title={user.id}>
-                                                            {user.id}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </td>
-
-                                            <td className="py-3.5 px-6 whitespace-nowrap">
-                                                {user.email}
-                                            </td>
-
-                                            <td className="py-3.5 px-6 whitespace-nowrap">
-                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${roleBadges[user.role] || 'bg-gray-50 text-gray-600 border-gray-200'}`}>
-                                                    {formattedRole}
-                                                </span>
-                                            </td>
-
-                                            <td className="py-3.5 px-6 whitespace-nowrap">
-                                                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${
-                                                    user.isActive ?
-                                                    'bg-emerald-50 text-emerald-700 border border-emerald-200/50' :
-                                                    'bg-rose-50 text-rose-700 border border-rose-200/50'
-                                                }`}>
-                                                    {user.isActive ? 'Active' : 'Inactive'}
-                                                </span>
-                                            </td>
-
-                                            <td className="py-3.5 px-6 text-gray-500 whitespace-nowrap text-xs">
-                                                {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : '—'}
-                                            </td>
-
-                                            <td className="py-3.5 px-6 text-right whitespace-nowrap">
-                                                <div className="flex items-center justify-end gap-1">
-                                                    <button
-                                                        title="Edit User"
-                                                        onClick={()=> handleOpenEdit(user)}
-                                                        className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors">
-                                                            <Pencil size={14} />
-                                                        </button>
-                                                    <button
-                                                        title="Delete User"
-                                                        onClick={() => deleteUser(user.id)}
-                                                        className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
-                                                            <Trash size={14} />
-                                                        </button>  
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                <AdminTable
+                    columns={userColumns}
+                    data={filteredUsers}
+                    isLoading={loading}
+                    loadingMessage="Loading users..."
+                    emptyMessage="No users found."
+                    error={error}
+                />
             </div>
             <AddOrEditUserModal
                 isOpen={modalState.isOpen}

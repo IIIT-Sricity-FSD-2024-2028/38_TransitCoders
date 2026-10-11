@@ -12,10 +12,10 @@ export default function AdminLayout() {
                 <SidebarItem icon={<People size={20} />} text="User Management" to="/admin/users" />
                 <SidebarItem icon={<Gear size={20} />} text="System Configuration" to="/admin/system-configuration" />
                 <SidebarItem icon={<ShieldCheck size={20} />} text="Roles & Permissions" to="/admin/roles&permissions" />
-                <SidebarItem icon={<Folder size={20} />} text="Database Management" to="/admin/database" />
+                {/* <SidebarItem icon={<Folder size={20} />} text="Database Management" to="/admin/database" /> */}
                 <SidebarItem icon={<Cpu size={20} />} text="Operations Monitoring" to="/admin/operations" />
                 <SidebarItem icon={<GraphUp size={20} />} text="Reports & Analytics" to="/admin/reports" />
-                <SidebarItem icon={<FileEarmarkText size={20} />} text="Security Logs" to="/admin/security-logs" />
+                {/* <SidebarItem icon={<FileEarmarkText size={20} />} text="Security Logs" to="/admin/security-logs" /> */}
                 <SidebarItem icon={<ExclamationTriangle size={20} />} text="Complaints Management" to="/admin/complaints" />
                 <SidebarItem icon={<ChatSquareText size={20} />} text="Feedback Review" to="/admin/feedback" />
                 <SidebarItem icon={<Gear size={20} />} text="Settings" to="/admin/settings" />
