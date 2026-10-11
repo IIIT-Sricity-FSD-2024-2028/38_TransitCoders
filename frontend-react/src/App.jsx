@@ -7,7 +7,7 @@ import UserManagement from './features/admin/UserManagement';
 import SystemConfiguration from './features/admin/SystemConfiguration';
 import ComplaintsManagement from './features/admin/ComplaintsManagement';
 import FeedbackReview from './features/admin/FeedbackReview';
-
+import CustomerLayout from './features/customer/CustomerLayout';
 import CustomerDashboard from './features/customer/CustomerDashboard';
 
 export default function App() {
@@ -22,8 +22,10 @@ export default function App() {
         <Route path="complaints" element={<ComplaintsManagement />} />
         <Route path="feedback" element={<FeedbackReview />} />
       </Route>
-
-      <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+      
+      <Route path='/customer' element={<CustomerLayout></CustomerLayout>}>
+        <Route path="/customer/dashboard" element={<CustomerDashboard />} />        
+      </Route>
     </Routes>
   );
 }
