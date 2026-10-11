@@ -18,17 +18,17 @@ export default function CustomerDashboard(){
     ]
 
     return(
-        <div>
+        <div className="space-y-6">
             <div>
-                <h1>Dashboard</h1>
-                <p>Welcome back</p>
+                <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+                <p className="text-gray-500">Welcome back</p>
             </div>
-            <div>
+            <div className="grid grid-cols-3 gap-4">
                 <StatCard label="ACTIVE SHIPMENTS" value={3} />
                 <StatCard label="DELIVERED" value={1} />
                 <StatCard label="SUPPORT TICKETS" value={0}/>
             </div>
-            <div>
+            <div className="grid grid-cols-2 gap-6">
                 <LiveTrackingCard order={activeOrder}></LiveTrackingCard>
                 <RecentActivity activities={recentList}></RecentActivity>
             </div>
