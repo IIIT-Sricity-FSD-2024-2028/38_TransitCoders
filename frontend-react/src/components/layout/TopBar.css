@@ -1,0 +1,91 @@
+.topbar{
+    width: 100%;
+    height: 70px;
+    padding: 0 20px;
+    box-sizing : border-box;
+
+    display : flex;
+    align-items : center;
+    justify-content : space-between;
+    background-color : white;
+    border-bottom : 1px solid #e5e7eb;
+}
+
+.topbar-title { 
+    margin : 0;
+    color : #111827;
+    font-size : 20px;
+    font-weight : 600;
+}
+
+.topbar-actions { 
+    display : flex;
+    align-items : center;
+    gap : 15px;
+}
+
+
+.topbar-search {
+    width : 250px;
+    height : 36px;
+    padding : 0 12px;
+    box-sizing : border-box;
+
+    display : flex;
+    align-items : center;
+    gap : 10px;
+
+    background-color: #f3f4f6;
+    border-radius: 9999px;
+}
+
+
+.topbar-search svg {
+    flex-shrink: 0;
+    color: #6b7280;
+}
+
+
+.topbar-search input::placeholder {
+    color: #6b7280;
+}
+
+.topbar-search input {
+
+    width : 100%;
+    min-width : 0;
+    /* padding : 30px; */
+    padding : 0;
+    border :none;
+    outline : none;
+    background-color : transparent;
+    color: #111827;
+    font: inherit;
+    font-size: 14px;
+}
+
+
+.topbar-icon-button {
+    width : 36px;
+    height : 36px;
+    padding : 0px;
+    display : flex;
+    align-items : center;
+    justify-content : center;
+    border: none;
+    outline: none;
+    border-radius : 50%;
+    background-color: transparent;
+    color: #374151;
+    cursor : pointer;
+}
+
+
+.topbar-icon-button:hover {
+    background-color: #f3f4f6;
+}
+
+.topbar-icon-button:focus-visible {
+    outline: 2px solid #6b7280;
+    outline-offset: 2px;
+}
