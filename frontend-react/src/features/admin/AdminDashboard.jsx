@@ -1,7 +1,52 @@
-import React from 'react';
+import React, { useEffect,useState } from 'react';
 import { People, ClockHistory, ExclamationTriangle, ShieldCheck } from 'react-bootstrap-icons';
+import KPICard from '../../components/shared/KPICard';
+import API from '../../services/api';
 
 const AdminDashboard = () => {
+    const [users, setUsers] =useState(0)
+    const [activeShipments, setActiveShipments] = useState(0);
+    const [openComplaints, setOpenComplaints] = useState(0);
+    const [pendingApprovals, setPendingApprovals] = useState(0);
+    const [dbStatus, setDbStatus] = useState('checking...');
+    useEffect(() => {
+        async function loadData() {
+            try {
+                const [users, shipments, complaints] = await Promise.all([
+                    API.users.getAll().catch(() => []),
+                    API.shipments.getAll().catch(() => []),
+                    API.complaints.getAll().catch(() => []),
+                ]);
+
+                if (Array.isArray(users) && users.length > 0) {
+                    setUsers(users.length);
+                    setPendingApprovals(users.filter((u) => !u.isActive).length);
+                    setDbStatus('connected');
+                } else {
+                    setUsers(0);
+                    setPendingApprovals(0);
+                    setDbStatus('disconnected');
+                }
+
+                setActiveShipments(
+                    Array.isArray(shipments)
+                        ? shipments.filter((s) => s.status === 'processing' || s.status === 'in-transit').length
+                        : 0
+                );
+
+                setOpenComplaints(
+                    Array.isArray(complaints)
+                        ? complaints.filter((c) => c.status === 'Open' || c.status === 'In Progress').length
+                        : 0
+                );
+            } catch (err) {
+                console.error("Error fetching data:", err);
+                setDbStatus('disconnected');
+            }
+        }
+        loadData();
+    }, []);
+
   return (
     <div className="p-2 bg-gray-100 min-h-screen">
         {/*Header Section*/}
@@ -21,71 +66,67 @@ const AdminDashboard = () => {
         {/* KPI Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Total Users */}
-            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">
-                    <People size={22} />
-                </div>
-                <div>
-                    <p className="text-xs font-medium text-gray-500">Total Users</p>
-                    <p className="text-2xl font-bold text-gray-900">0</p>
-                </div>
-            </div>
+            <KPICard
+                title="Total Users"
+                value={users}
+                isicon={true}
+                color="bg-blue-50 text-blue-500"
+                icon={<People size={22} />}
+            />
 
             {/* Active Shipments */}
-            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">
-                    <ClockHistory size={22} />
-                </div>
-                <div>
-                    <p className="text-xs font-medium text-gray-500">Active Shipments</p>
-                    <p className="text-2xl font-bold text-gray-900">1,248</p>
-                </div>
-            </div>
+            <KPICard
+                title="Active Shipments"
+                value={activeShipments}
+                isicon={true}
+                color="bg-orange-50 text-orange-500"
+                icon={<ClockHistory size={22} />}
+            />
 
             {/* Open Complaints */}
-            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-500 shrink-0">
-                    <ExclamationTriangle size={22} />
-                </div>
-                <div>
-                    <p className="text-xs font-medium text-gray-500">Open Complaints</p>
-                    <p className="text-2xl font-bold text-gray-900">0</p>
-                </div>
-            </div>
+            <KPICard
+                title="Open Complaints"
+                value={openComplaints}
+                isicon={true}
+                color="bg-red-50 text-red-500"
+                icon={<ExclamationTriangle size={22} />}
+            />
 
             {/* System Health */}
-            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
-                    <ShieldCheck size={22} />
-                </div>
-                <div>
-                    <p className="text-xs font-medium text-gray-500">System Health</p>
-                    <p className="text-2xl font-bold text-gray-900">99.9%</p>
-                </div>
-            </div>
+            <KPICard
+                title="System Health"
+                value="Good"
+                isicon={true}
+                color="bg-green-50 text-green-500"
+                icon={<ShieldCheck size={22} />}
+            />
         </div>
         
         {/* Infrastructure Monitoring Section */}
-        <div className="mt-6 bg-white p-4 rounded-md shadow-md">
-            <h2 className="text-lg font-semibold mb-2">Infrastructure Monitoring</h2>
+        <div className="mt-6 bg-white p-6 rounded-md shadow-md">
+            <h2 className="text-lg font-semibold mb-4">Infrastructure Monitoring</h2>
 
             <div className="grid grid-cols-4 gap-4">
-                <div className="bg-white p-4 rounded-md shadow-md">
-                    <h3 className="text-lg text-gray-500 mb-2">Database Status</h3>
-                    <p className="text-xl font-light">connected</p>
-                </div>  
-                <div className="bg-white p-4 rounded-md shadow-md">
-                    <h2 className="text-lg text-gray-500 mb-2">Server Load(CPU)</h2>
-                    <p className="text-xl font-light">67%</p>
-                </div>
-                <div className="bg-white p-4 rounded-md shadow-md">
-                    <h2 className="text-lg text-gray-500 mb-2">Pending Approvals</h2>
-                    <p className="text-xl font-light">45ms</p>
-                </div>
-                <div className="bg-white p-4 rounded-md shadow-md">
-                    <h2 className="text-lg text-gray-500 mb-2">System Alerts</h2>
-                    <p className="text-xl font-light">0</p>
-                </div>
+                <KPICard
+                    title="Database Status"
+                    value={dbStatus}
+                    isicon={false}
+                />
+                <KPICard
+                    title="Server Load(CPU)"
+                    value="67%"
+                    isicon={false}
+                />
+                <KPICard
+                    title="Pending Approvals"
+                    value={pendingApprovals}
+                    isicon={false}
+                />
+                <KPICard
+                    title="System Alerts"
+                    value="0"
+                    isicon={false}
+                />
             </div>
         </div>
         {/* Recent Activity Section */}

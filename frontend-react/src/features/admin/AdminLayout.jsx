@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar, { SidebarItem } from '../../components/layout/Sidebar';
+import Topbar from '../../components/layout/Topbar';
 import { LayoutTextWindow, People, Gear, ShieldCheck, Cpu, GraphUp, ChatSquareText, Folder, ShieldFillCheck, ExclamationTriangle, ShieldX, Shield, FileEarmarkText } from 'react-bootstrap-icons';
 
 export default function AdminLayout() {
@@ -18,12 +19,15 @@ export default function AdminLayout() {
                 {/* <SidebarItem icon={<FileEarmarkText size={20} />} text="Security Logs" to="/admin/security-logs" /> */}
                 <SidebarItem icon={<ExclamationTriangle size={20} />} text="Complaints Management" to="/admin/complaints" />
                 <SidebarItem icon={<ChatSquareText size={20} />} text="Feedback Review" to="/admin/feedback" />
-                <SidebarItem icon={<Gear size={20} />} text="Settings" to="/admin/settings" />
             </Sidebar>
-
-            <main className="flex-1 p-8 overflow-y-auto bg-gray-100">
-                <Outlet />
-            </main>
+            <div className="flex-1 flex flex-col overflow-hidden">
+                <div>
+                    <Topbar />
+                </div>
+                <main className="flex-1 p-8 overflow-y-auto bg-gray-100">
+                    <Outlet />
+                </main>
+            </div>
         </div>
     );
 }

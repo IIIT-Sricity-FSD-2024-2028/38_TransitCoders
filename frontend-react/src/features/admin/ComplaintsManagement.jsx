@@ -1,7 +1,8 @@
 import {useState, useEffect, useMemo} from "react";
-import { Search,ChevronDown,ThreeDotsVertical } from "react-bootstrap-icons";
+import { Search,ChevronDown,ThreeDotsVertical, ExclamationTriangle } from "react-bootstrap-icons";
 import { API } from "../../services/api";
 import AdminTable from "../../components/admin/AdminTable";
+import KPICard from "../../components/shared/KPICard";
 
 export default function ComplaintsManagement() {
     const [complaints, setComplaints] = useState([])
@@ -208,6 +209,37 @@ export default function ComplaintsManagement() {
                     <h1 className="text-2xl font-bold">Complaints Management</h1>
                     <p className="text-lg font-light text-gray-500 mb-2">Track, escalate, and resolve customer issues globally.</p>
                 </div>
+            </div>
+            {/* widgets */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <KPICard
+                    title="Total Complaints"
+                    value={complaints.length}
+                    isicon={true}
+                    color="bg-blue-50 text-blue-500"
+                    icon={<ExclamationTriangle size={22} />}
+                />
+                <KPICard
+                    title="Open Complaints"
+                    value={complaints.filter(c => c.status === 'Open').length}
+                    isicon={true}
+                    color="bg-amber-50 text-amber-500"
+                    icon={<ExclamationTriangle size={22} />}
+                />
+                <KPICard
+                    title="In Progress"
+                    value={complaints.filter(c => c.status === 'In Progress').length}
+                    isicon={true}
+                    color="bg-green-50 text-green-500"
+                    icon={<ExclamationTriangle size={22} />}
+                />
+                <KPICard
+                    title="Critical Priority"
+                    value={complaints.filter(c => c.priority === 'Critical').length}
+                    isicon={true}
+                    color="bg-rose-50 text-rose-500"
+                    icon={<ExclamationTriangle size={22} />}
+                />
             </div>
             {/* complaints table */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflaw-hidden">

@@ -2,6 +2,7 @@ import {useState, useEffect, useMemo} from "react";
 import { Search,ChevronDown,ThreeDotsVertical,Star,StarFill } from "react-bootstrap-icons";
 import { API } from "../../services/api";
 import AdminTable from "../../components/admin/AdminTable";
+import KPICard from "../../components/shared/KPICard";
 
 export default function FeedbackReview() {
     const [feedbacks, setFeedbacks] = useState([]);
@@ -163,6 +164,37 @@ export default function FeedbackReview() {
                     <h1 className="text-2xl font-bold">Feedback Review</h1>
                     <p className="text-lg font-light text-gray-500 mb-2">Monitor ratings and resolve negative platform reviews.</p>
                 </div>
+            </div>
+            {/* widgets */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <KPICard
+                    title="Total Feedbacks"
+                    value={feedbacks.length}
+                    isicon={true}
+                    color="bg-blue-50 text-blue-500"
+                    icon={<Star size={22} />}
+                />
+                <KPICard
+                    title="Positive Feedbacks"
+                    value={feedbacks.filter(f => f.rating >= 4).length}
+                    isicon={true}
+                    color="bg-green-50 text-green-500"
+                    icon={<StarFill size={22} />}
+                />
+                <KPICard
+                    title="Negative Feedbacks"
+                    value={feedbacks.filter(f => f.rating <= 2).length}
+                    isicon={true}
+                    color="bg-rose-50 text-rose-500"
+                    icon={<StarFill size={22} />}
+                />
+                <KPICard
+                    title="Pending Reviews"
+                    value={feedbacks.filter(f => f.status !== 'Reviewed').length}
+                    isicon={true}
+                    color="bg-orange-50 text-orange-500"
+                    icon={<ThreeDotsVertical size={22} />}
+                />
             </div>
             {/* Feedback table */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflaw-hidden">

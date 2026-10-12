@@ -2759,7 +2759,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "example": "Shazil Mirza"
+            "example": "Shazil"
           },
           "email": {
             "type": "string",
@@ -2807,7 +2807,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "example": "Shazil Mirza"
+            "example": "Shazil"
           },
           "email": {
             "type": "string",
@@ -2841,6 +2841,11 @@
           "company": {
             "type": "string",
             "example": "Acme Corp"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "description": "User account status"
           }
         }
       },

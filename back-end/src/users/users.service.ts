@@ -33,23 +33,29 @@ export class UsersService {
   }
 
   // ODDT-243 — create with duplicate email check + bcrypt
-  async create(dto: CreateUserDto, currentUser?: IUser): Promise<ISafeUser> {
-    if (currentUser && currentUser.role !== Role.SUPER_USER) {
-      if (dto.role === Role.SUPER_USER || dto.role === Role.ADMIN) {
-        throw new ForbiddenException('Only super_user can create admin-level accounts');
-      }
+  // src/users/users.service.ts
+
+async create(dto: CreateUserDto, currentUser?: IUser): Promise<ISafeUser> {
+  if (currentUser && currentUser.role !== Role.SUPER_USER) {
+    if (dto.role === Role.SUPER_USER || dto.role === Role.ADMIN) {
+      throw new ForbiddenException('Only super_user can create admin-level accounts');
     }
-    const existing = this.usersRepository.findByEmail(dto.email);
-    if (existing) {
-      throw new ConflictException('Email is already registered');
-    }
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
-    return this.sanitize(this.usersRepository.create({
-      ...dto,
-      password: hashedPassword,
-      isActive: false,
-    }));
   }
+  const existing = this.usersRepository.findByEmail(dto.email);
+  if (existing) {
+    throw new ConflictException('Email is already registered');
+  }
+  const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+  // Auto-activate customers, require approval for everyone else
+  const shouldAutoActivate = dto.role === Role.CUSTOMER;
+
+  return this.sanitize(this.usersRepository.create({
+    ...dto,
+    password: hashedPassword,
+    isActive: shouldAutoActivate,
+  }));
+}
 
   // ODDT-244 — update
   async update(id: string, dto: UpdateUserDto, currentUser?: IUser): Promise<ISafeUser> {

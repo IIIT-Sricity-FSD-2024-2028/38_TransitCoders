@@ -1,8 +1,9 @@
 import { useState, useEffect,useMemo } from "react";
-import { Search, Plus, ChevronDown, Pencil,Trash } from "react-bootstrap-icons";
+import { Search, Plus, ChevronDown, Pencil, Trash, People, ShieldCheck, CheckCircle } from "react-bootstrap-icons";
 import { API } from "../../services/api";
 import AddOrEditUserModal from './AddOrEditUserModal';
 import AdminTable from "../../components/admin/AdminTable";
+import KPICard from "../../components/shared/KPICard";
 
 const UserManagement=() => {
     const [modalState, setModalState] = useState({ isOpen: false, user: null });
@@ -38,7 +39,7 @@ const UserManagement=() => {
     const handleOpenEdit = (user) => {
         setModalState({ isOpen: true, user });
     };
-    
+
     const handleSuccess = (userResult, action) => {
         if (action === 'create') {
             setUsers((prev) => [ ...prev, userResult]);
@@ -88,12 +89,17 @@ const UserManagement=() => {
         {
             header: "Status",
             render: (user) => (
-                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${
-                user.isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/50' : 'bg-rose-50 text-rose-700 border border-rose-200/50'
-                }`}>
-                    {user.isActive ? 'Active' : 'Inactive'}
+                <span
+                className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium  ${
+                    user.isActive
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-amber-50 text-amber-700 border-amber-200'
+                }`}
+                >
+                <span  />
+                {user.isActive ? 'Active' : 'Pending Approval'}
                 </span>
-            )
+            ),
         },{
             header: "Last Login",
             render: (user) => (
@@ -107,6 +113,15 @@ const UserManagement=() => {
             cellClassName: "text-right whitespace-nowrap",
             render: (user) => (
                 <div className="flex items-center justify-end gap-1">
+                    {!user.isActive && (
+                        <button
+                            title="Approve User"
+                            onClick={() => approveUser(user.id)}
+                            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors mr-1"
+                        >
+                            <CheckCircle size={13} />
+                        </button>
+                    )}
                     <button
                         title="Edit User"
                         onClick={()=> handleOpenEdit(user)}
@@ -136,9 +151,9 @@ const UserManagement=() => {
             const matchesStatus =
                 selectedStatus === 'All Statuses' ||
                 (selectedStatus === 'Active' && user.isActive === true) ||
-                (selectedStatus === 'Inactive' && user.isActive === false);
+                ((selectedStatus === 'Pending' || selectedStatus === 'Inactive') && user.isActive === false);
             
-                return matchesSearch && matchesRole && matchesStatus;
+            return matchesSearch && matchesRole && matchesStatus;
         })
     },[users, searchTerm, selectedRole, selectedStatus]);
 
@@ -148,6 +163,17 @@ const UserManagement=() => {
             setUsers((prev) => prev.filter((user) => user.id !== userId));
         } catch (error) {
             console.error("Error deleting user:", error);
+        }
+    }
+    const approveUser = async (userId) => {
+        try {
+            await API.users.approve(userId);
+            setUsers((prev) =>
+                prev.map((user) => (user.id === userId ? { ...user, isActive: true } : user))
+            );
+        } catch (error) {
+            console.error("Error approving user:", error);
+            alert(error.message || "Failed to approve user");
         }
     }
 
@@ -161,7 +187,7 @@ const UserManagement=() => {
     };
 
     return (
-        <div className="p-8 bg-gray-100 min-h-screen">
+        <div className="bg-gray-100 min-h-screen">
             {/* Header Section */}
             <div className="flex justify-between items-center mb-6">
                 <div className="mb-4 left-full">
@@ -176,6 +202,42 @@ const UserManagement=() => {
                         <span>Add New User</span>
                     </button>
                 </div>
+            </div>
+            {/* widgets */}
+            <div className="grid grid-cols-4 gap-4 mb-6">
+                <KPICard
+                    title="Total Users"
+                    value={users.length}
+                    isicon={true}
+                    color="bg-blue-50 text-blue-500"
+                    icon={<People size={22} />}
+                />
+                <KPICard
+                    title="Active Users"
+                    value={users.filter(user => user.isActive).length}
+                    isicon={true}
+                    color="bg-emerald-50 text-emerald-500"
+                    icon={<ShieldCheck size={22} />}
+                />
+                <KPICard
+                    title="Pending Approvals"
+                    value={users.filter(user => !user.isActive).length}
+                    isicon={true}
+                    color="bg-amber-50 text-amber-500"
+                    icon={<CheckCircle size={22} />}
+                />
+                {
+                    selectedRole !== "All Roles" && (
+                        <KPICard
+                            title={`Total ${selectedRole.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}s`}
+                            value={users.filter(user => user.role === selectedRole).length}
+                            isicon={true}
+                            color="bg-purple-50 text-purple-500"
+                            icon={<ShieldCheck size={22} />}
+                        />
+                    )
+                }
+                
             </div>
             {/* User Management Table */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflaw-hidden">
@@ -219,7 +281,7 @@ const UserManagement=() => {
                                     <option value="All Statuses">All Statuses</option>
                                     <option value="Active">Active</option>
                                     <option value="Inactive">Inactive</option>
-                                    <option value="pending">Pending</option>
+                                    <option value="Pending">Pending Approval</option>
                                     <option value="suspended">Suspended</option>
                             </select>
                             <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={15} />
