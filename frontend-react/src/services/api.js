@@ -253,6 +253,14 @@ export const API = {
       const res = await apiFetch(`/shipments/${id}`, { method: 'PUT', body: JSON.stringify(data) });
       return res.data;
     },
+    async getById(id) {
+      const res = await apiFetch(`/shipments/${id}`);
+      return res.data;
+    },
+    async getTracking(id) {
+      const res = await apiFetch(`/shipments/${id}/track`);
+      return res.data;
+    },
     async cancel(id) {
       const res = await apiFetch(`/shipments/${id}`, { method: 'DELETE' });
       return res.data;

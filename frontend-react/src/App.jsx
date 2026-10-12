@@ -9,6 +9,13 @@ import ComplaintsManagement from './features/admin/ComplaintsManagement';
 import FeedbackReview from './features/admin/FeedbackReview';
 import CustomerLayout from './features/customer/CustomerLayout';
 import CustomerDashboard from './features/customer/CustomerDashboard';
+import MerchantLayout from './features/merchant/MerchantLayout';
+import MerchantDashboard from './features/merchant/MerchantDashboard';
+import BookShipment from './features/merchant/BookShipment';
+import MerchantOrders from './features/merchant/MerchantOrders';
+import TrackShipment from './features/merchant/TrackShipment';
+import AnalyticsReport from './features/merchant/AnalyticsReport';
+import MerchantSupport from './features/merchant/MerchantSupport';
 
 export default function App() {
   return (
@@ -23,8 +30,17 @@ export default function App() {
         <Route path="feedback" element={<FeedbackReview />} />
       </Route>
       
-      <Route path='/customer' element={<CustomerLayout></CustomerLayout>}>
-        <Route path="/customer/dashboard" element={<CustomerDashboard />} />        
+      <Route path='/customer' element={<CustomerLayout />}>
+        <Route path="dashboard" element={<CustomerDashboard />} />        
+      </Route>
+
+      <Route path="/merchant" element={<MerchantLayout />}>
+        <Route path="dashboard" element={<MerchantDashboard />} />
+        <Route path="book" element={<BookShipment />} />
+        <Route path="orders" element={<MerchantOrders />} />
+        <Route path="track" element={<TrackShipment />} />
+        <Route path="analytics" element={<AnalyticsReport />} />
+        <Route path="support" element={<MerchantSupport />} />
       </Route>
     </Routes>
   );

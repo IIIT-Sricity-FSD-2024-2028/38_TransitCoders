@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+body {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  color: #111827;
+  background-color: #F3F4F6;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.font-condensed {
+  font-family: 'Barlow Condensed', sans-serif;
+}
