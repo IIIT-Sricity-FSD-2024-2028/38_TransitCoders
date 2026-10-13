@@ -7,8 +7,11 @@ import UserManagement from './features/admin/UserManagement';
 import SystemConfiguration from './features/admin/SystemConfiguration';
 import ComplaintsManagement from './features/admin/ComplaintsManagement';
 import FeedbackReview from './features/admin/FeedbackReview';
+import ReportsAnalytics from './features/admin/ReportsAnalytics';  
+
 import CustomerLayout from './features/customer/CustomerLayout';
 import CustomerDashboard from './features/customer/CustomerDashboard';
+
 import MerchantLayout from './features/merchant/MerchantLayout';
 import MerchantDashboard from './features/merchant/MerchantDashboard';
 import BookShipment from './features/merchant/BookShipment';
@@ -37,6 +40,7 @@ export default function App() {
         <Route path="system-configuration" element={<SystemConfiguration />} />
         <Route path="complaints" element={<ComplaintsManagement />} />
         <Route path="feedback" element={<FeedbackReview />} />
+        <Route path="reports" element={<ReportsAnalytics />} />
       </Route>
       
       <Route path='/customer' element={<CustomerLayout />}>

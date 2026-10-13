@@ -66,7 +66,7 @@ export function SidebarItem({ icon, text, to, alert }) {
                 `}
             >
                 <span className="flex-shrink-0">{icon}</span>
-                <span className={`overflow-hidden transition-all whitespace-nowrap ${expanded ? 'w-52 ml-3' : 'w-0'}`}>
+                <span className={`overflow-hidden transition-all break-words leading-tight ${expanded ? 'w-52 ml-3' : 'w-0'}`}>
                     {text}
                 </span>
                 
