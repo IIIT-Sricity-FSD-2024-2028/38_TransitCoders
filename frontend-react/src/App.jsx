@@ -18,6 +18,7 @@ import AnalyticsReport from './features/merchant/AnalyticsReport';
 import MerchantSupport from './features/merchant/MerchantSupport';
 
 import AgentLayout from './features/agent/AgentLayout';
+import AgentDashboard from './features/agent/AgentDashboard';
 import AgentWorklist from './features/agent/AgentWorklist';
 
 
@@ -48,9 +49,8 @@ export default function App() {
       </Route>
       
       <Route path="/agent" element={<AgentLayout />}>
-      <Route path="/agent/dashboard" element={<AdminDashboard />}>
-      <Route path="worklist" element={<AgentWorklist />} />
-      </Route>
+        <Route path="dashboard" element={<AgentDashboard />} />
+        <Route path="worklist" element={<AgentWorklist />} />
       </Route>
 
     </Routes>
