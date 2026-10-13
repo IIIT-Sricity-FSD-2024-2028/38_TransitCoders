@@ -18,6 +18,7 @@ import AnalyticsReport from './features/merchant/AnalyticsReport';
 import MerchantSupport from './features/merchant/MerchantSupport';
 
 import AgentLayout from './features/agent/AgentLayout';
+import AgentWorklist from './features/agent/AgentWorklist';
 
 
 export default function App() {
