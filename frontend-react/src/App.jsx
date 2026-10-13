@@ -20,12 +20,16 @@ import MerchantSupport from './features/merchant/MerchantSupport';
 import AgentLayout from './features/agent/AgentLayout';
 import AgentDashboard from './features/agent/AgentDashboard';
 import AgentWorklist from './features/agent/AgentWorklist';
+import DashBoard from './features/hub-manager/DashBoard';
 
+import Login from "./pages/Login";
 
+// import AgentDashboard from "./components/agent/AgentDashboard"
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<RoleSelector />} />
+      <Route path="/" element={<Login />} />
+      {/* <Route path="/" element={<RoleSelector />} /> */}
 
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="dashboard" element={<AdminDashboard />} />
@@ -38,6 +42,8 @@ export default function App() {
       <Route path='/customer' element={<CustomerLayout />}>
         <Route path="dashboard" element={<CustomerDashboard />} />        
       </Route>
+
+      <Route path="/hub/dashboard" element={<DashBoard />} />
 
       <Route path="/merchant" element={<MerchantLayout />}>
         <Route path="dashboard" element={<MerchantDashboard />} />

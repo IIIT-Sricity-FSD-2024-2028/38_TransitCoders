@@ -1,0 +1,71 @@
+.order-card{
+    background-color: #fff;
+    border : 1px solid #e5e7eb;
+    padding : 18px;
+    border-radius: 10px;
+    margin-bottom : 15px;
+}
+
+.order-header{
+    display : flex;
+    justify-content : space-between;
+    align-items : center;
+    gap : 16px;
+    flex-wrap : wrap;
+}
+
+.order-id {
+    font-weight: bold;
+    color: #111827;
+    margin-right: 12px;
+}
+
+.order-status{
+    padding : 4px 8px;
+    border-radius : 12px;
+    font-size : 12px;
+}
+
+.order-status.pending {
+    background-color: #fff7ed;
+    color: #c2410c;
+}
+
+.order-status.intransit {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
+.order-status.delivered {
+    background-color: #f0fdf4;
+    color: #15803d;
+}
+
+.order-actions{
+    display : flex;
+    gap:8px;
+}
+
+
+.order-actions button{
+    background-color: #fff;
+    padding : 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #374151;
+    cursor: pointer;
+}
+
+.order-actions button:hover {
+    background-color: #f3f4f6;
+}
+
+.order-details {
+    margin-top : 15px;
+     color: #4b5563;
+    font-size: 14px;
+}
+
+.order-details p {
+    margin: 6px 0;
+}
