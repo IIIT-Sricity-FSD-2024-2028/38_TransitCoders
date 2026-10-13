@@ -17,6 +17,9 @@ import TrackShipment from './features/merchant/TrackShipment';
 import AnalyticsReport from './features/merchant/AnalyticsReport';
 import MerchantSupport from './features/merchant/MerchantSupport';
 
+import AgentLayout from './features/agent/AgentLayout';
+
+
 export default function App() {
   return (
     <Routes>
@@ -42,6 +45,13 @@ export default function App() {
         <Route path="analytics" element={<AnalyticsReport />} />
         <Route path="support" element={<MerchantSupport />} />
       </Route>
+      
+      <Route path="/agent" element={<AgentLayout />}>
+      <Route path="/agent/dashboard" element={<AdminDashboard />}>
+      <Route path="worklist" element={<AgentWorklist />} />
+      </Route>
+      </Route>
+
     </Routes>
   );
 }

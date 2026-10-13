@@ -76,3 +76,7 @@
 [2026-10-12 20:04:49] [INFO] GET /complaints 200 1ms | {"ip":"::1","userId":"cdbe9c7d-9010-48d6-9411-3027f670a8be","role":"super_user","status":200,"elapsed":1}
 [2026-10-12 20:04:49] [INFO] GET /users 200 1ms | {"ip":"::1","userId":"cdbe9c7d-9010-48d6-9411-3027f670a8be","role":"super_user","status":200,"elapsed":1}
 [2026-10-12 20:04:49] [INFO] GET /shipments 200 1ms | {"ip":"::1","userId":"cdbe9c7d-9010-48d6-9411-3027f670a8be","role":"super_user","status":200,"elapsed":1}
+[2026-10-13 00:26:28] [WARN] GET / → 404: Cannot GET / | {"userId":"anonymous","role":"-"}
+[2026-10-13 00:26:28] [WARN] GET / 404 13ms | {"ip":"::1","userId":"anonymous","role":"-","status":404,"elapsed":13}
+[2026-10-13 00:26:29] [WARN] GET /favicon.ico → 404: Cannot GET /favicon.ico | {"userId":"anonymous","role":"-"}
+[2026-10-13 00:26:29] [WARN] GET /favicon.ico 404 3ms | {"ip":"::1","userId":"anonymous","role":"-","status":404,"elapsed":3}
