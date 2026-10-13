@@ -1,66 +1,11 @@
 
 import { useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import OrderCard from '../../components/agent/OrderCard';
-import AcceptDeliveryModal from '../../components/agent/AcceptDeliveryModal';
-import ConfirmDeliveryModal from '../../components/agent/ConfirmDeliveryModal';
-
-const mockOrders = [
-    {
-        id: "ORD-9281",
-        customer: "Rahul Sharma",
-        phone: "+91 98765 43210",
-        origin: "Hub Central, Zone 4",
-        destination: "45 MG Road, Indiranagar, Bengaluru",
-        status: "in-transit",
-        priority: "High",
-        eta: "25 mins",
-        amount: "₹450",
-        distance: "3.1 km"
-    },
-    {
-        id: "ORD-9282",
-        customer: "Priya Nair",
-        phone: "+91 91234 56789",
-        origin: "Hub North, Koramangala",
-        destination: "12 Palm Grove, HSR Layout, Bengaluru",
-        status: "pending",
-        priority: "Medium",
-        eta: "50 mins",
-        amount: "₹280",
-        distance: "5.4 km"
-    },
-    {
-        id: "ORD-9283",
-        customer: "Ananya Roy",
-        phone: "+91 98221 11223",
-        origin: "Hub Central, Zone 4",
-        destination: "Flat 402, Whitefield, Bengaluru",
-        status: "pending",
-        priority: "High",
-        eta: "1 hr 10m",
-        amount: "₹520",
-        distance: "8.7 km"
-    },
-    {
-        id: "ORD-9280",
-        customer: "Vikram Das",
-        phone: "+91 99887 66554",
-        origin: "Hub Central, Zone 4",
-        destination: "8th Cross, Malleshwaram",
-        status: "delivered",
-        priority: "Standard",
-        eta: "Delivered",
-        amount: "₹320",
-        distance: "6.0 km"
-    }
-];
 
 export default function AgentWorklist() {
+    const { orders, setAcceptModalOrder, setConfirmModalOrder } = useOutletContext();
     const [filter, setFilter] = useState('all');
-
-    const [orders, setOrders] = useState(mockOrders);
-    const [acceptModalOrder, setAcceptModalOrder] = useState(null);
-    const [confirmModalOrder, setConfirmModalOrder] = useState(null);
 
     const filteredOrders = orders.filter(order => {
         if (filter === 'all') {
@@ -69,22 +14,6 @@ export default function AgentWorklist() {
 
         return order.status === filter;
     });
-
-    const handleConfirmAccept = (OrderId) =>{
-        setOrders((prevOrders) =>{
-            return prevOrders.map((order)=>{
-                return(order.id === OrderId ? ({...order,status : 'in-transit'}):(order));
-            })
-        });
-    };
-
-    const handleConfirmDelivery = (OrderId) =>{
-        setOrders((prevOrders) =>{
-            return prevOrders.map((order)=>{
-                return(order.id === OrderId ? ({...order,status : 'delivered',eta : 'Delivered'}):(order));
-            })
-        });
-    };
 
     const tabs = [
         {
@@ -173,18 +102,7 @@ export default function AgentWorklist() {
                     </div>
                 )}
             </div>
-                <AcceptDeliveryModal
-                    isOpen={Boolean(acceptModalOrder)}
-                    onClose={() => setAcceptModalOrder(null)}
-                    order={acceptModalOrder}
-                    onConfirmAccept={handleConfirmAccept}
-                />
-                <ConfirmDeliveryModal
-                    isOpen={Boolean(confirmModalOrder)}
-                    onClose={() => setConfirmModalOrder(null)}
-                    order={confirmModalOrder}
-                    onConfirmDelivery={handleConfirmDelivery}
-                />
         </div>
     );
 }
+
