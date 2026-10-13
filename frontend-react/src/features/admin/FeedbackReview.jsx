@@ -171,28 +171,28 @@ export default function FeedbackReview() {
                     title="Total Feedbacks"
                     value={feedbacks.length}
                     isicon={true}
-                    color="bg-blue-50 text-blue-500"
+                    iconcolor="bg-blue-50 text-blue-500"
                     icon={<Star size={22} />}
                 />
                 <KPICard
                     title="Positive Feedbacks"
                     value={feedbacks.filter(f => f.rating >= 4).length}
                     isicon={true}
-                    color="bg-green-50 text-green-500"
+                    iconcolor="bg-green-50 text-green-500"
                     icon={<StarFill size={22} />}
                 />
                 <KPICard
                     title="Negative Feedbacks"
                     value={feedbacks.filter(f => f.rating <= 2).length}
                     isicon={true}
-                    color="bg-rose-50 text-rose-500"
+                    iconcolor="bg-rose-50 text-rose-500"
                     icon={<StarFill size={22} />}
                 />
                 <KPICard
                     title="Pending Reviews"
                     value={feedbacks.filter(f => f.status !== 'Reviewed').length}
                     isicon={true}
-                    color="bg-orange-50 text-orange-500"
+                    iconcolor="bg-orange-50 text-orange-500"
                     icon={<ThreeDotsVertical size={22} />}
                 />
             </div>

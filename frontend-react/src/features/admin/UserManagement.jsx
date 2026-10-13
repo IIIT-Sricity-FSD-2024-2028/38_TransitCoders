@@ -209,21 +209,21 @@ const UserManagement=() => {
                     title="Total Users"
                     value={users.length}
                     isicon={true}
-                    color="bg-blue-50 text-blue-500"
+                    iconcolor="bg-blue-50 text-blue-500"
                     icon={<People size={22} />}
                 />
                 <KPICard
                     title="Active Users"
                     value={users.filter(user => user.isActive).length}
                     isicon={true}
-                    color="bg-emerald-50 text-emerald-500"
+                    iconcolor="bg-emerald-50 text-emerald-500"
                     icon={<ShieldCheck size={22} />}
                 />
                 <KPICard
                     title="Pending Approvals"
                     value={users.filter(user => !user.isActive).length}
                     isicon={true}
-                    color="bg-amber-50 text-amber-500"
+                    iconcolor="bg-amber-50 text-amber-500"
                     icon={<CheckCircle size={22} />}
                 />
                 {
@@ -232,7 +232,7 @@ const UserManagement=() => {
                             title={`Total ${selectedRole.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}s`}
                             value={users.filter(user => user.role === selectedRole).length}
                             isicon={true}
-                            color="bg-purple-50 text-purple-500"
+                            iconcolor="bg-purple-50 text-purple-500"
                             icon={<ShieldCheck size={22} />}
                         />
                     )

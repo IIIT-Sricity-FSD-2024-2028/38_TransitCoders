@@ -8,6 +8,7 @@ import SystemConfiguration from './features/admin/SystemConfiguration';
 import ComplaintsManagement from './features/admin/ComplaintsManagement';
 import FeedbackReview from './features/admin/FeedbackReview';
 import ReportsAnalytics from './features/admin/ReportsAnalytics';  
+import FinancialAnalytics from './features/admin/FinancialAnalytics';
 
 import CustomerLayout from './features/customer/CustomerLayout';
 import CustomerDashboard from './features/customer/CustomerDashboard';
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="complaints" element={<ComplaintsManagement />} />
         <Route path="feedback" element={<FeedbackReview />} />
         <Route path="reports" element={<ReportsAnalytics />} />
+        <Route path="financials" element={<FinancialAnalytics />} />
       </Route>
       
       <Route path='/customer' element={<CustomerLayout />}>

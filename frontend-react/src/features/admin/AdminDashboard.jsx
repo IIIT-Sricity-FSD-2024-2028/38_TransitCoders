@@ -86,7 +86,7 @@ const AdminDashboard = () => {
                 title="Total Users"
                 value={users}
                 isicon={true}
-                color="bg-blue-50 text-blue-500"
+                iconcolor="bg-blue-50 text-blue-500"
                 icon={<People size={22} />}
             />
 
@@ -95,7 +95,7 @@ const AdminDashboard = () => {
                 title="Active Shipments"
                 value={activeShipments}
                 isicon={true}
-                color="bg-orange-50 text-orange-500"
+                iconcolor="bg-orange-50 text-orange-500"
                 icon={<ClockHistory size={22} />}
             />
 
@@ -104,7 +104,7 @@ const AdminDashboard = () => {
                 title="Open Complaints"
                 value={openComplaints}
                 isicon={true}
-                color="bg-red-50 text-red-500"
+                iconcolor="bg-red-50 text-red-500"
                 icon={<ExclamationTriangle size={22} />}
             />
 
@@ -113,7 +113,7 @@ const AdminDashboard = () => {
                 title="System Health"
                 value="Good"
                 isicon={true}
-                color="bg-green-50 text-green-500"
+                iconcolor="bg-green-50 text-green-500"
                 icon={<ShieldCheck size={22} />}
             />
         </div>

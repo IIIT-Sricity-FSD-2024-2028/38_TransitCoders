@@ -216,28 +216,28 @@ export default function ComplaintsManagement() {
                     title="Total Complaints"
                     value={complaints.length}
                     isicon={true}
-                    color="bg-blue-50 text-blue-500"
+                    iconcolor="bg-blue-50 text-blue-500"
                     icon={<ExclamationTriangle size={22} />}
                 />
                 <KPICard
                     title="Open Complaints"
                     value={complaints.filter(c => c.status === 'Open').length}
                     isicon={true}
-                    color="bg-amber-50 text-amber-500"
+                    iconcolor="bg-amber-50 text-amber-500"
                     icon={<ExclamationTriangle size={22} />}
                 />
                 <KPICard
                     title="In Progress"
                     value={complaints.filter(c => c.status === 'In Progress').length}
                     isicon={true}
-                    color="bg-green-50 text-green-500"
+                    iconcolor="bg-green-50 text-green-500"
                     icon={<ExclamationTriangle size={22} />}
                 />
                 <KPICard
                     title="Critical Priority"
                     value={complaints.filter(c => c.priority === 'Critical').length}
                     isicon={true}
-                    color="bg-rose-50 text-rose-500"
+                    iconcolor="bg-rose-50 text-rose-500"
                     icon={<ExclamationTriangle size={22} />}
                 />
             </div>
