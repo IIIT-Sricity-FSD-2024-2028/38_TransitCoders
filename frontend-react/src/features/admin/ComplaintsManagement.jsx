@@ -202,7 +202,7 @@ export default function ComplaintsManagement() {
     ]
 
     return (
-        <div className="p-1 bg-gray-100 min-h-screen">
+        <div className="p-2 bg-gray-50 min-h-screen">
             {/* Header Section */}
             <div className="flex justify-between items-center mb-6">
                 <div className="mb-4 left-full">

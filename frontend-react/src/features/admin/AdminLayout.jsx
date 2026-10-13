@@ -4,7 +4,7 @@ import Topbar from '../../components/layout/Topbar';
 import { LayoutTextWindow, People, Gear, ShieldCheck, Cpu, GraphUp, ChatSquareText, Folder, ShieldFillCheck, ExclamationTriangle, ShieldX, Shield, FileEarmarkText } from 'react-bootstrap-icons';
 
 export default function AdminLayout() {
-    const currentUser = { name: "Shazil", role: "Super User" };
+    const currentUser = { name: "Super Admin", role: "Super User" };
 
     return (
         <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -24,7 +24,7 @@ export default function AdminLayout() {
                 <div>
                     <Topbar />
                 </div>
-                <main className="flex-1 p-8 overflow-y-auto bg-gray-100">
+                <main className="flex-1 p-4 overflow-y-auto bg-gray-50">
                     <Outlet />
                 </main>
             </div>
