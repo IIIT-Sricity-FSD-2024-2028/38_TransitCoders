@@ -1,6 +1,6 @@
 import { useState, createContext, useContext } from 'react';
-import { NavLink } from 'react-router-dom';
-import { ChevronBarRight, ChevronBarLeft, ThreeDotsVertical } from 'react-bootstrap-icons';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { ChevronBarRight, ChevronBarLeft, ThreeDotsVertical,BoxArrowRight } from 'react-bootstrap-icons';
 import Container from '../../assets/Container.svg';
 import Frame20 from '../../assets/Frame20.png';
 
@@ -8,8 +8,16 @@ import Frame20 from '../../assets/Frame20.png';
 const SidebarContext = createContext();
 
 export default function Sidebar({ user, children }) {
-    const [expanded, setExpanded] = useState(true);
-    
+    const [expanded, setExpanded] = useState(true)
+    const [showMenu, setShowMenu] = useState(false)
+    const navigate = useNavigate()
+
+    const handleLogout = () => {
+        localStorage.removeItem('authToken')
+        localStorage.removeItem('userRole')
+        navigate('/login')
+    }
+
     return (
         <aside className="sticky top-0 h-screen flex-shrink-0 z-40">
             <nav className={`h-full flex flex-col bg-white border border-transparent shadow-sm transition-all duration-300 ${expanded ? 'w-64' : 'w-20'}`}>
@@ -42,7 +50,22 @@ export default function Sidebar({ user, children }) {
                             <h4 className="font-semibold text-sm whitespace-nowrap">{user.name}</h4>
                             <span className="text-xs text-gray-500 whitespace-nowrap">{user.role}</span>
                         </div>
-                        <ThreeDotsVertical size={20} className="cursor-pointer" />
+                        <div className="relative">
+                            <div className="p-1 rounded-md hover:bg-gray-100 cursor-pointer" onClick={() => setShowMenu(!showMenu)}>
+                                <ThreeDotsVertical size={20} className="cursor-pointer" />
+                            </div>
+                            {showMenu && (
+                                <div className="absolute bottom-full right-0 mb-2 w-36 bg-white border border-gray-100 shadow-xl rounded-lg py-1 z-50 animate-reveal">
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center justify-between transition-colors"
+                                    >
+                                        Sign Out
+                                        <BoxArrowRight size={14} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -66,10 +89,13 @@ export function SidebarItem({ icon, text, to, alert }) {
                 `}
             >
                 <span className="flex-shrink-0">{icon}</span>
-                <span className={`overflow-hidden transition-all break-words leading-tight ${expanded ? 'w-52 ml-3' : 'w-0'}`}>
-                    {text}
-                </span>
-                
+                <span 
+                    className={`overflow-hidden transition-all duration-300 text-sm ${
+                        expanded 
+                            ? 'w-48 ml-3 whitespace-normal leading-snug' 
+                            : 'w-0 ml-0 whitespace-nowrap'
+                    }`}
+                >{text}</span>
                 {alert && (
                     <div className={`absolute w-2 h-2 rounded-full bg-orange-500 ${expanded ? 'right-2' : 'right-2 top-2'}`}/>
                 )}

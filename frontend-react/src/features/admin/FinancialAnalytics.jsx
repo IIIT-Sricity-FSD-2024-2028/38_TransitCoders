@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import API from '../../services/api';
-import AnalyticsView from '../admin/AnalyticsView';
-import ExpensesView from '../admin/ExpenseView';
+import AnalyticsView from '../../components/admin/AnalyticsView';
+import ExpensesView from '../../components/admin/ExpenseView';
 
 export default function FinancialAnalytics() {
     const [activeTab, setActiveTab] = useState('overview');

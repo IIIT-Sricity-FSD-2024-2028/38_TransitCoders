@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import AdminTable from '../../components/admin/AdminTable';
+import AdminTable from './AdminTable';
 import API from '../../services/api';
 
 export default function ExpensesView({ data, onRefresh }) {

@@ -2,7 +2,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, 
     Tooltip, ResponsiveContainer 
 } from 'recharts';
-import KPICard from '../../components/shared/KPICard';
+import KPICard from '../shared/KPICard';
 
 export default function AnalyticsView({ data }) {
     if (!data) return <div className="text-gray-500 mt-4">Loading analytics...</div>;

@@ -1,7 +1,7 @@
 import { useState, useEffect,useMemo } from "react";
 import { Search, Plus, ChevronDown, Pencil, Trash, People, ShieldCheck, CheckCircle } from "react-bootstrap-icons";
 import { API } from "../../services/api";
-import AddOrEditUserModal from './AddOrEditUserModal';
+import AddOrEditUserModal from '../../components/admin/AddOrEditUserModal';
 import AdminTable from "../../components/admin/AdminTable";
 import KPICard from "../../components/shared/KPICard";
 
