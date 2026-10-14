@@ -1,49 +1,10 @@
-import { useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { BoxSeam, ClockHistory, CheckCircle, Truck } from 'react-bootstrap-icons';
 import KPICard from '../../components/shared/KPICard';
 import OrderCard from '../../components/agent/OrderCard';
 
-const initialOrders = [
-    {
-        id: "ORD-9281",
-        customer: "Rahul Sharma",
-        phone: "+91 98765 43210",
-        origin: "Hub Central, Zone 4",
-        destination: "45 MG Road, Indiranagar, Bengaluru",
-        status: "in-transit",
-        priority: "High",
-        eta: "25 mins",
-        amount: "₹450",
-        distance: "3.1 km"
-    },
-    {
-        id: "ORD-9282",
-        customer: "Priya Nair",
-        phone: "+91 91234 56789",
-        origin: "Hub North, Koramangala",
-        destination: "12 Palm Grove, HSR Layout, Bengaluru",
-        status: "pending",
-        priority: "Medium",
-        eta: "50 mins",
-        amount: "₹280",
-        distance: "5.4 km"
-    },
-    {
-        id: "ORD-9280",
-        customer: "Vikram Das",
-        phone: "+91 99887 66554",
-        origin: "Hub Central, Zone 4",
-        destination: "8th Cross, Malleshwaram",
-        status: "delivered",
-        priority: "Standard",
-        eta: "Completed",
-        amount: "₹320",
-        distance: "6.0 km"
-    }
-];
-
 export default function AgentDashboard() {
-    const [orders] = useState(initialOrders);
+    const { orders, setAcceptModalOrder, setConfirmModalOrder } = useOutletContext();
 
     const pendingCount = orders.filter(o => o.status === 'pending').length;
     const transitCount = orders.filter(o => o.status === 'in-transit').length;
@@ -98,10 +59,16 @@ export default function AgentDashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {orders.map(order => (
-                        <OrderCard key={order.id} order={order} />
+                        <OrderCard 
+                            key={order.id} 
+                            order={order} 
+                            onAccept={(clickedOrder) => setAcceptModalOrder(clickedOrder)}
+                            onVerify={(clickedOrder) => setConfirmModalOrder(clickedOrder)}
+                        />
                     ))}
                 </div>
             </div>
         </div>
     );
 }
+
