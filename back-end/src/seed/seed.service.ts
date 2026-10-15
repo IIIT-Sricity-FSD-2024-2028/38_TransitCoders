@@ -11,6 +11,7 @@ import { ComplaintsRepository } from '../complaints/complaints.repository';
 import { FeedbackRepository } from '../feedback/feedback.repository';
 import { PricingService } from '../pricing/pricing.service';
 import { DatabaseService } from '../common/database/database.service';
+import { Role } from '../common/constants/roles.constant';
 import { IStatusEvent } from '../orders/interfaces/order.interface';
 
 /**
@@ -45,6 +46,13 @@ export class SeedService implements OnModuleInit {
     await this.seedUsers();
     await this.seedHubs();
     await this.seedOrders();
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        await this.migrateHubManagerDevelopmentData();
+      } catch (error) {
+        console.error('⚠️ Hub Manager development-data migration was not applied:', error);
+      }
+    }
     await this.seedShipments();
     await this.seedTickets();
     await this.seedComplaints();
@@ -306,6 +314,308 @@ export class SeedService implements OnModuleInit {
       );
     }
     console.log('✅ Seeded 10 orders (backend-priced) + payment charges');
+  }
+
+  private async migrateHubManagerDevelopmentData() {
+    const version = 'dev-hub-manager-test-data-v1';
+    if (
+      this.db.queryOne(
+        'SELECT version FROM data_migrations WHERE version = ?',
+        [version],
+      )
+    )
+      return;
+
+    const password = await bcrypt.hash('password123', 10);
+    const agents = [
+      {
+        name: 'Agent One',
+        email: 'agent1@swifttrack.com',
+        hubId: 'H001',
+        availabilityStatus: 'Available',
+      },
+      {
+        name: 'Agent Two',
+        email: 'agent2@swifttrack.com',
+        hubId: 'H002',
+        availabilityStatus: 'Available',
+      },
+      {
+        name: 'Agent Three',
+        email: 'agent3@swifttrack.com',
+        hubId: 'H001',
+        availabilityStatus: 'Busy',
+      },
+      {
+        name: 'Agent Four',
+        email: 'agent4@swifttrack.com',
+        hubId: 'H002',
+        availabilityStatus: 'Offline',
+      },
+    ] as const;
+    const orderTargets = [
+      {
+        orderId: 'ORD-2024-0001',
+        status: 'Delivered',
+        pickupHubId: 'H001',
+        deliveryHubId: 'H002',
+        agentEmail: agents[0].email,
+      },
+      {
+        orderId: 'ORD-2024-0002',
+        status: 'InTransit',
+        pickupHubId: 'H002',
+        deliveryHubId: 'H001',
+        agentEmail: agents[1].email,
+      },
+      {
+        orderId: 'ORD-2024-0003',
+        status: 'Pending',
+        pickupHubId: 'H001',
+        deliveryHubId: 'H002',
+      },
+      {
+        orderId: 'ORD-2024-0004',
+        status: 'Assigned',
+        pickupHubId: 'H001',
+        deliveryHubId: 'H002',
+        agentEmail: agents[0].email,
+      },
+      {
+        orderId: 'ORD-2024-0005',
+        status: 'Pending',
+        pickupHubId: 'H001',
+        deliveryHubId: 'H001',
+      },
+      {
+        orderId: 'ORD-2024-0006',
+        status: 'Delivered',
+        pickupHubId: 'H002',
+        deliveryHubId: 'H001',
+        agentEmail: agents[1].email,
+      },
+      {
+        orderId: 'ORD-2024-0008',
+        status: 'InTransit',
+        pickupHubId: 'H002',
+        deliveryHubId: 'H001',
+        agentEmail: agents[1].email,
+      },
+      {
+        orderId: 'ORD-2024-0010',
+        status: 'OutForDelivery',
+        pickupHubId: 'H001',
+        deliveryHubId: 'H002',
+        agentEmail: agents[0].email,
+      },
+    ] as const;
+
+    this.db.transaction((conn) => {
+      if (
+        conn
+          .prepare('SELECT version FROM data_migrations WHERE version = ?')
+          .get(version)
+      )
+        return;
+
+      const hubs = conn
+        .prepare('SELECT hubId, status FROM hubs WHERE hubId IN (?, ?)')
+        .all('H001', 'H002') as Array<{ hubId: string; status: string }>;
+      if (hubs.length !== 2 || hubs.some((hub) => hub.status !== 'active')) {
+        throw new Error('Active hubs H001 and H002 are required');
+      }
+
+      const orderIds = orderTargets.map((order) => order.orderId);
+      const orderRows = conn
+        .prepare(
+          `SELECT id, orderId, status, pickupHubId, deliveryHubId, assignedAgentId, statusHistory
+         FROM orders WHERE orderId IN (${orderIds.map(() => '?').join(', ')})`,
+        )
+        .all(...orderIds) as Array<{
+        id: string;
+        orderId: string;
+        status: string;
+        pickupHubId: string | null;
+        deliveryHubId: string | null;
+        assignedAgentId: string | null;
+        statusHistory: string;
+      }>;
+      if (orderRows.length !== orderTargets.length) {
+        const present = new Set(orderRows.map((order) => order.orderId));
+        const missing = orderIds.filter((orderId) => !present.has(orderId));
+        throw new Error(`Required orders are missing: ${missing.join(', ')}`);
+      }
+
+      const userIds = new Map<string, string>();
+      for (const agent of agents) {
+        let user = conn
+          .prepare(
+            'SELECT id, name, email, role, hubId, phone, isActive FROM users WHERE email = ?',
+          )
+          .get(agent.email) as
+          | {
+              id: string;
+              name: string;
+              email: string;
+              role: string;
+              hubId: string | null;
+              phone: string | null;
+              isActive: number;
+            }
+          | undefined;
+
+        if (user && user.role !== 'delivery_agent') {
+          throw new Error(
+            `${agent.email} exists but is not a delivery-agent account`,
+          );
+        }
+        if (
+          !user &&
+          (agent.email === agents[0].email || agent.email === agents[1].email)
+        ) {
+          throw new Error(
+            `Required existing agent account is missing: ${agent.email}`,
+          );
+        }
+
+        if (!user) {
+          const created = this.usersRepository.create({
+            name: agent.name,
+            email: agent.email,
+            password,
+            role: Role.DELIVERY_AGENT,
+            hubId: agent.hubId,
+            isActive: true,
+          });
+          user = {
+            id: created.id,
+            name: created.name,
+            email: created.email,
+            role: created.role,
+            hubId: created.hubId ?? null,
+            phone: created.phone ?? null,
+            isActive: 1,
+          };
+        } else if (
+          user.name !== agent.name ||
+          user.hubId !== agent.hubId ||
+          user.isActive !== 1
+        ) {
+          this.usersRepository.update(user.id, {
+            name: agent.name,
+            hubId: agent.hubId,
+            isActive: true,
+          });
+        }
+
+        const profile = conn
+          .prepare('SELECT id FROM agents WHERE userId = ?')
+          .get(user.id) as { id: string } | undefined;
+        if (profile) {
+          this.agentsRepository.update(profile.id, {
+            name: agent.name,
+            hubId: agent.hubId,
+            availabilityStatus: agent.availabilityStatus,
+          });
+        } else {
+          this.agentsRepository.create({
+            userId: user.id,
+            name: agent.name,
+            phone: user.phone ?? undefined,
+            hubId: agent.hubId,
+            availabilityStatus: agent.availabilityStatus,
+            vehicleType: 'bike',
+            currentTasksCount: 0,
+          });
+        }
+        userIds.set(agent.email, user.id);
+      }
+
+      const profiles = conn
+        .prepare(
+          'SELECT userId, hubId FROM agents WHERE userId IN (?, ?, ?, ?)',
+        )
+        .all(...agents.map((agent) => userIds.get(agent.email)!)) as Array<{
+        userId: string;
+        hubId: string;
+      }>;
+      const profileHubs = new Map(
+        profiles.map((profile) => [profile.userId, profile.hubId]),
+      );
+
+      const rowsByOrderId = new Map(
+        orderRows.map((order) => [order.orderId, order]),
+      );
+      for (const target of orderTargets) {
+        const current = rowsByOrderId.get(target.orderId)!;
+        const assignedAgentId =
+          'agentEmail' in target ? userIds.get(target.agentEmail)! : null;
+        if (
+          assignedAgentId &&
+          profileHubs.get(assignedAgentId) !== target.pickupHubId
+        ) {
+          throw new Error(
+            `Assigned agent for ${target.orderId} does not belong to ${target.pickupHubId}`,
+          );
+        }
+
+        const changed =
+          current.status !== target.status ||
+          current.pickupHubId !== target.pickupHubId ||
+          current.deliveryHubId !== target.deliveryHubId ||
+          current.assignedAgentId !== assignedAgentId;
+        if (!changed) continue;
+
+        let statusHistory = current.statusHistory;
+        if (current.status !== target.status) {
+          const history = JSON.parse(
+            current.statusHistory || '[]',
+          ) as IStatusEvent[];
+          if (!Array.isArray(history))
+            throw new Error(`Invalid status history for ${target.orderId}`);
+          history.push({
+            status: target.status,
+            timestamp: new Date().toISOString(),
+            note: `Normalized by ${version}`,
+          });
+          statusHistory = JSON.stringify(history);
+        }
+        conn
+          .prepare(
+            `UPDATE orders
+           SET status = ?, pickupHubId = ?, deliveryHubId = ?, assignedAgentId = ?, statusHistory = ?, updatedAt = ?
+           WHERE id = ?`,
+          )
+          .run(
+            target.status,
+            target.pickupHubId,
+            target.deliveryHubId,
+            assignedAgentId,
+            statusHistory,
+            new Date().toISOString(),
+            current.id,
+          );
+      }
+
+      const now = new Date().toISOString();
+      conn
+        .prepare(
+          `UPDATE agents
+         SET currentTasksCount = (
+           SELECT COUNT(*) FROM orders
+           WHERE assignedAgentId = agents.userId
+             AND status NOT IN ('Delivered', 'Cancelled', 'Returned', 'Failed')
+         ), updatedAt = ?
+         WHERE userId IN (?, ?, ?, ?)`,
+        )
+        .run(now, ...agents.map((agent) => userIds.get(agent.email)!));
+
+      conn
+        .prepare(
+          'INSERT INTO data_migrations (version, appliedAt) VALUES (?, ?)',
+        )
+        .run(version, now);
+    });
   }
 
   // ── 4 demo shipments ──────────────────────────────────────────────────────

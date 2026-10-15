@@ -256,6 +256,11 @@ CREATE TABLE IF NOT EXISTS pricing_config (
   agentPayoutFlat REAL NOT NULL DEFAULT 50,
   updatedAt TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS data_migrations (
+  version TEXT PRIMARY KEY,
+  appliedAt TEXT NOT NULL
+);
 `;
 
 @Injectable()
