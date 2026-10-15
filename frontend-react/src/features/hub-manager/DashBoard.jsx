@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 import Topbar from '../../components/layout/Topbar';
 import StatsCard from './StatsCard';
+import AssignAgentModal from "./modals/AssignAgentModal";
+import TransferHubModal from "./modals/TransferHubModal";
+import OrderDetailsModal from "./modals/OrderDetailsModal";
 
 import "./DashBoard.css";
 import OrderCard from './OrderCard';
@@ -16,13 +19,62 @@ export default function DashBoard() {
     const [activeFilter , setActiveFilter] = useState("All");
     const [loading,setLoading] = useState(true);
     const [error, setError] = useState("");
+    const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+    const [availableAgents, setAvailableAgents] = useState(0);
+    const [showAssignModal, setShowAssignModal] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState(null);
+
+    const [showTransferModal, setShowTransferModal] = useState(false);
+    const [selectedTransferOrder, setSelectedTransferOrder] = useState(null);
+    
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [selectedViewOrder, setSelectedViewOrder] = useState(null);
+
+
+    const deliveredOrders = orders.filter(order => {
+        return order.status === "Delivered";
+    }).length;
+    
+
+
+    async function loadAvailableAgents() {
+        try{
+            const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+            if(!user.hubId){
+                setAvailableAgents(0);
+                return;
+            }
+
+            const agents = await API.hubs.getAgentsForHub(user.hubId);
+
+            if(Array.isArray(agents)){
+                setAvailableAgents(
+                    agents.filter(agent => agent.availabilityStatus === "Available").length
+                );
+            }
+        }
+        catch (err) {
+        console.error("could not load available agents:", err);
+    }
+    }
+
+
+    async function refreshOrders() {
+        const result = await API.orders.getAll();
+
+        if(Array.isArray(result)){
+            setOrders(result);
+        }
+    }
 
 
     useEffect(() => {
         async function loadOrders(){
             try
             {const result = await API.orders.getAll();
-
+                
             if(result == null){
                 setError("Could not load orders. Check the backend and login.");
             }else if (!Array.isArray(result)){
@@ -39,7 +91,7 @@ export default function DashBoard() {
         }
 
         loadOrders();
-
+        loadAvailableAgents();
     },[]);
 
 
@@ -48,6 +100,9 @@ export default function DashBoard() {
                     ) : (
                         orders.filter(order => order.status === activeFilter)
                     );
+    const activeOrders = orders.filter(order => ["Pending", "Assigned", "InTransit", "OutForDelivery"].includes(order.status)).length;
+    const pendingOrders = orders.filter(order => order.status === "Pending").length;
+
     return(
         <div className = "dashboard">
             <Sidebar user = {{name : "Hub Manager" , role : "Hub Manager"}}/>
@@ -83,33 +138,33 @@ export default function DashBoard() {
                         <StatsCard
                             stats={{
                                 label: "Active Orders",
-                                value: 12,
+                                value: activeOrders,
                                 sub: "Current orders",
-                                icon: "orange"
+                                icon: "bi-box-seam"
                             }}
                         />
                         <StatsCard
                             stats={{
                                 label: "Pending Orders",
-                                value: 5,
+                                value: pendingOrders,
                                 sub: "Waiting for assignment",
-                                icon: "orange"
+                                icon: "bi-clock-history"
                             }}
                         />
                         <StatsCard
                             stats={{
                                 label: "Available Agents",
-                                value: 8,
+                                value: availableAgents,
                                 sub: "Ready for delivery",
-                                icon: "green"
+                                icon: "bi-people"
                             }}
                         />
                         <StatsCard
                             stats={{
-                                label: "Average Delivery",
-                                value: "38 min",
-                                sub: "Average time",
-                                icon: "blue"
+                                label: "Delivered Orders",
+                                value: deliveredOrders,
+                                sub: "Successfully delivered",
+                                icon: "bi-check-circle"
                             }}
                         />
 
@@ -117,23 +172,61 @@ export default function DashBoard() {
 
 
                     <div className = "order-filters">
-                        <button onClick = {() => setActiveFilter("All")}>All</button>
-                        <button onClick = {() => setActiveFilter("Pending")}>Pending</button>
-                        <button onClick={() => setActiveFilter("InTransit")}>In Transit</button>
-                        <button onClick = {() => setActiveFilter("Delivered")}>Delivered</button>
+                       {["All", "Pending", "Assigned", "InTransit", "OutForDelivery", "Delivered"].map(status => {
+                        return <button
+                        key = {status}
+                        className= {activeFilter === status ? "active" : ""}
+                        onClick={() => setActiveFilter(status)}
+                        >
+
+                            {{
+
+                            All: "All",
+                            Pending: "Pending",
+                            Assigned: "Assigned",
+                            InTransit: "In Transit",
+                            OutForDelivery: "Out for Delivery",
+                            Delivered: "Delivered"
+
+                        }[status]}
+                        </button>
+                       })}
                     </div>
+
+
+
+
                     {
-                    filteredOrders.map(order => {
+                    filteredOrders.length === 0 ? 
+                    (
+                    <p className="empty-orders-text">
+                         No orders found for this status.
+                    </p>) : 
+                    (filteredOrders.map(order => {
                             return (
                                 <OrderCard
                                     key={order.id}
                                     order={order}
-                                    onAssign={() => console.log("assigned", order.orderId)}
-                                    onTransfer={() => console.log("transferred", order.orderId)}
-                                    onView={() => console.log("viewed", order.orderId)}
+                                    onAssign={() => {
+                                      setSelectedOrder(order);
+                                      setShowAssignModal(true);
+                                    }}
+                                    onTransfer= {
+                                        order.pickupHubId === currentUser.hubId && ! ["Delivered", "Cancelled", "Returned", "Failed"].includes(order.status)
+                                        ? () => {
+                                            setSelectedTransferOrder(order);
+                                            setShowTransferModal(true);
+                                    } 
+                                    : undefined
+                                }
+                                    onView={() => {
+                                        setSelectedViewOrder(order);
+                                        setShowDetailsModal(true);
+                                    }}
                                 />
                             );
                         })
+                    )
                     }
                     </>
 
@@ -141,8 +234,30 @@ export default function DashBoard() {
                         </>)
                     }
                 </main>
+
+                <AssignAgentModal
+                  order={selectedOrder}
+                  isOpen={showAssignModal}
+                  onClose={() => setShowAssignModal(false)}
+                  onSuccess={refreshOrders}
+                />
+
+                <TransferHubModal
+                  order={selectedTransferOrder}
+                  isOpen={showTransferModal}
+                  onClose={() => setShowTransferModal(false)}
+                  onSuccess={refreshOrders}
+                />
+
+                <OrderDetailsModal
+                  order={selectedViewOrder}
+                  isOpen={showDetailsModal}
+                  onClose={() => setShowDetailsModal(false)}
+                />
             </div>
+
+
         </div>
 
     );
-}
+}                                                                                   

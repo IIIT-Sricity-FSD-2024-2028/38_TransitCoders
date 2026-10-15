@@ -7,9 +7,26 @@
     border-radius : 8px;
 }
 
+
 .stats-icon {
     font-size: 24px;
     margin-bottom: 10px;
+}
+
+.stats-card:nth-child(1) .stats-icon {
+    color: #f97316;
+}
+
+.stats-card:nth-child(2) .stats-icon {
+    color: #eab308;
+}
+
+.stats-card:nth-child(3) .stats-icon {
+    color: #16a34a;
+}
+
+.stats-card:nth-child(4) .stats-icon {
+    color: #2563eb;
 }
 
 .stats-label {
@@ -22,7 +39,7 @@
     color: #111827;
 }
 
-stat.subtitle {
+stats.subtitle {
     font-size: 14px;
     color: #6b7280;
     margin: 0;

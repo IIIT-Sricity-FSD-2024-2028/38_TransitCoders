@@ -1,0 +1,29 @@
+
+.assign-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.assign-modal {
+  background: white;
+  padding: 24px;
+  border-radius: 10px;
+  width: 350px;
+}
+
+.assign-modal select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 16px;
+}
+
+.assign-modal button {
+  padding: 10px 14px;
+  margin-right: 8px;
+  cursor: pointer;
+}

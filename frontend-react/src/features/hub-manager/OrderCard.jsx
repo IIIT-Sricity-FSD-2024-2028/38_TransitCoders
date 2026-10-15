@@ -16,7 +16,10 @@ export default function OrderCard({ order, onAssign, onTransfer, onView }) {
                     {order.status === "Pending" ? <button onClick={onAssign}>Assign Agent</button> : (<></>)
                     }
 
+                    {onTransfer && (
                     <button onClick={onTransfer}>Transfer Hub</button>
+                    )}
+                    
                     <button onClick={onView}>View</button>
                 </div>
             </div>

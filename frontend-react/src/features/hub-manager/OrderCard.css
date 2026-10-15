@@ -45,6 +45,10 @@
     display : flex;
     gap:8px;
 }
+.order-status.Assigned {
+    background-color: #fff7ed;
+    color: #234123;
+}
 
 
 .order-actions button{
