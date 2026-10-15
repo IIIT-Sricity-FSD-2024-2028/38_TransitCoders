@@ -13,9 +13,12 @@ export default function Sidebar({ user, children }) {
     const navigate = useNavigate()
 
     const handleLogout = () => {
+        localStorage.removeItem('x-auth-token')
         localStorage.removeItem('authToken')
         localStorage.removeItem('userRole')
-        navigate('/login')
+        localStorage.removeItem('user')
+        sessionStorage.clear()
+        navigate('/')
     }
 
     return (
@@ -42,7 +45,7 @@ export default function Sidebar({ user, children }) {
                     </ul>
                 </SidebarContext.Provider>
 
-                <div className="border-t flex p-3 items-center">
+                <div className="border-t flex p-3 items-center relative">
                     <img src={Frame20} className="w-10 h-10 rounded-md" alt="Avatar" />
                     
                     <div className={`flex justify-between items-center overflow-hidden transition-all ${expanded ? 'w-52 ml-3' : 'w-0'}`}>
@@ -54,18 +57,18 @@ export default function Sidebar({ user, children }) {
                             <div className="p-1 rounded-md hover:bg-gray-100 cursor-pointer" onClick={() => setShowMenu(!showMenu)}>
                                 <ThreeDotsVertical size={20} className="cursor-pointer" />
                             </div>
-                            {showMenu && (
-                                <div className="absolute bottom-full right-0 mb-2 w-36 bg-white border border-gray-100 shadow-xl rounded-lg py-1 z-50 animate-reveal">
-                                    <button
-                                        onClick={handleLogout}
-                                        className="w-full px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center justify-between transition-colors"
-                                    >
-                                        Sign Out
-                                        <BoxArrowRight size={14} />
-                                    </button>
-                                </div>
-                            )}
                         </div>
+                        {showMenu && (
+                            <div className="absolute bottom-full right-0 mb-2 w-36 bg-white border border-gray-100 shadow-xl rounded-lg py-1 z-50 animate-reveal">
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center justify-between transition-colors"
+                                >
+                                    Sign Out
+                                    <BoxArrowRight size={14} />
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </nav>

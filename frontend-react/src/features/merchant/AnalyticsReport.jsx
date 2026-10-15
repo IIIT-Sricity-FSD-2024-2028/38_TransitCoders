@@ -2,11 +2,12 @@ import { useState } from 'react';
 
 /**
  * AnalyticsReport
- * 100% Exact Replica of vanilla #view-analytics:
- * - Timeframe dropdown (Last 30 Days, Last 90 Days, This Year)
- * - 4 Analytics KPI Cards (Total, Delivered, In Transit, Revenue)
- * - Top Routes Table (with On-Time percentage badges)
- * - Issue Summary Table (Weather, Address, Damaged, etc. with trends)
+ * 
+ * Merchant shipment analytics and reporting view:
+ * - Timeframe selector (Last 30 Days, Last 90 Days, This Year)
+ * - Analytics KPI summary cards (Total, Delivered, In Transit, Revenue)
+ * - Top performing shipping routes table
+ * - Dispatch issue summary breakdown table
  */
 export default function AnalyticsReport() {
   const [timeframe, setTimeframe] = useState('Last 30 Days');

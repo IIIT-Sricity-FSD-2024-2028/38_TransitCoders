@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
@@ -12,47 +12,90 @@ import {
 import AdminTable from '../../components/admin/AdminTable';
 import OrderStatusBadge from '../../components/merchant/OrderStatusBadge';
 import ShippingLabelModal from '../../components/merchant/ShippingLabelModal';
-import { useMerchant } from '../../services/MerchantContext';
+import { loadOrders, saveOrders, setActiveTracking } from '../../services/merchantHelpers';
 
 /**
- * MerchantOrders
- * Features:
- * - Click order row or Tracking ID: Shows full AWB barcode shipping label modal
- * - Separate "Track" button to view live satellite map
- * - Live dispatch/deliver/cancel actions
+ * MerchantOrders — Order Management & Actions
+ * 
+ * Order listing and management view for merchants.
+ * Supports keyword searching, status filtering, order cancellation,
+ * dispatch progression, and shipping label modal preview.
  */
 export default function MerchantOrders() {
   const navigate = useNavigate();
-  const { 
-    orders, 
-    cancelOrder, 
-    advanceOrderStatus, 
-    setActiveTrackingOrder 
-  } = useMerchant();
 
+  // Component state for orders, search, filter, and modal
+  const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [selectedLabelOrder, setSelectedLabelOrder] = useState(null);
 
-  // Real-time derived filter
-  const filteredOrders = useMemo(() => {
-    return orders.filter((order) => {
-      const q = searchTerm.toLowerCase();
-      const matchesSearch =
-        !searchTerm ||
-        (order.trackingNumber && order.trackingNumber.toLowerCase().includes(q)) ||
-        (order.recipientName && order.recipientName.toLowerCase().includes(q)) ||
-        (order.deliveryAddress && order.deliveryAddress.toLowerCase().includes(q));
+  // Load orders from localStorage on mount
+  useEffect(() => {
+    const savedOrders = loadOrders();
+    setOrders(savedOrders);
+  }, []);
 
-      const matchesStatus =
-        statusFilter === 'ALL' ||
-        (order.status && order.status.toUpperCase() === statusFilter);
+  // Filter orders by search keyword and status
+  const filteredOrders = orders.filter((order) => {
+    const q = searchTerm.toLowerCase();
+    const matchesSearch =
+      !searchTerm ||
+      (order.trackingNumber && order.trackingNumber.toLowerCase().includes(q)) ||
+      (order.recipientName && order.recipientName.toLowerCase().includes(q)) ||
+      (order.deliveryAddress && order.deliveryAddress.toLowerCase().includes(q));
 
-      return matchesSearch && matchesStatus;
+    const matchesStatus =
+      statusFilter === 'ALL' ||
+      (order.status && order.status.toUpperCase() === statusFilter);
+
+    return matchesSearch && matchesStatus;
+  });
+
+  // Cancel an order and record cancellation in timeline
+  function handleCancelOrder(orderId) {
+    const updatedOrders = orders.map((o) =>
+      o.id === orderId
+        ? {
+            ...o,
+            status: 'CANCELLED',
+            timeline: [
+              ...o.timeline,
+              { title: 'Shipment Cancelled by Merchant', time: 'Just now', status: 'cancelled' }
+            ]
+          }
+        : o
+    );
+    setOrders(updatedOrders);
+    saveOrders(updatedOrders);
+  }
+
+  // Advance order status: PENDING -> IN_TRANSIT -> DELIVERED
+  function handleAdvanceStatus(orderId) {
+    const updatedOrders = orders.map((o) => {
+      if (o.id !== orderId) return o;
+
+      const nextStatus = o.status === 'PENDING' ? 'IN_TRANSIT' : 'DELIVERED';
+      return {
+        ...o,
+        status: nextStatus,
+        timeline: [
+          ...o.timeline,
+          { title: `Status Advanced: ${nextStatus}`, time: 'Just now', status: nextStatus === 'DELIVERED' ? 'done' : 'active' }
+        ]
+      };
     });
-  }, [orders, searchTerm, statusFilter]);
+    setOrders(updatedOrders);
+    saveOrders(updatedOrders);
+  }
 
-  // Column definitions for AdminTable
+  // Navigate to tracking view for selected order
+  function handleTrackOrder(order) {
+    setActiveTracking(order);
+    navigate('/merchant/track');
+  }
+
+  // AdminTable column definitions
   const orderColumns = [
     {
       header: 'Tracking / Barcode ID',
@@ -112,6 +155,7 @@ export default function MerchantOrders() {
       headerAlign: 'text-right',
       cellClassName: 'text-right',
       render: (row) => {
+        // Status-based actions
         const isCancellable = row.status === 'PENDING';
         const canAdvance = row.status === 'PENDING' || row.status === 'IN_TRANSIT';
 
@@ -129,10 +173,7 @@ export default function MerchantOrders() {
 
             {/* GPS Track Link */}
             <button
-              onClick={() => {
-                setActiveTrackingOrder(row);
-                navigate('/merchant/track');
-              }}
+              onClick={() => handleTrackOrder(row)}
               className="px-2 py-1 text-xs font-semibold text-orange-700 bg-orange-50 hover:bg-orange-100 rounded-md transition-colors flex items-center gap-1"
               title="Live GPS Track"
             >
@@ -140,10 +181,10 @@ export default function MerchantOrders() {
               <span>Track</span>
             </button>
 
-            {/* Live simulation action */}
+            {/* Advance status action */}
             {canAdvance && (
               <button
-                onClick={() => advanceOrderStatus(row.id)}
+                onClick={() => handleAdvanceStatus(row.id)}
                 className="px-2 py-1 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors flex items-center gap-1"
                 title={row.status === 'PENDING' ? 'Dispatch to Hub' : 'Mark as Delivered'}
               >
@@ -155,7 +196,7 @@ export default function MerchantOrders() {
             {/* Cancel order button */}
             {isCancellable && (
               <button
-                onClick={() => cancelOrder(row.id)}
+                onClick={() => handleCancelOrder(row.id)}
                 className="px-2 py-1 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-md transition-colors flex items-center gap-1"
                 title="Cancel Shipment"
               >
@@ -195,10 +236,11 @@ export default function MerchantOrders() {
 
       {/* ── Card with Search, Filter & AdminTable ── */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-4">
-        {/* Filter bar */}
+        {/* Search and status filter bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
           <div className="relative w-full sm:w-72">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            {/* Search Input */}
             <input
               type="text"
               value={searchTerm}
@@ -208,6 +250,7 @@ export default function MerchantOrders() {
             />
           </div>
 
+          {/* Status filter pills */}
           <div className="flex flex-wrap gap-1.5">
             {['ALL', 'PENDING', 'IN_TRANSIT', 'DELIVERED', 'CANCELLED'].map((s) => (
               <button
@@ -225,7 +268,7 @@ export default function MerchantOrders() {
           </div>
         </div>
 
-        {/* Declarative Table */}
+        {/* Shipments Data Table */}
         <AdminTable
           columns={orderColumns}
           data={filteredOrders}

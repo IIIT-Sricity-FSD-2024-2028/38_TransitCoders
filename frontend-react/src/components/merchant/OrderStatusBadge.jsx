@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * OrderStatusBadge component
- * Demonstrates conditional class rendering based on props
+ * Renders styled status badge pill based on shipment status
  * @param {{ status: string }} props
  */
 export default function OrderStatusBadge({ status }) {

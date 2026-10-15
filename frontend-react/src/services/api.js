@@ -442,8 +442,31 @@ export const API = {
       const res = await apiFetch('/hubs');
       return res.data || [];
     },
+    async getById(id) {
+      const res = await apiFetch(`/hubs/${encodeURIComponent(id)}`);
+      return res.data;
+    },
+    async create(data) {
+      const res = await apiFetch('/hubs', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return res.data;
+    },
+    async update(id, data) {
+      const res = await apiFetch(`/hubs/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+      return res.data;
+    },
+    async delete(id) {
+      return apiFetch(`/hubs/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      });
+    },
     async getAgentsForHub(hubId) {
-      const res = await apiFetch(`/hubs/${hubId}/agents`);
+      const res = await apiFetch(`/hubs/${encodeURIComponent(hubId)}/agents`);
       return res.data || [];
     },
   },

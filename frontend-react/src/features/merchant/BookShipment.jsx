@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   BoxSeam, 
@@ -14,22 +14,19 @@ import {
   QrCode,
   TagFill
 } from 'react-bootstrap-icons';
-import { useMerchant } from '../../services/MerchantContext';
+import { loadOrders, saveOrders, generateTrackingNumber, getAutoDimensions } from '../../services/merchantHelpers';
 
 /**
- * Realistic & Streamlined Merchant Shipment Booking Portal
+ * BookShipment — Merchant Order Creation Form
  * 
- * Key Realistic Improvements:
- * 1. Pre-configured Warehouse Profile: Defaults to Merchant's registered warehouse.
- * 2. Automatic PIN-Code Routing: Resolves routing hub automatically.
- * 3. Compact 2-Column Workflow: Destination & Package on left, Real-time sticky Fare breakdown on right.
- * 4. Printable AWB Shipping Label: Realistic barcode/QR printable shipping label on confirmation.
+ * Order booking and shipment dispatch view for merchants.
+ * Supports warehouse selection, destination resolution, live weight pricing,
+ * service level selection, and instant AWB shipping label generation.
  */
 export default function BookShipment() {
   const navigate = useNavigate();
-  const { createOrder } = useMerchant();
 
-  // Saved Merchant Warehouses
+  // ── Saved Merchant Warehouses (static data) ──
   const SAVED_WAREHOUSES = [
     {
       id: 'wh-01',
@@ -48,12 +45,49 @@ export default function BookShipment() {
       state: 'Karnataka',
       pincode: '560100',
       phone: '+91 98765 11223'
+    },
+    {
+      id: 'wh-03',
+      name: 'Mumbai Central Logistics Hub',
+      address: 'Bhiwandi Warehousing Complex, NH-48',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pincode: '421302',
+      phone: '+91 98200 44556'
+    },
+    {
+      id: 'wh-04',
+      name: 'Delhi-NCR Cargo Gateway',
+      address: 'Plot 12, Okhla Industrial Area Phase-III',
+      city: 'New Delhi',
+      state: 'Delhi',
+      pincode: '110020',
+      phone: '+91 98110 77889'
+    },
+    {
+      id: 'wh-05',
+      name: 'Hyderabad HITEC Fulfillment Center',
+      address: 'Financial District, Gachibowli',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      pincode: '500032',
+      phone: '+91 98490 33445'
+    },
+    {
+      id: 'wh-06',
+      name: 'Kolkata Eastern Logistics Depot',
+      address: 'Sector V, Salt Lake City',
+      city: 'Kolkata',
+      state: 'West Bengal',
+      pincode: '700091',
+      phone: '+91 98300 22334'
     }
   ];
 
+  // Selected merchant warehouse
   const [selectedWarehouseId, setSelectedWarehouseId] = useState('wh-01');
 
-  // Customer / Destination Details
+  // Form data state
   const [formData, setFormData] = useState({
     customerName: '',
     customerPhone: '',
@@ -65,31 +99,30 @@ export default function BookShipment() {
     pkgType: 'Box',
     pkgCategory: 'Electronics',
     pkgWeight: 2.0,
-    pkgLength: 25,
-    pkgWidth: 20,
-    pkgHeight: 15,
     declaredValue: 2000,
     // Service Level
-    serviceSpeed: 'express', // 'standard' | 'express' | 'overnight'
+    serviceSpeed: 'express',
     fragile: true,
     addInsurance: true,
     pickupDate: '2026-10-14',
     pickupSlot: 'Morning (09:00 AM – 01:00 PM)'
   });
 
+  // Submission state and created shipment
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookedShipment, setBookedShipment] = useState(null);
 
-  // Active Origin Warehouse
+  // Active warehouse object
   const activeWarehouse = SAVED_WAREHOUSES.find(w => w.id === selectedWarehouseId) || SAVED_WAREHOUSES[0];
 
-  // Dynamic Pricing Engine
+  // ── Pricing Configuration (static data) ──
   const PRICING_CONFIG = {
     standard: { base: 120, perKg: 40, sla: '3–4 Business Days' },
     express: { base: 220, perKg: 60, sla: '1–2 Business Days' },
     overnight: { base: 450, perKg: 95, sla: 'Next Day by 11:00 AM' }
   };
 
+  // Live fare and tax calculations
   const selectedTier = PRICING_CONFIG[formData.serviceSpeed] || PRICING_CONFIG.standard;
   const weight = parseFloat(formData.pkgWeight) || 1;
   const weightCharge = Math.round(weight * selectedTier.perKg);
@@ -99,15 +132,23 @@ export default function BookShipment() {
   const gstTax = Math.round(subTotal * 0.18);
   const grandTotal = subTotal + gstTax;
 
-  // Auto-resolved Routing Hub
-  const resolvedDestinationHub = useMemo(() => {
-    if (formData.destinationCity.toLowerCase().includes('bengaluru')) return 'BLR-01 (South Air Hub)';
-    if (formData.destinationCity.toLowerCase().includes('hyderabad')) return 'HYD-01 (Secunderabad Hub)';
-    if (formData.destinationCity.toLowerCase().includes('mumbai')) return 'BOM-01 (Bhiwandi Gateway)';
-    if (formData.destinationCity.toLowerCase().includes('delhi')) return 'DEL-01 (IGI Cargo Terminal)';
+  // Resolve regional distribution hub from destination city
+  function getResolvedHub() {
+    const city = formData.destinationCity.toLowerCase();
+    if (city.includes('bengaluru') || city.includes('bangalore')) return 'BLR-01 (South Air Hub)';
+    if (city.includes('hyderabad')) return 'HYD-01 (Secunderabad Hub)';
+    if (city.includes('mumbai') || city.includes('pune')) return 'BOM-01 (Bhiwandi Gateway)';
+    if (city.includes('delhi') || city.includes('noida') || city.includes('gurugram') || city.includes('gurgaon')) return 'DEL-01 (IGI Cargo Terminal)';
+    if (city.includes('kolkata')) return 'CCU-01 (Eastern Cargo Hub)';
+    if (city.includes('chennai')) return 'MAA-01 (Meenambakkam Gateway)';
     return `${formData.destinationCity.toUpperCase()}-01 Regional Depot`;
-  }, [formData.destinationCity]);
+  }
+  const resolvedDestinationHub = getResolvedHub();
 
+  // Automatically assign dimensions based on package type and weight
+  const autoDimensions = getAutoDimensions(formData.pkgType, formData.pkgWeight);
+
+  // Handle form input change
   function handleInputChange(e) {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -116,36 +157,58 @@ export default function BookShipment() {
     }));
   }
 
-  async function handleBookShipment(e) {
+  // Handle shipment booking form submission
+  function handleBookShipment(e) {
     e.preventDefault();
+
+    // Validation
     if (!formData.customerName.trim() || !formData.deliveryAddress.trim() || !formData.pincode.trim()) {
       alert('Please complete recipient name, address, and PIN code.');
       return;
     }
 
-    try {
-      setIsSubmitting(true);
+    setIsSubmitting(true);
 
-      const orderPayload = {
-        recvName: formData.customerName,
-        recvPhone: formData.customerPhone || '+91 94444 00000',
-        pickupAddress: activeWarehouse.address,
-        pickupCity: activeWarehouse.city,
-        recvAddress: formData.deliveryAddress,
-        recvCity: formData.destinationCity,
-        pkgWeight: weight,
-        pkgType: formData.pkgType,
-        serviceType: formData.serviceSpeed,
-        price: grandTotal
-      };
+    // Generate unique tracking number
+    const trackingNumber = generateTrackingNumber();
 
-      const newOrder = await createOrder(orderPayload);
-      setBookedShipment(newOrder);
-    } catch (err) {
-      alert('Failed to book shipment: ' + err.message);
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Create the new shipment object
+    const newShipment = {
+      id: trackingNumber,
+      trackingNumber: trackingNumber,
+      recipientName: formData.customerName,
+      recipientPhone: formData.customerPhone || '+91 94444 00000',
+      pickupAddress: `${activeWarehouse.address}, ${activeWarehouse.city}`,
+      deliveryAddress: `${formData.deliveryAddress}, ${formData.destinationCity}`,
+      origin: activeWarehouse.city,
+      destination: formData.destinationCity,
+      packageWeight: weight,
+      packageType: formData.pkgType,
+      length: autoDimensions.length,
+      width: autoDimensions.width,
+      height: autoDimensions.height,
+      dimensions: `${autoDimensions.length}x${autoDimensions.width}x${autoDimensions.height} cm`,
+      dimensionLabel: autoDimensions.label,
+      serviceType: formData.serviceSpeed,
+      status: 'PENDING',
+      price: grandTotal,
+      date: 'Just now',
+      timeline: [
+        { title: 'Shipment Created', time: 'Just now', status: 'done' },
+        { title: 'Dispatched to Origin Hub', time: 'In Queue', status: 'active' },
+        { title: 'Hub Transit', time: 'Expected tomorrow', status: 'pending' },
+        { title: 'Delivery to Recipient', time: 'Pending', status: 'pending' }
+      ]
+    };
+
+    // Save to localStorage: load existing orders → add new one at top → save back
+    const currentOrders = loadOrders();
+    const updatedOrders = [newShipment, ...currentOrders];
+    saveOrders(updatedOrders);
+
+    // Update UI state
+    setBookedShipment(newShipment);
+    setIsSubmitting(false);
   }
 
   return (
@@ -164,7 +227,7 @@ export default function BookShipment() {
         </div>
       </div>
 
-      {/* ── CONFIRMATION & AWB SHIPPING LABEL VIEW ── */}
+      {/* Show booking confirmation label OR booking form */}
       {bookedShipment ? (
         <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm space-y-8 animate-fadeIn">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-gray-100">
@@ -186,6 +249,7 @@ export default function BookShipment() {
                 <Printer size={16} />
                 <span>Print AWB Shipping Label</span>
               </button>
+              {/* Reset form to book another shipment */}
               <button
                 onClick={() => setBookedShipment(null)}
                 className="px-4 py-2.5 border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-bold rounded-lg transition-colors"
@@ -195,7 +259,7 @@ export default function BookShipment() {
             </div>
           </div>
 
-          {/* REALISTIC AWB SHIPPING LABEL PREVIEW */}
+          {/* AWB SHIPPING LABEL PREVIEW */}
           <div className="max-w-2xl mx-auto border-2 border-dashed border-gray-300 p-6 rounded-xl bg-gray-50/50 space-y-4">
             <div className="flex justify-between items-start border-b-2 border-black pb-3">
               <div>
@@ -209,7 +273,7 @@ export default function BookShipment() {
               </div>
             </div>
 
-            {/* Barcode Mock */}
+            {/* Printable Barcode Lines */}
             <div className="py-2 text-center bg-white border border-gray-200 rounded-lg p-3 space-y-1">
               <div className="font-mono text-2xl font-black tracking-widest text-gray-900">
                 {bookedShipment.trackingNumber}
@@ -242,10 +306,14 @@ export default function BookShipment() {
             </div>
 
             {/* Routing and Dimensions */}
-            <div className="grid grid-cols-3 gap-3 text-xs bg-white p-3 rounded-lg border border-gray-200">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-white p-3 rounded-lg border border-gray-200">
               <div>
                 <span className="text-[10px] text-gray-400 block font-semibold">WEIGHT</span>
                 <span className="font-bold text-gray-900">{weight} kg</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-gray-400 block font-semibold">DIMENSIONS</span>
+                <span className="font-bold text-gray-900">{autoDimensions.length}x{autoDimensions.width}x{autoDimensions.height} cm</span>
               </div>
               <div>
                 <span className="text-[10px] text-gray-400 block font-semibold">AUTO ROUTING HUB</span>
@@ -275,13 +343,13 @@ export default function BookShipment() {
         </div>
       ) : (
 
-        /* ── FAST 2-COLUMN MERCHANT FULFILLMENT FORM ── */
+        /* ── Merchant Fulfillment Form ── */
         <form onSubmit={handleBookShipment} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* LEFT 2 COLUMNS: Order Inputs */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* 1. Origin Warehouse (Pre-configured profile) */}
+            {/* 1. Origin Warehouse Selection */}
             <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm space-y-3">
               <div className="flex items-center justify-between border-b pb-2.5">
                 <div className="flex items-center gap-2">
@@ -291,6 +359,7 @@ export default function BookShipment() {
                 <span className="text-[11px] text-gray-400">Pre-saved Merchant Origin</span>
               </div>
 
+              {/* Warehouse Selection Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {SAVED_WAREHOUSES.map((wh) => (
                   <div
@@ -325,6 +394,7 @@ export default function BookShipment() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">Customer / Recipient Name *</label>
+                  {/* Customer / Recipient Name */}
                   <input
                     type="text"
                     name="customerName"
@@ -407,7 +477,7 @@ export default function BookShipment() {
                 </span>
               </div>
 
-              {/* Dynamic Weight Calculator Box */}
+              {/* Live Weight Calculator */}
               <div className="bg-gradient-to-r from-orange-50/70 to-amber-50/50 border border-orange-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="space-y-1 w-full sm:w-auto">
                   <label className="block text-xs font-bold text-gray-800 uppercase tracking-wide">
@@ -428,6 +498,7 @@ export default function BookShipment() {
                   </div>
                 </div>
 
+                {/* Live weight rate calculation */}
                 <div className="bg-white p-3.5 rounded-xl border border-orange-200 shadow-sm text-right min-w-[200px]">
                   <div className="text-[11px] text-gray-500 font-semibold uppercase">
                     Rate: <span className="text-orange-600 font-bold">₹{selectedTier.perKg} / kg</span>
@@ -470,13 +541,22 @@ export default function BookShipment() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-700 mb-1">Dimensions (LxWxH)</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-[11px] font-semibold text-gray-700">Dimensions (LxWxH)</label>
+                    <span className="text-[9px] font-bold text-orange-600 bg-orange-50 px-1 rounded border border-orange-200">
+                      Auto
+                    </span>
+                  </div>
                   <input
                     type="text"
-                    disabled
-                    value={`${formData.pkgLength}x${formData.pkgWidth}x${formData.pkgHeight} cm`}
-                    className="w-full px-2.5 py-1.5 border rounded-lg bg-gray-50 text-gray-500 font-mono"
+                    readOnly
+                    value={`${autoDimensions.length} x ${autoDimensions.width} x ${autoDimensions.height} cm`}
+                    className="w-full px-2.5 py-1.5 border border-orange-200 rounded-lg bg-orange-50/40 text-gray-900 font-mono text-xs font-bold"
+                    title={`Auto-computed for ${formData.pkgType} (${weight} kg)`}
                   />
+                  <p className="text-[10px] text-gray-400 mt-0.5 truncate" title={autoDimensions.label}>
+                    {autoDimensions.label}
+                  </p>
                 </div>
                 <div>
                   <label className="block text-[11px] font-semibold text-gray-700 mb-1">Declared Value (₹)</label>
@@ -491,7 +571,7 @@ export default function BookShipment() {
               </div>
             </div>
 
-            {/* 4. Speed Selection Cards */}
+            {/* 4. Service Speed & Courier SLA */}
             <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm space-y-3">
               <h3 className="text-sm font-bold text-gray-900 border-b pb-2">4. Service Speed & Courier SLA</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -531,7 +611,7 @@ export default function BookShipment() {
                 <span className="text-xs font-bold text-orange-600 uppercase">{formData.serviceSpeed}</span>
               </div>
 
-              {/* Itemized Fare Computation */}
+              {/* Itemized Fare Breakdown */}
               <div className="space-y-2.5 text-xs text-gray-600">
                 <div className="flex justify-between">
                   <span>Base Pickup & Handling:</span>
@@ -543,6 +623,7 @@ export default function BookShipment() {
                   <span className="font-bold text-gray-900">₹{weightCharge}.00</span>
                 </div>
 
+                {/* Fragile surcharge */}
                 {formData.fragile && (
                   <div className="flex justify-between text-amber-700">
                     <span>Fragile Protective Surcharge:</span>
@@ -575,7 +656,7 @@ export default function BookShipment() {
                 <div><b>Route Vector:</b> {activeWarehouse.city} → {formData.destinationCity}</div>
               </div>
 
-              {/* Confirm Button */}
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isSubmitting}

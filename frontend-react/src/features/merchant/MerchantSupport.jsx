@@ -3,10 +3,11 @@ import { ChatDots, Envelope, Telephone, PlusLg } from 'react-bootstrap-icons';
 
 /**
  * MerchantSupport
- * 100% Exact Replica of vanilla #view-support:
- * - 3 Support Channels (Live Chat with Online tag, Email Support, Phone Support)
- * - Support Tickets Table
- * - New Ticket Creation Modal
+ * 
+ * Merchant customer support and helpdesk portal:
+ * - 3 Dedicated channels (Live Chat, Email Support, Phone Assistance)
+ * - Support tickets table with status and priority tags
+ * - Modal to log new merchant support tickets
  */
 export default function MerchantSupport() {
   const [tickets, setTickets] = useState([
