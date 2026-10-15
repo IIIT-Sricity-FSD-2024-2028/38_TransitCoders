@@ -25,6 +25,7 @@ import AgentLayout from './features/agent/AgentLayout';
 import AgentDashboard from './features/agent/AgentDashboard';
 import AgentWorklist from './features/agent/AgentWorklist';
 import DashBoard from './features/hub-manager/DashBoard';
+import ReportIssue from "./features/agent/ReportIssue";
 
 import Login from "./pages/Login";
 
@@ -63,6 +64,7 @@ export default function App() {
       <Route path="/agent" element={<AgentLayout />}>
         <Route path="dashboard" element={<AgentDashboard />} />
         <Route path="worklist" element={<AgentWorklist />} />
+        <Route path="report-issue" element={<ReportIssue />} />
       </Route>
 
     </Routes>
