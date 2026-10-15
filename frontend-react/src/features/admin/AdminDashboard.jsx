@@ -71,13 +71,6 @@ const AdminDashboard = () => {
                 <h1 className="text-2xl font-bold">System Overview</h1>
                 <p className="text-lg font-light text-gray-500 mb-2">Real time system health and administration</p>
             </div>
-            <div className="right-full">
-                <button 
-                onClick={()=>AddNewUser}
-                className="bg-orange-500 flex text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors">
-                    Export full Report
-                </button>
-            </div>
         </div>
         {/* KPI Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
