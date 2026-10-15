@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   BoxSeam, 
@@ -14,39 +14,49 @@ import KPICard from '../../components/shared/KPICard';
 import AdminTable from '../../components/admin/AdminTable';
 import OrderStatusBadge from '../../components/merchant/OrderStatusBadge';
 import ShippingLabelModal from '../../components/merchant/ShippingLabelModal';
-import { useMerchant } from '../../services/MerchantContext';
-import { useState } from 'react';
+import { loadOrders, setActiveTracking } from '../../services/merchantHelpers';
 
 /**
  * MerchantDashboard
- * 100% Dynamic & Live:
- * - Subscribed to global useMerchant() context
- * - Updates instantly when any order is booked, cancelled, or advanced
- * - Dynamic charts deriving heights directly from live orders
+ * 
+ * Main overview dashboard for merchants.
+ * Displays KPI summary cards, live fleet status distribution,
+ * latest shipment widget, and recent shipments table.
  */
 export default function MerchantDashboard() {
   const navigate = useNavigate();
-  const { orders, setActiveTrackingOrder } = useMerchant();
+
+  // Orders list and selected order for shipping label modal preview
+  const [orders, setOrders] = useState([]);
   const [selectedLabelOrder, setSelectedLabelOrder] = useState(null);
 
-  // Dynamic statistics calculated directly from live orders
-  const stats = useMemo(() => {
-    const total = orders.length;
-    const delivered = orders.filter((o) => o.status === 'DELIVERED').length;
-    const transit = orders.filter((o) => o.status === 'IN_TRANSIT').length;
-    const pending = orders.filter((o) => o.status === 'PENDING').length;
-    const cancelled = orders.filter((o) => o.status === 'CANCELLED').length;
-    const spend = orders.reduce((acc, o) => acc + (Number(o.price) || 0), 0);
-    return { total, delivered, transit, pending, cancelled, spend };
-  }, [orders]);
+  // Load orders from localStorage on mount
+  useEffect(() => {
+    const savedOrders = loadOrders();
+    setOrders(savedOrders);
+  }, []);
 
-  // Dynamic chart calculations based on current live orders
-  const deliveredPct = stats.total > 0 ? Math.round((stats.delivered / stats.total) * 100) : 0;
-  const transitPct = stats.total > 0 ? Math.round((stats.transit / stats.total) * 100) : 0;
-  const pendingPct = stats.total > 0 ? Math.round((stats.pending / stats.total) * 100) : 0;
-  const cancelledPct = stats.total > 0 ? Math.round((stats.cancelled / stats.total) * 100) : 0;
+  // Compute overview metrics and status breakdown
+  const total = orders.length;
+  const delivered = orders.filter((o) => o.status === 'DELIVERED').length;
+  const transit = orders.filter((o) => o.status === 'IN_TRANSIT').length;
+  const pending = orders.filter((o) => o.status === 'PENDING').length;
+  const cancelled = orders.filter((o) => o.status === 'CANCELLED').length;
+  const spend = orders.reduce((acc, o) => acc + (Number(o.price) || 0), 0);
 
-  // Recent shipments columns
+  // Dynamic chart percentages
+  const deliveredPct = total > 0 ? Math.round((delivered / total) * 100) : 0;
+  const transitPct = total > 0 ? Math.round((transit / total) * 100) : 0;
+  const pendingPct = total > 0 ? Math.round((pending / total) * 100) : 0;
+  const cancelledPct = total > 0 ? Math.round((cancelled / total) * 100) : 0;
+
+  // Navigate to shipment tracking page
+  function handleTrackOrder(order) {
+    setActiveTracking(order);
+    navigate('/merchant/track');
+  }
+
+  // Recent shipments table columns
   const recentColumns = [
     {
       header: 'Tracking / Barcode ID',
@@ -103,6 +113,7 @@ export default function MerchantDashboard() {
           </div>
           <p className="text-sm text-gray-500 mt-1">Real-time dispatch metrics and shipment health</p>
         </div>
+        {/* New Shipment CTA */}
         <button
           onClick={() => navigate('/merchant/book')}
           className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-semibold shadow-sm transition-colors"
@@ -112,39 +123,39 @@ export default function MerchantDashboard() {
         </button>
       </div>
 
-      {/* ── 4 KPICards (Synchronized live) ── */}
+      {/* ── KPI Metric Cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
           title="TOTAL SHIPMENTS"
-          value={stats.total}
+          value={total}
           isicon={true}
           icon={<BoxSeam size={20} />}
           color="bg-orange-50 text-orange-600"
         />
         <KPICard
           title="DELIVERED"
-          value={stats.delivered}
+          value={delivered}
           isicon={true}
           icon={<CheckCircle size={20} />}
           color="bg-emerald-50 text-emerald-600"
         />
         <KPICard
           title="IN TRANSIT"
-          value={stats.transit}
+          value={transit}
           isicon={true}
           icon={<Truck size={20} />}
           color="bg-blue-50 text-blue-600"
         />
         <KPICard
           title="TOTAL SPEND"
-          value={`₹${stats.spend.toLocaleString()}`}
+          value={`₹${spend.toLocaleString()}`}
           isicon={true}
           icon={<CurrencyRupee size={20} />}
           color="bg-indigo-50 text-indigo-600"
         />
       </div>
 
-      {/* ── Live Visual Status Breakdown (Dynamic Bar & Donut representation) ── */}
+      {/* ── Live Visual Status Breakdown ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Dynamic Status Progress Bar */}
@@ -154,7 +165,7 @@ export default function MerchantDashboard() {
               <h2 className="text-sm font-bold text-gray-900">Live Fleet Distribution</h2>
               <p className="text-xs text-gray-400">Current share of active, completed, and pending shipments</p>
             </div>
-            <span className="text-xs font-semibold text-gray-500">{stats.total} Total Orders</span>
+            <span className="text-xs font-semibold text-gray-500">{total} Total Orders</span>
           </div>
 
           {/* Segmented live progress bar */}
@@ -181,34 +192,35 @@ export default function MerchantDashboard() {
             />
           </div>
 
-          {/* Interactive Legend with Live Counts */}
+          {/* Status breakdown legend */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs">
             <div className="p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-100">
-              <div className="text-emerald-700 font-bold">{stats.delivered} Orders</div>
+              <div className="text-emerald-700 font-bold">{delivered} Orders</div>
               <div className="text-emerald-600 text-[11px]">Delivered ({deliveredPct}%)</div>
             </div>
             <div className="p-2.5 rounded-lg bg-blue-50/70 border border-blue-100">
-              <div className="text-blue-700 font-bold">{stats.transit} Orders</div>
+              <div className="text-blue-700 font-bold">{transit} Orders</div>
               <div className="text-blue-600 text-[11px]">In Transit ({transitPct}%)</div>
             </div>
             <div className="p-2.5 rounded-lg bg-amber-50/70 border border-amber-100">
-              <div className="text-amber-700 font-bold">{stats.pending} Orders</div>
+              <div className="text-amber-700 font-bold">{pending} Orders</div>
               <div className="text-amber-600 text-[11px]">Pending ({pendingPct}%)</div>
             </div>
             <div className="p-2.5 rounded-lg bg-rose-50/70 border border-rose-100">
-              <div className="text-rose-700 font-bold">{stats.cancelled} Orders</div>
+              <div className="text-rose-700 font-bold">{cancelled} Orders</div>
               <div className="text-rose-600 text-[11px]">Cancelled ({cancelledPct}%)</div>
             </div>
           </div>
         </div>
 
-        {/* Live Tracking Quick Widget */}
+        {/* Latest Active Shipment Quick Widget */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between space-y-4">
           <div>
             <h2 className="text-sm font-bold text-gray-900">Latest Active Shipment</h2>
             <p className="text-xs text-gray-400">Click to monitor live delivery GPS</p>
           </div>
 
+          {/* First active shipment or empty placeholder */}
           {orders[0] ? (
             <div className="bg-orange-50/60 border border-orange-200/60 rounded-xl p-4 space-y-2">
               <div className="flex justify-between items-center">
@@ -227,10 +239,7 @@ export default function MerchantDashboard() {
                   <span>AWB Barcode</span>
                 </button>
                 <button
-                  onClick={() => {
-                    setActiveTrackingOrder(orders[0]);
-                    navigate('/merchant/track');
-                  }}
+                  onClick={() => handleTrackOrder(orders[0])}
                   className="flex-1 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
                 >
                   <span>Live Map</span>
@@ -249,7 +258,7 @@ export default function MerchantDashboard() {
 
       </div>
 
-      {/* ── Table with Declarative React AdminTable ── */}
+      {/* ── Recent Shipments Table ── */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <div>
@@ -265,6 +274,7 @@ export default function MerchantDashboard() {
           </button>
         </div>
 
+        {/* Display the 5 most recent shipments */}
         <AdminTable
           columns={recentColumns}
           data={orders.slice(0, 5)}

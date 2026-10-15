@@ -108,12 +108,18 @@ export default function ShippingLabelModal({ order, isOpen, onClose }) {
             </div>
           </div>
 
-          {/* Routing Hubs & Billed Weight */}
-          <div className="grid grid-cols-3 gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200 text-center">
+          {/* Routing Hubs, Dimensions & Billed Weight */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200 text-center">
             <div>
               <span className="text-[10px] text-gray-400 block font-semibold">BILLED WEIGHT</span>
               <span className="font-bold text-sm text-gray-900">
                 {order.packageWeight ? `${order.packageWeight} kg` : '2.0 kg'}
+              </span>
+            </div>
+            <div>
+              <span className="text-[10px] text-gray-400 block font-semibold">DIMENSIONS</span>
+              <span className="font-bold text-xs text-gray-900 mt-0.5 block truncate" title={order.dimensions || '28x22x16 cm'}>
+                {order.dimensions || (order.length ? `${order.length}x${order.width}x${order.height} cm` : '28x22x16 cm')}
               </span>
             </div>
             <div>
