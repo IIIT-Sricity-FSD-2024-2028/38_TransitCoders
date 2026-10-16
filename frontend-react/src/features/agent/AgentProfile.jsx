@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
     PersonFill, 
     TelephoneFill, 
@@ -17,8 +17,10 @@ import {
     CircleFill
 } from 'react-bootstrap-icons';
 
+const STATUS_STORAGE_KEY = 'swifttrack_agent_status';
+
 export default function AgentProfile() {
-    const [profile, setProfile] = useState({
+    const [profile, setProfile] = useState(() => ({
         name: "Karthik A.",
         agentId: "DA102",
         role: "Senior Delivery Agent",
@@ -28,7 +30,7 @@ export default function AgentProfile() {
         joinedDate: "12 Jan 2023",
         contractStatus: "Active",
         emergencyContact: "+91 99887 76655",
-        status: "available", // 'available' | 'on-delivery' | 'offline'
+        status: localStorage.getItem(STATUS_STORAGE_KEY) || "available",
         performance: {
             total: 210,
             completed: 198,
@@ -47,7 +49,19 @@ export default function AgentProfile() {
             contact: "+91 44 2345 6789",
             operatingHours: "06:00 AM - 10:00 PM"
         }
-    });
+    }));
+
+    // Listen to status changes triggered from Topbar or other components
+    useEffect(() => {
+        const handleStatusEvent = (e) => {
+            if (e.detail && e.detail !== profile.status) {
+                setProfile(prev => ({ ...prev, status: e.detail }));
+            }
+        };
+
+        window.addEventListener('agent-status-changed', handleStatusEvent);
+        return () => window.removeEventListener('agent-status-changed', handleStatusEvent);
+    }, [profile.status]);
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editForm, setEditForm] = useState({
@@ -65,6 +79,8 @@ export default function AgentProfile() {
 
     const handleStatusChange = (newStatus) => {
         setProfile(prev => ({ ...prev, status: newStatus }));
+        localStorage.setItem(STATUS_STORAGE_KEY, newStatus);
+        window.dispatchEvent(new CustomEvent('agent-status-changed', { detail: newStatus }));
         const label = newStatus === 'available' ? 'Available for Pickups' : newStatus === 'on-delivery' ? 'On Delivery Run' : 'Offline / On Break';
         triggerToast(`Status updated to: ${label}`);
     };

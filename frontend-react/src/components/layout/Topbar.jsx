@@ -2,7 +2,7 @@
 import { Search, Bell, PersonCircle } from "react-bootstrap-icons";
 import "./TopBar.css";
 
-function Topbar({ title = "Dashboard" }) {
+function Topbar({ title = "Dashboard", statusBadge }) {
     return (
         <header className="topbar">
             <h1 className="topbar-title">{title}</h1>
@@ -16,6 +16,12 @@ function Topbar({ title = "Dashboard" }) {
                         placeholder="Search..."
                     />
                 </div>
+
+                {statusBadge && (
+                    <div className="topbar-status-wrapper">
+                        {statusBadge}
+                    </div>
+                )}
 
                 <button
                     type="button"

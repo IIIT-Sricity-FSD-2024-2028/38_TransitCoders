@@ -1,9 +1,18 @@
 @import "tailwindcss";
 
-body {
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
   font-family: 'Poppins', 'Inter', sans-serif;
   color: #111827;
-  background-color: #F3F4F6;
+  background-color: #ffffff;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
 }
 
 .font-mono {
