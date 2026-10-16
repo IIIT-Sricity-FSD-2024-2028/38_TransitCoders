@@ -16,6 +16,11 @@ export class CreateOrderDto {
   @IsUUID()
   customerId: string;
 
+  @ApiProperty({ required: false, description: 'Tracking ID (e.g. TRK-AB12CD34)' })
+  @IsString()
+  @IsOptional()
+  trackingId?: string;
+
   @ApiProperty({ description: 'Full delivery address' })
   @IsString()
   @IsNotEmpty()

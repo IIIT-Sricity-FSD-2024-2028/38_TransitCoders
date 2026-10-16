@@ -137,7 +137,7 @@ export default function TrackShipment() {
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Enter tracking ID e.g. SWT-2026-98471"
+              placeholder="Enter tracking ID e.g. TRK-AB12CD34"
               className="w-full pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg text-sm outline-none focus:border-[#F97316] font-mono text-[#111827]"
             />
           </div>

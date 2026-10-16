@@ -184,6 +184,7 @@ export async function createMerchantOrder(shipment) {
 
     const payload = {
       customerId: DEFAULT_CUSTOMER_ID,
+      trackingId: shipment.trackingNumber || generateTrackingNumber(),
       deliveryAddress: shipment.deliveryAddress,
       pickupAddress: shipment.pickupAddress,
       pickupHubId: shipment.pickupHubId,
@@ -462,11 +463,14 @@ export function getAutoDimensions(packageType = 'Box', weight = 1) {
 }
 
 /**
- * Generates a unique tracking barcode identifier format: SWT-YYYY-XXXXX
+ * Generates a unique tracking number matching the common database format: TRK-XX00XX00
+ * e.g. TRK-AB12CD34, TRK-GH56IJ78
  * @returns {string} Tracking number
  */
 export function generateTrackingNumber() {
-  const year = new Date().getFullYear();
-  const rand = Math.floor(10000 + Math.random() * 90000);
-  return `SWT-${year}-${rand}`;
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const digits = '0123456789';
+  const rL = () => letters[Math.floor(Math.random() * letters.length)];
+  const rD = () => digits[Math.floor(Math.random() * digits.length)];
+  return `TRK-${rL()}${rL()}${rD()}${rD()}${rL()}${rL()}${rD()}${rD()}`;
 }

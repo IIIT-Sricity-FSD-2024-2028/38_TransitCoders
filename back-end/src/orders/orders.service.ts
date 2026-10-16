@@ -137,7 +137,14 @@ export class OrdersService {
       .toString(36)
       .substring(2, 6)
       .toUpperCase()}`;
-    const trackingId = `ST-${Math.floor(100000 + Math.random() * 900000)}`;
+    const generateCommonTrackingId = (): string => {
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const digits = '0123456789';
+      const rL = () => letters[Math.floor(Math.random() * letters.length)];
+      const rD = () => digits[Math.floor(Math.random() * digits.length)];
+      return `TRK-${rL()}${rL()}${rD()}${rD()}${rL()}${rL()}${rD()}${rD()}`;
+    };
+    const trackingId = dto.trackingId || generateCommonTrackingId();
 
     const history: IStatusEvent[] = [
       {
