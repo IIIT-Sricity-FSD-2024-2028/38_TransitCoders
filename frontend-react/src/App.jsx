@@ -24,8 +24,10 @@ import MerchantSupport from './features/merchant/MerchantSupport';
 import AgentLayout from './features/agent/AgentLayout';
 import AgentDashboard from './features/agent/AgentDashboard';
 import AgentWorklist from './features/agent/AgentWorklist';
-import DashBoard from './features/hub-manager/DashBoard';
+import DeliveryHistory from './features/agent/DeliveryHistory';
 import ReportIssue from "./features/agent/ReportIssue";
+import AgentProfile from './features/agent/AgentProfile';
+import DashBoard from './features/hub-manager/DashBoard';
 
 import Login from "./pages/Login";
 
@@ -62,9 +64,12 @@ export default function App() {
       </Route>
       
       <Route path="/agent" element={<AgentLayout />}>
+        <Route index element={<AgentDashboard />} />
         <Route path="dashboard" element={<AgentDashboard />} />
         <Route path="worklist" element={<AgentWorklist />} />
+        <Route path="history" element={<DeliveryHistory />} />
         <Route path="report-issue" element={<ReportIssue />} />
+        <Route path="profile" element={<AgentProfile />} />
       </Route>
 
     </Routes>
