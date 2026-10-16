@@ -18,50 +18,6 @@ import ConfirmDeliveryModal from '../../components/agent/ConfirmDeliveryModal';
 import AgentStatusBadge from '../../components/agent/AgentStatusBadge';
 import { API } from '../../services/api';
 
-const STORAGE_KEY = 'swifttrack_agent_orders_v3';
-
-const initialOrders = [
-    {
-        id: "ORD-9281",
-        orderId: "ORD-9281",
-        customer: "Rahul Sharma",
-        phone: "+91 98765 43210",
-        origin: "Hub Central, Zone 4",
-        destination: "45 MG Road, Indiranagar, Bengaluru",
-        status: "in-transit",
-        priority: "High",
-        eta: "25 mins",
-        amount: "₹450",
-        distance: "3.1 km"
-    },
-    {
-        id: "ORD-9282",
-        orderId: "ORD-9282",
-        customer: "Priya Nair",
-        phone: "+91 91234 56789",
-        origin: "Hub North, Koramangala",
-        destination: "12 Palm Grove, HSR Layout, Bengaluru",
-        status: "pending",
-        priority: "Medium",
-        eta: "50 mins",
-        amount: "₹280",
-        distance: "5.4 km"
-    },
-    {
-        id: "ORD-9280",
-        orderId: "ORD-9280",
-        customer: "Vikram Das",
-        phone: "+91 99887 66554",
-        origin: "Hub Central, Zone 4",
-        destination: "8th Cross, Malleshwaram",
-        status: "delivered",
-        priority: "Standard",
-        eta: "Delivered",
-        amount: "₹320",
-        distance: "6.0 km"
-    }
-];
-
 export default function AgentLayout() {
     const currentUser = (() => {
         try {
@@ -69,28 +25,35 @@ export default function AgentLayout() {
             if (saved) {
                 const u = JSON.parse(saved);
                 return {
-                    name: u.name || "Agent",
-                    role: "Delivery Agent"
+                    id: u.id,
+                    name: u.name || "Delivery Agent",
+                    email: u.email,
+                    role: "Delivery Agent",
+                    hubId: u.hubId
                 };
             }
         } catch (e) {
             console.warn('[AgentLayout] Error parsing user:', e);
         }
-        return { name: "JS", role: "Delivery Agent" };
+        return { name: "Delivery Agent", role: "Delivery Agent" };
     })();
 
-    // Load initial state from LocalStorage or fall back to default loads
+    const storageKey = currentUser?.id 
+        ? `swifttrack_agent_orders_${currentUser.id}` 
+        : (currentUser?.email ? `swifttrack_agent_orders_${currentUser.email}` : 'swifttrack_agent_orders_default');
+
+    // Load initial state from agent-scoped LocalStorage
     const [orders, setOrders] = useState(() => {
         try {
-            const saved = localStorage.getItem(STORAGE_KEY);
+            const saved = localStorage.getItem(storageKey);
             if (saved) {
                 const parsed = JSON.parse(saved);
-                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                if (Array.isArray(parsed)) return parsed;
             }
         } catch (e) {
             console.warn('[AgentLayout] Error reading localStorage:', e);
         }
-        return initialOrders;
+        return [];
     });
 
     const [acceptModalOrder, setAcceptModalOrder] = useState(null);
@@ -102,29 +65,30 @@ export default function AgentLayout() {
         setTimeout(() => setToast(null), 3500);
     }, []);
 
-    // Save orders to localStorage on any state change
+    // Save orders to agent-scoped localStorage on state changes
     useEffect(() => {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+            localStorage.setItem(storageKey, JSON.stringify(orders));
         } catch (e) {
             console.warn('[AgentLayout] Error saving orders to localStorage:', e);
         }
-    }, [orders]);
+    }, [orders, storageKey]);
 
     // Fetch live backend orders on mount
     const fetchBackendOrders = useCallback(async () => {
         try {
-            const backendOrders = await API.orders.getAll();
-            if (Array.isArray(backendOrders) && backendOrders.length > 0) {
-                setOrders(prev => {
-                    // Retain locally modified statuses if present
-                    const statusByOrderId = new Map();
-                    prev.forEach(o => {
-                        const key = o.orderId || o.id;
-                        statusByOrderId.set(key, o.status);
-                        if (o.rawId) statusByOrderId.set(o.rawId, o.status);
-                        if (o.id) statusByOrderId.set(o.id, o.status);
-                    });
+            if (API?.orders?.getAll) {
+                const backendOrders = await API.orders.getAll();
+                if (Array.isArray(backendOrders)) {
+                    setOrders(prev => {
+                        // Retain locally modified statuses if present
+                        const statusByOrderId = new Map();
+                        prev.forEach(o => {
+                            const key = o.orderId || o.id;
+                            statusByOrderId.set(key, o.status);
+                            if (o.rawId) statusByOrderId.set(o.rawId, o.status);
+                            if (o.id) statusByOrderId.set(o.id, o.status);
+                        });
 
                     const localMap = new Map();
 
@@ -160,8 +124,9 @@ export default function AgentLayout() {
                         });
                     });
 
-                    return Array.from(localMap.values());
-                });
+                        return Array.from(localMap.values());
+                    });
+                }
             }
         } catch (err) {
             console.warn('[AgentLayout] Backend orders fetch skipped (using offline state):', err?.message || err);
@@ -270,7 +235,8 @@ export default function AgentLayout() {
                         setAcceptModalOrder, 
                         setConfirmModalOrder,
                         refreshOrders: fetchBackendOrders,
-                        showToast
+                        showToast,
+                        user: currentUser
                     }} />
                 </main>
             </div>

@@ -34,22 +34,12 @@ const ISSUE_CATEGORIES = [
     }
 ];
 
-const INITIAL_RECENT_ISSUES = [
-    {
-        id: "RPT-9042",
-        orderId: "ORD-9280",
-        category: "Customer Unavailable / Phone Unreachable",
-        severity: "Medium",
-        description: "Called customer 3 times at gate; phone was switched off. Security guard confirmed recipient out of town.",
-        status: "Resolved",
-        timestamp: "Yesterday, 04:30 PM",
-    }
-];
-
 export default function ReportIssue() {
     const navigate = useNavigate();
     const outletContext = useOutletContext() || {};
     const orders = outletContext.orders || [];
+    const user = outletContext.user || {};
+    const issuesStorageKey = `swifttrack_agent_issues_${user.id || user.email || 'default'}`;
 
     const [selectedOrderId, setSelectedOrderId] = useState("");
     const [category, setCategory] = useState("customer_unavailable");
@@ -63,7 +53,16 @@ export default function ReportIssue() {
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
-    const [recentIssues, setRecentIssues] = useState(INITIAL_RECENT_ISSUES);
+    const [recentIssues, setRecentIssues] = useState(() => {
+        try {
+            const saved = localStorage.getItem(issuesStorageKey);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed)) return parsed;
+            }
+        } catch (_) {}
+        return [];
+    });
 
     useEffect(() => {
         if (orders.length > 0 && !selectedOrderId) {
@@ -131,7 +130,13 @@ export default function ReportIssue() {
             timestamp: "Just now",
         };
 
-        setRecentIssues((previous) => [newReport, ...previous]);
+        setRecentIssues((previous) => {
+            const updated = [newReport, ...previous];
+            try {
+                localStorage.setItem(issuesStorageKey, JSON.stringify(updated));
+            } catch (_) {}
+            return updated;
+        });
 
         setDescription("");
         setProofPhoto(null);

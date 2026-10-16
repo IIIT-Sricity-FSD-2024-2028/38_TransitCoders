@@ -539,6 +539,24 @@ export class OrdersService {
       [uuidv4(), orderId, reportedBy, type, description ?? null, new Date().toISOString()],
     );
   }
+  getAllMishaps(): Array<{
+    id: string;
+    orderId: string;
+    trackingId?: string;
+    customerName?: string;
+    reportedBy: string;
+    type: string;
+    description?: string;
+    createdAt: string;
+  }> {
+    return this.db.query<any>(
+      `SELECT m.id, m.orderId, m.reportedBy, m.type, m.description, m.createdAt,
+              o.trackingId, o.customerName, o.status as orderStatus
+       FROM mishaps m
+       LEFT JOIN orders o ON m.orderId = o.id
+       ORDER BY m.createdAt DESC`
+    );
+  }
 
   /**
    * "Send to different hub" (SRS Hub Manager). Records the transfer,

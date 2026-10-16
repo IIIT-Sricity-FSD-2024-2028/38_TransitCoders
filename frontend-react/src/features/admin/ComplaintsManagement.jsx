@@ -16,19 +16,42 @@ export default function ComplaintsManagement() {
     useEffect(() => {
         async function fetchComplaints() {
             try {
-                setLoading(true)
-                setError(null)
-                const response = await API.complaints.getAll()
-                setComplaints(Array.isArray(response) ? response : [])
+                setLoading(true);
+                setError(null);
+                
+                const [complaintsRes, mishapsRes] = await Promise.all([
+                    API.complaints.getAll().catch(() => []),
+                    API.mishaps.getAll().catch(() => [])
+                ]);
+
+                const formattedMishaps = (Array.isArray(mishapsRes) ? mishapsRes : []).map((m) => ({
+                    id: m.id,
+                    reference: m.trackingId || m.orderId?.slice(0, 8) || 'MISHAP',
+                    customerName: m.customerName || 'Delivery Incident',
+                    type: `Mishap: ${m.type.replace(/_/g, ' ')}`,
+                    description: m.description || 'Reported by delivery agent',
+                    priority: m.type === 'package_damaged' ? 'Critical' : 'High',
+                    status: 'Open',
+                    createdAt: m.createdAt,
+                    isMishap: true,
+                    orderId: m.orderId
+                }));
+
+                const allIssues = [
+                    ...(Array.isArray(complaintsRes) ? complaintsRes : []),
+                    ...formattedMishaps
+                ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                setComplaints(allIssues);
             } catch (err) {
-                console.error("Error fetching complaints:", err)
-                setError(err.message || "An error occurred while fetching complaints.")
+                console.error("Error fetching complaints & mishaps:", err);
+                setError(err.message || "An error occurred while fetching issues.");
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
         }
-        fetchComplaints()
-    },[])
+        fetchComplaints();
+    }, []);
 
     const filteredComplaints = useMemo(() => {
         return complaints.filter((complaint)=>{

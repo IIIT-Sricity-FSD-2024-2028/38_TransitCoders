@@ -51,6 +51,13 @@ export class OrdersController {
     if (status) orders = orders.filter((o) => o.status === status);
     return { success: true, data: orders };
   }
+  @Get('mishaps')
+  @Roles(Role.SUPER_USER, Role.ADMIN, Role.HUB_MANAGER)
+  @ApiOperation({ summary: 'List all delivery mishaps' })
+  @ApiResponse({ status: 200, description: 'Mishaps returned' })
+  getAllMishaps(): IApiResponse<any[]> {
+    return { success: true, data: this.ordersService.getAllMishaps() };
+  }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get order details (object-level access enforced)' })
