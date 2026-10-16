@@ -17,173 +17,31 @@ import {
     Check2Circle
 } from 'react-bootstrap-icons';
 
-const mockHistoricalDeliveries = [
-    {
-        id: "ORD-9280",
-        customer: "Vikram Das",
-        phone: "+91 99887 66554",
-        location: "8th Cross, Malleshwaram, Bengaluru",
-        origin: "Hub Central, Zone 4",
-        date: "2026-10-16",
-        deliveredTime: "10:15 AM",
-        period: "today",
-        status: "Delivered",
-        rating: 5,
-        feedback: "On time delivery and very courteous agent!",
-        amount: "₹320",
-        distance: "6.0 km",
-        timeTaken: "28 mins",
-        signatureVerified: true
-    },
-    {
-        id: "ORD-9279",
-        customer: "Anita Roy",
-        phone: "+91 98451 12340",
-        location: "Block 4, RMV 2nd Stage, Bengaluru",
-        origin: "Hub Central, Zone 4",
-        date: "2026-10-16",
-        deliveredTime: "09:40 AM",
-        period: "today",
-        status: "Delivered",
-        rating: 5,
-        feedback: "Package handled with extreme care.",
-        amount: "₹410",
-        distance: "4.5 km",
-        timeTaken: "22 mins",
-        signatureVerified: true
-    },
-    {
-        id: "ORD-9275",
-        customer: "Suresh Menon",
-        phone: "+91 97412 88990",
-        location: "Flat 302, Prestige Palms, Whitefield",
-        origin: "East Hub, Zone 2",
-        date: "2026-10-15",
-        deliveredTime: "04:30 PM",
-        period: "week",
-        status: "Delivered",
-        rating: 4,
-        feedback: "Prompt arrival, verified with OTP smoothly.",
-        amount: "₹520",
-        distance: "8.2 km",
-        timeTaken: "35 mins",
-        signatureVerified: true
-    },
-    {
-        id: "ORD-9270",
-        customer: "Meera Kulkarni",
-        phone: "+91 96321 44556",
-        location: "14th Main, Sector 3, HSR Layout",
-        origin: "Hub North, Koramangala",
-        date: "2026-10-14",
-        deliveredTime: "02:15 PM",
-        period: "week",
-        status: "Delivered",
-        rating: 5,
-        feedback: "Great service during heavy rain!",
-        amount: "₹290",
-        distance: "3.8 km",
-        timeTaken: "19 mins",
-        signatureVerified: true
-    },
-    {
-        id: "ORD-9264",
-        customer: "Arjun Reddy",
-        phone: "+91 95123 66778",
-        location: "22 Brigade Road, Ashok Nagar",
-        origin: "Hub Central, Zone 4",
-        date: "2026-10-12",
-        deliveredTime: "11:50 AM",
-        period: "week",
-        status: "Delivered",
-        rating: 5,
-        feedback: "Very polite delivery partner.",
-        amount: "₹380",
-        distance: "5.1 km",
-        timeTaken: "24 mins",
-        signatureVerified: true
-    },
-    {
-        id: "ORD-9258",
-        customer: "Divya Balaji",
-        phone: "+91 94481 99001",
-        location: "7th B Cross, Koramangala 4th Block",
-        origin: "Hub North, Koramangala",
-        date: "2026-10-10",
-        deliveredTime: "06:10 PM",
-        period: "week",
-        status: "Delivered",
-        rating: 4,
-        feedback: "Speedy delivery, highly satisfied.",
-        amount: "₹250",
-        distance: "2.7 km",
-        timeTaken: "15 mins",
-        signatureVerified: true
-    },
-    {
-        id: "ORD-9245",
-        customer: "Kiran Prasad",
-        phone: "+91 98801 22334",
-        location: "Villa 18, Palm Meadows, Whitefield",
-        origin: "East Hub, Zone 2",
-        date: "2026-10-04",
-        deliveredTime: "01:20 PM",
-        period: "month",
-        status: "Delivered",
-        rating: 5,
-        feedback: "Recipient signature recorded accurately.",
-        amount: "₹650",
-        distance: "9.4 km",
-        timeTaken: "40 mins",
-        signatureVerified: true
-    },
-    {
-        id: "ORD-9230",
-        customer: "Sneha Hegde",
-        phone: "+91 97312 33445",
-        location: "5th Phase, JP Nagar, Bengaluru",
-        origin: "South Hub, Zone 5",
-        date: "2026-09-28",
-        deliveredTime: "05:45 PM",
-        period: "month",
-        status: "Delivered",
-        rating: 5,
-        feedback: "Super quick delivery!",
-        amount: "₹340",
-        distance: "4.8 km",
-        timeTaken: "26 mins",
-        signatureVerified: true
-    }
-];
-
 export default function DeliveryHistory() {
     const context = useOutletContext() || {};
-    const liveDelivered = (context.orders || [])
-        .filter(o => o.status === 'delivered')
-        .map(o => ({
-            id: o.id,
-            customer: o.customer,
-            phone: o.phone || "+91 98765 00000",
-            location: o.destination || "Indiranagar, Bengaluru",
-            origin: o.origin || "Hub Central, Zone 4",
-            date: "Today",
-            deliveredTime: "Just now",
-            period: "today",
-            status: "Delivered",
-            rating: 5,
-            feedback: "Delivered successfully.",
-            amount: o.amount || "₹350",
-            distance: o.distance || "3.5 km",
-            timeTaken: "20 mins",
-            signatureVerified: true
-        }));
+    const liveDelivered = useMemo(() => {
+        return (context.orders || [])
+            .filter(o => o.status === 'delivered')
+            .map(o => ({
+                id: o.orderId || o.id,
+                customer: o.customer || 'Customer',
+                phone: o.phone || "+91 98765 00000",
+                location: o.destination || "Delivery Address",
+                origin: o.origin || "Hub Dispatch",
+                date: "Today",
+                deliveredTime: "Completed",
+                period: "today",
+                status: "Delivered",
+                rating: 5,
+                feedback: "Delivered successfully on schedule. Proof of delivery verified.",
+                amount: o.amount || "₹350",
+                distance: o.distance || "4.0 km",
+                timeTaken: "25 mins",
+                signatureVerified: true
+            }));
+    }, [context.orders]);
 
-    // Combine any delivered live items without duplicating IDs
-    const combinedDeliveries = useMemo(() => {
-        const existingIds = new Set(liveDelivered.map(d => d.id));
-        const filteredMock = mockHistoricalDeliveries.filter(m => !existingIds.has(m.id));
-        return [...liveDelivered, ...filteredMock];
-    }, [liveDelivered]);
+    const combinedDeliveries = liveDelivered;
 
     const [period, setPeriod] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
@@ -320,7 +178,11 @@ export default function DeliveryHistory() {
                     </div>
                     <div>
                         <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Payout</p>
-                        <p className="text-xl font-bold text-gray-900">₹2,860</p>
+                        <p className="text-xl font-bold text-gray-900">
+                            {combinedDeliveries.length > 0 
+                                ? `₹${combinedDeliveries.reduce((sum, d) => sum + (parseInt(String(d.amount).replace(/\D/g, '')) || 350), 0)}`
+                                : '₹0'}
+                        </p>
                     </div>
                 </div>
             </div>

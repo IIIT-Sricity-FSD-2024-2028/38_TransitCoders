@@ -361,6 +361,25 @@ export const API = {
     },
   },
 
+  // ── Agents ───────────────────────────────────────────────────────────────
+  agents: {
+    async getProfile(id) {
+      const res = await apiFetch(`/agents/${id}`);
+      return res.data;
+    },
+    async getWorklist(id) {
+      const res = await apiFetch(`/agents/${id}/worklist`);
+      return res.data;
+    },
+    async updateAvailability(id, availabilityStatus) {
+      const res = await apiFetch(`/agents/${id}/availability`, {
+        method: 'PATCH',
+        body: JSON.stringify({ availabilityStatus }),
+      });
+      return res.data;
+    },
+  },
+
   // ── Pricing — the SINGLE authoritative price calculator ───────────────────
   pricing: {
     async quote(serviceLevel, weightKg, paymentMode) {
