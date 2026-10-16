@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import RoleSelector from './RoleSelector';
 
 import AdminLayout from './features/admin/AdminLayout';
@@ -33,6 +33,10 @@ import AgentProfile from './features/agent/AgentProfile';
 import DashBoard from './features/hub-manager/DashBoard';
 
 import Login from "./pages/Login";
+import OrderQueue from "./features/hub-manager/OrderQueue";
+import Dispatch from "./features/hub-manager/Dispatch";
+import HubTransfer from "./features/hub-manager/HubTransfer";
+import Reports from "./features/hub-manager/Reports";
 
 // import AgentDashboard from "./components/agent/AgentDashboard"
 export default function App() {
@@ -50,7 +54,7 @@ export default function App() {
         <Route path="reports" element={<ReportsAnalytics />} />
         <Route path="financials" element={<FinancialAnalytics />} />
       </Route>
-      
+
       <Route path='/customer' element={<CustomerLayout />}>
         <Route path="dashboard" element={<CustomerDashboard />} />
         <Route path="orders" element={<CustomerOrders />} />
@@ -58,7 +62,12 @@ export default function App() {
         <Route path="support" element={<CustomerSupport />} />
       </Route>
 
+      <Route path="/hub" element={<Navigate to="/hub/dashboard" replace />} />
       <Route path="/hub/dashboard" element={<DashBoard />} />
+      <Route path="/hub/queue" element={<OrderQueue />} />
+      <Route path="/hub/dispatch" element={<Dispatch />} />
+      <Route path="/hub/transfer" element={<HubTransfer />} />
+      <Route path="/hub/reports" element={<Reports />} />
 
       <Route path="/merchant" element={<MerchantLayout />}>
         <Route path="dashboard" element={<MerchantDashboard />} />
