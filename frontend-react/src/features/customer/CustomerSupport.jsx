@@ -356,9 +356,8 @@ export default function CustomerSupport() {
                         )}
                     </div>
 
-                    <div className="pt-3 border-t border-gray-100 text-[11px] text-gray-400 flex items-center gap-1.5">
-                        <ShieldCheck size={14} className="text-emerald-500 shrink-0" />
-                        <span>Live backend complaints database connected</span>
+                    <div className="pt-3 border-t border-gray-100 flex items-center">
+                        <ShieldCheck size={16} className="text-emerald-500 shrink-0" title="Connected" />
                     </div>
                 </div>
             </div>
