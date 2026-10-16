@@ -2,52 +2,52 @@
 import { useEffect, useState } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import {
-  ExclamationTriangle,
-  CheckCircle,
-  Camera,
-  X,
-  ArrowLeft,
-  ClockHistory
+    ExclamationTriangle,
+    CheckCircle,
+    Camera,
+    X,
+    ArrowLeft,
+    ClockHistory
 } from "react-bootstrap-icons";
 import { API } from "../../services/api";
 
 const ISSUE_CATEGORIES = [
-  {
-    value: "CUSTOMER_UNAVAILABLE",
-    label: "Customer Unavailable / Phone Unreachable"
-  },
-  {
-    value: "DAMAGED_PACKAGE",
-    label: "Package Damaged In-Transit"
-  },
-  {
-    value: "ADDRESS_INCORRECT",
-    label: "Incorrect / Incomplete Delivery Address"
-  },
-  {
-    value: "VEHICLE_BREAKDOWN",
-    label: "Vehicle Breakdown / Transit Delay"
-  },
-  {
-    value: "CUSTOMER_REFUSED",
-    label: "Customer Refused Delivery"
-  },
-  {
-    value: "OTHER",
-    label: "Other Operational Issue"
-  }
+    {
+        value: "CUSTOMER_UNAVAILABLE",
+        label: "Customer Unavailable / Phone Unreachable"
+    },
+    {
+        value: "DAMAGED_PACKAGE",
+        label: "Package Damaged In-Transit"
+    },
+    {
+        value: "ADDRESS_INCORRECT",
+        label: "Incorrect / Incomplete Delivery Address"
+    },
+    {
+        value: "VEHICLE_BREAKDOWN",
+        label: "Vehicle Breakdown / Transit Delay"
+    },
+    {
+        value: "CUSTOMER_REFUSED",
+        label: "Customer Refused Delivery"
+    },
+    {
+        value: "OTHER",
+        label: "Other Operational Issue"
+    }
 ];
 
 const INITIAL_RECENT_ISSUES = [
-  {
-    id: "RPT-9042",
-    orderId: "ORD-9280",
-    category: "Customer Unavailable / Phone Unreachable",
-    severity: "Medium",
-    description: "Called customer 3 times at gate; phone was switched off. Security guard confirmed recipient out of town.",
-    status: "Resolved",
-    timestamp: "Yesterday, 04:30 PM",
-  }
+    {
+        id: "RPT-9042",
+        orderId: "ORD-9280",
+        category: "Customer Unavailable / Phone Unreachable",
+        severity: "Medium",
+        description: "Called customer 3 times at gate; phone was switched off. Security guard confirmed recipient out of town.",
+        status: "Resolved",
+        timestamp: "Yesterday, 04:30 PM",
+    }
 ];
 
 export default function ReportIssue() {
@@ -228,7 +228,7 @@ export default function ReportIssue() {
                                 const destination = order.destination || order.address || "";
                                 return (
                                     <option key={order.id} value={order.id}>
-                                        {order.id} &mdash; {customer} {destination ? `(${destination})` : ""} [{order.status}]
+                                        {order.orderId || order.id} &mdash; {customer} {destination ? `(${destination})` : ""} [{order.status}]
                                     </option>
                                 );
                             })
@@ -281,11 +281,10 @@ export default function ReportIssue() {
                                     key={level}
                                     type="button"
                                     onClick={() => setSeverity(level)}
-                                    className={`rounded-xl border py-2.5 px-3 text-xs font-bold transition-all cursor-pointer ${
-                                        severity === level
+                                    className={`rounded-xl border py-2.5 px-3 text-xs font-bold transition-all cursor-pointer ${severity === level
                                             ? activeClass
                                             : "border-gray-200 bg-gray-50/70 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                                    }`}
+                                        }`}
                                 >
                                     {level}
                                 </button>
@@ -467,11 +466,10 @@ export default function ReportIssue() {
                                     </div>
 
                                     <div className="flex items-center gap-2">
-                                        <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold border ${
-                                            issue.status === 'Resolved'
+                                        <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold border ${issue.status === 'Resolved'
                                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                                 : 'bg-amber-50 text-amber-700 border-amber-200'
-                                        }`}>
+                                            }`}>
                                             {issue.status}
                                         </span>
                                     </div>

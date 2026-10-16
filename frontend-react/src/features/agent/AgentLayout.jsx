@@ -18,11 +18,12 @@ import ConfirmDeliveryModal from '../../components/agent/ConfirmDeliveryModal';
 import AgentStatusBadge from '../../components/agent/AgentStatusBadge';
 import { API } from '../../services/api';
 
-const STORAGE_KEY = 'swifttrack_agent_orders_v1';
+const STORAGE_KEY = 'swifttrack_agent_orders_v3';
 
 const initialOrders = [
     {
         id: "ORD-9281",
+        orderId: "ORD-9281",
         customer: "Rahul Sharma",
         phone: "+91 98765 43210",
         origin: "Hub Central, Zone 4",
@@ -35,6 +36,7 @@ const initialOrders = [
     },
     {
         id: "ORD-9282",
+        orderId: "ORD-9282",
         customer: "Priya Nair",
         phone: "+91 91234 56789",
         origin: "Hub North, Koramangala",
@@ -47,6 +49,7 @@ const initialOrders = [
     },
     {
         id: "ORD-9280",
+        orderId: "ORD-9280",
         customer: "Vikram Das",
         phone: "+91 99887 66554",
         origin: "Hub Central, Zone 4",
@@ -114,8 +117,17 @@ export default function AgentLayout() {
             const backendOrders = await API.orders.getAll();
             if (Array.isArray(backendOrders) && backendOrders.length > 0) {
                 setOrders(prev => {
-                    const localMap = new Map(prev.map(o => [o.id, o]));
-                    
+                    // Retain locally modified statuses if present
+                    const statusByOrderId = new Map();
+                    prev.forEach(o => {
+                        const key = o.orderId || o.id;
+                        statusByOrderId.set(key, o.status);
+                        if (o.rawId) statusByOrderId.set(o.rawId, o.status);
+                        if (o.id) statusByOrderId.set(o.id, o.status);
+                    });
+
+                    const localMap = new Map();
+
                     backendOrders.forEach(bo => {
                         const rawStatus = (bo.status || '').toLowerCase();
                         let mappedStatus = 'pending';
@@ -127,24 +139,25 @@ export default function AgentLayout() {
                             mappedStatus = 'failed';
                         }
 
-                        const orderKey = bo.orderId || bo.id;
+                        // Order ID must be displayed (e.g. ORD-2024-0001), not the raw internal database UUID id
+                        const displayOrderId = bo.orderId || bo.order_id || bo.id;
+                        const preservedStatus = statusByOrderId.get(displayOrderId) || statusByOrderId.get(bo.id) || mappedStatus;
 
-                        // Only merge if not already tracked locally or update status
-                        if (!localMap.has(orderKey)) {
-                            localMap.set(orderKey, {
-                                id: orderKey,
-                                rawId: bo.id,
-                                customer: bo.customerName || bo.recipientName || bo.customer || 'Customer',
-                                phone: bo.customerPhone || bo.recipientPhone || bo.phone || '+91 98765 00000',
-                                origin: bo.pickupAddress || bo.origin || 'Central Hub, Zone 4',
-                                destination: bo.deliveryAddress || bo.destination || 'Indiranagar, Bengaluru',
-                                status: mappedStatus,
-                                priority: bo.priority || 'Standard',
-                                eta: mappedStatus === 'delivered' ? 'Delivered' : mappedStatus === 'in-transit' ? '30 mins' : 'Pending',
-                                amount: bo.amount ? `₹${bo.amount}` : '₹350',
-                                distance: bo.distance || '4.5 km'
-                            });
-                        }
+                        localMap.set(displayOrderId, {
+                            id: displayOrderId,
+                            orderId: displayOrderId,
+                            rawId: bo.id, // Keep the backend database UUID for updateStatus API calls
+                            trackingId: bo.trackingId || bo.tracking_id || displayOrderId,
+                            customer: bo.customerName || bo.recipientName || bo.customer || 'Customer',
+                            phone: bo.customerPhone || bo.recipientPhone || bo.phone || '+91 98765 00000',
+                            origin: bo.pickupAddress || bo.origin || 'Central Hub, Zone 4',
+                            destination: bo.deliveryAddress || bo.destination || 'Indiranagar, Bengaluru',
+                            status: preservedStatus,
+                            priority: bo.priority || 'Standard',
+                            eta: preservedStatus === 'delivered' ? 'Delivered' : preservedStatus === 'in-transit' ? '25 mins' : 'Pending',
+                            amount: bo.amount ? `₹${bo.amount}` : '₹350',
+                            distance: bo.distance || '4.5 km'
+                        });
                     });
 
                     return Array.from(localMap.values());
@@ -161,16 +174,20 @@ export default function AgentLayout() {
 
     // Handle accepting a delivery
     const handleConfirmAccept = async (orderId) => {
+        const target = orders.find(o => o.id === orderId || o.orderId === orderId || o.rawId === orderId);
+        const rawId = target?.rawId || target?.id || orderId;
+        const displayId = target?.orderId || target?.id || orderId;
+
         // Optimistic UI update
         setOrders(prev =>
-            prev.map(o => (o.id === orderId ? { ...o, status: 'in-transit', eta: '25 mins' } : o))
+            prev.map(o => (o.id === displayId || o.orderId === displayId || o.rawId === rawId ? { ...o, status: 'in-transit', eta: '25 mins' } : o))
         );
-        showToast(`Order #${orderId} accepted! Marked as In-Transit.`);
+        showToast(`Order #${displayId} accepted! Marked as In-Transit.`);
 
         // Sync with backend API
         try {
-            await API.orders.updateStatus(orderId, 'InTransit').catch(() => 
-                API.orders.updateStatus(orderId, 'PickedUp')
+            await API.orders.updateStatus(rawId, 'InTransit').catch(() => 
+                API.orders.updateStatus(rawId, 'PickedUp')
             );
         } catch (err) {
             console.warn('[handleConfirmAccept] Backend status update notice:', err?.message || err);
@@ -179,9 +196,13 @@ export default function AgentLayout() {
 
     // Handle confirming delivery with OTP and optional PoD photo
     const handleConfirmDelivery = async (orderId, details = {}) => {
+        const target = orders.find(o => o.id === orderId || o.orderId === orderId || o.rawId === orderId);
+        const rawId = target?.rawId || target?.id || orderId;
+        const displayId = target?.orderId || target?.id || orderId;
+
         // Optimistic UI update
         setOrders(prev =>
-            prev.map(o => (o.id === orderId ? { 
+            prev.map(o => (o.id === displayId || o.orderId === displayId || o.rawId === rawId ? { 
                 ...o, 
                 status: 'delivered', 
                 eta: 'Delivered',
@@ -189,18 +210,16 @@ export default function AgentLayout() {
                 verifiedOtp: details.otp || true
             } : o))
         );
-        showToast(`Order #${orderId} delivered and verified successfully!`);
+        showToast(`Order #${displayId} delivered and verified successfully!`);
 
         // Sync with backend
         try {
-            // Upload proof photo if attached
             if (details.photo) {
-                await API.agents.uploadPhoto(orderId, details.photo).catch(e => {
+                await API.agents.uploadPhoto(rawId, details.photo).catch(e => {
                     console.warn('[handleConfirmDelivery] PoD photo upload notice:', e?.message || e);
                 });
             }
-            // Update status on backend
-            await API.orders.updateStatus(orderId, 'Delivered').catch(e => {
+            await API.orders.updateStatus(rawId, 'Delivered').catch(e => {
                 console.warn('[handleConfirmDelivery] Backend status update notice:', e?.message || e);
             });
         } catch (err) {
@@ -239,7 +258,10 @@ export default function AgentLayout() {
                                 showToast(`Dispatch status set to: ${newStatus.replace('-', ' ')}`)
                             } 
                         />
-                    } 
+                    }
+                    showSearch={false}
+                    showNotification={false}
+                    profilePath="/agent/profile"
                 />
                 <main className="flex-1 p-6 md:p-8 overflow-y-auto bg-gray-100">
                     <Outlet context={{ 

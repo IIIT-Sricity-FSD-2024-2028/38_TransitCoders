@@ -180,15 +180,9 @@
   max-width: 440px;
 }
 
-/* Header with Title & Theme Switch */
+/* Header with Title */
 .auth-header {
   margin-bottom: 28px;
-}
-
-.auth-header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
 }
 
 .auth-header h1 {
@@ -205,36 +199,6 @@
   font-size: 14px;
   font-weight: 400;
   margin: 0;
-}
-
-/* Theme Switch Pill */
-.theme-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 14px;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  user-select: none;
-  font-size: 12px;
-  font-weight: 600;
-  color: #334155;
-  outline: none;
-  margin-top: 4px;
-}
-
-.theme-switch:hover {
-  background-color: #f1f5f9;
-  border-color: #cbd5e1;
-}
-
-.theme-switch-icon {
-  width: 13px;
-  height: 13px;
-  color: #64748b;
 }
 
 /* Form Groups & Inputs */
@@ -466,87 +430,7 @@
   flex-shrink: 0;
 }
 
-/* =========================================================================
-   Dark Mode Overrides
-   ========================================================================= */
 
-.auth-container.dark {
-  background-color: #0f172a;
-  color: #f8fafc;
-}
-
-.auth-container.dark .auth-right {
-  background-color: #0f172a;
-}
-
-.auth-container.dark .auth-header h1 {
-  color: #f8fafc;
-}
-
-.auth-container.dark .auth-header p {
-  color: #94a3b8;
-}
-
-.auth-container.dark .theme-switch {
-  background-color: #1e293b;
-  border-color: #334155;
-  color: #f8fafc;
-}
-
-.auth-container.dark .theme-switch:hover {
-  background-color: #334155;
-}
-
-.auth-container.dark .theme-switch-icon {
-  color: #fdba74;
-}
-
-.auth-container.dark .form-group label {
-  color: #f8fafc;
-}
-
-.auth-container.dark .form-input {
-  background-color: #1e293b;
-  border-color: #334155;
-  color: #f8fafc;
-}
-
-.auth-container.dark .form-input::placeholder {
-  color: #64748b;
-}
-
-.auth-container.dark .form-input:focus {
-  background-color: #0f172a;
-  border-color: #f97316;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.25);
-}
-
-.auth-container.dark .remember-me {
-  color: #cbd5e1;
-}
-
-.auth-container.dark .divider {
-  color: #64748b;
-}
-
-.auth-container.dark .divider::before,
-.auth-container.dark .divider::after {
-  background-color: #334155;
-}
-
-.auth-container.dark .google-btn {
-  background-color: #1e293b;
-  border-color: #334155;
-  color: #f8fafc;
-}
-
-.auth-container.dark .google-btn:hover {
-  background-color: #334155;
-}
-
-.auth-container.dark .auth-footer {
-  color: #94a3b8;
-}
 
 /* =========================================================================
    Responsive Design

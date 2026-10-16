@@ -30,9 +30,9 @@ export default function OrderCard({ order ,onAccept,onVerify}) {
                 {/* Top Header */}
                 <div className="flex justify-between items-start mb-3.5">
                     <div>
-                        <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Tracking ID</span>
+                        <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Order ID</span>
                         <h3 className="text-base font-bold text-gray-900 group-hover:text-orange-600 transition-colors">
-                            {order.id}
+                            {order.orderId || order.id}
                         </h3>
                     </div>
 

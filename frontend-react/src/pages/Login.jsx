@@ -11,11 +11,10 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [isDark, setIsDark] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Check saved theme or remember me email on load
+  // Check saved remember me email on load
   useEffect(() => {
     const savedEmail = localStorage.getItem('swifttrack_remembered_email');
     if (savedEmail) {
@@ -23,10 +22,6 @@ export default function Login() {
       setRememberMe(true);
     }
   }, []);
-
-  const toggleTheme = () => {
-    setIsDark((prev) => !prev);
-  };
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -72,7 +67,7 @@ export default function Login() {
   }
 
   return (
-    <div className={`auth-container ${isDark ? 'dark' : ''}`}>
+    <div className="auth-container">
       {/* Left Side: Branding & Hero Logistics Image */}
       <div className="auth-left">
         <div className="auth-overlay"></div>
@@ -111,44 +106,8 @@ export default function Login() {
       <div className="auth-right">
         <div className="auth-form-box">
           <div className="auth-header">
-            <div className="auth-header-row">
-              <div>
-                <h1>Welcome back</h1>
-                <p>Sign in to your account to continue</p>
-              </div>
-
-              {/* Dark/Light Mode Pill Switch */}
-              <button
-                type="button"
-                className="theme-switch"
-                onClick={toggleTheme}
-                aria-label="Toggle dark mode"
-              >
-                {isDark ? (
-                  <>
-                    <svg className="theme-switch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="5" />
-                      <line x1="12" y1="1" x2="12" y2="3" />
-                      <line x1="12" y1="21" x2="12" y2="23" />
-                      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                      <line x1="1" y1="12" x2="3" y2="12" />
-                      <line x1="21" y1="12" x2="23" y2="12" />
-                      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                    </svg>
-                    <span>Light</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="theme-switch-icon" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                    </svg>
-                    <span>Dark</span>
-                  </>
-                )}
-              </button>
-            </div>
+            <h1>Welcome back</h1>
+            <p>Sign in to your account to continue</p>
           </div>
 
           <form id="login-form" onSubmit={handleSubmit}>
