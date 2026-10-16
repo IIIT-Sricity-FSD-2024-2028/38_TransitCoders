@@ -1,8 +1,11 @@
-import { GeoAlt, Telephone, Clock, Cash, Truck, CheckCircle } from 'react-bootstrap-icons';
+import { useState } from 'react';
+import { GeoAlt, Telephone, Clock, Cash, Truck, CheckCircle, Compass } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
+import RouteModal from './RouteModal';
 
 export default function OrderCard({ order ,onAccept,onVerify}) {
     const navigate = useNavigate();
+    const [showRouteModal, setShowRouteModal] = useState(false);
 
     // Badge styles based on status
     const statusStyles = {
@@ -108,21 +111,45 @@ export default function OrderCard({ order ,onAccept,onVerify}) {
             {/* Action Buttons */}
             <div className="mt-1">
                 {order.status === 'pending' && (
-                    <button
-                        onClick={() => onAccept && onAccept(order)}
-                        className="w-full bg-orange-500 hover:bg-orange-600 active:scale-[0.99] text-white font-medium py-2.5 px-4 rounded-xl text-sm transition-all shadow-sm shadow-orange-500/20 cursor-pointer"
-                    >
-                        Accept Delivery
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setShowRouteModal(true)}
+                            className="px-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                            title="Preview delivery route"
+                        >
+                            <Compass size={13} className="text-gray-500" />
+                            <span>Route</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => onAccept && onAccept(order)}
+                            className="flex-1 bg-orange-500 hover:bg-orange-600 active:scale-[0.99] text-white font-medium py-2.5 px-4 rounded-xl text-sm transition-all shadow-sm shadow-orange-500/20 cursor-pointer"
+                        >
+                            Accept Delivery
+                        </button>
+                    </div>
                 )}
 
                 {order.status === 'in-transit' && (
-                    <button
-                        onClick={() =>  onVerify && onVerify(order)}
-                        className="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-medium py-2.5 px-4 rounded-xl text-sm transition-all shadow-sm shadow-blue-600/20 cursor-pointer"
-                    >
-                        Verify & Complete Delivery
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setShowRouteModal(true)}
+                            className="flex-1 bg-white hover:bg-blue-50/80 active:scale-[0.99] border border-blue-200 text-blue-700 font-semibold py-2.5 px-3 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                            title="Open turn-by-turn directions & navigation"
+                        >
+                            <Compass size={14} className="text-blue-600" />
+                            <span>Map</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => onVerify && onVerify(order)}
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-semibold py-2.5 px-3 rounded-xl text-xs transition-all shadow-sm shadow-blue-600/20 cursor-pointer"
+                        >
+                            Verify & Complete
+                        </button>
+                    </div>
                 )}
 
                 {order.status === 'delivered' && (
@@ -135,6 +162,13 @@ export default function OrderCard({ order ,onAccept,onVerify}) {
                     </button>
                 )}
             </div>
+
+            {/* Turn-by-Turn Route Navigation Modal */}
+            <RouteModal
+                isOpen={showRouteModal}
+                onClose={() => setShowRouteModal(false)}
+                order={order}
+            />
         </div>
     );
 }

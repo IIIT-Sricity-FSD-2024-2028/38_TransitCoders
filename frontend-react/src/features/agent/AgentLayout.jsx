@@ -15,6 +15,7 @@ import {
 
 import AcceptDeliveryModal from '../../components/agent/AcceptDeliveryModal';
 import ConfirmDeliveryModal from '../../components/agent/ConfirmDeliveryModal';
+import AgentStatusBadge from '../../components/agent/AgentStatusBadge';
 import { API } from '../../services/api';
 
 const STORAGE_KEY = 'swifttrack_agent_orders_v1';
@@ -216,7 +217,16 @@ export default function AgentLayout() {
             </Sidebar>
 
             <div className="flex-1 flex flex-col overflow-hidden">
-                <Topbar />
+                <Topbar 
+                    title="Delivery Agent Portal" 
+                    statusBadge={
+                        <AgentStatusBadge 
+                            onStatusChange={(newStatus) => 
+                                showToast(`Dispatch status set to: ${newStatus.replace('-', ' ')}`)
+                            } 
+                        />
+                    } 
+                />
                 <main className="flex-1 p-6 md:p-8 overflow-y-auto bg-gray-100">
                     <Outlet context={{ 
                         orders, 
