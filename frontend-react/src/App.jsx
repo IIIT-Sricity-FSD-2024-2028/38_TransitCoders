@@ -12,6 +12,9 @@ import FinancialAnalytics from './features/admin/FinancialAnalytics';
 
 import CustomerLayout from './features/customer/CustomerLayout';
 import CustomerDashboard from './features/customer/CustomerDashboard';
+import CustomerOrders from './features/customer/CustomerOrders';
+import CustomerTracking from './features/customer/CustomerTracking';
+import CustomerSupport from './features/customer/CustomerSupport';
 
 import MerchantLayout from './features/merchant/MerchantLayout';
 import MerchantDashboard from './features/merchant/MerchantDashboard';
@@ -49,7 +52,10 @@ export default function App() {
       </Route>
       
       <Route path='/customer' element={<CustomerLayout />}>
-        <Route path="dashboard" element={<CustomerDashboard />} />        
+        <Route path="dashboard" element={<CustomerDashboard />} />
+        <Route path="orders" element={<CustomerOrders />} />
+        <Route path="tracking" element={<CustomerTracking />} />
+        <Route path="support" element={<CustomerSupport />} />
       </Route>
 
       <Route path="/hub/dashboard" element={<DashBoard />} />
