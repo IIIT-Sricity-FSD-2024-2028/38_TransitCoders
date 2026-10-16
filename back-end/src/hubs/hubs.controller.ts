@@ -41,7 +41,7 @@ export class HubsController {
 
   @Get(':id/agents')
   @UseGuards(RolesGuard)
-  @Roles(Role.HUB_MANAGER, Role.SUPER_USER)
+  @Roles(Role.HUB_MANAGER, Role.SUPER_USER, Role.ADMIN)
   @ApiOperation({ summary: 'List delivery agents for a specific hub' })
   @ApiHeader({ name: 'x-auth-token', required: true })
   @ApiResponse({ status: 200, description: 'Agents retrieved for hub' })

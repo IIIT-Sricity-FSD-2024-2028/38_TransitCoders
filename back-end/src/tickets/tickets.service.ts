@@ -39,8 +39,8 @@ export class TicketsService {
 
   update(id: string, dto: UpdateTicketDto, user: IUser): ITicket {
     const ticket = this.findById(id);
-    // Only the owning merchant or a super_user may update
-    if (ticket.merchantId !== user.id && user.role !== Role.SUPER_USER) {
+    // Only the owning merchant or a super_user or admin may update
+    if (ticket.merchantId !== user.id && ![Role.SUPER_USER, Role.ADMIN].includes(user.role)) {
       throw new ForbiddenException('You do not own this ticket');
     }
     return this.ticketsRepository.update(id, dto)!;
@@ -48,7 +48,7 @@ export class TicketsService {
 
   delete(id: string, user: IUser): void {
     const ticket = this.findById(id);
-    // Only the owning merchant may delete
+    // Only the owning merchant or super user may delete
     if (ticket.merchantId !== user.id && user.role !== Role.SUPER_USER) {
       throw new ForbiddenException('You do not own this ticket');
     }

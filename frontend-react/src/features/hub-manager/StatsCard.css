@@ -1,0 +1,47 @@
+.stats-card {
+    width: 100%;
+    min-width: 0;
+    background-color: #fff;
+    padding : 20px;
+    border : 1px solid #e5e7eb;
+    box-shadow : 0px  4px 6px rgba(0, 0, 0, 0.1);
+    border-radius : 8px;
+}
+
+
+.stats-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.stats-card:nth-child(1) .stats-icon {
+    color: #f97316;
+}
+
+.stats-card:nth-child(2) .stats-icon {
+    color: #eab308;
+}
+
+.stats-card:nth-child(3) .stats-icon {
+    color: #16a34a;
+}
+
+.stats-card:nth-child(4) .stats-icon {
+    color: #2563eb;
+}
+
+.stats-label {
+    color: #6b7280;
+    margin: 0 0 8px;
+}
+.stats-value {
+    font-size: 26px;
+    margin: 0 0 8px;
+    color: #111827;
+}
+
+.stats-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}

@@ -98,40 +98,61 @@ const Orders = (() => {
     Modal.open('edit-shipment-modal');
   }
 
-  function saveEdit() {
+  async function saveEdit() {
     const form = document.getElementById('edit-shipment-form');
     if (!Validator.validateForm(form)) {
       showToast('Please fix the errors before saving.', 'error');
       return;
     }
 
-    const id = document.getElementById('edit-ship-id').value;
-    const updated = MockDB.updateShipment(id, {
-      recipient: document.getElementById('edit-recipient').value.trim(),
-      origin:    document.getElementById('edit-origin').value.trim(),
-      dest:      document.getElementById('edit-dest').value.trim(),
-      service:   document.getElementById('edit-service').value,
-      weight:    document.getElementById('edit-weight').value + ' kg',
-      amount:    '₹' + parseFloat(document.getElementById('edit-amount').value).toFixed(2),
-      status:    document.getElementById('edit-status').value,
-    });
+    const trackingId = document.getElementById('edit-ship-id').value;
+    // Find the real backend UUID from AppState
+    const state = window.AppState ? window.AppState.getState() : { orders: [] };
+    const canonical = state.orders.find(o => o.tracking_id === trackingId || o.order_id === trackingId);
+    const backendId = canonical ? (canonical.id || trackingId) : trackingId;
 
-    if (updated) {
+    const payload = {
+      customerName: document.getElementById('edit-recipient').value.trim(),
+      pickupAddress: document.getElementById('edit-origin').value.trim(),
+      deliveryAddress: document.getElementById('edit-dest').value.trim(),
+      packageType: document.getElementById('edit-service').value,
+      weight: parseFloat(document.getElementById('edit-weight').value) || 1,
+    };
+
+    try {
+      if (window.API && window.API.orders && backendId) {
+        await window.API.orders.update(backendId, payload);
+        if (window.AppState) await window.AppState.refresh();
+      }
       Modal.close('edit-shipment-modal');
       render();
       showToast('Shipment updated successfully!');
+    } catch (err) {
+      console.error('[Orders] update failed:', err?.message || err);
+      showToast('Update failed \u2014 ' + (err?.message || 'server error'), 'error');
     }
   }
 
-  /* ── DELETE ── */
+  /* ── DELETE / CANCEL ── */
   async function confirmDelete(id) {
-    const ok = await Confirm.show('Delete Shipment', `Are you sure you want to delete shipment ${id}? This action cannot be undone.`);
+    const ok = await Confirm.show('Cancel Shipment', `Are you sure you want to cancel shipment ${id}? This cannot be undone.`);
     if (!ok) return;
-    const deleted = MockDB.deleteShipment(id);
-    if (deleted) {
+
+    const state = window.AppState ? window.AppState.getState() : { orders: [] };
+    const canonical = state.orders.find(o => o.tracking_id === id || o.order_id === id);
+    const backendId = canonical ? (canonical.id || id) : id;
+
+    try {
+      if (window.API && window.API.orders && backendId) {
+        await window.API.orders.cancel(backendId);
+        if (window.AppState) await window.AppState.refresh();
+      }
       render();
-      Dashboard.render();
-      showToast('Shipment deleted.', 'warning');
+      if (typeof Dashboard !== 'undefined' && Dashboard.render) Dashboard.render();
+      showToast('Shipment cancelled.', 'warning');
+    } catch (err) {
+      console.error('[Orders] cancel failed:', err?.message || err);
+      showToast('Cancel failed \u2014 ' + (err?.message || 'server error'), 'error');
     }
   }
 

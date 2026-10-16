@@ -1,11 +1,13 @@
 /**
- * Feedback Review — wired to backend API
- * Falls back to StorageAPI if backend is offline.
+ * Feedback Review — wired to backend API exclusively.
+ * Bug Fix F10: Removed StorageAPI fallback. All data now comes from the
+ * NestJS backend via window.API.feedback.*. Network errors are logged and
+ * shown to the user instead of silently falling back to stale localStorage.
  */
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const tableBody   = document.getElementById("feedbackTableBody");
-  const searchInput = document.getElementById("searchInput");
+  const tableBody    = document.getElementById("feedbackTableBody");
+  const searchInput  = document.getElementById("searchInput");
   const ratingFilter = document.getElementById("ratingFilter");
   const statusFilter = document.getElementById("statusFilter");
 
@@ -24,64 +26,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const usersById = getUsersById();
       const raw = await window.API.feedback.getAll();
-      feedbackList = raw.map((f, index) => ({
+      feedbackList = (raw || []).map((f, index) => ({
         id: f.id,
         reference: f.reference || buildReference("FDBK", index),
         customer: f.customerName || usersById.get(f.userId)?.name || f.userId || 'Customer',
-        rating: f.rating,
+        rating: Number(f.rating) || 0,
         comment: f.comments || f.comment || '—',
         status: f.status || 'New',
-        date: new Date(f.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric' }),
+        date: f.createdAt ? new Date(f.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : '—',
         _raw: f,
       }));
-    } catch (_) {
-      // fallback: normalize StorageAPI feedback shape
-      try {
-        const usersById = getUsersById();
-        const raw = StorageAPI?.getFeedback?.() || [];
-        feedbackList = raw.map((c, index) => ({
-          id: c.id || c._id || ('FB-' + Date.now().toString().slice(-6)),
-          reference: c.reference || buildReference('FDBK', index),
-          customer: c.customerName || c.customer || usersById.get(c.userId)?.name || c.userId || 'Customer',
-          rating: c.rating || c.value || 0,
-          comment: c.comments || c.comment || '—',
-          status: c.status || 'New',
-          date: c.date ? new Date(c.date).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : (c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : ''),
-          _raw: c,
-        }));
-      } catch (e) {
-        feedbackList = StorageAPI?.getFeedback?.() || [];
+    } catch (err) {
+      console.error('[feedback.js] Failed to fetch feedback from backend:', err?.message || err);
+      if (typeof window.showToast === 'function') {
+        window.showToast('Failed to load feedback. Is the backend running?', 'error');
       }
+      feedbackList = [];
     }
-      const usersById = getUsersById();
-      const safe = (v, fallback) => {
-        if (v === undefined || v === null) return fallback;
-        if (typeof v === 'string' && v.trim().toLowerCase() === 'undefined') return fallback;
-        return v;
-      };
-
-      // Try backend then merge with local storage entries
-      let backendList = [];
-      try {
-        backendList = await window.API.feedback.getAll() || [];
-      } catch (e) { backendList = []; }
-
-      const localList = (StorageAPI?.getFeedback?.() || []);
-      const merged = [...backendList];
-      for (const l of localList) {
-        if (!merged.find(b => b && (b.id === l.id || b.id === l._id))) merged.push(l);
-      }
-
-      feedbackList = merged.map((c, index) => ({
-        id: safe(c.id || c._id, 'FB-' + Date.now().toString().slice(-6)),
-        reference: safe(c.reference, buildReference('FDBK', index)),
-        customer: safe(c.customerName, safe(c.customer, usersById.get(c.userId)?.name || c.userId || 'Customer')),
-        rating: safe(c.rating, c.value || 0),
-        comment: safe(c.comments, c.comment || '—'),
-        status: safe(c.status, 'New'),
-        date: c.date ? new Date(c.date).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : (c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : ''),
-        _raw: c,
-      }));
   }
 
   function renderTable() {
@@ -124,8 +85,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         const id = e.currentTarget.dataset.id;
         try {
           await window.API.feedback.update(id, { status: 'Reviewed' });
-        } catch (_) {
-          StorageAPI?.updateFeedbackStatus?.(id, 'Reviewed');
+        } catch (err) {
+          console.error('[feedback.js] Failed to update feedback status:', err?.message || err);
+          if (typeof window.showToast === 'function') window.showToast('Failed to update feedback.', 'error');
         }
         await loadFeedback();
         renderTable();

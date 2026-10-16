@@ -8,17 +8,17 @@ export class CreateShipmentDto {
   recipient?: string;
 
   @ApiProperty() @IsString() @IsNotEmpty()
-  originHubId: string;
+  originHubId!: string;
 
   @ApiProperty() @IsString() @IsNotEmpty()
-  destinationHubId: string;
+  destinationHubId!: string;
 
   @ApiProperty({ enum: ['standard', 'express', 'same-day'] })
   @IsEnum(['standard', 'express', 'same-day'])
-  serviceType: 'standard' | 'express' | 'same-day';
+  serviceType!: 'standard' | 'express' | 'same-day';
 
   @ApiProperty() @IsNumber() @Min(0.1)
-  weight: number;
+  weight!: number;
 
   @ApiProperty({ required: false }) @IsString() @IsOptional()
   merchantId?: string;

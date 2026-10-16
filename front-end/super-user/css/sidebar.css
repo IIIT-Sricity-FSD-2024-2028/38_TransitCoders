@@ -230,3 +230,6 @@ body.dark .logout-btn:hover {
     stroke-linecap: round;
     stroke-linejoin: round;
 }
+
+body[data-role='admin'] [data-role-restrict='super_user'] { display: none !important; }
+

@@ -5,6 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { ShipmentsRepository } from './shipments.repository';
+import { PricingService } from '../pricing/pricing.service';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { UpdateShipmentDto } from './dto/update-shipment.dto';
 import { IShipment } from './interfaces/shipment.interface';
@@ -13,13 +14,16 @@ import { Role } from '../common/constants/roles.constant';
 
 @Injectable()
 export class ShipmentsService {
-  constructor(private readonly shipmentsRepository: ShipmentsRepository) {}
+  constructor(
+    private readonly shipmentsRepository: ShipmentsRepository,
+    private readonly pricingService: PricingService,
+  ) {}
 
   findAll(user: IUser): IShipment[] {
     if (user.role === Role.MERCHANT) {
       return this.shipmentsRepository.findByMerchant(user.id);
     }
-    if (user.role === Role.SUPER_USER || user.role === Role.HUB_MANAGER) {
+    if ([Role.SUPER_USER, Role.ADMIN, Role.HUB_MANAGER].includes(user.role)) {
       return this.shipmentsRepository.findAll();
     }
     throw new ForbiddenException('You do not have permission to view shipments');
@@ -32,17 +36,15 @@ export class ShipmentsService {
   }
 
   create(dto: CreateShipmentDto, user: IUser): IShipment {
-    const merchantId = user.role === Role.SUPER_USER && dto.merchantId
+    const merchantId = [Role.SUPER_USER, Role.ADMIN].includes(user.role) && dto.merchantId
       ? dto.merchantId
       : user.id;
 
-    const rateMap: Record<string, number> = {
-      standard: 50,
-      express: 100,
-      'same-day': 200,
-    };
-    const rate = rateMap[dto.serviceType] ?? 50;
-    const amount = Math.max(dto.weight * rate, 100);
+    // Authoritative backend pricing (same engine as orders)
+    const amount = this.pricingService.calculateTotal({
+      serviceLevel: dto.serviceType,
+      weightKg: dto.weight,
+    });
 
     const shipmentId = this.shipmentsRepository.nextShipmentId();
 
@@ -69,21 +71,15 @@ export class ShipmentsService {
 
   update(id: string, dto: UpdateShipmentDto, user: IUser): IShipment {
     const shipment = this.findById(id);
-    if (shipment.merchantId !== user.id && user.role !== Role.SUPER_USER) {
+    if (shipment.merchantId !== user.id && ![Role.SUPER_USER, Role.ADMIN].includes(user.role)) {
       throw new ForbiddenException('You do not have permission to update this shipment');
     }
 
     let amount = shipment.amount;
     if (dto.weight !== undefined || dto.serviceType !== undefined) {
-      const rateMap: Record<string, number> = {
-        standard: 50,
-        express: 100,
-        'same-day': 200,
-      };
       const serviceType = dto.serviceType ?? shipment.serviceType;
       const weight = dto.weight ?? shipment.weight;
-      const rate = rateMap[serviceType] ?? 50;
-      amount = Math.max(weight * rate, 100);
+      amount = this.pricingService.calculateTotal({ serviceLevel: serviceType, weightKg: weight });
     }
 
     return this.shipmentsRepository.update(shipment.id, { ...dto, amount })!;
@@ -91,7 +87,7 @@ export class ShipmentsService {
 
   cancel(id: string, user: IUser): IShipment {
     const shipment = this.findById(id);
-    if (shipment.merchantId !== user.id && user.role !== Role.SUPER_USER) {
+    if (shipment.merchantId !== user.id && ![Role.SUPER_USER, Role.ADMIN].includes(user.role)) {
       throw new ForbiddenException('Only the merchant or super user can cancel this shipment');
     }
     if (!['pending', 'processing'].includes(shipment.status)) {

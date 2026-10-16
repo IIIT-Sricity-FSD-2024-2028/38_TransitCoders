@@ -9,6 +9,7 @@ import { UsersRepository } from '../users/users.repository';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { IUser } from '../users/interfaces/user.interface';
+import { AppLogger } from '../common/logger/app.logger';
 
 /**
  * AuthService — ODDT-233, ODDT-234, ODDT-235
@@ -71,5 +72,21 @@ export class AuthService {
     if (user) {
       this.usersRepository.update(user.id, { authToken: undefined });
     }
+  }
+
+  /**
+   * Forgot-password: checks if email is registered and logs the attempt.
+   * Always returns silently — no user enumeration (same response for
+   * registered and unregistered emails). A real deployment would queue an
+   * SMTP reset email here.
+   */
+  forgotPassword(email: string): void {
+    const user = this.usersRepository.findByEmail(email);
+    if (user) {
+      AppLogger.info(`Forgot-password requested for registered email: ${email} (userId: ${user.id})`);
+    } else {
+      AppLogger.warn(`Forgot-password requested for unknown email: ${email}`);
+    }
+    // No-op: real implementation would send an email with a time-limited reset token.
   }
 }

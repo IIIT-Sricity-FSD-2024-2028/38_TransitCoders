@@ -4,7 +4,10 @@
  */
 
 document.addEventListener("DOMContentLoaded", async () => {
-    await StorageAPI.init();
+    // Wait for backend hydration — no StorageAPI needed
+    if (window.AppState && typeof window.AppState.hydrate === 'function') {
+        await window.AppState.hydrate();
+    }
     
     // Check if PermissionsConfig is loaded, if not wait a bit or error
     if (typeof window.PermissionsConfig === 'undefined') {
@@ -33,12 +36,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Load data
     function loadData() {
-        const storedRoles = StorageAPI.getRoles();
-        // Fallback to default configs if stored array is missing IDs (legacy state.js seed) or length mismatch
+        // Read roles from live AppState (backend-hydrated)
+        const storedRoles = (window.AppState ? window.AppState.getState().roles : []) || [];
+        // Fallback to default configs if backend returned nothing
         if (storedRoles && storedRoles.length > 0 && storedRoles[0].id) {
             activeRoles = JSON.parse(JSON.stringify(storedRoles));
-            
-            // Auto-append any new roles from default config not currently in DB
+
+            // Auto-append any new roles from default config not currently in backend
             defaultRoles.forEach(dRole => {
                 if (!activeRoles.find(ar => ar.id === dRole.id)) {
                     activeRoles.push(JSON.parse(JSON.stringify(dRole)));
@@ -46,14 +50,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         } else {
             activeRoles = JSON.parse(JSON.stringify(defaultRoles));
-            // Immediately migrate the legacy state silently
-            if (typeof window.AppState !== 'undefined') {
-                const s = window.AppState.getState();
-                s.roles = activeRoles;
-                window.AppState.saveState(s);
-            }
         }
-        
+
         // Select 'admin' by default if possible, else first
         const adminIdx = activeRoles.findIndex(r => r.id === 'admin');
         selectedRoleIndex = adminIdx >= 0 ? adminIdx : 0;
@@ -203,19 +201,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // Save
+    // Save — persist each role to the backend
     if (saveBtn) {
-        saveBtn.addEventListener('click', () => {
-            // Save entire active array to ensure new default roles propagate
-            if (typeof window.AppState !== 'undefined') {
-                const s = window.AppState.getState();
-                s.roles = JSON.parse(JSON.stringify(activeRoles));
-                window.AppState.saveState(s);
-            }
+        saveBtn.addEventListener('click', async () => {
+            const promises = activeRoles.map(role => {
+                const id = role.roleId || role.id;
+                if (!id || !window.API || !window.API.roles) return Promise.resolve();
+                return window.API.roles.update(id, { permissions: role.permissions }).catch(err => {
+                    console.error(`[roles-permissions.js] Failed to update role ${id}:`, err?.message);
+                });
+            });
+            await Promise.all(promises);
+
             saveBtn.disabled = true;
             if (typeof window.showToast === 'function') {
                 showToast("Permissions successfully updated.", "success");
             }
+            // Refresh from backend
+            if (window.AppState) await window.AppState.refresh();
         });
     }
 

@@ -1,0 +1,83 @@
+.dispatch-page {
+    padding: 0;
+}
+
+.dispatch-page > p {
+color: #64748b;
+}
+
+.dispatch-order {
+    background : white;
+    padding: 15px;
+    margin-bottom: 12px;
+    margin-top: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.dispatch-order h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.dispatch-order p {
+    margin: 6px 0;
+    color: #64748b;
+}
+
+.dispatch-order button {
+    padding: 9px 14px;
+    background: #ff6b1a;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor : pointer;
+}
+
+
+.recent-orders {
+    margin-top: 30px;
+}
+
+.recent-orders-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.recent-orders-heading h2 {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.recent-orders-heading a {
+    color: #ff6b1a;
+    text-decoration: none;
+}
+
+.recent-order-card {
+    background: white;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.recent-order-card h3 {
+    margin-top: 0;
+}
+
+.recent-order-card p {
+    color: #666;
+}
+
+.recent-order-card button {
+    padding: 8px 12px;
+    background: white;
+    color: #ff6b1a;
+    border: 1px solid #ff6b1a;
+    border-radius: 6px;
+    cursor: pointer;
+}

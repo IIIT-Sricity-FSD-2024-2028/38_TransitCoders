@@ -1,0 +1,61 @@
+.order-queue {
+    padding: 0;
+}
+
+.queue-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.queue-filter button {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    cursor: pointer;
+}
+
+.queue-filter button:hover {
+    background-color: #f3f4f6;
+}
+
+.queue-filter button.active {
+    background-color: #ff6b1a;
+    color: #fff;
+    border-color: #ff6b1a;
+}
+
+.queue-search-container {
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.queue-search-input {
+    width: 100%;
+    max-width: 420px;
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.queue-search-input:focus {
+    border-color: #ff6b1a;
+}
+
+.queue-status-msg {
+    color: #6b7280;
+    font-size: 14px;
+    padding: 24px 0;
+}
+
+.queue-error-msg {
+    color: #dc2626;
+    font-size: 14px;
+    padding: 12px 0;
+}

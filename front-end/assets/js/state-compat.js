@@ -81,9 +81,11 @@
     /* Helper: get logged-in agent's user_id from session */
     function _getAgentId() {
         try {
-            var sess = JSON.parse(sessionStorage.getItem('user') || sessionStorage.getItem('st_session') || '{}');
-            return sess.user_id || 'U_AGT_102';
-        } catch(e) { return 'U_AGT_102'; }
+            // 'user' is the canonical session key (st_session was removed in auth.js)
+            var raw = sessionStorage.getItem('user') || localStorage.getItem('user') || '{}';
+            var sess = JSON.parse(raw);
+            return sess.user_id || sess.id || '';
+        } catch(e) { return ''; }
     }
 
     /* 1. window.mockData (Hub Manager proxy) */

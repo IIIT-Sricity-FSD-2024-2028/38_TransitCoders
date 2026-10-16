@@ -6,6 +6,8 @@ front-end/node_modules/
 # Build outputs
 dist/
 backend/dist/
+backend/logs/
+backend/uploads/
 front-end/dist/
 build/
 .next/

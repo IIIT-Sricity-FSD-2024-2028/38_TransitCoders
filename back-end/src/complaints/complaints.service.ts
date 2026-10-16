@@ -28,6 +28,8 @@ export class ComplaintsService {
       id: complaint.id,
       customerName: user ? user.name : complaint.userId,
       orderId: (complaint as any).orderId,
+      type: complaint.type,
+      priority: complaint.priority,
       description: complaint.description,
       status: complaint.status,
       createdAt: complaint.createdAt,
@@ -54,19 +56,28 @@ export class ComplaintsService {
     const created = this.complaintsRepository.create({
       ...dto,
       userId: user.id,
+      priority: dto.priority ?? 'Medium', // Fallback ensures it's never undefined
       status: 'Open',
     });
-    // compute reference using current count
     const all = this.complaintsRepository.findAll();
     return this.toResponse(created, all.findIndex((x) => x.id === created.id));
   }
 
   update(id: string, dto: UpdateComplaintDto, user: IUser): ComplaintResponseDto {
-    this.complaintsRepository.findById(id); // throws NotFoundException if missing
-    if (user.role !== Role.SUPER_USER) {
-      throw new ForbiddenException('Only super_user can update complaint status');
+    const existing = this.complaintsRepository.findById(id);
+    if (!existing) {
+      throw new NotFoundException(`Complaint ${id} not found`);
     }
-    const updated = this.complaintsRepository.update(id, dto)!;
+
+    if (![Role.SUPER_USER, Role.ADMIN, Role.HUB_MANAGER].includes(user.role)) {
+      throw new ForbiddenException('Only admin-level users can update complaint status');
+    }
+
+    const updated = this.complaintsRepository.update(id, dto);
+    if (!updated) {
+      throw new NotFoundException(`Complaint ${id} could not be updated`);
+    }
+
     return this.toResponse(updated, 0);
   }
 }

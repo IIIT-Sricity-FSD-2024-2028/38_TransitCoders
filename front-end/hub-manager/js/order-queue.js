@@ -150,12 +150,13 @@ function openAgentModal(orderId) {
   openModal("agentModal");
 }
 
-function assignAgentDirect(orderId, agentId) {
-  if (!setOrderAssignment(orderId, agentId, window.SwiftTrackEnums.OrderStatus.ASSIGNED)) return;
+async function assignAgentDirect(orderId, agentId) {
+  var ok = await setOrderAssignment(orderId, agentId, window.SwiftTrackEnums.OrderStatus.ASSIGNED);
+  if (!ok) return;
   closeModal("agentModal");
   showSuccessTick("Agent assigned");
   showToast("Agent assigned to " + orderId, "success");
-  loadQueue();
+  setTimeout(loadQueue, 600);
 }
 
 function openTransferModal(orderId) {
@@ -174,19 +175,21 @@ function openTransferModal(orderId) {
   openModal("approveTransferModal");
 }
 
-function confirmTransfer() {
+async function confirmTransfer() {
   if (!selectedTransferOrder) return;
   var select = document.getElementById("transferHubSelect");
   if (!select || !select.value) {
     showToast("Select destination hub", "error");
     return;
   }
-  setOrderHub(selectedTransferOrder.order_id, select.value);
   closeModal("approveTransferModal");
-  showSuccessTick("Transfer updated");
-  showToast("Order transferred to " + getHubName(select.value), "success");
+  var ok = await setOrderHub(selectedTransferOrder.order_id, select.value, 'Hub transfer via Order Queue');
+  if (ok) {
+    showSuccessTick("Transfer updated");
+    showToast("Order transferred to " + getHubName(select.value), "success");
+    setTimeout(loadQueue, 600);
+  }
   selectedTransferOrder = null;
-  loadQueue();
 }
 
 function viewOrder(orderId) {

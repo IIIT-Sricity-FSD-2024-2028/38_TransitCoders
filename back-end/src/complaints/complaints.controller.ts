@@ -30,8 +30,8 @@ export class ComplaintsController {
   constructor(private readonly complaintsService: ComplaintsService) {}
 
   @Get()
-  @Roles(Role.CUSTOMER, Role.SUPER_USER)
-  @ApiOperation({ summary: 'List complaints (customer sees own, super_user sees all)' })
+  @Roles(Role.CUSTOMER, Role.SUPER_USER, Role.ADMIN, Role.HUB_MANAGER)
+  @ApiOperation({ summary: 'List complaints (customer sees own, hub manager + super_user see all)' })
   @ApiResponse({ status: 200, type: [ComplaintResponseDto] })
   findAll(@CurrentUser() user: IUser): IApiResponse<ComplaintResponseDto[]> {
     return { success: true, data: this.complaintsService.findAll(user) };
@@ -48,9 +48,9 @@ export class ComplaintsController {
   }
 
   @Put(':id')
-  @Roles(Role.SUPER_USER)
-  @ApiOperation({ summary: 'Update complaint status (super_user only)' })
-  @ApiResponse({ status: 403, description: 'Not super_user' })
+  @Roles(Role.SUPER_USER, Role.ADMIN, Role.HUB_MANAGER)
+  @ApiOperation({ summary: 'Update complaint status (hub manager or super_user — SRS: hub managers resolve complaints)' })
+  @ApiResponse({ status: 403, description: 'Not authorized' })
   update(
     @Param('id') id: string,
     @Body() dto: UpdateComplaintDto,

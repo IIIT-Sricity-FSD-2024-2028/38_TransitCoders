@@ -91,28 +91,82 @@ const BookShipment = (() => {
   }
 
   /* ── CONFIRM & SUBMIT ── */
-  function confirmOrder() {
-    // Generate tracking ID
-    const newShipment = MockDB.addShipment({
-      recipient: document.getElementById('recv-name')?.value.trim() || 'Customer',
-      origin:    document.getElementById('pickup-city')?.value.trim() + ', ' + document.getElementById('pickup-state')?.value.trim(),
-      dest:      document.getElementById('recv-city')?.value.trim(),
-      service:   (s => s.charAt(0).toUpperCase() + s.slice(1))(document.querySelector('.service-opt.active')?.dataset.val || 'express'),
-      weight:    (document.getElementById('pkg-weight')?.value || '1') + ' kg',
-      amount:    document.getElementById('sum-total')?.textContent || '₹0.00',
-      status:    'pending',
-    });
+  async function confirmOrder() {
+    // Read session — merchant is the logged-in user
+    let session = {};
+    try { session = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user') || '{}'); } catch (_) {}
 
-    // Show tracking ID on final step
-    const tidEl = document.getElementById('confirmed-tracking-id');
-    if (tidEl) tidEl.textContent = newShipment.id;
+    const serviceEl  = document.querySelector('.service-opt.active');
+    const serviceVal = serviceEl?.dataset.val || 'express'; // standard | express | overnight→sameday
+    // Backend accepts: standard, express, sameday
+    const serviceLevel = serviceVal === 'overnight' ? 'sameday' : serviceVal;
 
-    const dateEl = document.getElementById('confirmed-date');
-    if (dateEl) dateEl.textContent = document.getElementById('pickup-date')?.value || 'TBD';
+    const pickupCity  = document.getElementById('pickup-city')?.value.trim()  || '';
+    const pickupState = document.getElementById('pickup-state')?.value.trim() || '';
+    const recvCity    = document.getElementById('recv-city')?.value.trim()    || '';
+    const recvAddr    = document.getElementById('recv-address')?.value.trim() || '';
+    const recvName    = document.getElementById('recv-name')?.value.trim()    || 'Customer';
+    const recvPhone   = document.getElementById('recv-phone')?.value.trim()   || '';
+    const weightKg    = parseFloat(document.getElementById('pkg-weight')?.value) || 1.0;
+    const pkgType     = document.getElementById('pkg-type')?.value.trim()     || 'Standard';
+    const isCOD       = document.getElementById('cod-check')?.checked;
 
-    nextStep();
-    showToast('Shipment booked successfully! 🎉');
-    Dashboard.render();
+    // merchantId from session; customerId = merchant's own ID for this academic project
+    // (the merchant portal creates B2B shipments — customer is the merchant themselves)
+    const merchantId  = session.user_id || session.id || '';
+    const customerId  = merchantId; // fallback: merchant is also the billing customer
+
+    if (!merchantId) {
+      showToast('Session expired — please log in again', 'error');
+      return;
+    }
+
+    const orderPayload = {
+      merchantId,
+      customerId,
+      customerName:     recvName,
+      customerPhone:    recvPhone,
+      pickupAddress:    pickupCity + (pickupState ? ', ' + pickupState : ''),
+      deliveryAddress:  recvAddr   || recvCity,
+      weight:           weightKg,
+      serviceLevel,
+      packageType:      pkgType,
+      paymentMode:      isCOD ? 'COD' : 'Prepaid',
+      priority:         serviceLevel === 'sameday' ? 'High' : 'Medium',
+    };
+
+    // Disable confirm button while in flight
+    const confirmBtn = document.querySelector('.wizard-btn-primary');
+    if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = 'Booking...'; }
+
+    try {
+      let order = null;
+      if (window.API && window.API.orders) {
+        order = await window.API.orders.create(orderPayload);
+      }
+
+      // Show tracking ID on final step
+      const trackingId = order?.trackingId || order?.tracking_id || ('SWT-' + Date.now().toString().slice(-6));
+      const tidEl = document.getElementById('confirmed-tracking-id');
+      if (tidEl) tidEl.textContent = trackingId;
+
+      const dateEl = document.getElementById('confirmed-date');
+      if (dateEl) dateEl.textContent = document.getElementById('pickup-date')?.value || 'TBD';
+
+      nextStep();
+      showToast('Shipment booked successfully! 🎉');
+
+      // Refresh state so dashboard reflects the new order
+      if (window.AppState) window.AppState.refresh().then(() => {
+        if (typeof Dashboard !== 'undefined' && Dashboard.render) Dashboard.render();
+      });
+
+    } catch (err) {
+      console.error('[BookShipment] create failed:', err?.message || err);
+      showToast('Failed to book shipment — please try again', 'error');
+    } finally {
+      if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = 'Confirm & Book'; }
+    }
   }
 
   /* ── INIT ── */

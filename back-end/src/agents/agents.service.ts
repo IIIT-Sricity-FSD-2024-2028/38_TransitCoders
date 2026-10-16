@@ -20,14 +20,16 @@ export class AgentsService {
   }
 
   findById(id: string): IAgentProfile {
-    const agent = this.agentsRepository.findById(id);
+    // Accept either the agent-profile id or the underlying user id —
+    // the frontend session only knows the user id.
+    const agent = this.agentsRepository.findById(id) ?? this.agentsRepository.findByUserId(id);
     if (!agent) throw new NotFoundException('Agent not found');
     return agent;
   }
 
   getWorklist(id: string, user: IUser): IOrder[] {
     const agent = this.findById(id);
-    if (user.id !== agent.userId && user.role !== Role.SUPER_USER && user.role !== Role.HUB_MANAGER) {
+    if (user.id !== agent.userId && ![Role.SUPER_USER, Role.ADMIN, Role.HUB_MANAGER].includes(user.role)) {
       throw new ForbiddenException('You can only view your own worklist');
     }
     return this.ordersRepository.findByAgent(agent.userId);

@@ -35,10 +35,10 @@ window.Auth = {
     if (window.API) {
       await window.API.auth.logout();
     } else {
-      window.API.Token.clear();
+      // Fallback when api.js is not loaded — clear session manually
+      localStorage.removeItem('x-auth-token');
       localStorage.removeItem('user');
       sessionStorage.removeItem('user');
-      sessionStorage.removeItem('st_session');
       localStorage.removeItem('userRole');
     }
     const isRoot = window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/');
@@ -99,13 +99,14 @@ async function handleLogin(form) {
     };
     localStorage.setItem("user", JSON.stringify(userData));
     sessionStorage.setItem("user", JSON.stringify(userData));
-    sessionStorage.setItem("st_session", JSON.stringify(userData));
+    // st_session removed — sessionStorage('user') is the canonical session key
     localStorage.setItem("userRole", user.role);
 
     showToast("Login successful!", "success");
 
     const routeMap = {
       super_user:     "../super-user/dashboard.html",
+      admin:          "../super-user/dashboard.html",
       hub_manager:    "../hub-manager/dashboard.html",
       merchant:       "../merchant/merchant.html",
       customer:       "../customer/index.html",
@@ -114,33 +115,9 @@ async function handleLogin(form) {
     setTimeout(() => { window.location.href = routeMap[user.role] || "../index.html"; }, 1500);
 
   } catch (err) {
-    // Backend down or bad creds — try mock fallback so frontend keeps working standalone
-    console.warn("Backend login failed:", err.message, "— trying mock fallback");
-    _mockLoginFallback(email, password);
+    console.error("Backend login failed:", err);
+    showToast(err?.message || "Login failed", "error");
   }
-}
-
-/** Fallback: use mockData if backend is unreachable (dev only) */
-function _mockLoginFallback(email, password) {
-  let users = [];
-  if (window.AppState?.getState) users = window.AppState.getState().users || [];
-  else if (window.mockData?.users) users = window.mockData.users;
-
-  const match = users.find(u =>
-    String(u.email).toLowerCase() === email.toLowerCase() && u.password === password
-  );
-  if (!match) { showToast("Invalid credentials", "error"); return; }
-  if (!match.active) { showToast("Account pending approval", "error"); return; }
-
-  const userData = { user_id: match.user_id, name: match.name, email: match.email, role: match.role, hub_id: match.hub_id || null };
-  localStorage.setItem("user", JSON.stringify(userData));
-  sessionStorage.setItem("user", JSON.stringify(userData));
-  sessionStorage.setItem("st_session", JSON.stringify(userData));
-  localStorage.setItem("userRole", match.role);
-  showToast("Login successful! (offline mode)", "success");
-
-  const routeMap = { super_user:"../super-user/dashboard.html", hub_manager:"../hub-manager/dashboard.html", merchant:"../merchant/merchant.html", customer:"../customer/index.html", delivery_agent:"../delivery-agent/worklist.html", admin:"../hub-manager/dashboard.html" };
-  setTimeout(() => { window.location.href = routeMap[match.role] || "../index.html"; }, 1500);
 }
 
 // ─── Register ─────────────────────────────────────────────────────────────────
