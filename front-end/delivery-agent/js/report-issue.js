@@ -279,12 +279,19 @@ function bindFormSubmit() {
         const orderRef = DeliveryData.getOrderById(numericId);
         const backendOrderId = orderRef ? orderRef._ref : null;
 
-        const issueType   = report.issueType;
+        const rawType = report.issueType;
+        const typeMap = {
+            package: 'package_damaged',
+            unavailable: 'customer_unavailable',
+            refused: 'other',
+            other: 'other'
+        };
+        const mishapType = typeMap[rawType] || 'other';
         const description = JSON.stringify(report.details); // serialise sub-fields as description
 
         if (backendOrderId && window.API && window.API.orders) {
             try {
-                await window.API.orders.reportMishap(backendOrderId, issueType, description);
+                await window.API.orders.reportMishap(backendOrderId, mishapType, description);
                 if (window.AppState) window.AppState.refresh();
                 showModal('report-success-modal');
             } catch (err) {

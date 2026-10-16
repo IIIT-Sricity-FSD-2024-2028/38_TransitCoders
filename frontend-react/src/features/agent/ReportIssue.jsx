@@ -2,52 +2,48 @@
 import { useEffect, useState } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import {
-  ExclamationTriangle,
-  CheckCircle,
-  Camera,
-  X,
-  ArrowLeft,
-  ClockHistory
+    ExclamationTriangle,
+    CheckCircle,
+    Camera,
+    X,
+    ArrowLeft,
+    ClockHistory
 } from "react-bootstrap-icons";
 import { API } from "../../services/api";
 
 const ISSUE_CATEGORIES = [
-  {
-    value: "CUSTOMER_UNAVAILABLE",
-    label: "Customer Unavailable / Phone Unreachable"
-  },
-  {
-    value: "DAMAGED_PACKAGE",
-    label: "Package Damaged In-Transit"
-  },
-  {
-    value: "ADDRESS_INCORRECT",
-    label: "Incorrect / Incomplete Delivery Address"
-  },
-  {
-    value: "VEHICLE_BREAKDOWN",
-    label: "Vehicle Breakdown / Transit Delay"
-  },
-  {
-    value: "CUSTOMER_REFUSED",
-    label: "Customer Refused Delivery"
-  },
-  {
-    value: "OTHER",
-    label: "Other Operational Issue"
-  }
+    {
+        value: "customer_unavailable",
+        label: "Customer Unavailable / Phone Unreachable"
+    },
+    {
+        value: "package_damaged",
+        label: "Package Damaged In-Transit"
+    },
+    {
+        value: "address_not_found",
+        label: "Incorrect / Incomplete Delivery Address"
+    },
+    {
+        value: "vehicle_breakdown",
+        label: "Vehicle Breakdown / Transit Delay"
+    },
+    {
+        value: "other",
+        label: "Customer Refused / Other Operational Issue"
+    }
 ];
 
 const INITIAL_RECENT_ISSUES = [
-  {
-    id: "RPT-9042",
-    orderId: "ORD-9280",
-    category: "Customer Unavailable / Phone Unreachable",
-    severity: "Medium",
-    description: "Called customer 3 times at gate; phone was switched off. Security guard confirmed recipient out of town.",
-    status: "Resolved",
-    timestamp: "Yesterday, 04:30 PM",
-  }
+    {
+        id: "RPT-9042",
+        orderId: "ORD-9280",
+        category: "Customer Unavailable / Phone Unreachable",
+        severity: "Medium",
+        description: "Called customer 3 times at gate; phone was switched off. Security guard confirmed recipient out of town.",
+        status: "Resolved",
+        timestamp: "Yesterday, 04:30 PM",
+    }
 ];
 
 export default function ReportIssue() {
@@ -56,7 +52,7 @@ export default function ReportIssue() {
     const orders = outletContext.orders || [];
 
     const [selectedOrderId, setSelectedOrderId] = useState("");
-    const [category, setCategory] = useState("CUSTOMER_UNAVAILABLE");
+    const [category, setCategory] = useState("customer_unavailable");
     const [severity, setSeverity] = useState("Medium");
     const [description, setDescription] = useState("");
 
@@ -71,7 +67,10 @@ export default function ReportIssue() {
 
     useEffect(() => {
         if (orders.length > 0 && !selectedOrderId) {
-            setSelectedOrderId(orders[0].id);
+            const activeOrder = orders.find(
+                (o) => !['delivered', 'failed', 'cancelled'].includes((o.status || '').toLowerCase())
+            );
+            setSelectedOrderId(activeOrder ? (activeOrder.orderId || activeOrder.id) : (orders[0].orderId || orders[0].id));
         }
     }, [orders, selectedOrderId]);
 
@@ -97,18 +96,29 @@ export default function ReportIssue() {
             (item) => item.value === category
         );
 
+        const selectedOrder = orders.find(
+            (o) => o.id === selectedOrderId || o.orderId === selectedOrderId
+        );
+        const targetId = selectedOrder?.rawId || selectedOrderId;
+
         try {
             if (API?.orders?.reportMishap) {
                 await API.orders.reportMishap(
-                    selectedOrderId,
+                    targetId,
                     category,
                     description.trim()
-                ).catch((err) => {
-                    console.warn("Issue API call fallback:", err);
-                });
+                );
+                if (outletContext?.refreshOrders) {
+                    await outletContext.refreshOrders();
+                }
             }
         } catch (error) {
-            console.warn("Issue API unavailable; using local demo mode.", error);
+            console.warn("Issue API report error:", error);
+            if (error?.message) {
+                setErrorMessage(error.message);
+                setSubmitting(false);
+                return;
+            }
         }
 
         const newReport = {
@@ -228,7 +238,7 @@ export default function ReportIssue() {
                                 const destination = order.destination || order.address || "";
                                 return (
                                     <option key={order.id} value={order.id}>
-                                        {order.id} &mdash; {customer} {destination ? `(${destination})` : ""} [{order.status}]
+                                        {order.orderId || order.id} &mdash; {customer} {destination ? `(${destination})` : ""} [{order.status}]
                                     </option>
                                 );
                             })
@@ -281,11 +291,10 @@ export default function ReportIssue() {
                                     key={level}
                                     type="button"
                                     onClick={() => setSeverity(level)}
-                                    className={`rounded-xl border py-2.5 px-3 text-xs font-bold transition-all cursor-pointer ${
-                                        severity === level
+                                    className={`rounded-xl border py-2.5 px-3 text-xs font-bold transition-all cursor-pointer ${severity === level
                                             ? activeClass
                                             : "border-gray-200 bg-gray-50/70 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                                    }`}
+                                        }`}
                                 >
                                     {level}
                                 </button>
@@ -467,11 +476,10 @@ export default function ReportIssue() {
                                     </div>
 
                                     <div className="flex items-center gap-2">
-                                        <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold border ${
-                                            issue.status === 'Resolved'
+                                        <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold border ${issue.status === 'Resolved'
                                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                                 : 'bg-amber-50 text-amber-700 border-amber-200'
-                                        }`}>
+                                            }`}>
                                             {issue.status}
                                         </span>
                                     </div>

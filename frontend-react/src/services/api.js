@@ -81,27 +81,27 @@ export const API = {
     async create(data) {
       const res = await apiFetch('/users', { method: 'POST', body: JSON.stringify(data) });
       if (window.AppState) {
-          const s = window.AppState.getState();
-          s.users.push({ 
-              ...data, 
-              user_id: res.data.id, 
-              hub_id: data.hubId || null, 
-              active: true 
-          });
-          window.AppState.saveState(s);
+        const s = window.AppState.getState();
+        s.users.push({
+          ...data,
+          user_id: res.data.id,
+          hub_id: data.hubId || null,
+          active: true
+        });
+        window.AppState.saveState(s);
       }
       return res.data;
     },
     async update(id, data) {
       const res = await apiFetch(`/users/${id}`, { method: 'PUT', body: JSON.stringify(data) });
       if (window.AppState) {
-          const s = window.AppState.getState();
-          const u = s.users.find(x => x.user_id === id);
-          if (u) { 
-              Object.assign(u, data); 
-              if (data.hubId !== undefined) u.hub_id = data.hubId;
-              window.AppState.saveState(s); 
-          }
+        const s = window.AppState.getState();
+        const u = s.users.find(x => x.user_id === id);
+        if (u) {
+          Object.assign(u, data);
+          if (data.hubId !== undefined) u.hub_id = data.hubId;
+          window.AppState.saveState(s);
+        }
       }
       return res.data;
     },
@@ -123,18 +123,18 @@ export const API = {
     async create(data) {
       const res = await apiFetch('/tickets', { method: 'POST', body: JSON.stringify(data) });
       if (window.AppState) {
-          const s = window.AppState.getState();
-          s.tickets.push({ ...data, id: res.data.id });
-          window.AppState.saveState(s);
+        const s = window.AppState.getState();
+        s.tickets.push({ ...data, id: res.data.id });
+        window.AppState.saveState(s);
       }
       return res.data;
     },
     async update(id, data) {
       const res = await apiFetch(`/tickets/${id}`, { method: 'PUT', body: JSON.stringify(data) });
       if (window.AppState) {
-          const s = window.AppState.getState();
-          const t = s.tickets.find(x => x.id === id);
-          if (t) { Object.assign(t, data); window.AppState.saveState(s); }
+        const s = window.AppState.getState();
+        const t = s.tickets.find(x => x.id === id);
+        if (t) { Object.assign(t, data); window.AppState.saveState(s); }
       }
       return res.data;
     },
@@ -152,18 +152,18 @@ export const API = {
     async create(data) {
       const res = await apiFetch('/complaints', { method: 'POST', body: JSON.stringify(data) });
       if (window.AppState) {
-          const s = window.AppState.getState();
-          s.complaints.push({ ...data, id: res.data.id });
-          window.AppState.saveState(s);
+        const s = window.AppState.getState();
+        s.complaints.push({ ...data, id: res.data.id });
+        window.AppState.saveState(s);
       }
       return res.data;
     },
     async update(id, data) {
       const res = await apiFetch(`/complaints/${id}`, { method: 'PUT', body: JSON.stringify(data) });
       if (window.AppState) {
-          const s = window.AppState.getState();
-          const c = s.complaints.find(x => x.id === id);
-          if (c) { Object.assign(c, data); window.AppState.saveState(s); }
+        const s = window.AppState.getState();
+        const c = s.complaints.find(x => x.id === id);
+        if (c) { Object.assign(c, data); window.AppState.saveState(s); }
       }
       return res.data;
     },
@@ -178,18 +178,18 @@ export const API = {
     async create(data) {
       const res = await apiFetch('/feedback', { method: 'POST', body: JSON.stringify(data) });
       if (window.AppState) {
-          const s = window.AppState.getState();
-          s.feedback.push({ ...data, id: res.data.id });
-          window.AppState.saveState(s);
+        const s = window.AppState.getState();
+        s.feedback.push({ ...data, id: res.data.id });
+        window.AppState.saveState(s);
       }
       return res.data;
     },
     async update(id, data) {
       const res = await apiFetch(`/feedback/${id}`, { method: 'PUT', body: JSON.stringify(data) });
       if (window.AppState) {
-          const s = window.AppState.getState();
-          const f = s.feedback.find(x => x.id === id);
-          if (f) { Object.assign(f, data); window.AppState.saveState(s); }
+        const s = window.AppState.getState();
+        const f = s.feedback.find(x => x.id === id);
+        if (f) { Object.assign(f, data); window.AppState.saveState(s); }
       }
       return res.data;
     },
@@ -220,7 +220,7 @@ export const API = {
       const token = Token.get();
       const formData = new FormData();
       formData.append('photo', file);
-      
+
       const res = await fetch(`${API_BASE}/agents/${id}/delivery-photo`, {
         method: 'POST',
         headers: { 'x-auth-token': token }, // FormData automatically sets multipart/form-data with boundary
@@ -320,9 +320,27 @@ export const API = {
       return res.data;
     },
     async reportMishap(id, type, description) {
+      const typeMap = {
+        vehicle_breakdown: 'vehicle_breakdown',
+        vehicle: 'vehicle_breakdown',
+        traffic: 'vehicle_breakdown',
+        address_not_found: 'address_not_found',
+        address_incorrect: 'address_not_found',
+        address: 'address_not_found',
+        customer_unavailable: 'customer_unavailable',
+        unavailable: 'customer_unavailable',
+        package_damaged: 'package_damaged',
+        damaged_package: 'package_damaged',
+        package: 'package_damaged',
+        damaged: 'package_damaged',
+        customer_refused: 'other',
+        refused: 'other',
+        other: 'other',
+      };
+      const cleanType = typeMap[(type || '').trim().toLowerCase()] || 'other';
       const res = await apiFetch(`/orders/${id}/mishap`, {
         method: 'POST',
-        body: JSON.stringify({ type, description }),
+        body: JSON.stringify({ type: cleanType, description: description || '' }),
       });
       return res.data;
     },

@@ -43,7 +43,7 @@ export default function ConfirmDeliveryModal({ isOpen, onClose, order, onConfirm
         <div className="flex justify-between items-start pb-4 border-b border-gray-100">
           <div>
             <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Proof of Delivery (PoD)</span>
-            <h2 className="text-xl font-bold text-gray-900 mt-0.5">Order #{order.id}</h2>
+            <h2 className="text-xl font-bold text-gray-900 mt-0.5">Order #{order.orderId || order.id}</h2>
           </div>
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 cursor-pointer">
             <X size={20} />

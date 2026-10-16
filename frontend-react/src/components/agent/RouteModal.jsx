@@ -16,7 +16,7 @@ export default function RouteModal({ isOpen, onClose, order }) {
                             <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-bold">Fastest Route</span>
                         </div>
                         <h3 className="text-lg font-bold flex items-center gap-2 mt-0.5">
-                            <Compass className="animate-spin-slow" /> Directions for #{order.id}
+                            <Compass className="animate-spin-slow" /> Directions for #{order.orderId || order.id}
                         </h3>
                     </div>
                     <button 
