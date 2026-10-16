@@ -1,53 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChatDots, Envelope, Telephone, PlusLg } from 'react-bootstrap-icons';
+import { fetchMerchantTickets, createMerchantTicket } from '../../services/merchantHelpers';
 
 /**
  * MerchantSupport
  * 
  * Merchant customer support and helpdesk portal:
  * - 3 Dedicated channels (Live Chat, Email Support, Phone Assistance)
- * - Support tickets table with status and priority tags
- * - Modal to log new merchant support tickets
+ * - Support tickets table loaded from backend SQLite database
+ * - Modal to log new merchant support tickets directly to database
  */
 export default function MerchantSupport() {
-  const [tickets, setTickets] = useState([
-    {
-      id: 'TCK-2026-041',
-      subject: 'Address change for order SWT-2026-98471',
-      category: 'Delivery',
-      date: '28 Mar 2026',
-      status: 'OPEN',
-      priority: 'HIGH'
-    },
-    {
-      id: 'TCK-2026-039',
-      subject: 'Billing query for March invoice',
-      category: 'Billing',
-      date: '24 Mar 2026',
-      status: 'RESOLVED',
-      priority: 'MEDIUM'
-    }
-  ]);
-
+  const [tickets, setTickets] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newSubject, setNewSubject] = useState('');
   const [newCategory, setNewCategory] = useState('Delivery');
   const [newDesc, setNewDesc] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleCreateTicket(e) {
+  // Fetch real tickets from backend SQLite database on mount
+  useEffect(() => {
+    fetchMerchantTickets().then((liveTickets) => {
+      if (Array.isArray(liveTickets)) setTickets(liveTickets);
+    });
+  }, []);
+
+  async function handleCreateTicket(e) {
     e.preventDefault();
-    if (!newSubject) return;
+    if (!newSubject.trim()) return;
 
-    const newTicket = {
-      id: `TCK-2026-0${Math.floor(42 + Math.random() * 50)}`,
-      subject: newSubject,
-      category: newCategory,
-      date: 'Today',
-      status: 'OPEN',
-      priority: 'MEDIUM',
-    };
+    setIsSubmitting(true);
+    try {
+      await createMerchantTicket({
+        subject: newSubject.trim(),
+        category: newCategory,
+        description: newDesc.trim(),
+      });
+      // Refresh tickets from backend database
+      const refreshed = await fetchMerchantTickets();
+      setTickets(refreshed);
+    } catch (err) {
+      console.error('Failed to create ticket in database:', err);
+    }
 
-    setTickets([newTicket, ...tickets]);
+    setIsSubmitting(false);
     setShowModal(false);
     setNewSubject('');
     setNewDesc('');
@@ -137,21 +133,29 @@ export default function MerchantSupport() {
             </tr>
           </thead>
           <tbody className="divide-y divide-[#E5E7EB]">
-            {tickets.map((t) => (
-              <tr key={t.id} className="hover:bg-[#F9FAFB]">
-                <td className="px-5 py-3.5 font-mono font-semibold text-[#F97316]">{t.id}</td>
-                <td className="px-5 py-3.5 font-medium text-[#111827]">{t.subject}</td>
-                <td className="px-5 py-3.5 text-[#6B7280]">{t.category}</td>
-                <td className="px-5 py-3.5 text-[#6B7280]">{t.date}</td>
-                <td className="px-5 py-3.5">
-                  <span className={`inline-block px-2 py-0.5 rounded-full font-bold text-[10px] ${
-                    t.status === 'OPEN' ? 'bg-[#FEF3C7] text-[#D97706]' : 'bg-[#D1FAE5] text-[#059669]'
-                  }`}>
-                    {t.status}
-                  </span>
+            {tickets.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-5 py-8 text-center text-gray-400">
+                  No support tickets found in database. Click &quot;New Ticket&quot; to create one.
                 </td>
               </tr>
-            ))}
+            ) : (
+              tickets.map((t) => (
+                <tr key={t.id} className="hover:bg-[#F9FAFB]">
+                  <td className="px-5 py-3.5 font-mono font-semibold text-[#F97316]">{t.id}</td>
+                  <td className="px-5 py-3.5 font-medium text-[#111827]">{t.subject}</td>
+                  <td className="px-5 py-3.5 text-[#6B7280]">{t.category}</td>
+                  <td className="px-5 py-3.5 text-[#6B7280]">{t.date}</td>
+                  <td className="px-5 py-3.5">
+                    <span className={`inline-block px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                      t.status === 'OPEN' ? 'bg-[#FEF3C7] text-[#D97706]' : 'bg-[#D1FAE5] text-[#059669]'
+                    }`}>
+                      {t.status}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

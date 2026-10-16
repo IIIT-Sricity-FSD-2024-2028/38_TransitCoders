@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
   BoxSeam, 
   CheckCircle, 
@@ -14,7 +14,7 @@ import KPICard from '../../components/shared/KPICard';
 import AdminTable from '../../components/admin/AdminTable';
 import OrderStatusBadge from '../../components/merchant/OrderStatusBadge';
 import ShippingLabelModal from '../../components/merchant/ShippingLabelModal';
-import { loadOrders, setActiveTracking } from '../../services/merchantHelpers';
+import { loadOrders, fetchMerchantOrders, setActiveTracking } from '../../services/merchantHelpers';
 
 /**
  * MerchantDashboard
@@ -24,16 +24,29 @@ import { loadOrders, setActiveTracking } from '../../services/merchantHelpers';
  * latest shipment widget, and recent shipments table.
  */
 export default function MerchantDashboard() {
-  const navigate = useNavigate();
-
-  // Orders list and selected order for shipping label modal preview
+  // Orders list, label preview modal state, and backend connection indicator
   const [orders, setOrders] = useState([]);
   const [selectedLabelOrder, setSelectedLabelOrder] = useState(null);
+  const [isBackendConnected, setIsBackendConnected] = useState(false);
 
-  // Load orders from localStorage on mount
+  // Load orders on mount (instant local render + live backend API sync)
   useEffect(() => {
+    // 1. Instant render from local cache
     const savedOrders = loadOrders();
     setOrders(savedOrders);
+
+    // 2. Fetch live database records from backend API
+    let isMounted = true;
+    fetchMerchantOrders().then((liveOrders) => {
+      if (isMounted && Array.isArray(liveOrders)) {
+        setOrders(liveOrders);
+        setIsBackendConnected(true);
+      }
+    }).catch(() => {
+      if (isMounted) setIsBackendConnected(false);
+    });
+
+    return () => { isMounted = false; };
   }, []);
 
   // Compute overview metrics and status breakdown
@@ -49,12 +62,6 @@ export default function MerchantDashboard() {
   const transitPct = total > 0 ? Math.round((transit / total) * 100) : 0;
   const pendingPct = total > 0 ? Math.round((pending / total) * 100) : 0;
   const cancelledPct = total > 0 ? Math.round((cancelled / total) * 100) : 0;
-
-  // Navigate to shipment tracking page
-  function handleTrackOrder(order) {
-    setActiveTracking(order);
-    navigate('/merchant/track');
-  }
 
   // Recent shipments table columns
   const recentColumns = [
@@ -83,7 +90,7 @@ export default function MerchantDashboard() {
       header: 'Route',
       render: (row) => (
         <span className="text-gray-500 text-xs">
-          {row.origin || 'Chennai'} → {row.destination || 'Bengaluru'}
+          {row.origin || 'Origin'} → {row.destination || 'Destination'}
         </span>
       ),
     },
@@ -106,21 +113,25 @@ export default function MerchantDashboard() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Merchant Overview</h1>
-            <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-              LIVE DATA
+            <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
+              isBackendConnected 
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                : 'bg-amber-50 text-amber-700 border-amber-200'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${isBackendConnected ? 'bg-emerald-500 animate-ping' : 'bg-amber-400'}`}></span>
+              {isBackendConnected ? 'BACKEND CONNECTED' : 'LOCAL CACHE MODE'}
             </span>
           </div>
           <p className="text-sm text-gray-500 mt-1">Real-time dispatch metrics and shipment health</p>
         </div>
         {/* New Shipment CTA */}
-        <button
-          onClick={() => navigate('/merchant/book')}
+        <Link
+          to="/merchant/book"
           className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-semibold shadow-sm transition-colors"
         >
           <Plus size={18} />
           <span>New Shipment</span>
-        </button>
+        </Link>
       </div>
 
       {/* ── KPI Metric Cards ── */}
@@ -238,13 +249,14 @@ export default function MerchantDashboard() {
                 >
                   <span>AWB Barcode</span>
                 </button>
-                <button
-                  onClick={() => handleTrackOrder(orders[0])}
+                <Link
+                  to="/merchant/track"
+                  onClick={() => setActiveTracking(orders[0])}
                   className="flex-1 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
                 >
                   <span>Live Map</span>
                   <ArrowRight size={12} />
-                </button>
+                </Link>
               </div>
             </div>
           ) : (
@@ -265,13 +277,13 @@ export default function MerchantDashboard() {
             <h2 className="text-base font-bold text-gray-900">Recent Shipments</h2>
             <p className="text-xs text-gray-400">Click any tracking ID to view live route animation</p>
           </div>
-          <button
-            onClick={() => navigate('/merchant/orders')}
+          <Link
+            to="/merchant/orders"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-orange-600 hover:text-orange-700 hover:underline"
           >
             <span>View All ({orders.length})</span>
             <ArrowRight size={14} />
-          </button>
+          </Link>
         </div>
 
         {/* Display the 5 most recent shipments */}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
   Search, 
   Plus, 
@@ -12,7 +12,14 @@ import {
 import AdminTable from '../../components/admin/AdminTable';
 import OrderStatusBadge from '../../components/merchant/OrderStatusBadge';
 import ShippingLabelModal from '../../components/merchant/ShippingLabelModal';
-import { loadOrders, saveOrders, setActiveTracking } from '../../services/merchantHelpers';
+import { 
+  loadOrders, 
+  saveOrders, 
+  fetchMerchantOrders, 
+  cancelMerchantOrder, 
+  updateMerchantOrderStatus, 
+  setActiveTracking 
+} from '../../services/merchantHelpers';
 
 /**
  * MerchantOrders — Order Management & Actions
@@ -22,18 +29,27 @@ import { loadOrders, saveOrders, setActiveTracking } from '../../services/mercha
  * dispatch progression, and shipping label modal preview.
  */
 export default function MerchantOrders() {
-  const navigate = useNavigate();
-
   // Component state for orders, search, filter, and modal
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [selectedLabelOrder, setSelectedLabelOrder] = useState(null);
 
-  // Load orders from localStorage on mount
+  // Load orders on mount (instant local render + live backend API sync)
   useEffect(() => {
+    // 1. Instant local render
     const savedOrders = loadOrders();
     setOrders(savedOrders);
+
+    // 2. Fetch live records from backend API
+    let isMounted = true;
+    fetchMerchantOrders().then((liveOrders) => {
+      if (isMounted && Array.isArray(liveOrders)) {
+        setOrders(liveOrders);
+      }
+    });
+
+    return () => { isMounted = false; };
   }, []);
 
   // Filter orders by search keyword and status
@@ -52,47 +68,18 @@ export default function MerchantOrders() {
     return matchesSearch && matchesStatus;
   });
 
-  // Cancel an order and record cancellation in timeline
-  function handleCancelOrder(orderId) {
-    const updatedOrders = orders.map((o) =>
-      o.id === orderId
-        ? {
-            ...o,
-            status: 'CANCELLED',
-            timeline: [
-              ...o.timeline,
-              { title: 'Shipment Cancelled by Merchant', time: 'Just now', status: 'cancelled' }
-            ]
-          }
-        : o
-    );
+  // Cancel an order in backend and record cancellation in timeline
+  async function handleCancelOrder(orderId) {
+    const updatedOrders = await cancelMerchantOrder(orderId);
     setOrders(updatedOrders);
-    saveOrders(updatedOrders);
   }
 
   // Advance order status: PENDING -> IN_TRANSIT -> DELIVERED
-  function handleAdvanceStatus(orderId) {
-    const updatedOrders = orders.map((o) => {
-      if (o.id !== orderId) return o;
-
-      const nextStatus = o.status === 'PENDING' ? 'IN_TRANSIT' : 'DELIVERED';
-      return {
-        ...o,
-        status: nextStatus,
-        timeline: [
-          ...o.timeline,
-          { title: `Status Advanced: ${nextStatus}`, time: 'Just now', status: nextStatus === 'DELIVERED' ? 'done' : 'active' }
-        ]
-      };
-    });
+  async function handleAdvanceStatus(orderId) {
+    const target = orders.find((o) => o.id === orderId);
+    const nextStatus = target && target.status === 'PENDING' ? 'IN_TRANSIT' : 'DELIVERED';
+    const updatedOrders = await updateMerchantOrderStatus(orderId, nextStatus);
     setOrders(updatedOrders);
-    saveOrders(updatedOrders);
-  }
-
-  // Navigate to tracking view for selected order
-  function handleTrackOrder(order) {
-    setActiveTracking(order);
-    navigate('/merchant/track');
   }
 
   // AdminTable column definitions
@@ -172,14 +159,15 @@ export default function MerchantOrders() {
             </button>
 
             {/* GPS Track Link */}
-            <button
-              onClick={() => handleTrackOrder(row)}
+            <Link
+              to="/merchant/track"
+              onClick={() => setActiveTracking(row)}
               className="px-2 py-1 text-xs font-semibold text-orange-700 bg-orange-50 hover:bg-orange-100 rounded-md transition-colors flex items-center gap-1"
               title="Live GPS Track"
             >
               <ArrowUpRight size={11} />
               <span>Track</span>
-            </button>
+            </Link>
 
             {/* Advance status action */}
             {canAdvance && (
@@ -225,13 +213,13 @@ export default function MerchantOrders() {
             Click on any order or tracking ID to view and print its official Barcode Shipping Label
           </p>
         </div>
-        <button
-          onClick={() => navigate('/merchant/book')}
+        <Link
+          to="/merchant/book"
           className="inline-flex items-center gap-1.5 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-semibold shadow-sm transition-colors"
         >
           <Plus size={18} />
           <span>Book Shipment</span>
-        </button>
+        </Link>
       </div>
 
       {/* ── Card with Search, Filter & AdminTable ── */}
