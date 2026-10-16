@@ -13,28 +13,24 @@ import { API } from "../../services/api";
 
 const ISSUE_CATEGORIES = [
     {
-        value: "CUSTOMER_UNAVAILABLE",
+        value: "customer_unavailable",
         label: "Customer Unavailable / Phone Unreachable"
     },
     {
-        value: "DAMAGED_PACKAGE",
+        value: "package_damaged",
         label: "Package Damaged In-Transit"
     },
     {
-        value: "ADDRESS_INCORRECT",
+        value: "address_not_found",
         label: "Incorrect / Incomplete Delivery Address"
     },
     {
-        value: "VEHICLE_BREAKDOWN",
+        value: "vehicle_breakdown",
         label: "Vehicle Breakdown / Transit Delay"
     },
     {
-        value: "CUSTOMER_REFUSED",
-        label: "Customer Refused Delivery"
-    },
-    {
-        value: "OTHER",
-        label: "Other Operational Issue"
+        value: "other",
+        label: "Customer Refused / Other Operational Issue"
     }
 ];
 
@@ -56,7 +52,7 @@ export default function ReportIssue() {
     const orders = outletContext.orders || [];
 
     const [selectedOrderId, setSelectedOrderId] = useState("");
-    const [category, setCategory] = useState("CUSTOMER_UNAVAILABLE");
+    const [category, setCategory] = useState("customer_unavailable");
     const [severity, setSeverity] = useState("Medium");
     const [description, setDescription] = useState("");
 
@@ -71,7 +67,10 @@ export default function ReportIssue() {
 
     useEffect(() => {
         if (orders.length > 0 && !selectedOrderId) {
-            setSelectedOrderId(orders[0].id);
+            const activeOrder = orders.find(
+                (o) => !['delivered', 'failed', 'cancelled'].includes((o.status || '').toLowerCase())
+            );
+            setSelectedOrderId(activeOrder ? (activeOrder.orderId || activeOrder.id) : (orders[0].orderId || orders[0].id));
         }
     }, [orders, selectedOrderId]);
 
@@ -97,18 +96,29 @@ export default function ReportIssue() {
             (item) => item.value === category
         );
 
+        const selectedOrder = orders.find(
+            (o) => o.id === selectedOrderId || o.orderId === selectedOrderId
+        );
+        const targetId = selectedOrder?.rawId || selectedOrderId;
+
         try {
             if (API?.orders?.reportMishap) {
                 await API.orders.reportMishap(
-                    selectedOrderId,
+                    targetId,
                     category,
                     description.trim()
-                ).catch((err) => {
-                    console.warn("Issue API call fallback:", err);
-                });
+                );
+                if (outletContext?.refreshOrders) {
+                    await outletContext.refreshOrders();
+                }
             }
         } catch (error) {
-            console.warn("Issue API unavailable; using local demo mode.", error);
+            console.warn("Issue API report error:", error);
+            if (error?.message) {
+                setErrorMessage(error.message);
+                setSubmitting(false);
+                return;
+            }
         }
 
         const newReport = {

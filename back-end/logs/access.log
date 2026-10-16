@@ -17631,3 +17631,15 @@
 [2026-10-16 01:27:15] [INFO] POST /auth/login 200 96ms | {"ip":"::1","userId":"anonymous","role":"-","status":200,"elapsed":96}
 [2026-10-16 01:48:31] [WARN] POST /orders/ORD-9281/mishap → 400: type must be one of the following values: vehicle_breakdown, address_not_found, customer_unavailable, package_damaged, other | {"userId":"9922a7e7-122a-4c67-8177-89b5c4e42e8d","role":"delivery_agent"}
 [2026-10-16 01:48:31] [WARN] POST /orders/ORD-9281/mishap 400 5ms | {"ip":"::1","userId":"9922a7e7-122a-4c67-8177-89b5c4e42e8d","role":"delivery_agent","status":400,"elapsed":5}
+[2026-10-17 00:39:18] [WARN] POST /orders/ORD-2024-0010/mishap → 401: Invalid or expired token | {"userId":"anonymous","role":"-"}
+[2026-10-17 00:39:18] [WARN] POST /orders/ORD-2024-0010/mishap 401 15ms | {"ip":"::1","userId":"anonymous","role":"-","status":401,"elapsed":15}
+[2026-10-17 00:41:17] [WARN] GET /orders → 401: Invalid or expired token | {"userId":"anonymous","role":"-"}
+[2026-10-17 00:41:17] [WARN] GET /orders 401 12ms | {"ip":"::1","userId":"anonymous","role":"-","status":401,"elapsed":12}
+[2026-10-17 00:41:17] [WARN] GET /orders → 401: Invalid or expired token | {"userId":"anonymous","role":"-"}
+[2026-10-17 00:41:17] [WARN] GET /orders 401 8ms | {"ip":"::1","userId":"anonymous","role":"-","status":401,"elapsed":8}
+[2026-10-17 00:41:27] [INFO] POST /auth/login 200 119ms | {"ip":"::1","userId":"anonymous","role":"-","status":200,"elapsed":119}
+[2026-10-17 00:41:28] [INFO] GET /orders 200 3ms | {"ip":"::1","userId":"9922a7e7-122a-4c67-8177-89b5c4e42e8d","role":"delivery_agent","status":200,"elapsed":3}
+[2026-10-17 00:41:28] [INFO] GET /orders 200 1ms | {"ip":"::1","userId":"9922a7e7-122a-4c67-8177-89b5c4e42e8d","role":"delivery_agent","status":200,"elapsed":1}
+[2026-10-17 00:41:40] [WARN] POST /orders/ORD-2024-0055/mishap → 400: type must be one of the following values: vehicle_breakdown, address_not_found, customer_unavailable, package_damaged, other | {"userId":"9922a7e7-122a-4c67-8177-89b5c4e42e8d","role":"delivery_agent"}
+[2026-10-17 00:41:40] [WARN] POST /orders/ORD-2024-0055/mishap 400 6ms | {"ip":"::1","userId":"9922a7e7-122a-4c67-8177-89b5c4e42e8d","role":"delivery_agent","status":400,"elapsed":6}
+[2026-10-17 00:46:34] [INFO] GET /orders 200 5ms | {"ip":"::1","userId":"9922a7e7-122a-4c67-8177-89b5c4e42e8d","role":"delivery_agent","status":200,"elapsed":5}
