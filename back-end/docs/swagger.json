@@ -200,6 +200,30 @@
         ]
       }
     },
+    "/orders/mishaps": {
+      "get": {
+        "operationId": "OrdersController_getAllMishaps",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mishaps returned"
+          }
+        },
+        "summary": "List all delivery mishaps",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
     "/orders/{id}": {
       "get": {
         "operationId": "OrdersController_findById",

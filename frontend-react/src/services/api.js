@@ -488,6 +488,13 @@ export const API = {
       return res.data || [];
     },
   },
+  // ── Mishaps ───────────────────────────────────────────────────────────────
+  mishaps: {
+    async getAll() {
+      const res = await apiFetch('/orders/mishaps');
+      return res.data || [];
+    },
+  },
 };
 
 window.API_BASE = API_BASE;
