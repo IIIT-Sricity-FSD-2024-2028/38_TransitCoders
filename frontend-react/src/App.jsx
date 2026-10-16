@@ -1,6 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import RoleSelector from './RoleSelector';
 
+import LandingPage from './features/LandingPage';
+import Login from "./pages/Login";
+
 import AdminLayout from './features/admin/AdminLayout';
 import AdminDashboard from './features/admin/AdminDashboard';
 import UserManagement from './features/admin/UserManagement';
@@ -32,7 +35,6 @@ import ReportIssue from "./features/agent/ReportIssue";
 import AgentProfile from './features/agent/AgentProfile';
 import DashBoard from './features/hub-manager/DashBoard';
 
-import Login from "./pages/Login";
 import OrderQueue from "./features/hub-manager/OrderQueue";
 import Dispatch from "./features/hub-manager/Dispatch";
 import HubTransfer from "./features/hub-manager/HubTransfer";
@@ -42,7 +44,8 @@ import Reports from "./features/hub-manager/Reports";
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<Login />} />
       {/* <Route path="/" element={<RoleSelector />} /> */}
 
       <Route path="/admin" element={<AdminLayout />}>
