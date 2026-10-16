@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { DatabaseSync } from 'node:sqlite';
 import { v4 as uuidv4 } from 'uuid';
 import { DatabaseService } from '../common/database/database.service';
 import { IOrder, IStatusEvent, IPricingBreakdown } from './interfaces/order.interface';
@@ -111,7 +112,10 @@ export class OrdersRepository {
     return row ? Number(row.n) : 0;
   }
 
-  create(order: Omit<IOrder, 'id' | 'createdAt' | 'updatedAt'>): IOrder {
+  create(
+    order: Omit<IOrder, 'id' | 'createdAt' | 'updatedAt'>,
+    conn?: DatabaseSync,
+  ): IOrder {
     const id = uuidv4();
     const now = new Date();
     const newOrder: IOrder = {
@@ -120,41 +124,45 @@ export class OrdersRepository {
       createdAt: now,
       updatedAt: now,
     };
-    this.db.run(
-      `INSERT INTO orders (id, orderId, trackingId, merchantId, customerId, customerName, customerPhone,
+    const sql = `INSERT INTO orders (id, orderId, trackingId, merchantId, customerId, customerName, customerPhone,
          pickupAddress, deliveryAddress, pickupHubId, deliveryHubId, status, assignedAgentId, packageType,
          serviceLevel, weight, amount, pricingBreakdown, paymentMode, paymentStatus, priority,
          estimatedDelivery, pickupScheduledAt, statusHistory, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        newOrder.id,
-        newOrder.orderId,
-        newOrder.trackingId,
-        newOrder.merchantId,
-        newOrder.customerId,
-        newOrder.customerName ?? null,
-        newOrder.customerPhone ?? null,
-        newOrder.pickupAddress ?? null,
-        newOrder.deliveryAddress,
-        newOrder.pickupHubId ?? null,
-        newOrder.deliveryHubId ?? null,
-        newOrder.status,
-        newOrder.assignedAgentId ?? null,
-        newOrder.packageType ?? null,
-        newOrder.serviceLevel ?? 'standard',
-        newOrder.weight ?? null,
-        newOrder.amount ?? 0,
-        newOrder.pricingBreakdown ? JSON.stringify(newOrder.pricingBreakdown) : null,
-        newOrder.paymentMode ?? 'Prepaid',
-        newOrder.paymentStatus ?? 'pending',
-        newOrder.priority ?? 'Medium',
-        newOrder.estimatedDelivery ? newOrder.estimatedDelivery.toISOString() : null,
-        newOrder.pickupScheduledAt ? newOrder.pickupScheduledAt.toISOString() : null,
-        JSON.stringify(newOrder.statusHistory ?? []),
-        newOrder.createdAt.toISOString(),
-        newOrder.updatedAt.toISOString(),
-      ],
-    );
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const params = [
+      newOrder.id,
+      newOrder.orderId,
+      newOrder.trackingId,
+      newOrder.merchantId,
+      newOrder.customerId,
+      newOrder.customerName ?? null,
+      newOrder.customerPhone ?? null,
+      newOrder.pickupAddress ?? null,
+      newOrder.deliveryAddress,
+      newOrder.pickupHubId ?? null,
+      newOrder.deliveryHubId ?? null,
+      newOrder.status,
+      newOrder.assignedAgentId ?? null,
+      newOrder.packageType ?? null,
+      newOrder.serviceLevel ?? 'standard',
+      newOrder.weight ?? null,
+      newOrder.amount ?? 0,
+      newOrder.pricingBreakdown ? JSON.stringify(newOrder.pricingBreakdown) : null,
+      newOrder.paymentMode ?? 'Prepaid',
+      newOrder.paymentStatus ?? 'pending',
+      newOrder.priority ?? 'Medium',
+      newOrder.estimatedDelivery ? newOrder.estimatedDelivery.toISOString() : null,
+      newOrder.pickupScheduledAt ? newOrder.pickupScheduledAt.toISOString() : null,
+      JSON.stringify(newOrder.statusHistory ?? []),
+      newOrder.createdAt.toISOString(),
+      newOrder.updatedAt.toISOString(),
+    ];
+
+    if (conn) {
+      conn.prepare(sql).run(...params);
+    } else {
+      this.db.run(sql, params);
+    }
     return newOrder;
   }
 

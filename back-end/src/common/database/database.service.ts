@@ -18,7 +18,6 @@ import { DatabaseSync } from 'node:sqlite';
 import { SqlitePool } from './sqlite-pool';
 
 const DATA_DIR = join(process.cwd(), 'data');
-const DB_FILE = join(process.env.DB_FILE || join(DATA_DIR, 'swifttrack.db'));
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS users (
@@ -266,12 +265,18 @@ CREATE TABLE IF NOT EXISTS data_migrations (
 @Injectable()
 export class DatabaseService implements OnModuleDestroy {
   private readonly pool: SqlitePool;
+  readonly dbFile: string;
 
   constructor() {
     mkdirSync(DATA_DIR, { recursive: true });
     const size = Number(process.env.DB_POOL_SIZE || 4);
-    this.pool = new SqlitePool({ file: DB_FILE, size });
+    this.dbFile = join(process.env.DB_FILE || join(DATA_DIR, 'swifttrack.db'));
+    this.pool = new SqlitePool({ file: this.dbFile, size });
     this.pool.acquireWriter().exec(SCHEMA);
+  }
+
+  getDbPath(): string {
+    return this.dbFile;
   }
 
   /** SELECT via the read pool (round-robin connection). */

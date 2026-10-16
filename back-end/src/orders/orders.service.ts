@@ -200,8 +200,18 @@ export class OrdersService {
     if (user.role === Role.CUSTOMER || user.role === Role.DELIVERY_AGENT) {
       throw new ForbiddenException('You do not have permission to update this order');
     }
-    // Address/package edits are allowed; financial fields are NOT editable here.
-    const { amount: _a, paymentStatus: _ps, pricingBreakdown: _pb, ...safeChanges } = dto as any;
+    // Address/package edits are allowed; financial, lifecycle, and hub ownership fields are NOT editable here.
+    const {
+      amount: _a,
+      paymentStatus: _ps,
+      pricingBreakdown: _pb,
+      status: _s,
+      assignedAgentId: _ag,
+      statusHistory: _sh,
+      pickupHubId: _ph,
+      deliveryHubId: _dh,
+      ...safeChanges
+    } = dto as any;
     return this.ordersRepository.update(order.id, safeChanges)!;
   }
 
@@ -539,11 +549,31 @@ export class OrdersService {
     if (user.role === Role.HUB_MANAGER && (!user.hubId || (order.pickupHubId && order.pickupHubId !== user.hubId))) {
       throw new ForbiddenException('You can only transfer orders currently at your hub');
     }
-    if ([OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.RETURNED, OrderStatus.FAILED].includes(order.status as OrderStatus)) {
-      throw new BadRequestException(`Order in status ${order.status} cannot be transferred`);
+    if (order.status !== OrderStatus.PENDING) {
+      throw new BadRequestException(
+        `Only Pending orders can be transferred. This order is ${order.status}.`,
+      );
+    }
+    if (order.assignedAgentId) {
+      throw new BadRequestException(
+        'This order already has an assigned agent. Unassign the agent before transferring.',
+      );
     }
     if (!toHubId || toHubId === order.pickupHubId) {
       throw new BadRequestException('Destination hub must differ from the current hub');
+    }
+
+    const destHub = this.db.queryOne<{ hubId: string; status: string }>(
+      'SELECT hubId, status FROM hubs WHERE hubId = ?',
+      [toHubId],
+    );
+    if (!destHub) {
+      throw new BadRequestException(`Destination hub ${toHubId} does not exist`);
+    }
+    if (destHub.status !== 'active') {
+      throw new BadRequestException(
+        `Destination hub ${toHubId} is not active (status: ${destHub.status})`,
+      );
     }
 
     const history: IStatusEvent[] = [
