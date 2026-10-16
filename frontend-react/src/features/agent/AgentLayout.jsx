@@ -60,10 +60,21 @@ const initialOrders = [
 ];
 
 export default function AgentLayout() {
-    const currentUser = {
-        name: "JS",
-        role: "Delivery Agent"
-    };
+    const currentUser = (() => {
+        try {
+            const saved = localStorage.getItem("user");
+            if (saved) {
+                const u = JSON.parse(saved);
+                return {
+                    name: u.name || "Agent",
+                    role: "Delivery Agent"
+                };
+            }
+        } catch (e) {
+            console.warn('[AgentLayout] Error parsing user:', e);
+        }
+        return { name: "JS", role: "Delivery Agent" };
+    })();
 
     // Load initial state from LocalStorage or fall back to default loads
     const [orders, setOrders] = useState(() => {
@@ -116,12 +127,15 @@ export default function AgentLayout() {
                             mappedStatus = 'failed';
                         }
 
+                        const orderKey = bo.orderId || bo.id;
+
                         // Only merge if not already tracked locally or update status
-                        if (!localMap.has(bo.id)) {
-                            localMap.set(bo.id, {
-                                id: bo.id,
-                                customer: bo.recipientName || bo.customer || 'Customer',
-                                phone: bo.recipientPhone || bo.phone || '+91 98765 00000',
+                        if (!localMap.has(orderKey)) {
+                            localMap.set(orderKey, {
+                                id: orderKey,
+                                rawId: bo.id,
+                                customer: bo.customerName || bo.recipientName || bo.customer || 'Customer',
+                                phone: bo.customerPhone || bo.recipientPhone || bo.phone || '+91 98765 00000',
                                 origin: bo.pickupAddress || bo.origin || 'Central Hub, Zone 4',
                                 destination: bo.deliveryAddress || bo.destination || 'Indiranagar, Bengaluru',
                                 status: mappedStatus,

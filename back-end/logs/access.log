@@ -17631,3 +17631,8 @@
 [2026-10-16 01:27:15] [INFO] POST /auth/login 200 96ms | {"ip":"::1","userId":"anonymous","role":"-","status":200,"elapsed":96}
 [2026-10-16 01:48:31] [WARN] POST /orders/ORD-9281/mishap → 400: type must be one of the following values: vehicle_breakdown, address_not_found, customer_unavailable, package_damaged, other | {"userId":"9922a7e7-122a-4c67-8177-89b5c4e42e8d","role":"delivery_agent"}
 [2026-10-16 01:48:31] [WARN] POST /orders/ORD-9281/mishap 400 5ms | {"ip":"::1","userId":"9922a7e7-122a-4c67-8177-89b5c4e42e8d","role":"delivery_agent","status":400,"elapsed":5}
+[2026-10-16 22:53:47] [WARN] POST /auth/login → 400: Expected property name or '}' in JSON at position 1 (line 1 column 2) | {"userId":"anonymous","role":"-"}
+[2026-10-16 22:54:03] [INFO] POST /auth/login 200 107ms | {"ip":"::1","userId":"anonymous","role":"-","status":200,"elapsed":107}
+[2026-10-16 22:54:20] [INFO] GET /orders 200 3ms | {"ip":"::1","userId":"9922a7e7-122a-4c67-8177-89b5c4e42e8d","role":"delivery_agent","status":200,"elapsed":3}
+[2026-10-16 23:10:30] [WARN] GET / → 404: Cannot GET / | {"userId":"anonymous","role":"-"}
+[2026-10-16 23:10:30] [WARN] GET / 404 2ms | {"ip":"::1","userId":"anonymous","role":"-","status":404,"elapsed":2}

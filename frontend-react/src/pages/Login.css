@@ -1,79 +1,564 @@
-.login-page {
-    min-height: 100vh;
-    display: flex;
-    font-family: Arial, sans-serif;
-    background-color: #f5f5fa;
+/* =========================================================================
+   SwiftTrack Login Page Styles
+   Exact replica of the provided design reference
+   ========================================================================= */
+
+.auth-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #ffffff;
+  color: #0f172a;
+  font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow: hidden;
 }
 
-.login-brand {
-    width: 50%;
-    padding: 40px;
-    background-color: #29234f;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+/* =========================================================================
+   Left Side: Logistics 3D Hero & Branding
+   ========================================================================= */
+
+.auth-left {
+  flex: 1.05;
+  position: relative;
+  background-color: #0b1329;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 48px 56px;
+  min-height: 100vh;
 }
 
-.login-brand h1 {
-    font-size: 50px;
-    margin-bottom: 30px;
+.auth-left-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.98;
+  filter: contrast(105%) brightness(102%);
 }
 
-.login-brand h2 {
-    font-size: 30px;
-    margin: 5px 0;
+.auth-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(30, 64, 175, 0.12) 0%,
+    rgba(15, 23, 42, 0.05) 30%,
+    rgba(15, 23, 42, 0.35) 70%,
+    rgba(15, 23, 42, 0.7) 100%
+  );
+  z-index: 1;
 }
 
-.login-brand p {
-    margin-top: 30px;
-    line-height: 1.5;
+.auth-left-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.login-form-section {
-    width : 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* SwiftTrack Brand Logo */
+.auth-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  user-select: none;
 }
 
-.login-form {
-    width: 320px;
-    padding: 25px;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+.auth-logo-icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 6px rgba(249, 115, 22, 0.35));
 }
 
-.login-form label {
-    display: block;
-    margin-top: 15px;
-    margin-bottom: 5px;
+.auth-logo-text {
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
-.login-form input {
-    width: 100%;
-    padding: 10px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+.auth-logo-swift {
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.login-form button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 20px;
-    background-color: #6242b5;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.auth-logo-track {
+  color: #ff5c02;
+  text-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
 }
 
-.login-form button:hover {
-    background-color: #4e3298;
+/* Middle Promo Banner */
+.auth-promo {
+  margin: auto 0;
+  padding-top: 30px;
+  padding-bottom: 30px;
 }
 
-.login-error {
-    color: red;
+.auth-promo h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 36px;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: #111827; /* Dark charcoal/navy as shown in user reference */
+  margin-bottom: 16px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.auth-promo p {
+  font-size: 15px;
+  color: #ffffff;
+  max-width: 420px;
+  line-height: 1.55;
+  font-weight: 400;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Bottom Social Proof */
+.auth-social-proof {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.avatars {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #ffedd5;
+  background-color: #ff5c02;
+  color: #ffffff;
+  margin-left: -10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.avatar-circle:first-child {
+  margin-left: 0;
+}
+
+.proof-text {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* =========================================================================
+   Right Side: Sign In Form Box
+   ========================================================================= */
+
+.auth-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background-color: #ffffff;
+  min-height: 100vh;
+}
+
+.auth-form-box {
+  width: 100%;
+  max-width: 440px;
+}
+
+/* Header with Title & Theme Switch */
+.auth-header {
+  margin-bottom: 28px;
+}
+
+.auth-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.auth-header h1 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 32px;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0 0 6px 0;
+}
+
+.auth-header p {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* Theme Switch Pill */
+.theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  outline: none;
+  margin-top: 4px;
+}
+
+.theme-switch:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.theme-switch-icon {
+  width: 13px;
+  height: 13px;
+  color: #64748b;
+}
+
+/* Form Groups & Inputs */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 7px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 14px;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #0f172a;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+  font-size: 13.5px;
+}
+
+.form-input:focus {
+  background-color: #ffffff;
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+}
+
+/* Password Toggle Wrapper */
+.password-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-wrap .form-input {
+  padding-right: 44px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #f97316; /* Exact orange toggle eye icon from screenshot */
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 6px;
+  transition: opacity 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+  opacity: 0.8;
+}
+
+/* Remember Me & Forgot Password */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  margin-bottom: 22px;
+  font-size: 13.5px;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+}
+
+.remember-me input {
+  width: 15px;
+  height: 15px;
+  accent-color: #f97316;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 0;
+}
+
+.forgot-link {
+  color: #f97316;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13.5px;
+  transition: color 0.2s ease;
+}
+
+.forgot-link:hover {
+  color: #ea580c;
+}
+
+/* Primary Sign In Button */
+.auth-btn {
+  width: 100%;
+  padding: 13px 20px;
+  background-color: #f97316;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-btn:hover {
+  background-color: #ea580c;
+}
+
+.auth-btn:active {
+  transform: translateY(1px);
+}
+
+.auth-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: #9ca3af;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: #e5e7eb;
+}
+
+/* Google Sign In Button */
+.google-btn {
+  width: 100%;
+  padding: 11px 16px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.google-btn:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
+/* Footer Link */
+.auth-footer {
+  text-align: center;
+  font-size: 13.5px;
+  color: #64748b;
+  margin-top: 24px;
+}
+
+.auth-footer a {
+  color: #f97316;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 4px;
+  transition: color 0.2s ease;
+}
+
+.auth-footer a:hover {
+  color: #ea580c;
+  text-decoration: underline;
+}
+
+/* Error Banner */
+.login-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 18px;
+}
+
+.login-error-banner svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* =========================================================================
+   Dark Mode Overrides
+   ========================================================================= */
+
+.auth-container.dark {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+.auth-container.dark .auth-right {
+  background-color: #0f172a;
+}
+
+.auth-container.dark .auth-header h1 {
+  color: #f8fafc;
+}
+
+.auth-container.dark .auth-header p {
+  color: #94a3b8;
+}
+
+.auth-container.dark .theme-switch {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+.auth-container.dark .theme-switch:hover {
+  background-color: #334155;
+}
+
+.auth-container.dark .theme-switch-icon {
+  color: #fdba74;
+}
+
+.auth-container.dark .form-group label {
+  color: #f8fafc;
+}
+
+.auth-container.dark .form-input {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+.auth-container.dark .form-input::placeholder {
+  color: #64748b;
+}
+
+.auth-container.dark .form-input:focus {
+  background-color: #0f172a;
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.25);
+}
+
+.auth-container.dark .remember-me {
+  color: #cbd5e1;
+}
+
+.auth-container.dark .divider {
+  color: #64748b;
+}
+
+.auth-container.dark .divider::before,
+.auth-container.dark .divider::after {
+  background-color: #334155;
+}
+
+.auth-container.dark .google-btn {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+.auth-container.dark .google-btn:hover {
+  background-color: #334155;
+}
+
+.auth-container.dark .auth-footer {
+  color: #94a3b8;
+}
+
+/* =========================================================================
+   Responsive Design
+   ========================================================================= */
+
+@media (max-width: 1024px) {
+  .auth-left {
+    display: none;
+  }
+
+  .auth-right {
+    flex: 1;
+    padding: 32px 20px;
+  }
 }
