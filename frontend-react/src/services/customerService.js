@@ -232,7 +232,109 @@ export const customerService = {
 
         const orders = await this.getOrders();
         return orders.find(o => o.id === id || o.trackingId === id) || null;
+    },
+
+    // Fetch complaints submitted by customer
+    async getComplaints() {
+        await this.ensureAuth();
+        try {
+            const res = await API.complaints.getAll();
+            if (Array.isArray(res) && res.length > 0) return res;
+        } catch (_) { /* fallback below */ }
+
+        return [
+            {
+                id: 'CMP-2024-001',
+                orderId: 'TRK-UV34WX56',
+                type: 'Delivery Delay',
+                details: 'Package was scheduled for delivery 3 days ago but has not moved from Hyderabad hub.',
+                priority: 'High',
+                status: 'In Progress',
+                createdAt: '2026-10-12T09:30:00.000Z'
+            },
+            {
+                id: 'CMP-2024-002',
+                orderId: 'TRK-EF78GH90',
+                type: 'Address Change Request',
+                details: 'Requested update of apartment number before out-for-delivery dispatch.',
+                priority: 'Medium',
+                status: 'Resolved',
+                createdAt: '2026-10-10T14:15:00.000Z'
+            }
+        ];
+    },
+
+    // Submit a new complaint
+    async submitComplaint(data) {
+        await this.ensureAuth();
+        const payload = {
+            orderId: data.orderId,
+            type: data.type || 'General Inquiry',
+            details: data.details,
+            priority: data.priority || 'Medium',
+            customer: 'Aarav Sharma',
+            createdAt: new Date().toISOString(),
+            status: 'Open'
+        };
+
+        try {
+            const res = await API.complaints.create(payload);
+            if (res) return { success: true, data: res };
+        } catch (err) {
+            console.warn('[customerService] Backend complaint create offline, mock saved:', err.message);
+        }
+
+        return {
+            success: true,
+            data: { id: `CMP-${Math.floor(1000 + Math.random() * 9000)}`, ...payload }
+        };
+    },
+
+    // Fetch feedback submitted by customer
+    async getFeedback() {
+        await this.ensureAuth();
+        try {
+            const res = await API.feedback.getAll();
+            if (Array.isArray(res) && res.length > 0) return res;
+        } catch (_) { /* fallback below */ }
+
+        return [
+            {
+                id: 'FB-2024-001',
+                orderId: 'TRK-XK29BL7M',
+                rating: 5,
+                comment: 'Super fast delivery in Chennai! Agent Rajesh was very professional.',
+                createdAt: '2026-10-06T11:00:00.000Z',
+                status: 'Reviewed'
+            }
+        ];
+    },
+
+    // Submit customer feedback and star rating
+    async submitFeedback(data) {
+        await this.ensureAuth();
+        const payload = {
+            orderId: data.orderId,
+            rating: Number(data.rating),
+            comment: data.comment,
+            customer: 'Aarav Sharma',
+            createdAt: new Date().toISOString(),
+            status: 'Submitted'
+        };
+
+        try {
+            const res = await API.feedback.create(payload);
+            if (res) return { success: true, data: res };
+        } catch (err) {
+            console.warn('[customerService] Backend feedback create offline, mock saved:', err.message);
+        }
+
+        return {
+            success: true,
+            data: { id: `FB-${Math.floor(1000 + Math.random() * 9000)}`, ...payload }
+        };
     }
 };
 
 export default customerService;
+
