@@ -4,6 +4,7 @@ import { ExclamationCircle, ChatSquareHeart, CheckCircleFill, ClockHistory, Send
 import { customerService } from '../../services/customerService';
 import StarRating from '../../components/customer/StarRating';
 import StatusBadge from '../../components/customer/StatusBadge';
+import Toast from '../../components/customer/Toast';
 
 export default function CustomerSupport() {
     const [searchParams] = useSearchParams();
@@ -361,6 +362,13 @@ export default function CustomerSupport() {
                     </div>
                 </div>
             </div>
+
+            {/* Day 6 Toast Notification */}
+            <Toast
+                message={successMessage}
+                type="success"
+                onClose={() => setSuccessMessage(null)}
+            />
         </div>
     );
 }
