@@ -1,5 +1,6 @@
 .stats-card {
-    width : 300px;
+    width: 100%;
+    min-width: 0;
     background-color: #fff;
     padding : 20px;
     border : 1px solid #e5e7eb;
@@ -39,7 +40,7 @@
     color: #111827;
 }
 
-stats.subtitle {
+.stats-subtitle {
     font-size: 14px;
     color: #6b7280;
     margin: 0;

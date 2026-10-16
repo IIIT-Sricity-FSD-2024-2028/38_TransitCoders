@@ -10,6 +10,9 @@ export default function TransferHubModal({ order, isOpen, onClose, onSuccess }) 
 
   useEffect(() => {
     if (!isOpen) return;
+    setHubId("");
+    setError("");
+    setHubs([]);
 
     async function loadHubs() {
       try {
@@ -18,7 +21,7 @@ export default function TransferHubModal({ order, isOpen, onClose, onSuccess }) 
         if (Array.isArray(result)) {
           setHubs(
             result.filter(
-                hub => hub.hubId != order ?.pickupHubId 
+              hub => hub.hubId !== order?.pickupHubId && (hub.status === "active" || !hub.status)
             )
           );
         }
@@ -33,6 +36,11 @@ export default function TransferHubModal({ order, isOpen, onClose, onSuccess }) 
   async function handleTransfer() {
     if (!hubId) {
       setError("Please select a destination hub.");
+      return;
+    }
+
+    if (order.status !== "Pending" || order.assignedAgentId) {
+      setError("Only unassigned pending orders can be transferred to another hub.");
       return;
     }
 
@@ -70,15 +78,15 @@ export default function TransferHubModal({ order, isOpen, onClose, onSuccess }) 
           <option value="">Select a hub</option>
           {hubs.map(hub => (
             <option key={hub.hubId} value={hub.hubId}>
-              {hub.hubName || hub.name || hub.hubId}
+              {hub.name || hub.hubName || hub.hubId} ({hub.hubId})
             </option>
           ))}
         </select>
 
-        {error && <p className="transfer-error">{error}</p>}
+        {error && <p className="transfer-error" role="alert">{error}</p>}
 
         <button onClick={onClose}>Cancel</button>
-        <button onClick={handleTransfer} disabled={hubs.length === 0}>
+        <button onClick={handleTransfer} disabled={hubs.length === 0 || !hubId}>
           Transfer
         </button>
       </div>

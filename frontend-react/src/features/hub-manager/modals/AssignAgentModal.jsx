@@ -6,36 +6,67 @@ import "./AssignAgentModal.css";
 export default function AssignAgentModal({ order, isOpen, onClose, onSuccess }) {
   const [agents, setAgents] = useState([]);
   const [agentId, setAgentId] = useState("");
+  const [loadingAgents, setLoadingAgents] = useState(false);
+  const [agentError, setAgentError] = useState("");
+  const [assignmentError, setAssignmentError] = useState("");
+  const [assigning, setAssigning] = useState(false);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || !order) return;
+    let active = true;
+
+    setAgents([]);
+    setAgentId("");
+    setAgentError("");
+    setAssignmentError("");
+    setLoadingAgents(true);
 
     async function loadAgents() {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      const result = await API.hubs.getAgentsForHub(user.hubId);
+      try {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        if (!user.hubId) {
+          throw new Error("The signed-in Hub Manager has no assigned hub.");
+        }
+        const result = await API.hubs.getAgentsForHub(user.hubId);
 
-      if (Array.isArray(result)) {
-        setAgents(result.filter(a => a.availabilityStatus === "Available"));
+        if (!Array.isArray(result)) {
+          throw new Error("Could not load agents for this hub.");
+        }
+        if (active) {
+          setAgents(result.filter(a => a.availabilityStatus === "Available"));
+        }
+      } catch (error) {
+        if (active) {
+          setAgentError(error.message || "Could not load agents for this hub.");
+        }
+      } finally {
+        if (active) setLoadingAgents(false);
       }
     }
 
     loadAgents();
-  }, [isOpen]);
+    return () => {
+      active = false;
+    };
+  }, [isOpen, order?.id]);
 
   async function handleAssign() {
     if (!agentId) {
-      alert("Please select an agent");
+      setAssignmentError("Please select an agent.");
       return;
     }
 
+    setAssignmentError("");
+    setAssigning(true);
     try {
       await API.orders.assign(order.id, agentId);
       await onSuccess();
       onClose();
     } catch (error) {
-  console.error("Assignment failed:", error);
-  alert("Could not assign agent. Check the browser console.");
-}
+      setAssignmentError(error.message || "Could not assign agent.");
+    } finally {
+      setAssigning(false);
+    }
   }
 
   if (!isOpen || !order) return null;
@@ -46,10 +77,18 @@ export default function AssignAgentModal({ order, isOpen, onClose, onSuccess }) 
         <h2>Assign Agent</h2>
         <p>Order: {order.orderId}</p>
 
-        {agents.length === 0 ? (
+        {loadingAgents ? (
+          <p>Loading available agents...</p>
+        ) : agentError ? (
+          <p role="alert">{agentError}</p>
+        ) : agents.length === 0 ? (
           <p>No available agents in your hub.</p>
         ) : (
-          <select value={agentId} onChange={e => setAgentId(e.target.value)}>
+          <select
+            value={agentId}
+            onChange={e => setAgentId(e.target.value)}
+            disabled={assigning}
+          >
             <option value="">Select an agent</option>
             {agents.map(a => (
               <option key={a.id} value={a.userId}>
@@ -59,9 +98,14 @@ export default function AssignAgentModal({ order, isOpen, onClose, onSuccess }) 
           </select>
         )}
 
+        {assignmentError && <p role="alert">{assignmentError}</p>}
+
         <button onClick={onClose}>Cancel</button>
-        <button onClick={handleAssign} disabled={agents.length === 0}>
-          Assign
+        <button
+          onClick={handleAssign}
+          disabled={loadingAgents || Boolean(agentError) || agents.length === 0 || !agentId || assigning}
+        >
+          {assigning ? "Assigning..." : "Assign"}
         </button>
       </div>
     </div>

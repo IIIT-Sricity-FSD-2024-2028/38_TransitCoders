@@ -13,8 +13,9 @@ export default function OrderCard({ order, onAssign, onTransfer, onView }) {
                 </div>
 
                 <div className="order-actions">
-                    {order.status === "Pending" ? <button onClick={onAssign}>Assign Agent</button> : (<></>)
-                    }
+                    {order.status === "Pending" && onAssign && (
+                        <button onClick={onAssign}>Assign Agent</button>
+                    )}
 
                     {onTransfer && (
                     <button onClick={onTransfer}>Transfer Hub</button>

@@ -36,6 +36,12 @@
     color: #1d4ed8;
 }
 
+.order-status.pickedup,
+.order-status.outfordelivery {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
 .order-status.delivered {
     background-color: #f0fdf4;
     color: #15803d;
@@ -45,9 +51,20 @@
     display : flex;
     gap:8px;
 }
-.order-status.Assigned {
+.order-status.assigned {
     background-color: #fff7ed;
     color: #234123;
+}
+
+.order-status.cancelled,
+.order-status.failed {
+    background-color: #fef2f2;
+    color: #b91c1c;
+}
+
+.order-status.returned {
+    background-color: #f3f4f6;
+    color: #4b5563;
 }
 
 
