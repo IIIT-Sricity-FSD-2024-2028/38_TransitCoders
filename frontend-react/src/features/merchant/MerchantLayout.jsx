@@ -18,10 +18,19 @@ import {
  * for child route views.
  */
 export default function MerchantLayout() {
-  // Current authenticated merchant profile details
+  // Current authenticated merchant profile details from database session
+  const storedUser = (() => {
+    try {
+      const u = localStorage.getItem('user');
+      return u ? JSON.parse(u) : null;
+    } catch (_) {
+      return null;
+    }
+  })();
+
   const currentMerchant = { 
-    name: "Prasanna Raja", 
-    role: "Merchant" 
+    name: storedUser?.name || 'Merchant Portal', 
+    role: storedUser?.role ? storedUser.role.charAt(0).toUpperCase() + storedUser.role.slice(1) : 'Merchant' 
   };
 
   return (

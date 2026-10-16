@@ -41,3 +41,9 @@ Thumbs.db
 logs/
 *.log
 **/logs/
+back-end/logs/
+backend/logs/
+
+# SQLite temporary files
+*.db-shm
+*.db-wal

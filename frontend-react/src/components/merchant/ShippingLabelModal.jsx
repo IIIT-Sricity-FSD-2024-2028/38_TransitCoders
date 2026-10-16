@@ -92,9 +92,9 @@ export default function ShippingLabelModal({ order, isOpen, onClose }) {
                 <Building size={11} />
                 <span>SHIP FROM (MERCHANT):</span>
               </p>
-              <p className="font-bold text-gray-900">SwiftTrack Hub (Main Warehouse)</p>
-              <p className="text-gray-600 text-[11px]">{order.pickupAddress || 'Plot 24, Guindy Industrial Estate, Chennai'}</p>
-              <p className="text-gray-500 font-mono text-[11px]">Chennai, TN - 600032</p>
+              <p className="font-bold text-gray-900">{order.pickupHubName || 'Logistics Origin Hub'}</p>
+              <p className="text-gray-600 text-[11px]">{order.pickupAddress || 'Origin Logistics Facility'}</p>
+              <p className="text-gray-500 font-mono text-[11px]">{order.origin || 'Origin'}</p>
             </div>
 
             <div className="space-y-1">
@@ -103,7 +103,7 @@ export default function ShippingLabelModal({ order, isOpen, onClose }) {
                 <span>SHIP TO (CUSTOMER):</span>
               </p>
               <p className="font-bold text-gray-900">{order.recipientName || 'Customer'}</p>
-              <p className="text-gray-600 text-[11px]">{order.deliveryAddress}</p>
+              <p className="text-gray-600 text-[11px]">{order.deliveryAddress || 'Customer Address'}</p>
               <p className="text-gray-500 font-mono text-[11px]">Contact: {order.recipientPhone || 'N/A'}</p>
             </div>
           </div>
@@ -113,7 +113,7 @@ export default function ShippingLabelModal({ order, isOpen, onClose }) {
             <div>
               <span className="text-[10px] text-gray-400 block font-semibold">BILLED WEIGHT</span>
               <span className="font-bold text-sm text-gray-900">
-                {order.packageWeight ? `${order.packageWeight} kg` : '2.0 kg'}
+                {order.packageWeight ? `${order.packageWeight} kg` : '1.0 kg'}
               </span>
             </div>
             <div>
@@ -125,13 +125,13 @@ export default function ShippingLabelModal({ order, isOpen, onClose }) {
             <div>
               <span className="text-[10px] text-gray-400 block font-semibold">DESTINATION HUB</span>
               <span className="font-bold text-sm text-orange-600">
-                {order.destination ? `${order.destination.toUpperCase()}-01` : 'BLR-01'}
+                {order.destination ? `${order.destination.toUpperCase()}-01` : 'DEST-01'}
               </span>
             </div>
             <div>
               <span className="text-[10px] text-gray-400 block font-semibold">COD / AMOUNT</span>
               <span className="font-bold text-sm text-gray-900">
-                ₹{order.price || 350} (PAID)
+                ₹{order.price || 0} ({order.paymentMode || 'PAID'})
               </span>
             </div>
           </div>

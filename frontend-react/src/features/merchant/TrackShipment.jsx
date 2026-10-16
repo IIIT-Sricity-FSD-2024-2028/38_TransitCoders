@@ -2,7 +2,14 @@ import { useState, useEffect } from 'react';
 import { Search, ArrowRight, ArrowClockwise, GeoAlt, CheckCircleFill, ClockFill } from 'react-bootstrap-icons';
 import OrderStatusBadge from '../../components/merchant/OrderStatusBadge';
 import ShippingLabelModal from '../../components/merchant/ShippingLabelModal';
-import { loadOrders, findOrder, getActiveTracking, setActiveTracking } from '../../services/merchantHelpers';
+import { 
+  loadOrders, 
+  findOrder, 
+  trackOrderWithBackend, 
+  fetchMerchantOrders, 
+  getActiveTracking, 
+  setActiveTracking 
+} from '../../services/merchantHelpers';
 
 /**
  * TrackShipment — Live GPS Satellite Tracking Interface
@@ -19,9 +26,9 @@ export default function TrackShipment() {
   const [searchError, setSearchError] = useState(null);
   const [selectedLabelOrder, setSelectedLabelOrder] = useState(null);
 
-  // Load orders and pre-selected tracking from localStorage on mount
+  // Load orders and pre-selected tracking on mount
   useEffect(() => {
-    // Load all orders from localStorage
+    // 1. Instant load from local cache
     const savedOrders = loadOrders();
     setOrders(savedOrders);
 
@@ -31,14 +38,24 @@ export default function TrackShipment() {
       setCurrentOrder(activeOrder);
       setSearchInput(activeOrder.trackingNumber || activeOrder.id);
     } else if (savedOrders.length > 0) {
-      // Default to first order if nothing pre-selected
       setCurrentOrder(savedOrders[0]);
       setSearchInput(savedOrders[0].trackingNumber || savedOrders[0].id);
     }
+
+    // 2. Sync with live backend database
+    fetchMerchantOrders().then((liveOrders) => {
+      if (Array.isArray(liveOrders) && liveOrders.length > 0) {
+        setOrders(liveOrders);
+        if (!activeOrder) {
+          const matched = liveOrders.find(o => o.trackingNumber === searchInput || o.id === searchInput);
+          if (matched) setCurrentOrder(matched);
+        }
+      }
+    });
   }, []);
 
-  // Search for an order by tracking ID
-  function handleSearch(e) {
+  // Search for an order by tracking ID across local store & backend API
+  async function handleSearch(e) {
     e.preventDefault();
     const trackingId = searchInput.trim();
     if (!trackingId) return;
@@ -46,8 +63,8 @@ export default function TrackShipment() {
     setIsSearching(true);
     setSearchError(null);
 
-    // Search in local orders store
-    const found = findOrder(trackingId);
+    // Search in local orders store and live backend API
+    const found = await trackOrderWithBackend(trackingId);
 
     if (found) {
       setCurrentOrder(found);
@@ -142,22 +159,37 @@ export default function TrackShipment() {
 
         {/* Quick select order chips */}
         <div className="flex items-center gap-2 flex-wrap text-xs text-[#6B7280] pt-1">
-          <span className="font-semibold text-gray-400">Saved Shipments:</span>
-          {orders.map((o) => (
-            <button
-              key={o.id}
-              onClick={() => handleSelectOrder(o)}
-              className={`px-2.5 py-1 rounded-full font-mono text-[11px] font-semibold transition-all ${
-                currentOrder?.id === o.id
-                  ? 'bg-orange-600 text-white shadow-sm'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-              }`}
-            >
-              {o.trackingNumber || o.id} • {o.status}
-            </button>
-          ))}
+          <span className="font-semibold text-gray-400">Database Shipments:</span>
+          {orders.length > 0 ? (
+            orders.map((o) => (
+              <button
+                key={o.id}
+                onClick={() => handleSelectOrder(o)}
+                className={`px-2.5 py-1 rounded-full font-mono text-[11px] font-semibold transition-all ${
+                  currentOrder?.id === o.id
+                    ? 'bg-orange-600 text-white shadow-sm'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                }`}
+              >
+                {o.trackingNumber || o.id} • {o.status}
+              </button>
+            ))
+          ) : (
+            <span className="text-gray-400 text-xs italic">No shipments found in database. Book a shipment to track live GPS.</span>
+          )}
         </div>
       </div>
+
+      {/* ── Empty State when no shipment is selected ── */}
+      {!currentOrder && (
+        <div className="bg-white border border-[#E5E7EB] rounded-xl p-12 text-center shadow-sm space-y-3">
+          <GeoAlt size={36} className="mx-auto text-gray-300" />
+          <h3 className="text-base font-bold text-gray-800">No Shipment Selected</h3>
+          <p className="text-xs text-gray-500 max-w-sm mx-auto">
+            Enter a valid tracking ID above or book a new shipment to monitor real-time GPS telemetry and milestone logs.
+          </p>
+        </div>
+      )}
 
       {/* ── Active Tracking Results ── */}
       {currentOrder && (
