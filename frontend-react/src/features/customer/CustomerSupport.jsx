@@ -322,16 +322,18 @@ export default function CustomerSupport() {
                             ) : (
                                 <div className="space-y-3">
                                     {complaintsList.map((c) => (
-                                        <div key={c.id} className="p-3.5 bg-gray-50 rounded-xl border border-gray-100 space-y-1.5">
+                                        <div key={c.id || c.reference} className="p-3.5 bg-gray-50 rounded-xl border border-gray-100 space-y-1.5">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-xs font-bold text-gray-900">{c.id}</span>
-                                                <StatusBadge status={c.status} />
+                                                <span className="text-xs font-bold text-gray-900 font-mono">
+                                                    {c.reference ? c.reference.toUpperCase() : (c.id ? `#${c.id.slice(0, 8)}` : 'Ticket')}
+                                                </span>
+                                                <StatusBadge status={c.status || 'Open'} />
                                             </div>
-                                            <p className="text-xs font-semibold text-orange-600">{c.type}</p>
-                                            <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">{c.details}</p>
+                                            <p className="text-xs font-semibold text-orange-600">{c.type || 'General Issue'}</p>
+                                            <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">{c.details || c.description || 'No description provided.'}</p>
                                             <div className="text-[10px] text-gray-400 pt-1 flex justify-between">
-                                                <span>Order: {c.orderId}</span>
-                                                <span className="uppercase font-semibold">{c.priority} Priority</span>
+                                                <span>Order: {c.orderId || 'N/A'}</span>
+                                                <span className="uppercase font-semibold">{c.priority || 'Medium'} Priority</span>
                                             </div>
                                         </div>
                                     ))}
@@ -342,13 +344,15 @@ export default function CustomerSupport() {
                                 <p className="text-xs text-gray-400 py-6 text-center">No feedback submitted yet.</p>
                             ) : (
                                 <div className="space-y-3">
-                                    {feedbackList.map((f) => (
-                                        <div key={f.id} className="p-3.5 bg-gray-50 rounded-xl border border-gray-100 space-y-1.5">
+                                    {feedbackList.map((f, idx) => (
+                                        <div key={f.id || idx} className="p-3.5 bg-gray-50 rounded-xl border border-gray-100 space-y-1.5">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-xs font-bold text-gray-800">Order: {f.orderId}</span>
+                                                <span className="text-xs font-bold text-gray-800 font-mono">
+                                                    Order: {f.orderId || (f.reference ? f.reference.toUpperCase() : 'General')}
+                                                </span>
                                                 <span className="text-xs font-bold text-amber-500">★ {f.rating}/5</span>
                                             </div>
-                                            <p className="text-xs text-gray-600 leading-relaxed italic">"{f.comment}"</p>
+                                            <p className="text-xs text-gray-600 leading-relaxed italic">"{f.comment || f.comments || 'No comment provided.'}"</p>
                                         </div>
                                     ))}
                                 </div>

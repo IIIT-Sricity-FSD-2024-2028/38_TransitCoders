@@ -56,7 +56,13 @@ window.CustomerAPI = {
     try {
       if (window.API && window.API.complaints) {
         const res = await window.API.complaints.getAll();
-        if (res && res.length) return res.filter(c => c.customer === user.name || c.userId === user.user_id);
+        if (res && res.length) {
+          return res.map(c => ({
+            ...c,
+            details: c.details || c.description,
+            date: c.createdAt || c.date
+          }));
+        }
       }
     } catch (e) { console.warn("API fallback to AppState for complaints"); }
 
@@ -72,6 +78,19 @@ window.CustomerAPI = {
     const user = this.getCurrentUser();
     if (!user) return [];
 
+    try {
+      if (window.API && window.API.feedback) {
+        const res = await window.API.feedback.getAll();
+        if (res && res.length) {
+          return res.map(f => ({
+            ...f,
+            comment: f.comment || f.comments,
+            date: f.createdAt || f.date
+          }));
+        }
+      }
+    } catch (e) { console.warn("API fallback to AppState for feedback"); }
+
     if (window.AppState) {
       const state = window.AppState.getState();
       return state.feedback.filter(f => f.customer === user.name || f.userId === user.user_id)
@@ -84,12 +103,12 @@ window.CustomerAPI = {
     const user = this.getCurrentUser();
     if (!user) throw new Error("Not authenticated");
 
+    const description = data.description || data.details || '';
     const payload = {
-      customer: user.name,
-      userId: user.id || user.user_id,
-      date: new Date().toISOString(),
-      status: 'Open',
-      ...data
+      orderId: data.orderId,
+      type: data.type || 'General Issue',
+      description,
+      priority: data.priority || 'Medium',
     };
 
     try {
@@ -100,11 +119,19 @@ window.CustomerAPI = {
     } catch (e) { console.warn("API fallback to AppState for submitting complaint"); }
 
     if (window.AppState) {
-      payload.id = 'CMP-' + Math.floor(Math.random() * 10000);
+      const fallbackItem = {
+        id: 'CMP-' + Math.floor(Math.random() * 10000),
+        customer: user.name,
+        userId: user.id || user.user_id,
+        date: new Date().toISOString(),
+        status: 'Open',
+        ...payload,
+        details: description
+      };
       const state = window.AppState.getState();
-      state.complaints.push(payload);
+      state.complaints.push(fallbackItem);
       window.AppState.saveState(state);
-      return { success: true, data: payload };
+      return { success: true, data: fallbackItem };
     }
     throw new Error("State manager not found");
   },
@@ -113,12 +140,11 @@ window.CustomerAPI = {
     const user = this.getCurrentUser();
     if (!user) throw new Error("Not authenticated");
 
+    const comments = data.comments || data.comment || '';
     const payload = {
-      customer: user.name,
-      userId: user.id || user.user_id,
-      date: new Date().toISOString(),
-      status: 'Pending',
-      ...data
+      orderId: data.orderId,
+      rating: Number(data.rating),
+      comments,
     };
 
     try {

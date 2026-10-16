@@ -53,8 +53,10 @@ export class ComplaintsService {
   }
 
   create(dto: CreateComplaintDto, user: IUser): ComplaintResponseDto {
+    const description = (dto.description || dto.details || '').trim();
     const created = this.complaintsRepository.create({
       ...dto,
+      description,
       userId: user.id,
       priority: dto.priority ?? 'Medium', // Fallback ensures it's never undefined
       status: 'Open',
