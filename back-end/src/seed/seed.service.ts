@@ -46,17 +46,93 @@ export class SeedService implements OnModuleInit {
     await this.seedUsers();
     await this.seedHubs();
     await this.seedOrders();
-    if (process.env.NODE_ENV === 'development') {
+    if (this.isDevelopmentOrTestEnvironment()) {
       try {
         await this.migrateHubManagerDevelopmentData();
+        await this.seedExpandedMultiHubDevelopmentData();
       } catch (error) {
-        console.error('⚠️ Hub Manager development-data migration was not applied:', error);
+        console.error('⚠️ Development-data migration was not applied:', error);
       }
     }
     await this.seedShipments();
     await this.seedTickets();
     await this.seedComplaints();
     await this.seedFeedback();
+  }
+
+  /**
+   * Determine whether development fixtures should be seeded.
+   *
+   * Development fixtures (e.g. dev accounts and the Hub Manager demo workflow fixture)
+   * must NEVER be seeded in a production deployment, even if NODE_ENV is missing or misconfigured.
+   *
+   * Never rely on a filename alone (such as 'swifttrack.db') as proof of a development
+   * environment, because production deployments may also default to or use that filename.
+   *
+   * Development seeding is allowed ONLY when explicitly verified by:
+   * 1. NODE_ENV explicitly set to 'development' or 'test'.
+   * 2. An explicit opt-in environment flag (SEED_DEV_DATA, SWIFTTRACK_DEV_FIXTURES, SWIFTTRACK_ENV).
+   * 3. An explicit development/test npm script lifecycle event (e.g. start:dev, test, test:e2e).
+   *
+   * In all other cases (missing NODE_ENV, unknown environment, or production/staging),
+   * development fixtures are strictly suppressed.
+   */
+  isDevelopmentOrTestEnvironment(): boolean {
+    const nodeEnv = (process.env.NODE_ENV || '').toLowerCase().trim();
+
+    // 1. Strict blacklist: production or staging environments must NEVER seed dev fixtures
+    if (
+      nodeEnv === 'production' ||
+      nodeEnv === 'staging' ||
+      nodeEnv === 'prod' ||
+      nodeEnv === 'release' ||
+      nodeEnv === 'uat'
+    ) {
+      return false;
+    }
+
+    // 2. Extra safety: refuse if database path explicitly points to production
+    const dbFile = (process.env.DB_FILE || '').toLowerCase();
+    if (dbFile.includes('production') || dbFile.includes('prod.db')) {
+      return false;
+    }
+
+    // 3. Compiled distribution protection: running from dist/ without explicit dev flags is blocked
+    const isCompiledDist = __filename.includes('dist');
+    const hasExplicitDevFlag =
+      process.env.SEED_DEV_DATA === 'true' ||
+      process.env.SWIFTTRACK_DEV_FIXTURES === 'true' ||
+      process.env.SWIFTTRACK_ENV === 'development';
+
+    if (isCompiledDist && !hasExplicitDevFlag) {
+      return false;
+    }
+
+    // 4. Positive identification: explicit development or test NODE_ENV
+    if (nodeEnv === 'development' || nodeEnv === 'test') {
+      return true;
+    }
+
+    // 5. Positive identification: explicit opt-in flag
+    if (hasExplicitDevFlag) {
+      return true;
+    }
+
+    // 6. Positive identification: running from recognized development or test npm scripts
+    const lifecycle = (process.env.npm_lifecycle_event || '').toLowerCase().trim();
+    if (
+      lifecycle === 'start:dev' ||
+      lifecycle === 'start:debug' ||
+      lifecycle === 'test' ||
+      lifecycle === 'test:e2e' ||
+      lifecycle === 'test:watch'
+    ) {
+      return true;
+    }
+
+    // 7. DEFAULT CLOSED: If NODE_ENV is missing, empty, or unverified, NEVER seed dev fixtures.
+    // Filename substrings (e.g. 'swifttrack.db') are NEVER accepted as proof of development.
+    return false;
   }
 
   // ── 5 system roles with full permission maps ──────────────────────────────
@@ -168,7 +244,7 @@ export class SeedService implements OnModuleInit {
     const hashedPassword = await hash('password123');
 
     const users = [
-      ...(process.env.NODE_ENV !== 'production' ? [
+      ...(this.isDevelopmentOrTestEnvironment() ? [
         { name: 'Super Admin', email: 'super@swifttrack.com', password: hashedPassword, role: 'super_user' as const, isActive: true },
         { name: 'Business Admin', email: 'admin@swifttrack.com', password: hashedPassword, role: 'admin' as const, isActive: true },
       ] : []),
@@ -297,27 +373,28 @@ export class SeedService implements OnModuleInit {
       mk('ORD-2024-0010', 'TRK-GH56IJ78', merchant2.id, customer2.id, 'Lakshmi Priya', '12, JP Nagar Phase 2, Bengaluru - 560078', 'H004', 'H006', 'OutForDelivery', agent1?.id, 'Clothing', 'express', 2.1, 'COD', 'High', 0),
     ];
 
-    for (const o of orders) {
-      const created = this.ordersRepository.create(o as any);
-      // Ledger charge record for each seeded order (consistent financial model)
-      this.db.run(
-        `INSERT INTO payments (id, orderId, type, amount, method, status, createdAt, updatedAt)
-         VALUES (lower(hex(randomblob(16))), ?, 'charge', ?, ?, ?, ?, ?)`,
-        [
+    this.db.transaction((conn) => {
+      for (const o of orders) {
+        const created = this.ordersRepository.create(o as any, conn);
+        // Ledger charge record for each seeded order (consistent financial model)
+        conn.prepare(
+          `INSERT INTO payments (id, orderId, type, amount, method, status, createdAt, updatedAt)
+           VALUES (lower(hex(randomblob(16))), ?, 'charge', ?, ?, ?, ?, ?)`,
+        ).run(
           created.id,
           created.amount,
           created.paymentMode,
           created.paymentMode === 'Prepaid' ? 'paid' : 'pending',
           new Date().toISOString(),
           new Date().toISOString(),
-        ],
-      );
-    }
+        );
+      }
+    });
     console.log('✅ Seeded 10 orders (backend-priced) + payment charges');
   }
 
   private async migrateHubManagerDevelopmentData() {
-    const version = 'dev-hub-manager-test-data-v1';
+    const version = 'dev-hub-manager-fixture-v2';
     if (
       this.db.queryOne(
         'SELECT version FROM data_migrations WHERE version = ?',
@@ -389,14 +466,14 @@ export class SeedService implements OnModuleInit {
       },
       {
         orderId: 'ORD-2024-0006',
-        status: 'Delivered',
+        status: 'Returned',
         pickupHubId: 'H002',
         deliveryHubId: 'H001',
         agentEmail: agents[1].email,
       },
       {
         orderId: 'ORD-2024-0008',
-        status: 'InTransit',
+        status: 'PickedUp',
         pickupHubId: 'H002',
         deliveryHubId: 'H001',
         agentEmail: agents[1].email,
@@ -616,6 +693,283 @@ export class SeedService implements OnModuleInit {
         )
         .run(version, now);
     });
+  }
+
+  private async seedExpandedMultiHubDevelopmentData() {
+    const version = 'dev-multi-hub-expanded-v1';
+    if (
+      this.db.queryOne(
+        'SELECT version FROM data_migrations WHERE version = ?',
+        [version],
+      )
+    )
+      return;
+
+    const password = await bcrypt.hash('password123', 10);
+
+    // 1. Ensure additional customers & merchants exist
+    const additionalUsers = [
+      { name: 'Rohan Mehra', email: 'customer3@example.com', phone: '+91 90000 00003', role: Role.CUSTOMER },
+      { name: 'Ananya Deshmukh', email: 'customer4@example.com', phone: '+91 90000 00004', role: Role.CUSTOMER },
+      { name: 'Vikram Singhania', email: 'customer5@example.com', phone: '+91 90000 00005', role: Role.CUSTOMER },
+      { name: 'Merchant Three', email: 'merchant3@example.com', company: 'Apex Retail', role: Role.MERCHANT },
+    ];
+
+    for (const u of additionalUsers) {
+      if (!this.usersRepository.findByEmail(u.email)) {
+        this.usersRepository.create({
+          name: u.name,
+          email: u.email,
+          phone: (u as any).phone,
+          company: (u as any).company,
+          password,
+          role: u.role,
+          isActive: true,
+        });
+      }
+    }
+
+    // 2. Ensure delivery agents for H003 (Delhi), H004 (Bengaluru), H006 (Hyderabad) exist
+    const additionalAgents: Array<{
+      name: string;
+      email: string;
+      hubId: string;
+      availabilityStatus: 'Available' | 'Busy' | 'Offline';
+      vehicleType: string;
+      phone: string;
+    }> = [
+      { name: 'Agent Five', email: 'agent5@swifttrack.com', hubId: 'H003', availabilityStatus: 'Available', vehicleType: 'bike', phone: '+91 91000 00005' },
+      { name: 'Agent Six', email: 'agent6@swifttrack.com', hubId: 'H003', availabilityStatus: 'Available', vehicleType: 'van', phone: '+91 91000 00006' },
+      { name: 'Agent Seven', email: 'agent7@swifttrack.com', hubId: 'H004', availabilityStatus: 'Available', vehicleType: 'bike', phone: '+91 91000 00007' },
+      { name: 'Agent Eight', email: 'agent8@swifttrack.com', hubId: 'H004', availabilityStatus: 'Busy', vehicleType: 'bike', phone: '+91 91000 00008' },
+      { name: 'Agent Nine', email: 'agent9@swifttrack.com', hubId: 'H006', availabilityStatus: 'Available', vehicleType: 'bike', phone: '+91 91000 00009' },
+      { name: 'Agent Ten', email: 'agent10@swifttrack.com', hubId: 'H006', availabilityStatus: 'Available', vehicleType: 'van', phone: '+91 91000 00010' },
+    ];
+
+    for (const a of additionalAgents) {
+      let user = this.usersRepository.findByEmail(a.email);
+      if (!user) {
+        user = this.usersRepository.create({
+          name: a.name,
+          email: a.email,
+          phone: a.phone,
+          password,
+          role: Role.DELIVERY_AGENT,
+          hubId: a.hubId,
+          isActive: true,
+        });
+      }
+      const profile = this.agentsRepository.findByUserId(user.id);
+      if (!profile) {
+        this.agentsRepository.create({
+          userId: user.id,
+          name: a.name,
+          phone: a.phone,
+          hubId: a.hubId,
+          availabilityStatus: a.availabilityStatus,
+          vehicleType: a.vehicleType,
+          currentTasksCount: 0,
+        });
+      }
+    }
+
+    // Resolve user accounts
+    const m1 = this.usersRepository.findByEmail('merchant1@example.com')!;
+    const m2 = this.usersRepository.findByEmail('merchant2@example.com')!;
+    const m3 = this.usersRepository.findByEmail('merchant3@example.com') || m1;
+    const c1 = this.usersRepository.findByEmail('customer1@example.com')!;
+    const c2 = this.usersRepository.findByEmail('customer2@example.com')!;
+    const c3 = this.usersRepository.findByEmail('customer3@example.com') || c1;
+    const c4 = this.usersRepository.findByEmail('customer4@example.com') || c2;
+    const c5 = this.usersRepository.findByEmail('customer5@example.com') || c1;
+
+    const a1 = this.usersRepository.findByEmail('agent1@swifttrack.com');
+    const a2 = this.usersRepository.findByEmail('agent2@swifttrack.com');
+    const a3 = this.usersRepository.findByEmail('agent3@swifttrack.com');
+    const a5 = this.usersRepository.findByEmail('agent5@swifttrack.com');
+    const a6 = this.usersRepository.findByEmail('agent6@swifttrack.com');
+    const a7 = this.usersRepository.findByEmail('agent7@swifttrack.com');
+    const a8 = this.usersRepository.findByEmail('agent8@swifttrack.com');
+    const a9 = this.usersRepository.findByEmail('agent9@swifttrack.com');
+    const a10 = this.usersRepository.findByEmail('agent10@swifttrack.com');
+
+    // 50 new development orders (ORD-2024-0011 through ORD-2024-0060)
+    const definitions: Array<{
+      orderId: string;
+      trackingId: string;
+      merchant: typeof m1;
+      customer: typeof c1;
+      deliveryAddress: string;
+      pickupHubId: string;
+      deliveryHubId: string;
+      status: string;
+      assignedAgentId?: string;
+      packageType: string;
+      serviceLevel: 'standard' | 'express' | 'same-day';
+      weight: number;
+      paymentMode: 'Prepaid' | 'COD';
+      priority: 'Low' | 'Medium' | 'High';
+      daysOffset: number;
+    }> = [
+      // H001 Chennai: 3 Pending unassigned + 3 active/terminal
+      { orderId: 'ORD-2024-0011', trackingId: 'TRK-AA11BB22', merchant: m1, customer: c1, deliveryAddress: '55 Barakhamba Road, Connaught Place, New Delhi - 110001', pickupHubId: 'H001', deliveryHubId: 'H003', status: 'Pending', packageType: 'Electronics', serviceLevel: 'standard', weight: 1.5, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 0 },
+      { orderId: 'ORD-2024-0012', trackingId: 'TRK-CC33DD44', merchant: m2, customer: c2, deliveryAddress: '10 100 Feet Road, Indiranagar, Bengaluru - 560038', pickupHubId: 'H001', deliveryHubId: 'H004', status: 'Pending', packageType: 'Clothing', serviceLevel: 'express', weight: 3.2, paymentMode: 'Prepaid', priority: 'Medium', daysOffset: 0 },
+      { orderId: 'ORD-2024-0013', trackingId: 'TRK-EE55FF66', merchant: m3, customer: c3, deliveryAddress: '16 Jubilee Hills Check Post, Hyderabad - 500033', pickupHubId: 'H001', deliveryHubId: 'H006', status: 'Pending', packageType: 'Medical Supplies', serviceLevel: 'same-day', weight: 0.7, paymentMode: 'COD', priority: 'High', daysOffset: 0 },
+      { orderId: 'ORD-2024-0018', trackingId: 'TRK-OO55PP66', merchant: m2, customer: c3, deliveryAddress: '73 Outer Ring Road, Bellandur, Bengaluru - 560103', pickupHubId: 'H001', deliveryHubId: 'H004', status: 'Assigned', assignedAgentId: a3?.id, packageType: 'Electronics', serviceLevel: 'express', weight: 3.5, paymentMode: 'Prepaid', priority: 'High', daysOffset: 1 },
+      { orderId: 'ORD-2024-0019', trackingId: 'TRK-QQ77RR88', merchant: m1, customer: c4, deliveryAddress: '14 Ring Road, South Extension Part II, New Delhi - 110049', pickupHubId: 'H001', deliveryHubId: 'H003', status: 'InTransit', assignedAgentId: a3?.id, packageType: 'Industrial Tools', serviceLevel: 'standard', weight: 6.2, paymentMode: 'Prepaid', priority: 'Medium', daysOffset: 1 },
+      { orderId: 'ORD-2024-0020', trackingId: 'TRK-SS99TT00', merchant: m2, customer: c5, deliveryAddress: '42 Gachibowli Stadium Road, Hyderabad - 500032', pickupHubId: 'H001', deliveryHubId: 'H006', status: 'Delivered', assignedAgentId: a3?.id, packageType: 'Clothing', serviceLevel: 'standard', weight: 2.0, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 2 },
+
+      // H002 Mumbai: 4 Pending unassigned + 4 active/terminal
+      { orderId: 'ORD-2024-0014', trackingId: 'TRK-GG77HH88', merchant: m2, customer: c4, deliveryAddress: '12 Velachery Main Road, Chennai - 600042', pickupHubId: 'H002', deliveryHubId: 'H001', status: 'Pending', packageType: 'Handicrafts', serviceLevel: 'express', weight: 2.4, paymentMode: 'Prepaid', priority: 'High', daysOffset: 0 },
+      { orderId: 'ORD-2024-0015', trackingId: 'TRK-II99JJ00', merchant: m1, customer: c5, deliveryAddress: '88 Netaji Subhash Place, Pitampura, New Delhi - 110034', pickupHubId: 'H002', deliveryHubId: 'H003', status: 'Pending', packageType: 'Documents', serviceLevel: 'standard', weight: 0.5, paymentMode: 'Prepaid', priority: 'Medium', daysOffset: 0 },
+      { orderId: 'ORD-2024-0016', trackingId: 'TRK-KK11LL22', merchant: m2, customer: c1, deliveryAddress: '45 Brigade Road, Ashok Nagar, Bengaluru - 560025', pickupHubId: 'H002', deliveryHubId: 'H004', status: 'Pending', packageType: 'Auto Parts', serviceLevel: 'same-day', weight: 4.0, paymentMode: 'COD', priority: 'High', daysOffset: 0 },
+      { orderId: 'ORD-2024-0017', trackingId: 'TRK-MM33NN44', merchant: m3, customer: c2, deliveryAddress: '80 Banjara Hills Road No 10, Hyderabad - 500034', pickupHubId: 'H002', deliveryHubId: 'H006', status: 'Pending', packageType: 'Books', serviceLevel: 'standard', weight: 1.8, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 0 },
+      { orderId: 'ORD-2024-0042', trackingId: 'TRK-VW34XY56', merchant: m2, customer: c2, deliveryAddress: '21 Mall Road, Civil Lines, Delhi - 110054', pickupHubId: 'H002', deliveryHubId: 'H003', status: 'Assigned', assignedAgentId: a2?.id, packageType: 'Smart Watches', serviceLevel: 'express', weight: 1.1, paymentMode: 'Prepaid', priority: 'Medium', daysOffset: 1 },
+      { orderId: 'ORD-2024-0043', trackingId: 'TRK-ZA78BC90', merchant: m1, customer: c3, deliveryAddress: '92 Electronic City Phase 1, Bengaluru - 560100', pickupHubId: 'H002', deliveryHubId: 'H004', status: 'OutForDelivery', assignedAgentId: a2?.id, packageType: 'Audio Gear', serviceLevel: 'express', weight: 2.6, paymentMode: 'Prepaid', priority: 'High', daysOffset: 1 },
+      { orderId: 'ORD-2024-0044', trackingId: 'TRK-DE12FG34', merchant: m2, customer: c4, deliveryAddress: '34 Anna Nagar 2nd Avenue, Chennai - 600040', pickupHubId: 'H002', deliveryHubId: 'H001', status: 'Delivered', assignedAgentId: a2?.id, packageType: 'Kitchen Appliances', serviceLevel: 'standard', weight: 5.8, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 3 },
+      { orderId: 'ORD-2024-0045', trackingId: 'TRK-HI56JK78', merchant: m1, customer: c5, deliveryAddress: '25 Madhapur Main Road, HITEC City, Hyderabad - 500081', pickupHubId: 'H002', deliveryHubId: 'H006', status: 'Returned', assignedAgentId: a2?.id, packageType: 'Footwear', serviceLevel: 'standard', weight: 1.6, paymentMode: 'COD', priority: 'Medium', daysOffset: 2 },
+
+      // H003 Delhi: 4 Pending unassigned + 6 active/terminal
+      { orderId: 'ORD-2024-0021', trackingId: 'TRK-UU11VV22', merchant: m1, customer: c1, deliveryAddress: '78 OMR IT Highway, Sholinganallur, Chennai - 600119', pickupHubId: 'H003', deliveryHubId: 'H001', status: 'Pending', packageType: 'Documents', serviceLevel: 'express', weight: 0.6, paymentMode: 'Prepaid', priority: 'High', daysOffset: 0 },
+      { orderId: 'ORD-2024-0022', trackingId: 'TRK-WW33XX44', merchant: m2, customer: c2, deliveryAddress: '28 Linking Road, Bandra West, Mumbai - 400050', pickupHubId: 'H003', deliveryHubId: 'H002', status: 'Pending', packageType: 'Consumer Goods', serviceLevel: 'standard', weight: 3.8, paymentMode: 'Prepaid', priority: 'Medium', daysOffset: 0 },
+      { orderId: 'ORD-2024-0023', trackingId: 'TRK-YY55ZZ66', merchant: m3, customer: c3, deliveryAddress: '10 100 Feet Road, Indiranagar, Bengaluru - 560038', pickupHubId: 'H003', deliveryHubId: 'H004', status: 'Pending', packageType: 'Medical Supplies', serviceLevel: 'express', weight: 1.2, paymentMode: 'COD', priority: 'High', daysOffset: 0 },
+      { orderId: 'ORD-2024-0024', trackingId: 'TRK-AB12CD34', merchant: m2, customer: c4, deliveryAddress: '16 Jubilee Hills Check Post, Hyderabad - 500033', pickupHubId: 'H003', deliveryHubId: 'H006', status: 'Pending', packageType: 'Sports Gear', serviceLevel: 'standard', weight: 2.7, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 0 },
+      { orderId: 'ORD-2024-0025', trackingId: 'TRK-EF56GH78', merchant: m1, customer: c5, deliveryAddress: '19 Gandhi Irwin Road, Egmore, Chennai - 600008', pickupHubId: 'H003', deliveryHubId: 'H001', status: 'Assigned', assignedAgentId: a5?.id, packageType: 'Electronics', serviceLevel: 'same-day', weight: 2.3, paymentMode: 'Prepaid', priority: 'High', daysOffset: 1 },
+      { orderId: 'ORD-2024-0026', trackingId: 'TRK-IJ90KL12', merchant: m2, customer: c1, deliveryAddress: '9 Nariman Point, Marine Drive, Mumbai - 400021', pickupHubId: 'H003', deliveryHubId: 'H002', status: 'InTransit', assignedAgentId: a5?.id, packageType: 'Hardware', serviceLevel: 'standard', weight: 5.5, paymentMode: 'COD', priority: 'Medium', daysOffset: 1 },
+      { orderId: 'ORD-2024-0027', trackingId: 'TRK-MN34OP56', merchant: m1, customer: c2, deliveryAddress: '73 Outer Ring Road, Bellandur, Bengaluru - 560103', pickupHubId: 'H003', deliveryHubId: 'H004', status: 'PickedUp', assignedAgentId: a6?.id, packageType: 'Fashion', serviceLevel: 'express', weight: 1.9, paymentMode: 'Prepaid', priority: 'High', daysOffset: 1 },
+      { orderId: 'ORD-2024-0046', trackingId: 'TRK-LM90NO12', merchant: m2, customer: c1, deliveryAddress: '42 Gachibowli Stadium Road, Hyderabad - 500032', pickupHubId: 'H003', deliveryHubId: 'H006', status: 'OutForDelivery', assignedAgentId: a5?.id, packageType: 'Network Switches', serviceLevel: 'express', weight: 4.1, paymentMode: 'Prepaid', priority: 'High', daysOffset: 1 },
+      { orderId: 'ORD-2024-0047', trackingId: 'TRK-PQ34RS56', merchant: m1, customer: c2, deliveryAddress: '12 Velachery Main Road, Chennai - 600042', pickupHubId: 'H003', deliveryHubId: 'H001', status: 'Delivered', assignedAgentId: a6?.id, packageType: 'Ceramic Tiles', serviceLevel: 'standard', weight: 9.5, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 2 },
+      { orderId: 'ORD-2024-0048', trackingId: 'TRK-TU78VW90', merchant: m2, customer: c3, deliveryAddress: '64 SV Road, Malad West, Mumbai - 400064', pickupHubId: 'H003', deliveryHubId: 'H002', status: 'Failed', assignedAgentId: a6?.id, packageType: 'Fragile Glassware', serviceLevel: 'standard', weight: 2.2, paymentMode: 'COD', priority: 'Medium', daysOffset: 2 },
+
+      // H004 Bengaluru: 4 Pending unassigned + 6 active/terminal
+      { orderId: 'ORD-2024-0028', trackingId: 'TRK-QR78ST90', merchant: m2, customer: c3, deliveryAddress: '34 Anna Nagar 2nd Avenue, Chennai - 600040', pickupHubId: 'H004', deliveryHubId: 'H001', status: 'Pending', packageType: 'Electronics', serviceLevel: 'same-day', weight: 1.4, paymentMode: 'Prepaid', priority: 'High', daysOffset: 0 },
+      { orderId: 'ORD-2024-0029', trackingId: 'TRK-UV12WX34', merchant: m1, customer: c4, deliveryAddress: '102 Hiranandani Gardens, Powai, Mumbai - 400076', pickupHubId: 'H004', deliveryHubId: 'H002', status: 'Pending', packageType: 'Office Supplies', serviceLevel: 'express', weight: 2.8, paymentMode: 'Prepaid', priority: 'Medium', daysOffset: 0 },
+      { orderId: 'ORD-2024-0030', trackingId: 'TRK-YZ56AB78', merchant: m2, customer: c5, deliveryAddress: '55 Barakhamba Road, Connaught Place, New Delhi - 110001', pickupHubId: 'H004', deliveryHubId: 'H003', status: 'Pending', packageType: 'Lab Equipment', serviceLevel: 'standard', weight: 4.6, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 0 },
+      { orderId: 'ORD-2024-0031', trackingId: 'TRK-CD90EF12', merchant: m3, customer: c1, deliveryAddress: '80 Banjara Hills Road No 10, Hyderabad - 500034', pickupHubId: 'H004', deliveryHubId: 'H006', status: 'Pending', packageType: 'Perishables', serviceLevel: 'express', weight: 3.0, paymentMode: 'COD', priority: 'High', daysOffset: 0 },
+      { orderId: 'ORD-2024-0032', trackingId: 'TRK-GH34IJ56', merchant: m2, customer: c2, deliveryAddress: '78 OMR IT Highway, Sholinganallur, Chennai - 600119', pickupHubId: 'H004', deliveryHubId: 'H001', status: 'Assigned', assignedAgentId: a7?.id, packageType: 'Components', serviceLevel: 'standard', weight: 3.2, paymentMode: 'Prepaid', priority: 'Medium', daysOffset: 1 },
+      { orderId: 'ORD-2024-0033', trackingId: 'TRK-KL78MN90', merchant: m1, customer: c3, deliveryAddress: '28 Linking Road, Bandra West, Mumbai - 400050', pickupHubId: 'H004', deliveryHubId: 'H002', status: 'OutForDelivery', assignedAgentId: a7?.id, packageType: 'Cosmetics', serviceLevel: 'express', weight: 1.5, paymentMode: 'Prepaid', priority: 'High', daysOffset: 1 },
+      { orderId: 'ORD-2024-0034', trackingId: 'TRK-OP12QR34', merchant: m2, customer: c4, deliveryAddress: '14 Ring Road, South Extension Part II, New Delhi - 110049', pickupHubId: 'H004', deliveryHubId: 'H003', status: 'InTransit', assignedAgentId: a8?.id, packageType: 'Machine Parts', serviceLevel: 'standard', weight: 8.4, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 2 },
+      { orderId: 'ORD-2024-0049', trackingId: 'TRK-XY12ZA34', merchant: m1, customer: c4, deliveryAddress: '25 Madhapur Main Road, HITEC City, Hyderabad - 500081', pickupHubId: 'H004', deliveryHubId: 'H006', status: 'PickedUp', assignedAgentId: a7?.id, packageType: 'Sensor Modules', serviceLevel: 'same-day', weight: 0.8, paymentMode: 'Prepaid', priority: 'High', daysOffset: 1 },
+      { orderId: 'ORD-2024-0050', trackingId: 'TRK-BC56DE78', merchant: m2, customer: c5, deliveryAddress: '19 Gandhi Irwin Road, Egmore, Chennai - 600008', pickupHubId: 'H004', deliveryHubId: 'H001', status: 'Delivered', assignedAgentId: a8?.id, packageType: 'Educational Kits', serviceLevel: 'standard', weight: 3.6, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 3 },
+      { orderId: 'ORD-2024-0051', trackingId: 'TRK-FG90HI12', merchant: m1, customer: c1, deliveryAddress: '9 Nariman Point, Marine Drive, Mumbai - 400021', pickupHubId: 'H004', deliveryHubId: 'H002', status: 'Cancelled', packageType: 'Fitness Trackers', serviceLevel: 'standard', weight: 1.3, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 2 },
+
+      // H006 Hyderabad: 4 Pending unassigned + 6 active/terminal
+      { orderId: 'ORD-2024-0035', trackingId: 'TRK-ST56UV78', merchant: m1, customer: c5, deliveryAddress: '12 Velachery Main Road, Chennai - 600042', pickupHubId: 'H006', deliveryHubId: 'H001', status: 'Pending', packageType: 'Pharmaceuticals', serviceLevel: 'express', weight: 1.8, paymentMode: 'Prepaid', priority: 'High', daysOffset: 0 },
+      { orderId: 'ORD-2024-0036', trackingId: 'TRK-WX90YZ12', merchant: m2, customer: c1, deliveryAddress: '64 SV Road, Malad West, Mumbai - 400064', pickupHubId: 'H006', deliveryHubId: 'H002', status: 'Pending', packageType: 'Textiles', serviceLevel: 'same-day', weight: 2.1, paymentMode: 'Prepaid', priority: 'High', daysOffset: 0 },
+      { orderId: 'ORD-2024-0037', trackingId: 'TRK-BC34DE56', merchant: m3, customer: c2, deliveryAddress: '88 Netaji Subhash Place, Pitampura, New Delhi - 110034', pickupHubId: 'H006', deliveryHubId: 'H003', status: 'Pending', packageType: 'Heavy Hardware', serviceLevel: 'standard', weight: 6.7, paymentMode: 'COD', priority: 'Medium', daysOffset: 0 },
+      { orderId: 'ORD-2024-0038', trackingId: 'TRK-FG78HI90', merchant: m2, customer: c3, deliveryAddress: '45 Brigade Road, Ashok Nagar, Bengaluru - 560025', pickupHubId: 'H006', deliveryHubId: 'H004', status: 'Pending', packageType: 'Retail Apparel', serviceLevel: 'express', weight: 2.5, paymentMode: 'Prepaid', priority: 'Medium', daysOffset: 0 },
+      { orderId: 'ORD-2024-0039', trackingId: 'TRK-JK12LM34', merchant: m1, customer: c4, deliveryAddress: '34 Anna Nagar 2nd Avenue, Chennai - 600040', pickupHubId: 'H006', deliveryHubId: 'H001', status: 'Assigned', assignedAgentId: a9?.id, packageType: 'Solar Parts', serviceLevel: 'standard', weight: 5.1, paymentMode: 'Prepaid', priority: 'Medium', daysOffset: 1 },
+      { orderId: 'ORD-2024-0040', trackingId: 'TRK-NO56PQ78', merchant: m2, customer: c5, deliveryAddress: '102 Hiranandani Gardens, Powai, Mumbai - 400076', pickupHubId: 'H006', deliveryHubId: 'H002', status: 'InTransit', assignedAgentId: a9?.id, packageType: 'Telecom Gear', serviceLevel: 'express', weight: 3.4, paymentMode: 'Prepaid', priority: 'High', daysOffset: 1 },
+      { orderId: 'ORD-2024-0041', trackingId: 'TRK-RS90TU12', merchant: m1, customer: c1, deliveryAddress: '21 Mall Road, Civil Lines, Delhi - 110054', pickupHubId: 'H006', deliveryHubId: 'H003', status: 'PickedUp', assignedAgentId: a10?.id, packageType: 'Luxury Goods', serviceLevel: 'same-day', weight: 1.0, paymentMode: 'COD', priority: 'High', daysOffset: 1 },
+      { orderId: 'ORD-2024-0052', trackingId: 'TRK-JK34LM56', merchant: m2, customer: c2, deliveryAddress: '92 Electronic City Phase 1, Bengaluru - 560100', pickupHubId: 'H006', deliveryHubId: 'H004', status: 'OutForDelivery', assignedAgentId: a9?.id, packageType: 'Drone Accessories', serviceLevel: 'express', weight: 2.9, paymentMode: 'Prepaid', priority: 'High', daysOffset: 1 },
+      { orderId: 'ORD-2024-0053', trackingId: 'TRK-NO78PQ90', merchant: m1, customer: c3, deliveryAddress: '78 OMR IT Highway, Sholinganallur, Chennai - 600119', pickupHubId: 'H006', deliveryHubId: 'H001', status: 'Delivered', assignedAgentId: a10?.id, packageType: 'Craft Supplies', serviceLevel: 'standard', weight: 1.7, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 2 },
+      { orderId: 'ORD-2024-0054', trackingId: 'TRK-RS12TU34', merchant: m2, customer: c4, deliveryAddress: '28 Linking Road, Bandra West, Mumbai - 400050', pickupHubId: 'H006', deliveryHubId: 'H002', status: 'Returned', assignedAgentId: a10?.id, packageType: 'Designer Apparel', serviceLevel: 'standard', weight: 1.9, paymentMode: 'COD', priority: 'Medium', daysOffset: 2 },
+
+      // H005 Kolkata (Maintenance Hub): Historical terminal orders only — zero pending unassigned
+      { orderId: 'ORD-2024-0055', trackingId: 'TRK-VW56XY78', merchant: m1, customer: c5, deliveryAddress: '11 Park Street, Kolkata - 700016', pickupHubId: 'H001', deliveryHubId: 'H005', status: 'Delivered', assignedAgentId: a1?.id, packageType: 'Printing Paper', serviceLevel: 'standard', weight: 8.0, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 4 },
+      { orderId: 'ORD-2024-0056', trackingId: 'TRK-ZA90BC12', merchant: m2, customer: c1, deliveryAddress: '50 Salt Lake Sector V, Kolkata - 700091', pickupHubId: 'H003', deliveryHubId: 'H005', status: 'Delivered', assignedAgentId: a5?.id, packageType: 'Books & Journals', serviceLevel: 'express', weight: 4.3, paymentMode: 'Prepaid', priority: 'Medium', daysOffset: 3 },
+      { orderId: 'ORD-2024-0057', trackingId: 'TRK-DE34FG56', merchant: m1, customer: c2, deliveryAddress: '22 Camac Street, Kolkata - 700017', pickupHubId: 'H004', deliveryHubId: 'H005', status: 'Returned', assignedAgentId: a7?.id, packageType: 'Test Probes', serviceLevel: 'standard', weight: 1.5, paymentMode: 'COD', priority: 'Low', daysOffset: 3 },
+      { orderId: 'ORD-2024-0058', trackingId: 'TRK-HI78JK90', merchant: m2, customer: c3, deliveryAddress: '11 Park Street, Kolkata - 700016', pickupHubId: 'H006', deliveryHubId: 'H005', status: 'Delivered', assignedAgentId: a9?.id, packageType: 'Handloom Fabrics', serviceLevel: 'express', weight: 3.8, paymentMode: 'Prepaid', priority: 'Medium', daysOffset: 4 },
+      { orderId: 'ORD-2024-0059', trackingId: 'TRK-LM12NO34', merchant: m1, customer: c4, deliveryAddress: '50 Salt Lake Sector V, Kolkata - 700091', pickupHubId: 'H002', deliveryHubId: 'H005', status: 'Cancelled', packageType: 'Ceramic Mugs', serviceLevel: 'standard', weight: 2.7, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 3 },
+      { orderId: 'ORD-2024-0060', trackingId: 'TRK-PQ56RS78', merchant: m2, customer: c5, deliveryAddress: '22 Camac Street, Kolkata - 700017', pickupHubId: 'H002', deliveryHubId: 'H005', status: 'Delivered', assignedAgentId: a2?.id, packageType: 'Packaged Snacks', serviceLevel: 'standard', weight: 5.0, paymentMode: 'Prepaid', priority: 'Low', daysOffset: 5 },
+    ];
+
+    // Insert orders and payments inside transaction
+    this.db.transaction((conn) => {
+      // Re-check version inside transaction for strict concurrency safety
+      if (
+        conn
+          .prepare('SELECT version FROM data_migrations WHERE version = ?')
+          .get(version)
+      ) {
+        return;
+      }
+
+      for (const d of definitions) {
+        const existing = conn.prepare('SELECT id FROM orders WHERE orderId = ?').get(d.orderId);
+        if (existing) continue;
+
+        const breakdown = this.pricingService.calculateQuote({
+          serviceLevel: d.serviceLevel,
+          weightKg: d.weight,
+          paymentMode: d.paymentMode,
+        });
+
+        const history: IStatusEvent[] = [
+          {
+            status: 'Pending',
+            timestamp: new Date(Date.now() - (d.daysOffset + 1) * 86400000).toISOString(),
+            note: 'Order created',
+          },
+        ];
+        if (d.status !== 'Pending') {
+          history.push({
+            status: d.status,
+            timestamp: new Date(Date.now() - d.daysOffset * 86400000).toISOString(),
+            note: `Seeded at ${d.status}`,
+          });
+        }
+
+        const orderRow = this.ordersRepository.create({
+          orderId: d.orderId,
+          trackingId: d.trackingId,
+          merchantId: d.merchant.id,
+          customerId: d.customer.id,
+          customerName: d.customer.name,
+          customerPhone: d.customer.phone || '+91 90000 00001',
+          deliveryAddress: d.deliveryAddress,
+          pickupHubId: d.pickupHubId,
+          deliveryHubId: d.deliveryHubId,
+          status: d.status,
+          assignedAgentId: d.assignedAgentId,
+          packageType: d.packageType,
+          serviceLevel: d.serviceLevel,
+          weight: d.weight,
+          amount: breakdown.total,
+          pricingBreakdown: breakdown,
+          paymentMode: d.paymentMode,
+          paymentStatus: d.paymentMode === 'Prepaid' ? 'paid' : 'pending',
+          priority: d.priority,
+          estimatedDelivery: new Date(Date.now() + 2 * 86400000),
+          statusHistory: history,
+        } as any, conn);
+
+        conn
+          .prepare(
+            `INSERT INTO payments (id, orderId, type, amount, method, status, createdAt, updatedAt)
+             VALUES (lower(hex(randomblob(16))), ?, 'charge', ?, ?, ?, ?, ?)`,
+          )
+          .run(
+            orderRow.id,
+            orderRow.amount,
+            orderRow.paymentMode,
+            orderRow.paymentMode === 'Prepaid' ? 'paid' : 'pending',
+            new Date().toISOString(),
+            new Date().toISOString(),
+          );
+      }
+
+      // Recalculate currentTasksCount for all agents from active orders
+      const now = new Date().toISOString();
+      conn
+        .prepare(
+          `UPDATE agents
+           SET currentTasksCount = (
+             SELECT COUNT(*) FROM orders
+             WHERE assignedAgentId = agents.userId
+               AND status NOT IN ('Delivered', 'Cancelled', 'Returned', 'Failed')
+           ), updatedAt = ?`,
+        )
+        .run(now);
+
+      conn
+        .prepare(
+          'INSERT INTO data_migrations (version, appliedAt) VALUES (?, ?)',
+        )
+        .run(version, now);
+    });
+
+    console.log(`✅ Applied development data migration ${version} (expanded 60-order multi-hub dataset)`);
   }
 
   // ── 4 demo shipments ──────────────────────────────────────────────────────
