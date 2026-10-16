@@ -14,14 +14,22 @@ const AdminDashboard = () => {
     const [recentUsers, setRecentUsers] = useState([]);
     const [recentComplaints, setRecentComplaints] = useState([]);
 
+    const [apiLatency, setApiLatency] = useState('Measuring...');
+    const [activeHubs, setActiveHubs] = useState(0);
+
     useEffect(() => {
         async function loadData() {
             try {
-                const [users, shipments, complaints] = await Promise.all([
+                const startTime = performance.now();
+                const [users, shipments, complaints, hubs] = await Promise.all([
                     API.users.getAll().catch(() => []),
                     API.shipments.getAll().catch(() => []),
                     API.complaints.getAll().catch(() => []),
+                    API.hubs.getAll().catch(() => []),
                 ]);
+
+                const latencyMs = Math.round(performance.now() - startTime);
+                setApiLatency(`${latencyMs} ms`);
 
                 if (Array.isArray(users) && users.length > 0) {
                     setUsers(users.length);
@@ -55,6 +63,12 @@ const AdminDashboard = () => {
                     .slice(0, 5);
                     setRecentComplaints(sortedComplaints);
                 }
+
+                if (Array.isArray(hubs)) {
+                    const activeCount = hubs.filter(h => h.status ? h.status.toLowerCase() === 'active' : true).length;
+                    setActiveHubs(activeCount);
+                }
+
             } catch (err) {
                 console.error("Error fetching data:", err);
                 setDbStatus('disconnected');
@@ -121,9 +135,10 @@ const AdminDashboard = () => {
                     value={dbStatus}
                     isicon={false}
                 />
+                {/* computed using performance.now() to measure the time taken for API calls */}
                 <KPICard
-                    title="Server Load(CPU)"
-                    value="67%"
+                    title="API Latency"
+                    value={apiLatency}
                     isicon={false}
                 />
                 <KPICard
@@ -132,8 +147,8 @@ const AdminDashboard = () => {
                     isicon={false}
                 />
                 <KPICard
-                    title="System Alerts"
-                    value="0"
+                    title="Active Hubs"
+                    value={activeHubs}
                     isicon={false}
                 />
             </div>

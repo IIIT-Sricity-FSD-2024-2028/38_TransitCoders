@@ -9,8 +9,8 @@ export default function ComplaintsManagement() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [searchTerm, setSearchTerm] = useState("")
-    const [selectedPriority, setSelectedPriority] = useState("All")
-    const [selectedStatus, setSelectedStatus] = useState("All")
+    const [selectedPriority, setSelectedPriority] = useState("All Priorities")
+    const [selectedStatus, setSelectedStatus] = useState("All Statuses")
     const [activeMenuId, setActiveMenuId] = useState(null) //for adding 3dots menu for actions in each row
 
     useEffect(() => {
@@ -39,8 +39,8 @@ export default function ComplaintsManagement() {
             (complaint.description?.toLowerCase().includes(query)) ||
             (complaint.type?.toLowerCase().includes(query))||
             (complaint.id?.toString().includes(query))  
-            const matchesPriority = selectedPriority === "All" || complaint.priority === selectedPriority
-            const matchesStatus = selectedStatus === "All" || complaint.status === selectedStatus
+            const matchesPriority = selectedPriority === "All Priorities" || complaint.priority === selectedPriority
+            const matchesStatus = selectedStatus === "All Statuses" || complaint.status === selectedStatus
             return matchesSearch && matchesPriority && matchesStatus
         })
     }, [complaints, searchTerm, selectedPriority, selectedStatus])
