@@ -19,6 +19,7 @@ export default function DashBoard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const hubId = currentUser.hubId || currentUser.hub_id || "";
 
   const [availableAgents, setAvailableAgents] = useState(0);
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -30,8 +31,6 @@ export default function DashBoard() {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedViewOrder, setSelectedViewOrder] = useState(null);
 
-  const recentOrders = orders.slice(0, 4);
-
   const deliveredOrders = orders.filter((order) => {
     return order.status === "Delivered";
   }).length;
@@ -39,13 +38,14 @@ export default function DashBoard() {
   async function loadAvailableAgents() {
     try {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const currentHubId = user.hubId || user.hub_id || "";
 
-      if (!user.hubId) {
+      if (!currentHubId) {
         setAvailableAgents(0);
         return;
       }
 
-      const agents = await API.hubs.getAgentsForHub(user.hubId);
+      const agents = await API.hubs.getAgentsForHub(currentHubId);
 
       if (Array.isArray(agents)) {
         setAvailableAgents(
@@ -155,62 +155,54 @@ export default function DashBoard() {
               />
             </div>
 
+            <div className="order-filters">
+              {["All", "Pending", "Assigned", "InTransit", "OutForDelivery", "Delivered"].map((status) => (
+                <button
+                  key={status}
+                  className={activeFilter === status ? "active" : ""}
+                  onClick={() => setActiveFilter(status)}
+                >
+                  {{
+                    All: "All",
+                    Pending: "Pending",
+                    Assigned: "Assigned",
+                    InTransit: "In Transit",
+                    OutForDelivery: "Out for Delivery",
+                    Delivered: "Delivered",
+                  }[status] || status}
+                </button>
+              ))}
+            </div>
+
             <div className="recent-orders">
               <div className="recent-orders-heading">
-                <h2>Recent Orders</h2>
-                <Link to="/hub/queue">View All Orders</Link>
+                <h2>{activeFilter === "All" ? "All Orders" : `${activeFilter} Orders`} ({filteredOrders.length})</h2>
+                <Link to="/hub/queue">View All in Queue</Link>
               </div>
 
-              {recentOrders.length === 0 ? (
-                <p>No orders available.</p>
+              {filteredOrders.length === 0 ? (
+                <p className="empty-orders-text">No orders found for this status.</p>
               ) : (
-                recentOrders.map((order) => {
-                  return (
-                    <div className="recent-order-card" key={order.id}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "10px" }}>
-                        <div>
-                          <h3>{order.orderId}</h3>
-                          <p><strong>Tracking ID:</strong> {order.trackingId || "N/A"}</p>
-                          <p><strong>Status:</strong> {order.status}</p>
-                          <p><strong>Customer:</strong> {order.customerName || "N/A"}</p>
-                          <p><strong>Destination:</strong> {order.deliveryAddress || "N/A"}</p>
-                        </div>
-                        <button
-                          onClick={() => {
-                            setSelectedViewOrder(order);
-                            setShowDetailsModal(true);
-                          }}
-                        >
-                          View Details
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-            {/* {filteredOrders.length === 0 ? (
-              <p className="empty-orders-text">
-                No orders found for this status.
-              </p>
-            ) : (
-              filteredOrders.map((order) => {
-                return (
+                filteredOrders.map((order) => (
                   <OrderCard
                     key={order.id}
                     order={order}
-                    onAssign={() => {
-                      setSelectedOrder(order);
-                      setShowAssignModal(true);
-                    }}
+                    onAssign={
+                      hubId &&
+                      order.pickupHubId === hubId &&
+                      order.status === "Pending" &&
+                      !order.assignedAgentId
+                        ? () => {
+                            setSelectedOrder(order);
+                            setShowAssignModal(true);
+                          }
+                        : undefined
+                    }
                     onTransfer={
-                      order.pickupHubId === currentUser.hubId &&
-                      ![
-                        "Delivered",
-                        "Cancelled",
-                        "Returned",
-                        "Failed",
-                      ].includes(order.status)
+                      hubId &&
+                      order.pickupHubId === hubId &&
+                      order.status === "Pending" &&
+                      !order.assignedAgentId
                         ? () => {
                             setSelectedTransferOrder(order);
                             setShowTransferModal(true);
@@ -222,16 +214,16 @@ export default function DashBoard() {
                       setShowDetailsModal(true);
                     }}
                   />
-                );
-              })
-            )} */}
+                ))
+              )}
+            </div>
           </>
         ) : (
           <></>
         )}
       </div>
 
-      {/* <AssignAgentModal
+      <AssignAgentModal
         order={selectedOrder}
         isOpen={showAssignModal}
         onClose={() => setShowAssignModal(false)}
@@ -243,7 +235,7 @@ export default function DashBoard() {
         isOpen={showTransferModal}
         onClose={() => setShowTransferModal(false)}
         onSuccess={refreshOrders}
-      /> */}
+      />
 
       <OrderDetailsModal
         order={selectedViewOrder}

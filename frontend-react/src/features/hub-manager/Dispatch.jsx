@@ -20,12 +20,13 @@ export default function Dispatch() {
     setError("");
     try {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-      if (!user.hubId) {
+      const currentHubId = user.hubId || user.hub_id || "";
+      if (!currentHubId) {
         setOrders([]);
         setError("The signed-in Hub Manager has no assigned hub.");
         return;
       }
-      setHubId(user.hubId);
+      setHubId(currentHubId);
 
       const result = await API.orders.getAll();
       if (!Array.isArray(result)) {
@@ -44,10 +45,12 @@ export default function Dispatch() {
     loadOrders();
   }, []);
 
+  const effectiveHubId = hubId || (JSON.parse(localStorage.getItem("user") || "{}").hubId || JSON.parse(localStorage.getItem("user") || "{}").hub_id || "");
+
   const pendingOrders = orders.filter((order) => {
     return (
       order.status === "Pending" &&
-      order.pickupHubId === hubId &&
+      order.pickupHubId === effectiveHubId &&
       !order.assignedAgentId
     );
   });

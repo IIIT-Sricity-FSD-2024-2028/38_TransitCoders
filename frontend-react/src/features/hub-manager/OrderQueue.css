@@ -17,6 +17,16 @@
     cursor: pointer;
 }
 
+.queue-filter button:hover {
+    background-color: #f3f4f6;
+}
+
+.queue-filter button.active {
+    background-color: #ff6b1a;
+    color: #fff;
+    border-color: #ff6b1a;
+}
+
 .queue-search-container {
     margin-top: 16px;
     margin-bottom: 8px;

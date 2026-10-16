@@ -10,6 +10,7 @@ const terminalStatuses = ["Delivered", "Cancelled", "Returned", "Failed"];
 
 export default function HubTransfer() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const hubId = user.hubId || user.hub_id || "";
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -21,7 +22,7 @@ export default function HubTransfer() {
     setLoading(true);
     setError("");
     try {
-      if (!user.hubId) {
+      if (!hubId) {
         throw new Error("The signed-in Hub Manager has no assigned hub.");
       }
 
@@ -44,7 +45,7 @@ export default function HubTransfer() {
 
   const transferOrders = orders.filter(
     (order) =>
-      order.pickupHubId === user.hubId &&
+      order.pickupHubId === hubId &&
       order.status === "Pending" &&
       !order.assignedAgentId,
   );

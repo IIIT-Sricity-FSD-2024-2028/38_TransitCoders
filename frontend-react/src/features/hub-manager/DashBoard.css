@@ -50,6 +50,12 @@
     background-color: #f3f4f6;
 }
 
+.order-filters button.active {
+    background-color: #ff6b1a;
+    color: #fff;
+    border-color: #ff6b1a;
+}
+
 .recent-orders {
     margin-top: 30px;
 }

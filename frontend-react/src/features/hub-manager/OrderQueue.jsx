@@ -3,6 +3,7 @@ import HubManagerLayout from "./HubManagerLayout.jsx";
 import { API } from "../../services/api.js";
 import OrderCard from "./OrderCard";
 import AssignAgentModal from "./modals/AssignAgentModal";
+import TransferHubModal from "./modals/TransferHubModal";
 import OrderDetailsModal from "./modals/OrderDetailsModal";
 import "./OrderQueue.css";
 
@@ -14,9 +15,12 @@ export default function OrderQueue() {
   const [error, setError] = useState("");
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedAssignOrder, setSelectedAssignOrder] = useState(null);
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [selectedTransferOrder, setSelectedTransferOrder] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const hubId = user.hubId || user.hub_id || "";
 
   async function loadOrders() {
     setLoading(true);
@@ -104,13 +108,24 @@ export default function OrderQueue() {
               key={order.id}
               order={order}
               onAssign={
-                user.hubId &&
-                order.pickupHubId === user.hubId &&
+                hubId &&
+                order.pickupHubId === hubId &&
                 order.status === "Pending" &&
                 !order.assignedAgentId
                   ? () => {
                       setSelectedAssignOrder(order);
                       setShowAssignModal(true);
+                    }
+                  : undefined
+              }
+              onTransfer={
+                hubId &&
+                order.pickupHubId === hubId &&
+                order.status === "Pending" &&
+                !order.assignedAgentId
+                  ? () => {
+                      setSelectedTransferOrder(order);
+                      setShowTransferModal(true);
                     }
                   : undefined
               }
@@ -127,6 +142,13 @@ export default function OrderQueue() {
         order={selectedAssignOrder}
         isOpen={showAssignModal}
         onClose={() => setShowAssignModal(false)}
+        onSuccess={loadOrders}
+      />
+
+      <TransferHubModal
+        order={selectedTransferOrder}
+        isOpen={showTransferModal}
+        onClose={() => setShowTransferModal(false)}
         onSuccess={loadOrders}
       />
 

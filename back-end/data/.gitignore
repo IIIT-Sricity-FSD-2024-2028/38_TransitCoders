@@ -1,0 +1,5 @@
+*.db-wal
+*.db-shm
+swifttrack.backup-*.db
+swifttrack.pre-migration-*.db
+swifttrack.runtime-test.db*
