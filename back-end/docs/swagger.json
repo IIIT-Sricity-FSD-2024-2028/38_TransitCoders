@@ -3100,8 +3100,7 @@
           }
         },
         "required": [
-          "type",
-          "description"
+          "type"
         ]
       },
       "UpdateComplaintDto": {
@@ -3144,6 +3143,10 @@
           "customerName": {
             "type": "string",
             "example": "John Doe"
+          },
+          "orderId": {
+            "type": "string",
+            "example": "ORD-2024-0001"
           },
           "rating": {
             "type": "number",

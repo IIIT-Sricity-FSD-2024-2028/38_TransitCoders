@@ -239,7 +239,13 @@ export const customerService = {
         await this.ensureAuth();
         try {
             const res = await API.complaints.getAll();
-            if (Array.isArray(res) && res.length > 0) return res;
+            if (Array.isArray(res) && res.length > 0) {
+                return res.map(c => ({
+                    ...c,
+                    details: c.details || c.description,
+                    description: c.description || c.details
+                }));
+            }
         } catch (_) { /* fallback below */ }
 
         return [
@@ -267,26 +273,36 @@ export const customerService = {
     // Submit a new complaint
     async submitComplaint(data) {
         await this.ensureAuth();
+        const description = data.description || data.details || '';
         const payload = {
             orderId: data.orderId,
-            type: data.type || 'General Inquiry',
-            details: data.details,
-            priority: data.priority || 'Medium',
-            customer: 'Aarav Sharma',
-            createdAt: new Date().toISOString(),
-            status: 'Open'
+            type: data.type || 'General Issue',
+            description,
+            priority: data.priority || 'Medium'
         };
 
         try {
             const res = await API.complaints.create(payload);
-            if (res) return { success: true, data: res };
+            if (res) {
+                const item = res.data || res;
+                return { 
+                    success: true, 
+                    data: { ...item, details: item.description || description } 
+                };
+            }
         } catch (err) {
             console.warn('[customerService] Backend complaint create offline, mock saved:', err.message);
         }
 
         return {
             success: true,
-            data: { id: `CMP-${Math.floor(1000 + Math.random() * 9000)}`, ...payload }
+            data: { 
+                id: `CMP-${Math.floor(1000 + Math.random() * 9000)}`, 
+                ...payload, 
+                details: description,
+                status: 'Open', 
+                createdAt: new Date().toISOString() 
+            }
         };
     },
 
@@ -295,7 +311,14 @@ export const customerService = {
         await this.ensureAuth();
         try {
             const res = await API.feedback.getAll();
-            if (Array.isArray(res) && res.length > 0) return res;
+            if (Array.isArray(res) && res.length > 0) {
+                return res.map(f => ({
+                    ...f,
+                    comment: f.comment || f.comments,
+                    comments: f.comments || f.comment,
+                    orderId: f.orderId || 'General'
+                }));
+            }
         } catch (_) { /* fallback below */ }
 
         return [
@@ -313,25 +336,34 @@ export const customerService = {
     // Submit customer feedback and star rating
     async submitFeedback(data) {
         await this.ensureAuth();
+        const comments = data.comments || data.comment || '';
         const payload = {
             orderId: data.orderId,
             rating: Number(data.rating),
-            comment: data.comment,
-            customer: 'Aarav Sharma',
-            createdAt: new Date().toISOString(),
-            status: 'Submitted'
+            comments
         };
 
         try {
             const res = await API.feedback.create(payload);
-            if (res) return { success: true, data: res };
+            if (res) {
+                const item = res.data || res;
+                return { 
+                    success: true, 
+                    data: { ...item, comment: item.comments || comments } 
+                };
+            }
         } catch (err) {
             console.warn('[customerService] Backend feedback create offline, mock saved:', err.message);
         }
 
         return {
             success: true,
-            data: { id: `FB-${Math.floor(1000 + Math.random() * 9000)}`, ...payload }
+            data: { 
+                id: `FB-${Math.floor(1000 + Math.random() * 9000)}`, 
+                ...payload, 
+                comment: comments,
+                createdAt: new Date().toISOString() 
+            }
         };
     }
 };

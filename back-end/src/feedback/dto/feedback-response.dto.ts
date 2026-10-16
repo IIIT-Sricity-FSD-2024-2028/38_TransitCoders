@@ -10,6 +10,9 @@ export class FeedbackResponseDto {
   @ApiProperty({ example: 'John Doe' })
   customerName: string;
 
+  @ApiProperty({ example: 'ORD-2024-0001', required: false })
+  orderId?: string;
+
   @ApiProperty({ example: 4 })
   rating: number;
 

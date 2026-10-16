@@ -27,6 +27,7 @@ export class FeedbackService {
       reference,
       id: feedback.id,
       customerName: user ? user.name : feedback.userId,
+      orderId: (feedback as any).orderId,
       rating: (feedback as any).rating,
       comment: feedback.comments,
       status: feedback.status,
@@ -49,8 +50,10 @@ export class FeedbackService {
   }
 
   create(dto: CreateFeedbackDto, user: IUser): FeedbackResponseDto {
+    const comments = (dto.comments || dto.comment || '').toString();
     const created = this.feedbackRepository.create({
       ...dto,
+      comments,
       userId: user.id,
       status: 'New',
     });

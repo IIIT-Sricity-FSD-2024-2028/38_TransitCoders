@@ -150,7 +150,13 @@ export const API = {
       return res.data || [];
     },
     async create(data) {
-      const res = await apiFetch('/complaints', { method: 'POST', body: JSON.stringify(data) });
+      const payload = {
+        orderId: data.orderId,
+        type: data.type || 'General Issue',
+        description: data.description || data.details || data.comment || data.message || '',
+        priority: data.priority || 'Medium',
+      };
+      const res = await apiFetch('/complaints', { method: 'POST', body: JSON.stringify(payload) });
       if (window.AppState) {
         const s = window.AppState.getState();
         s.complaints.push({ ...data, id: res.data.id });
@@ -176,7 +182,12 @@ export const API = {
       return res.data || [];
     },
     async create(data) {
-      const res = await apiFetch('/feedback', { method: 'POST', body: JSON.stringify(data) });
+      const payload = {
+        orderId: data.orderId,
+        rating: Number(data.rating),
+        comments: data.comments || data.comment || data.feedback || '',
+      };
+      const res = await apiFetch('/feedback', { method: 'POST', body: JSON.stringify(payload) });
       if (window.AppState) {
         const s = window.AppState.getState();
         s.feedback.push({ ...data, id: res.data.id });
