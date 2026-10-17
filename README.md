@@ -190,7 +190,7 @@ All pre-seeded test accounts share the uniform password: **`password123`**
 - `frontend-react/src/components/agent/` — Developed reusable, interactive Agent components including `OrderCard`, `AcceptDeliveryModal`, `ConfirmDeliveryModal` (proof-of-delivery confirmation), `RouteModal` (destination & route view), and `AgentStatusBadge`.
 - `frontend-react/src/services/api.js` — Connected Delivery Agent REST APIs for worklist fetching, order state updates (`Picked Up`, `Out for Delivery`, `Delivered`), mishap/exception reporting, and dynamic agent profile data.
 
-#### 5. Shreeshanth R (S20240010224)
+#### 5. Shreesaanth R (S20240010224)
 - `frontend-react/src/ & App.jsx` — Integrated the Customer portal routing architecture, child navigation routes, and role-based route layout nesting.
 - `frontend-react/src/features/customer/` — Developed the complete Customer portal pages (`CustomerDashboard`, `CustomerOrders`, `CustomerTracking`, `CustomerSupport`) and the responsive nested layout shell (`CustomerLayout.jsx`).
 - `frontend-react/src/components/customer/` — Developed reusable, interactive Customer components including `LiveTrackingCard`, `OrderDetailsDrawer` (slide-over shipment breakdown & tracking timeline), `RecentActivity`, `StarRating`, `StatCard`, `StatusBadge`, and `Toast` notifications.
