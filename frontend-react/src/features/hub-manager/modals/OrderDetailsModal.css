@@ -15,6 +15,8 @@
   border-radius: 10px;
   width: 400px;
   max-width: 90%;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
 }
 
 .details-modal h2 {

@@ -1,162 +1,102 @@
+import { useState } from 'react';
+import { useAppSelector } from '../../../app/hooks';
+import { selectCurrentUser } from '../../../shared/auth/authSlice';
+import { useAuthorizeReturn, useUpdateOrder } from '../hubManagerHooks';
+import { statusLabel } from '../../../services/orderStatus';
+import OrderMessages from '../../../components/OrderMessages';
+import WarehouseNextStep from '../WarehouseNextStep';
+import './OrderDetailsModal.css';
 
-import { useState, useEffect } from "react";
-import { API } from "../../../services/api";
-import "./OrderDetailsModal.css";
+export default function OrderDetailsModal({ order, isOpen, ...props }) {
+  return isOpen && order ? <OrderDetails key={order.id} initialOrder={order} {...props} /> : null;
+}
 
-export default function OrderDetailsModal({ order, isOpen, onClose, onSuccess }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [deliveryAddress, setDeliveryAddress] = useState("");
-  const [priority, setPriority] = useState("Medium");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [currentOrder, setCurrentOrder] = useState(order);
+function OrderDetails({ initialOrder, onClose, onSuccess, onAssign, onTransfer }) {
+  const [savedOrder, setSavedOrder] = useState(null);
+  const order = savedOrder && (savedOrder.updatedAt || '') >= (initialOrder.updatedAt || '')
+    ? savedOrder
+    : initialOrder;
+  const [mode, setMode] = useState('view');
+  const [deliveryAddress, setDeliveryAddress] = useState(order.deliveryAddress || '');
+  const [priority, setPriority] = useState(order.priority || 'Medium');
+  const [reason, setReason] = useState('');
+  const [error, setError] = useState('');
+  const hubId = useAppSelector(selectCurrentUser)?.hubId;
+  const [triggerAuthorizeReturn, { isLoading: returning }] = useAuthorizeReturn();
+  const [triggerUpdateOrder, { isLoading: updating }] = useUpdateOrder();
+  const saving = returning || updating;
+  const canMessageAgent = order.assignedAgentId && order.pickupHubId === hubId;
 
-  useEffect(() => {
-    if (isOpen && order) {
-      setCurrentOrder(order);
-      setDeliveryAddress(order.deliveryAddress || "");
-      setPriority(order.priority || "Medium");
-      setIsEditing(false);
-      setError("");
-      setSaving(false);
-    }
-  }, [isOpen, order]);
-
-  if (!isOpen || !currentOrder) return null;
-
-  async function handleSave(e) {
-    if (e) e.preventDefault();
-
-    if (!deliveryAddress.trim()) {
-      setError("Delivery address cannot be empty.");
-      return;
-    }
-
-    setSaving(true);
-    setError("");
-
-    try {
-      const updated = await API.orders.update(currentOrder.id, {
-        deliveryAddress: deliveryAddress.trim(),
-        priority: priority,
-      });
-
-      // Defensively unpack the order object if wrapped in { success, data }
-      const updatedOrder =
-        updated && updated.orderId
-          ? updated
-          : updated && updated.data && updated.data.orderId
-          ? updated.data
-          : {
-              ...currentOrder,
-              deliveryAddress: deliveryAddress.trim(),
-              priority: priority,
-            };
-
-      setCurrentOrder(updatedOrder);
-      setIsEditing(false);
-
-      if (onSuccess) {
-        await onSuccess();
-      }
-    } catch (err) {
-      setError(err.message || "Failed to update order.");
-    } finally {
-      setSaving(false);
-    }
+  function view() {
+    setMode('view');
+    setDeliveryAddress(order.deliveryAddress || '');
+    setPriority(order.priority || 'Medium');
+    setReason('');
+    setError('');
   }
 
-  function handleCancel() {
-    setDeliveryAddress(currentOrder.deliveryAddress || "");
-    setPriority(currentOrder.priority || "Medium");
-    setError("");
-    setIsEditing(false);
+  async function submit(event) {
+    event.preventDefault();
+    if (saving) return;
+    setError('');
+    if ((mode === 'edit' && !deliveryAddress.trim()) || (mode === 'return' && !reason.trim())) {
+      setError(mode === 'edit' ? 'Enter a delivery address.' : 'Enter a reason for the return.');
+      return;
+    }
+    try {
+      const updated = mode === 'return'
+        ? await triggerAuthorizeReturn({ id: order.id, reason: reason.trim() }).unwrap()
+        : await triggerUpdateOrder({ id: order.id, deliveryAddress: deliveryAddress.trim(), priority }).unwrap();
+      setSavedOrder(updated);
+      setMode('view');
+      if (onSuccess) await onSuccess();
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   return (
-    <div className="details-overlay">
+    <div role="dialog" aria-modal="true" aria-labelledby="order-detail-title" className="details-overlay">
       <div className="details-modal">
-        <h2>Order Details</h2>
-
-        <p><strong>Order ID:</strong> {currentOrder.orderId}</p>
-        {currentOrder.trackingId && (
-          <p><strong>Tracking ID:</strong> {currentOrder.trackingId}</p>
-        )}
-        <p><strong>Status:</strong> {currentOrder.status}</p>
-        <p><strong>Customer:</strong> {currentOrder.customerName || "N/A"}</p>
-        <p><strong>Pickup Hub:</strong> {currentOrder.pickupHubId || "N/A"}</p>
-        <p><strong>Delivery Hub:</strong> {currentOrder.deliveryHubId || "N/A"}</p>
-
-        {!isEditing ? (
+        <h2 id="order-detail-title">Order Details</h2>
+        <p><strong>Order ID:</strong> {order.orderId}</p>
+        <p><strong>Tracking ID:</strong> {order.trackingId || '—'}</p>
+        <p><strong>Status:</strong> {statusLabel(order.status)}</p>
+        <p><strong>Customer:</strong> {order.customerName}</p>
+        <p><strong>Pickup Hub:</strong> {order.pickupHubId || '—'}</p>
+        <p><strong>Delivery Hub:</strong> {order.deliveryHubId || '—'}</p>
+        {mode === 'view' ? (
           <>
-            <p><strong>Priority:</strong> {currentOrder.priority || "Medium"}</p>
-            <p><strong>Destination:</strong> {currentOrder.deliveryAddress || "N/A"}</p>
-
-            {error && <p className="details-error" role="alert">{error}</p>}
-
-            <div className="details-actions">
-              <button
-                type="button"
-                className="btn-primary"
-                onClick={() => setIsEditing(true)}
-              >
-                Edit Order
-              </button>
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={onClose}
-              >
-                Close
-              </button>
+            <p><strong>Priority:</strong> {order.priority}</p>
+            <p><strong>Destination:</strong> {order.deliveryAddress}</p>
+            {order.paymentStatus && <p><strong>Payment status:</strong> {order.paymentStatus}</p>}
+            {order.warehouse && <p><strong>Warehouse:</strong> {order.warehouse.checkedOutAt ? 'Checked out' : order.warehouse.checkedInAt ? 'Checked in' : 'Awaiting check-in'}</p>}
+            {hubId && <WarehouseNextStep order={order} hubId={hubId} />}
+            {canMessageAgent && <OrderMessages orderId={order.id} channel="hub" label="Message delivery agent" />}
+            <div className="details-actions flex-wrap">
+              {onAssign && <button type="button" className="btn-primary" onClick={onAssign}>Assign Agent</button>}
+              {onTransfer && <button type="button" className="btn-primary" onClick={onTransfer}>Transfer Hub</button>}
+              {['Pending', 'Assigned'].includes(order.status) && <button type="button" className="btn-primary" onClick={() => setMode('edit')}>Edit Order</button>}
+              {order.status === 'Delivered' && <button type="button" className="btn-primary" onClick={() => setMode('return')}>Authorize Return</button>}
+              <button type="button" className="btn-secondary" onClick={onClose}>Close</button>
             </div>
           </>
         ) : (
-          <form onSubmit={handleSave}>
-            <div className="details-form-group">
-              <label htmlFor="edit-delivery-address">Destination Address</label>
-              <input
-                id="edit-delivery-address"
-                type="text"
-                value={deliveryAddress}
-                onChange={(e) => setDeliveryAddress(e.target.value)}
-                disabled={saving}
-                placeholder="Enter delivery address"
-              />
-            </div>
-
-            <div className="details-form-group">
-              <label htmlFor="edit-priority">Priority</label>
-              <select
-                id="edit-priority"
-                value={priority}
-                onChange={(e) => setPriority(e.target.value)}
-                disabled={saving}
-              >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-              </select>
-            </div>
-
+          <form onSubmit={submit}>
+            {mode === 'edit' ? (
+              <>
+                <div className="details-form-group"><label htmlFor="edit-delivery-address">Destination Address</label><input id="edit-delivery-address" value={deliveryAddress} onChange={event => setDeliveryAddress(event.target.value)} disabled={saving} required /></div>
+                <div className="details-form-group"><label htmlFor="edit-priority">Priority</label><select id="edit-priority" value={priority} onChange={event => setPriority(event.target.value)} disabled={saving}>
+                  {['Low', 'Medium', 'High'].map(value => <option key={value}>{value}</option>)}
+                </select></div>
+              </>
+            ) : (
+              <div className="details-form-group"><label htmlFor="return-reason">Return reason</label><textarea id="return-reason" value={reason} onChange={event => setReason(event.target.value)} disabled={saving} required className="w-full rounded border border-gray-300 p-2" /></div>
+            )}
             {error && <p className="details-error" role="alert">{error}</p>}
-
             <div className="details-actions">
-              <button
-                type="submit"
-                className="btn-primary"
-                disabled={saving}
-              >
-                {saving ? "Saving..." : "Save Changes"}
-              </button>
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={handleCancel}
-                disabled={saving}
-              >
-                Cancel
-              </button>
+              <button type="submit" className="btn-primary" disabled={saving}>{saving ? 'Saving…' : mode === 'edit' ? 'Save Changes' : 'Confirm Return'}</button>
+              <button type="button" className="btn-secondary" onClick={view} disabled={saving}>Cancel</button>
             </div>
           </form>
         )}

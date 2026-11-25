@@ -1,7 +1,8 @@
 
 import "./OrderCard.css";
+import WarehouseNextStep from "./WarehouseNextStep";
 
-export default function OrderCard({ order, onAssign, onTransfer, onView }) {
+export default function OrderCard({ order, hubId, onAssign, onTransfer, onView }) {
     const statusText = order?.status || "Pending";
     return (
         <div className="order-card">
@@ -27,9 +28,11 @@ export default function OrderCard({ order, onAssign, onTransfer, onView }) {
             </div>
 
             <div className="order-details">
+                <p><strong>Tracking ID:</strong> {order.trackingId}</p>
                 <p><strong>Customer:</strong> {order.customerName || "N/A"}</p>
                 <p><strong>Destination:</strong> {order.deliveryAddress || "N/A"}</p>
             </div>
+            {hubId && <WarehouseNextStep order={order} hubId={hubId} />}
         </div>
     );
 }

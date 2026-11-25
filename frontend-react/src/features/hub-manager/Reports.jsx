@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Bar,
   BarChart,
@@ -9,9 +9,11 @@ import {
   YAxis,
 } from "recharts";
 
-import HubManagerLayout from "./HubManagerLayout.jsx";
+import { useAppSelector } from "../../app/hooks";
+import { selectCurrentUser } from "../../shared/auth/authSlice";
+import { useOrders } from "../../shared/orders/ordersHooks";
+import { useHubAgents } from "./hubManagerHooks";
 import StatsCard from "./StatsCard";
-import { API } from "../../services/api.js";
 import "./Reports.css";
 
 const statuses = [
@@ -34,53 +36,25 @@ const activeStatuses = [
 ];
 
 export default function Reports() {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const hubId = user.hubId;
+  const hubId = useAppSelector(selectCurrentUser)?.hubId;
 
-  const [orders, setOrders] = useState([]);
-  const [agents, setAgents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const {
+    data: orderData,
+    isLoading: ordersLoading,
+    error: ordersError,
+  } = useOrders(undefined, { skip: !hubId });
+  const {
+    data: agentDataRaw,
+    isLoading: agentsLoading,
+    error: agentsError,
+  } = useHubAgents(hubId, { skip: !hubId });
 
-  useEffect(() => {
-    let active = true;
-
-    async function loadReports() {
-      try {
-        if (!hubId) {
-          throw new Error("No hub is assigned to this account.");
-        }
-
-        const [orderData, agentData] = await Promise.all([
-          API.orders.getAll(),
-          API.hubs.getAgentsForHub(hubId),
-        ]);
-
-        if (!Array.isArray(orderData) || !Array.isArray(agentData)) {
-          throw new Error("Invalid data received from the backend.");
-        }
-
-        if (active) {
-          setOrders(orderData);
-          setAgents(agentData);
-        }
-      } catch (err) {
-        if (active) {
-          setError(err.message || "Could not load reports.");
-        }
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadReports();
-
-    return () => {
-      active = false;
-    };
-  }, [hubId]);
+  const loading = Boolean(hubId) && (ordersLoading || agentsLoading);
+  const error = !hubId
+    ? "No hub is assigned to this account."
+    : (ordersError?.message || agentsError?.message || "");
+  const orders = Array.isArray(orderData) ? orderData : [];
+  const agents = Array.isArray(agentDataRaw) ? agentDataRaw : [];
 
   const hubOrders = orders.filter(
     order =>
@@ -145,7 +119,7 @@ export default function Reports() {
     { age: "Over 48 hours", orders: 0 },
   ];
 
-  const now = Date.now();
+  const [now] = useState(Date.now);
 
   pendingOrders.forEach(order => {
     const created = new Date(order.createdAt).getTime();
@@ -206,23 +180,14 @@ export default function Reports() {
   });
 
   if (loading) {
-    return (
-      <HubManagerLayout title="Hub Reports">
-        <p>Loading reports...</p>
-      </HubManagerLayout>
-    );
+    return <p>Loading reports...</p>;
   }
 
   if (error) {
-    return (
-      <HubManagerLayout title="Hub Reports">
-        <p role="alert">{error}</p>
-      </HubManagerLayout>
-    );
+    return <p role="alert">{error}</p>;
   }
 
   return (
-    <HubManagerLayout title="Hub Reports">
       <div className="hub-reports">
         <p>Operational insights for your hub.</p>
 
@@ -331,6 +296,5 @@ export default function Reports() {
           </section>
         </div>
       </div>
-    </HubManagerLayout>
   );
 }
