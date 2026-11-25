@@ -4,17 +4,21 @@ import { ExclamationCircle, ChatSquareHeart, CheckCircleFill, ClockHistory, Send
 import { customerService } from '../../services/customerService';
 import StarRating from '../../components/customer/StarRating';
 import StatusBadge from '../../components/customer/StatusBadge';
-import Toast from '../../components/customer/Toast';
 
 export default function CustomerSupport() {
     const [searchParams] = useSearchParams();
+    const orderId = searchParams.get('orderId') || '';
+    return <CustomerSupportForms key={orderId} initialOrderId={orderId} />;
+}
+
+function CustomerSupportForms({ initialOrderId }) {
 
     // Tab State: 'COMPLAINT' or 'FEEDBACK'
     const [activeTab, setActiveTab] = useState('COMPLAINT');
 
     // 1. Controlled Form State: Complaint
     const [complaintForm, setComplaintForm] = useState({
-        orderId: '',
+        orderId: initialOrderId,
         type: 'Delivery Delay',
         details: '',
         priority: 'Medium'
@@ -22,34 +26,26 @@ export default function CustomerSupport() {
 
     // 2. Controlled Form State: Feedback
     const [feedbackForm, setFeedbackForm] = useState({
-        orderId: '',
+        orderId: initialOrderId,
         rating: 5,
         comment: ''
     });
 
     const [submitting, setSubmitting] = useState(false);
     const [successMessage, setSuccessMessage] = useState(null);
+    const [submitError, setSubmitError] = useState('');
+    const [historyError, setHistoryError] = useState('');
 
     // History lists loaded from backend
     const [complaintsList, setComplaintsList] = useState([]);
     const [feedbackList, setFeedbackList] = useState([]);
     const [loadingHistory, setLoadingHistory] = useState(true);
 
-    // Side Effect: Auto-populate Order ID from URL if navigated from Tracking/Orders (useEffect)
-    useEffect(() => {
-        const orderIdParam = searchParams.get('orderId');
-        if (orderIdParam) {
-            setComplaintForm((prev) => ({ ...prev, orderId: orderIdParam }));
-            setFeedbackForm((prev) => ({ ...prev, orderId: orderIdParam }));
-        }
-    }, [searchParams]);
-
     // Side Effect: Load past complaints and feedback on mount
     useEffect(() => {
         let isMounted = true;
         async function loadHistory() {
             try {
-                setLoadingHistory(true);
                 const [cData, fData] = await Promise.all([
                     customerService.getComplaints(),
                     customerService.getFeedback()
@@ -59,7 +55,7 @@ export default function CustomerSupport() {
                     setFeedbackList(fData);
                 }
             } catch (err) {
-                console.error("Failed to load support history:", err);
+                if (isMounted) setHistoryError(err.message);
             } finally {
                 if (isMounted) setLoadingHistory(false);
             }
@@ -71,20 +67,21 @@ export default function CustomerSupport() {
     // 3. Event Handler: Complaint Submission (Controlled Form)
     async function handleSubmitComplaint(e) {
         e.preventDefault();
+        setSuccessMessage(null);
+        setSubmitError('');
         if (!complaintForm.orderId.trim() || !complaintForm.details.trim()) {
-            alert('Please provide both the Order ID and explanation details.');
+            setSubmitError('Please provide both the order ID and an explanation.');
             return;
         }
 
         setSubmitting(true);
         try {
-            const res = await customerService.submitComplaint(complaintForm);
-            setSuccessMessage(`Complaint #${res.data.id} submitted successfully! Support team will review within 24h.`);
-            setComplaintsList((prev) => [res.data, ...prev]);
+            const complaint = await customerService.submitComplaint(complaintForm);
+            setSuccessMessage('Complaint submitted successfully.');
+            setComplaintsList((prev) => [complaint, ...prev]);
             setComplaintForm({ orderId: '', type: 'Delivery Delay', details: '', priority: 'Medium' });
         } catch (err) {
-            console.error(err);
-            alert('Failed to submit complaint. Please try again.');
+            setSubmitError(err.message);
         } finally {
             setSubmitting(false);
         }
@@ -93,20 +90,21 @@ export default function CustomerSupport() {
     // 4. Event Handler: Feedback Submission (Controlled Form)
     async function handleSubmitFeedback(e) {
         e.preventDefault();
+        setSuccessMessage(null);
+        setSubmitError('');
         if (!feedbackForm.orderId.trim() || !feedbackForm.comment.trim()) {
-            alert('Please provide the Order ID and your experience comment.');
+            setSubmitError('Please provide the order ID and your comment.');
             return;
         }
 
         setSubmitting(true);
         try {
-            const res = await customerService.submitFeedback(feedbackForm);
+            const feedback = await customerService.submitFeedback(feedbackForm);
             setSuccessMessage(`Thank you for your feedback! Rating of ${feedbackForm.rating} stars recorded.`);
-            setFeedbackList((prev) => [res.data, ...prev]);
+            setFeedbackList((prev) => [feedback, ...prev]);
             setFeedbackForm({ orderId: '', rating: 5, comment: '' });
         } catch (err) {
-            console.error(err);
-            alert('Failed to submit feedback. Please try again.');
+            setSubmitError(err.message);
         } finally {
             setSubmitting(false);
         }
@@ -122,6 +120,8 @@ export default function CustomerSupport() {
                 </p>
             </div>
 
+            {submitError && <p role="alert" className="text-sm text-red-700">{submitError}</p>}
+            {historyError && <p role="alert" className="text-sm text-red-700">Support history could not be loaded. {historyError}</p>}
             {/* Notification Banner */}
             {successMessage && (
                 <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-sm flex items-center justify-between">
@@ -146,7 +146,7 @@ export default function CustomerSupport() {
                     <div className="flex border-b border-gray-100">
                         <button
                             type="button"
-                            onClick={() => { setActiveTab('COMPLAINT'); setSuccessMessage(null); }}
+                            onClick={() => { setActiveTab('COMPLAINT'); setSuccessMessage(null); setSubmitError(''); }}
                             className={`flex-1 py-4 text-center text-xs font-bold tracking-wider uppercase transition-colors cursor-pointer flex items-center justify-center gap-2 ${
                                 activeTab === 'COMPLAINT'
                                     ? 'text-orange-600 border-b-2 border-orange-500 bg-orange-50/30'
@@ -158,7 +158,7 @@ export default function CustomerSupport() {
                         </button>
                         <button
                             type="button"
-                            onClick={() => { setActiveTab('FEEDBACK'); setSuccessMessage(null); }}
+                            onClick={() => { setActiveTab('FEEDBACK'); setSuccessMessage(null); setSubmitError(''); }}
                             className={`flex-1 py-4 text-center text-xs font-bold tracking-wider uppercase transition-colors cursor-pointer flex items-center justify-center gap-2 ${
                                 activeTab === 'FEEDBACK'
                                     ? 'text-orange-600 border-b-2 border-orange-500 bg-orange-50/30'
@@ -366,12 +366,6 @@ export default function CustomerSupport() {
                 </div>
             </div>
 
-            {/* Day 6 Toast Notification */}
-            <Toast
-                message={successMessage}
-                type="success"
-                onClose={() => setSuccessMessage(null)}
-            />
         </div>
     );
 }

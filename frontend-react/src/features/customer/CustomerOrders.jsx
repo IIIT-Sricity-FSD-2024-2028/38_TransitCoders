@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, CurrencyRupee, BoxSeam, Calendar3, GeoAlt, ArrowRight } from 'react-bootstrap-icons';
 import { customerService } from '../../services/customerService';
+import { statusKey } from '../../services/orderStatus';
 import StatusBadge from '../../components/customer/StatusBadge';
 import OrderDetailsDrawer from '../../components/customer/OrderDetailsDrawer';
 
@@ -11,6 +12,7 @@ export default function CustomerOrders() {
     const [searchParams] = useSearchParams();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('ALL');
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -20,7 +22,6 @@ export default function CustomerOrders() {
         let isMounted = true;
         async function fetchOrders() {
             try {
-                setLoading(true);
                 const data = await customerService.getOrders();
                 if (isMounted) {
                     setOrders(data);
@@ -33,7 +34,7 @@ export default function CustomerOrders() {
                     }
                 }
             } catch (err) {
-                console.error("Failed to fetch customer orders:", err);
+                if (isMounted) setError(err.message);
             } finally {
                 if (isMounted) setLoading(false);
             }
@@ -53,16 +54,16 @@ export default function CustomerOrders() {
                 (order.deliveryAddress && order.deliveryAddress.toLowerCase().includes(term)) ||
                 (order.packageType && order.packageType.toLowerCase().includes(term));
 
-            const s = (order.status || '').toLowerCase();
+            const s = statusKey(order.status);
             let matchesStatus = true;
             if (selectedStatus === 'IN TRANSIT') {
-                matchesStatus = s.includes('transit') || s.includes('out') || s.includes('assign');
+                matchesStatus = ['assigned', 'pickedup', 'intransit', 'outfordelivery'].includes(s);
             } else if (selectedStatus === 'DELIVERED') {
-                matchesStatus = s.includes('deliver');
+                matchesStatus = s === 'delivered';
             } else if (selectedStatus === 'PENDING') {
-                matchesStatus = s.includes('pend');
+                matchesStatus = s === 'pending';
             } else if (selectedStatus === 'CANCELLED') {
-                matchesStatus = s.includes('cancel');
+                matchesStatus = s === 'cancelled';
             }
 
             return matchesSearch && matchesStatus;
@@ -78,6 +79,8 @@ export default function CustomerOrders() {
                     Live tracking, history, and status updates for all your shipments.
                 </p>
             </div>
+
+            {error && <p role="alert" className="text-red-700">{error}</p>}
 
             {/* Search & Filter Bar (Controlled Components & Event Handling) */}
             <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">

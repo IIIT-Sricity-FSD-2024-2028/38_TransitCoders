@@ -4,7 +4,7 @@ import KPICard from '../../components/shared/KPICard';
 import OrderCard from '../../components/agent/OrderCard';
 
 export default function AgentDashboard() {
-    const { orders, setAcceptModalOrder, setConfirmModalOrder } = useOutletContext();
+    const { orders, setAcceptModalOrder, setConfirmModalOrder, advanceOrder, busyOrder } = useOutletContext();
 
     const pendingCount = orders.filter(o => o.status === 'pending').length;
     const transitCount = orders.filter(o => o.status === 'in-transit').length;
@@ -63,7 +63,9 @@ export default function AgentDashboard() {
                             key={order.id} 
                             order={order} 
                             onAccept={(clickedOrder) => setAcceptModalOrder(clickedOrder)}
-                            onVerify={(clickedOrder) => setConfirmModalOrder(clickedOrder)}
+                            onVerify={setConfirmModalOrder}
+                            onAdvance={advanceOrder}
+                            busy={Boolean(busyOrder)}
                         />
                     ))}
                 </div>

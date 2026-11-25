@@ -7,16 +7,16 @@ import { customerService } from "../../services/customerService";
 export default function CustomerDashboard() {
     const [dashboardData, setDashboardData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         let isMounted = true;
         async function fetchDashboard() {
             try {
-                setLoading(true);
                 const data = await customerService.getDashboardData();
                 if (isMounted) setDashboardData(data);
             } catch (err) {
-                console.error("Failed to load dashboard data:", err);
+                if (isMounted) setError(err.message);
             } finally {
                 if (isMounted) setLoading(false);
             }
@@ -45,11 +45,9 @@ export default function CustomerDashboard() {
         );
     }
 
-    const { stats, activeOrder, recentOrders } = dashboardData || {
-        stats: { activeShipments: 0, delivered: 0, supportTickets: 0 },
-        activeOrder: null,
-        recentOrders: []
-    };
+    if (error) return <p role="alert">Could not load the dashboard. {error}</p>;
+
+    const { stats, activeOrder, recentOrders } = dashboardData;
 
     return (
         <div className="space-y-6">

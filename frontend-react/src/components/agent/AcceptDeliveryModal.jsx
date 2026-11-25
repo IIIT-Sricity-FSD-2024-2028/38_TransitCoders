@@ -1,10 +1,10 @@
-import { X, GeoAlt, Telephone, BoxSeam, CheckCircle, Cash } from 'react-bootstrap-icons';
+import { X, GeoAlt, Telephone, CheckCircle } from 'react-bootstrap-icons';
 
-export default function AcceptDeliveryModal({ isOpen, onClose, order, onConfirmAccept }) {
+export default function AcceptDeliveryModal({ isOpen, onClose, order, onConfirmAccept, busy, error }) {
   if (!isOpen || !order) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div role="dialog" aria-modal="true" aria-label="Accept delivery" className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-start pb-4 border-b border-gray-100">
@@ -12,7 +12,7 @@ export default function AcceptDeliveryModal({ isOpen, onClose, order, onConfirmA
             <span className="text-xs font-semibold text-orange-500 uppercase tracking-wider">Delivery Assignment</span>
             <h2 className="text-xl font-bold text-gray-900 mt-0.5">Order #{order.orderId || order.id}</h2>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 cursor-pointer">
+          <button aria-label="Close" onClick={onClose} disabled={busy} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 cursor-pointer">
             <X size={20} />
           </button>
         </div>
@@ -21,11 +21,11 @@ export default function AcceptDeliveryModal({ isOpen, onClose, order, onConfirmA
         <div className="grid grid-cols-3 gap-2 py-4 border-b border-gray-100 text-center">
           <div className="bg-gray-50 p-2.5 rounded-xl">
             <span className="text-[11px] text-gray-400 block font-medium">ETA</span>
-            <span className="text-sm font-bold text-gray-800">{order.eta || '30 mins'}</span>
+            <span className="text-sm font-bold text-gray-800">{order.eta}</span>
           </div>
           <div className="bg-gray-50 p-2.5 rounded-xl">
             <span className="text-[11px] text-gray-400 block font-medium">Distance</span>
-            <span className="text-sm font-bold text-gray-800">{order.distance || '4.5 km'}</span>
+            <span className="text-sm font-bold text-gray-800">{order.distance}</span>
           </div>
           <div className="bg-gray-50 p-2.5 rounded-xl">
             <span className="text-[11px] text-gray-400 block font-medium">Priority</span>
@@ -54,20 +54,20 @@ export default function AcceptDeliveryModal({ isOpen, onClose, order, onConfirmA
           </div>
         </div>
 
+        {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
+
         {/* Action Buttons */}
         <div className="pt-5 flex items-center gap-3 justify-end">
-          <button onClick={onClose} className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer">
+          <button onClick={onClose} disabled={busy} className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer">
             Cancel
           </button>
           <button
-            onClick={() => {
-              onConfirmAccept(order.id);
-              onClose();
-            }}
+            disabled={busy}
+            onClick={onConfirmAccept}
             className="px-5 py-2.5 text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-xl cursor-pointer flex items-center gap-2"
           >
             <CheckCircle size={16} />
-            <span>Accept & Start Delivery</span>
+            <span>{busy ? 'Saving…' : 'Accept & Mark Picked Up'}</span>
           </button>
         </div>
       </div>

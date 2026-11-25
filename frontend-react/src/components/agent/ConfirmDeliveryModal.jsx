@@ -1,117 +1,40 @@
 import { useState } from 'react';
-import { X, CheckCircle, Camera, GeoAlt } from 'react-bootstrap-icons';
 
-export default function ConfirmDeliveryModal({ isOpen, onClose, order, onConfirmDelivery }) {
-  const [otp, setOtp] = useState(['', '', '', '']);
-  const [podImage, setPodImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+export default function ConfirmDeliveryModal({ isOpen, onClose, order, onConfirmDelivery, busy, error }) {
+  const [photo, setPhoto] = useState(null);
+  const [fileError, setFileError] = useState('');
 
   if (!isOpen || !order) return null;
 
-  const handleOtpChange = (index, value) => {
-    if (value.length > 1) value = value.slice(-1);
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    if (value && index < 3) {
-      const next = document.getElementById(`otp-${index + 1}`);
-      if (next) next.focus();
+  function selectPhoto(event) {
+    const file = event.target.files[0];
+    if (file && (!allowedTypes.includes(file.type) || file.size > 5 * 1024 * 1024 || !file.size)) {
+      setFileError('Choose a JPEG, PNG, WebP, or GIF file up to 5 MB.');
+      setPhoto(null);
+      return;
     }
-  };
-
-  const handleImage = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setPodImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result);
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onConfirmDelivery(order.id, { otp: otp.join(''), photo: podImage });
-    onClose();
-  };
+    setFileError('');
+    setPhoto(file || null);
+  }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex justify-between items-start pb-4 border-b border-gray-100">
-          <div>
-            <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Proof of Delivery (PoD)</span>
-            <h2 className="text-xl font-bold text-gray-900 mt-0.5">Order #{order.orderId || order.id}</h2>
-          </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 cursor-pointer">
-            <X size={20} />
-          </button>
+    <div role="dialog" aria-modal="true" aria-labelledby="delivery-confirmation" className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <form className="w-full max-w-md space-y-4 rounded-xl border border-gray-100 bg-white p-6 shadow-xl" onSubmit={event => { event.preventDefault(); if (!busy && !fileError) onConfirmDelivery(photo); }}>
+        <h2 id="delivery-confirmation" className="text-lg font-bold">Confirm delivery</h2>
+        <p className="text-sm text-gray-600">{order.orderId} · {order.customer}</p>
+        <p className="text-sm text-gray-600">{order.destination}</p>
+        <label className="block space-y-2 text-sm font-semibold">
+          <span>Proof of delivery photo (optional)</span>
+          <input type="file" disabled={busy} accept={allowedTypes.join(',')} className="block w-full text-sm font-normal" onChange={selectPhoto} />
+        </label>
+        {(fileError || error) && <p role="alert" className="text-sm text-red-700">{fileError || error}</p>}
+        <div className="flex justify-end gap-3">
+          <button type="button" disabled={busy} onClick={onClose} className="rounded-lg px-4 py-2 text-sm font-medium">Cancel</button>
+          <button type="submit" disabled={busy || Boolean(fileError)} className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{busy ? 'Saving…' : 'Confirm delivery'}</button>
         </div>
-
-        {/* Customer Banner */}
-        <div className="my-4 bg-blue-50/70 border border-blue-100 rounded-xl p-3 text-xs flex justify-between items-center">
-          <div>
-            <span className="text-blue-700 font-semibold block">{order.customer}</span>
-            <span className="text-gray-500">{order.destination}</span>
-          </div>
-          <span className="font-bold text-blue-900 bg-white px-2.5 py-1 rounded-lg border border-blue-200">
-            {order.amount}
-          </span>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* OTP Input */}
-          <div>
-            <label className="text-xs font-semibold text-gray-700 uppercase block mb-1">
-              Customer 4-Digit OTP
-            </label>
-            <div className="flex gap-2 justify-center py-2">
-              {[0, 1, 2, 3].map(i => (
-                <input
-                  key={i}
-                  id={`otp-${i}`}
-                  type="text"
-                  maxLength={1}
-                  value={otp[i]}
-                  onChange={e => handleOtpChange(i, e.target.value)}
-                  className="w-12 h-12 text-center text-xl font-bold border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-blue-500 outline-none"
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Photo Upload */}
-          <div>
-            <label className="text-xs font-semibold text-gray-700 uppercase block mb-1">
-              Upload Proof of Delivery Photo (Optional)
-            </label>
-            <label className="border-2 border-dashed border-gray-200 hover:border-blue-400 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer bg-gray-50/50">
-              <input type="file" accept="image/*" onChange={handleImage} className="hidden" />
-              {imagePreview ? (
-                <img src={imagePreview} alt="Preview" className="h-32 object-cover rounded-lg" />
-              ) : (
-                <div className="text-center py-2">
-                  <Camera size={22} className="mx-auto text-blue-500 mb-1" />
-                  <span className="text-xs text-blue-600 font-medium">Click to select photo</span>
-                </div>
-              )}
-            </label>
-          </div>
-
-          {/* Actions */}
-          <div className="pt-3 flex items-center gap-3 justify-end border-t border-gray-100">
-            <button type="button" onClick={onClose} className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer">
-              Cancel
-            </button>
-            <button type="submit" className="px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl cursor-pointer flex items-center gap-2">
-              <CheckCircle size={16} />
-              <span>Confirm Delivery</span>
-            </button>
-          </div>
-        </form>
-      </div>
+      </form>
     </div>
   );
 }

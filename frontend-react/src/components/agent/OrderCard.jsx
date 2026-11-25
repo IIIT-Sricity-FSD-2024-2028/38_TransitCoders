@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { GeoAlt, Telephone, Clock, Cash, Truck, CheckCircle, Compass } from 'react-bootstrap-icons';
-import { useNavigate } from 'react-router-dom';
+import { statusLabel } from '../../services/orderStatus';
 import RouteModal from './RouteModal';
 
-export default function OrderCard({ order ,onAccept,onVerify}) {
-    const navigate = useNavigate();
+export default function OrderCard({ order, onAccept, onVerify, onAdvance, busy }) {
     const [showRouteModal, setShowRouteModal] = useState(false);
 
     // Badge styles based on status
@@ -44,7 +43,7 @@ export default function OrderCard({ order ,onAccept,onVerify}) {
                         )}
 
                         <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-semibold border capitalize ${statusStyles[statusKey] || statusStyles.pending}`}>
-                            {order.status?.replace('-', ' ')}
+                            {statusLabel(order.backendStatus)}
                         </span>
                     </div>
                 </div>
@@ -110,7 +109,9 @@ export default function OrderCard({ order ,onAccept,onVerify}) {
 
             {/* Action Buttons */}
             <div className="mt-1">
-                {order.status === 'pending' && (
+                {order.backendStatus === 'Assigned' && order.awaitingHandoff &&
+                    <p className="mb-2 text-sm text-amber-800">Waiting for the warehouse to check out this parcel. Refresh the worklist after handoff.</p>}
+                {order.backendStatus === 'Assigned' && (
                     <div className="flex items-center gap-2">
                         <button
                             type="button"
@@ -123,7 +124,8 @@ export default function OrderCard({ order ,onAccept,onVerify}) {
                         </button>
                         <button
                             type="button"
-                            onClick={() => onAccept && onAccept(order)}
+                            disabled={busy || order.awaitingHandoff}
+                            onClick={() => onAccept(order)}
                             className="flex-1 bg-orange-500 hover:bg-orange-600 active:scale-[0.99] text-white font-medium py-2.5 px-4 rounded-xl text-sm transition-all shadow-sm shadow-orange-500/20 cursor-pointer"
                         >
                             Accept Delivery
@@ -144,10 +146,11 @@ export default function OrderCard({ order ,onAccept,onVerify}) {
                         </button>
                         <button
                             type="button"
-                            onClick={() => onVerify && onVerify(order)}
+                            disabled={busy}
+                            onClick={() => order.backendStatus === 'OutForDelivery' ? onVerify(order) : onAdvance(order)}
                             className="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-semibold py-2.5 px-3 rounded-xl text-xs transition-all shadow-sm shadow-blue-600/20 cursor-pointer"
                         >
-                            Verify & Complete
+                            {order.backendStatus === 'OutForDelivery' ? 'Complete Delivery' : order.backendStatus === 'PickedUp' ? 'Mark In Transit' : 'Mark Out for Delivery'}
                         </button>
                     </div>
                 )}

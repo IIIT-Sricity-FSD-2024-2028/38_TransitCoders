@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, GeoAltFill, BoxSeam, Truck, CheckCircleFill, CurrencyRupee, ExclamationCircle, Person } from 'react-bootstrap-icons';
+import { X, GeoAltFill, BoxSeam, CheckCircleFill, CurrencyRupee, ExclamationCircle, Person } from 'react-bootstrap-icons';
+import { deliveryStage } from '../../services/orderStatus';
 import StatusBadge from './StatusBadge';
 
 const TIMELINE_STAGES = [
@@ -12,15 +13,7 @@ const TIMELINE_STAGES = [
     { key: 'delivered', label: 'Delivered' }
 ];
 
-function getStageIndex(status) {
-    const s = (status || '').toLowerCase().replace(/[\s_-]/g, '');
-    if (s.includes('deliver')) return 5;
-    if (s.includes('out')) return 4;
-    if (s.includes('transit')) return 3;
-    if (s.includes('pick')) return 2;
-    if (s.includes('assign')) return 1;
-    return 0; // pending
-}
+
 
 export default function OrderDetailsDrawer({ order, onClose }) {
     const navigate = useNavigate();
@@ -38,8 +31,8 @@ export default function OrderDetailsDrawer({ order, onClose }) {
 
     if (!order) return null;
 
-    const isCancelled = (order.status || '').toLowerCase().includes('cancel');
-    const currentIndex = getStageIndex(order.status);
+    const isCancelled = ['Cancelled', 'Failed', 'Returned'].includes(order.status);
+    const currentIndex = deliveryStage(order.status, order.statusHistory);
 
     return (
         <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
@@ -85,7 +78,7 @@ export default function OrderDetailsDrawer({ order, onClose }) {
                         {isCancelled ? (
                             <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center gap-2 font-medium">
                                 <ExclamationCircle size={18} />
-                                This order was cancelled.
+                                This order is {order.status.toLowerCase()}.
                             </div>
                         ) : (
                             <div className="space-y-4">
