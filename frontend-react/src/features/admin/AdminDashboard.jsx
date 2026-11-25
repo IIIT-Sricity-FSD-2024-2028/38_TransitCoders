@@ -1,6 +1,7 @@
-import React, { useEffect,useState } from 'react';
+import { useEffect,useState } from 'react';
 import { People, ClockHistory, ExclamationTriangle, ShieldCheck } from 'react-bootstrap-icons';
 import KPICard from '../../components/shared/KPICard';
+import { isActiveOrder } from '../../services/orderStatus';
 import API from '../../services/api';
 import RecentActivityCard from '../../components/admin/RecentActivityCard';
 
@@ -16,16 +17,17 @@ const AdminDashboard = () => {
 
     const [apiLatency, setApiLatency] = useState('Measuring...');
     const [activeHubs, setActiveHubs] = useState(0);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         async function loadData() {
             try {
                 const startTime = performance.now();
                 const [users, shipments, complaints, hubs] = await Promise.all([
-                    API.users.getAll().catch(() => []),
-                    API.shipments.getAll().catch(() => []),
-                    API.complaints.getAll().catch(() => []),
-                    API.hubs.getAll().catch(() => []),
+                    API.users.getAll(),
+                    API.orders.getAll(),
+                    API.complaints.getAll(),
+                    API.hubs.getAll(),
                 ]);
 
                 const latencyMs = Math.round(performance.now() - startTime);
@@ -48,7 +50,7 @@ const AdminDashboard = () => {
 
                 setActiveShipments(
                     Array.isArray(shipments)
-                        ? shipments.filter((s) => s.status === 'processing' || s.status === 'in-transit').length
+                        ? shipments.filter(shipment => isActiveOrder(shipment.status)).length
                         : 0
                 );
 
@@ -70,7 +72,7 @@ const AdminDashboard = () => {
                 }
 
             } catch (err) {
-                console.error("Error fetching data:", err);
+                setError(err.message);
                 setDbStatus('disconnected');
             }
         }
@@ -79,6 +81,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-2 bg-gray-50 min-h-screen">
+        {error && <p role="alert" className="mb-4 text-sm text-red-700">{error}</p>}
         {/*Header Section*/}
         <div className='flex justify-between items-center mb-6 '>
             <div className="felx mb-4 left-full">

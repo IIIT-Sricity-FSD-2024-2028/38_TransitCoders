@@ -15,6 +15,7 @@ const UserManagement = lazy(() => import('./features/admin/UserManagement'));
 const SystemConfiguration = lazy(() => import('./features/admin/SystemConfiguration'));
 const ComplaintsManagement = lazy(() => import('./features/admin/ComplaintsManagement'));
 const FeedbackReview = lazy(() => import('./features/admin/FeedbackReview'));
+const MerchantTickets = lazy(() => import('./features/admin/MerchantTickets'));
 const ReportsAnalytics = lazy(() => import('./features/admin/ReportsAnalytics'));
 const FinancialAnalytics = lazy(() => import('./features/admin/FinancialAnalytics'));
 const CustomerDashboard = lazy(() => import('./features/customer/CustomerDashboard'));
@@ -55,6 +56,7 @@ export default function App() {
             <Route path="system-configuration" element={<SystemConfiguration />} />
             <Route path="complaints" element={<ComplaintsManagement />} />
             <Route path="feedback" element={<FeedbackReview />} />
+            <Route path="tickets" element={<MerchantTickets />} />
             <Route path="reports" element={<ReportsAnalytics />} />
             <Route path="financials" element={<FinancialAnalytics />} />
           </Route>

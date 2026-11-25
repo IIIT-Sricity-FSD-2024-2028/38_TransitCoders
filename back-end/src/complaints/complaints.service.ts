@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -11,6 +12,7 @@ import { UpdateComplaintDto } from './dto/update-complaint.dto';
 import { IComplaint } from './interfaces/complaint.interface';
 import { IUser } from '../users/interfaces/user.interface';
 import { Role } from '../common/constants/roles.constant';
+import { OrdersService } from '../orders/orders.service';
 
 // ODDT-303 — ComplaintsService
 @Injectable()
@@ -18,11 +20,12 @@ export class ComplaintsService {
   constructor(
     private readonly complaintsRepository: ComplaintsRepository,
     private readonly usersRepository: UsersRepository,
+    private readonly ordersService: OrdersService,
   ) {}
 
-  private toResponse(complaint: IComplaint, index: number): ComplaintResponseDto {
+  private toResponse(complaint: IComplaint): ComplaintResponseDto {
     const user = this.usersRepository.findById(complaint.userId);
-    const reference = `CMP-${String(index + 1).padStart(4, '0')}`.toLowerCase();
+    const reference = `CMP-${complaint.id.slice(0, 8).toUpperCase()}`;
     return {
       reference,
       id: complaint.id,
@@ -38,31 +41,30 @@ export class ComplaintsService {
   }
 
   findAll(user: IUser): ComplaintResponseDto[] {
-    const list =
-      user.role === Role.CUSTOMER
-        ? this.complaintsRepository.findByUser(user.id)
-        : this.complaintsRepository.findAll();
-    return list.map((c, i) => this.toResponse(c, i));
+    if (user.role === Role.CUSTOMER) return this.complaintsRepository.findByUser(user.id).map(c => this.toResponse(c));
+    if (user.role === Role.HUB_MANAGER) return this.complaintsRepository.findByHub(user.hubId ?? '').map(c => this.toResponse(c));
+    return this.complaintsRepository.findAll().map(c => this.toResponse(c));
   }
 
   findById(id: string): ComplaintResponseDto {
     const complaint = this.complaintsRepository.findById(id);
     if (!complaint) throw new NotFoundException(`Complaint ${id} not found`);
-    // For a single item, use index 0 for stable reference
-    return this.toResponse(complaint, 0);
+    return this.toResponse(complaint);
   }
 
   create(dto: CreateComplaintDto, user: IUser): ComplaintResponseDto {
     const description = (dto.description || dto.details || '').trim();
+    if (!description) throw new BadRequestException('Description is required');
+    const order = dto.orderId && this.ordersService.getAuthorizedOrder(dto.orderId.trim(), user);
     const created = this.complaintsRepository.create({
       ...dto,
+      orderId: order ? order.trackingId : undefined,
       description,
       userId: user.id,
       priority: dto.priority ?? 'Medium', // Fallback ensures it's never undefined
       status: 'Open',
     });
-    const all = this.complaintsRepository.findAll();
-    return this.toResponse(created, all.findIndex((x) => x.id === created.id));
+    return this.toResponse(created);
   }
 
   update(id: string, dto: UpdateComplaintDto, user: IUser): ComplaintResponseDto {
@@ -74,12 +76,15 @@ export class ComplaintsService {
     if (![Role.SUPER_USER, Role.ADMIN, Role.HUB_MANAGER].includes(user.role)) {
       throw new ForbiddenException('Only admin-level users can update complaint status');
     }
+    if (user.role === Role.HUB_MANAGER && !this.complaintsRepository.findByHub(user.hubId ?? '').some(complaint => complaint.id === id)) {
+      throw new ForbiddenException('This complaint belongs to a different hub');
+    }
 
     const updated = this.complaintsRepository.update(id, dto);
     if (!updated) {
       throw new NotFoundException(`Complaint ${id} could not be updated`);
     }
 
-    return this.toResponse(updated, 0);
+    return this.toResponse(updated);
   }
 }

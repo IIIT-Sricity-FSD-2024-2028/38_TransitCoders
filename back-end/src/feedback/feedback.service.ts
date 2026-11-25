@@ -11,6 +11,7 @@ import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { IFeedback } from './interfaces/feedback.interface';
 import { IUser } from '../users/interfaces/user.interface';
 import { Role } from '../common/constants/roles.constant';
+import { OrdersService } from '../orders/orders.service';
 
 // ODDT-308 — FeedbackService
 @Injectable()
@@ -18,11 +19,12 @@ export class FeedbackService {
   constructor(
     private readonly feedbackRepository: FeedbackRepository,
     private readonly usersRepository: UsersRepository,
+    private readonly ordersService: OrdersService,
   ) {}
 
-  private toResponse(feedback: IFeedback, index: number): FeedbackResponseDto {
+  private toResponse(feedback: IFeedback): FeedbackResponseDto {
     const user = this.usersRepository.findById(feedback.userId);
-    const reference = `FBK-${String(index + 1).padStart(4, '0')}`.toLowerCase();
+    const reference = `FBK-${feedback.id.slice(0, 8).toUpperCase()}`;
     return {
       reference,
       id: feedback.id,
@@ -40,25 +42,26 @@ export class FeedbackService {
       user.role === Role.CUSTOMER
         ? this.feedbackRepository.findByUser(user.id)
         : this.feedbackRepository.findAll();
-    return list.map((f, i) => this.toResponse(f, i));
+    return list.map(f => this.toResponse(f));
   }
 
   findById(id: string): FeedbackResponseDto {
     const feedback = this.feedbackRepository.findById(id);
     if (!feedback) throw new NotFoundException(`Feedback ${id} not found`);
-    return this.toResponse(feedback, 0);
+    return this.toResponse(feedback);
   }
 
   create(dto: CreateFeedbackDto, user: IUser): FeedbackResponseDto {
     const comments = (dto.comments || dto.comment || '').toString();
+    const order = dto.orderId && this.ordersService.getAuthorizedOrder(dto.orderId.trim(), user);
     const created = this.feedbackRepository.create({
       ...dto,
+      orderId: order ? order.trackingId : undefined,
       comments,
       userId: user.id,
       status: 'New',
     });
-    const all = this.feedbackRepository.findAll();
-    return this.toResponse(created, all.findIndex((x) => x.id === created.id));
+    return this.toResponse(created);
   }
 
   update(id: string, dto: UpdateFeedbackDto, user: IUser): FeedbackResponseDto {
@@ -67,6 +70,6 @@ export class FeedbackService {
       throw new ForbiddenException('Only admin-level users can update feedback status');
     }
     const updated = this.feedbackRepository.update(id, dto)!;
-    return this.toResponse(updated, 0);
+    return this.toResponse(updated);
   }
 }

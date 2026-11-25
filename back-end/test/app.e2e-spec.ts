@@ -2,10 +2,20 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
+import { randomUUID } from 'node:crypto';
+import { rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { AppModule } from './../src/app.module';
 
 describe('Auth (e2e)', () => {
   let app: INestApplication<App>;
+  const previousDatabase = process.env.DB_FILE;
+  const database = join(tmpdir(), `swifttrack-auth-${randomUUID()}.db`);
+
+  beforeAll(() => {
+    process.env.DB_FILE = database;
+  });
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -31,6 +41,12 @@ describe('Auth (e2e)', () => {
   });
 
   afterEach(async () => {
-    await app.close();
+    await app?.close();
+  });
+
+  afterAll(() => {
+    if (previousDatabase === undefined) delete process.env.DB_FILE;
+    else process.env.DB_FILE = previousDatabase;
+    rmSync(database, { force: true });
   });
 });

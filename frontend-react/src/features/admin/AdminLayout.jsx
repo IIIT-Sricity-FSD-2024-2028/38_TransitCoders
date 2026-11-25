@@ -18,6 +18,7 @@ export default function AdminLayout() {
                 <SidebarItem icon={<Bank size={20} />} text="Financial Analytics" to="/admin/financials" />
                 <SidebarItem icon={<ExclamationTriangle size={20} />} text="Complaints Management" to="/admin/complaints" />
                 <SidebarItem icon={<ChatSquareText size={20} />} text="Feedback Review" to="/admin/feedback" />
+                <SidebarItem icon={<LifePreserver size={20} />} text="Merchant Tickets" to="/admin/tickets" />
             </Sidebar>
             <div className="flex-1 flex flex-col overflow-hidden">
                 <div>

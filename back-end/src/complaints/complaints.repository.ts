@@ -49,6 +49,16 @@ export class ComplaintsRepository {
       .map((r) => this.toComplaint(r));
   }
 
+  findByHub(hubId: string): IComplaint[] {
+    return this.db.query(
+      `SELECT DISTINCT c.* FROM complaints c
+       JOIN orders o ON c.orderId IN (o.id, o.orderId, o.trackingId) AND c.userId = o.customerId
+       WHERE o.pickupHubId = ? OR o.deliveryHubId = ?
+       ORDER BY c.createdAt DESC`,
+      [hubId, hubId],
+    ).map(row => this.toComplaint(row));
+  }
+
   create(data: Omit<IComplaint, 'id' | 'createdAt' | 'updatedAt'>): IComplaint {
     const complaint: IComplaint = {
       ...data,

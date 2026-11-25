@@ -1,8 +1,9 @@
-import { useState, useEffect,useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Search, Plus, ChevronDown, Pencil, Trash, People, ShieldCheck, CheckCircle } from "react-bootstrap-icons";
 import { API } from "../../services/api";
 import AddOrEditUserModal from '../../components/admin/AddOrEditUserModal';
 import AdminTable from "../../components/admin/AdminTable";
+import { getSessionUser } from '../../services/session';
 import KPICard from "../../components/shared/KPICard";
 
 const UserManagement=() => {
@@ -14,13 +15,17 @@ const UserManagement=() => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [actionError, setActionError] = useState('');
+    const [saving, setSaving] = useState(false);
+    const [hubs, setHubs] = useState([]);
+    const currentUser = getSessionUser();
+    const canManagePrivilegedRoles = currentUser.role === 'super_user';
 
     useEffect(() => {
         async function loadUsers() {
             try {
-                setLoading(true);
-                setError(null);
-                const data = await API.users.getAll();
+                const [data, hubData] = await Promise.all([API.users.getAll(), API.hubs.getAll()]);
+                setHubs(hubData);
                 setUsers(Array.isArray(data) ? data : []);
             }catch (err){
                 console.error("Error fetching users:", err);
@@ -101,7 +106,7 @@ const UserManagement=() => {
                 </span>
             ),
         },{
-            header: "Last Login",
+            header: "Updated",
             render: (user) => (
                 <span className="text-gray-500 whitespace-nowrap text-xs">
                     {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : '—'}
@@ -111,11 +116,11 @@ const UserManagement=() => {
             header: "Actions",
             headerAlign: "text-right",
             cellClassName: "text-right whitespace-nowrap",
-            render: (user) => (
+            render: (user) => !canManagePrivilegedRoles && ['admin', 'super_user'].includes(user.role) ? '—' : (
                 <div className="flex items-center justify-end gap-1">
                     {!user.isActive && (
                         <button
-                            title="Approve User"
+                            title="Approve User" disabled={saving}
                             onClick={() => approveUser(user.id)}
                             className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors mr-1"
                         >
@@ -123,24 +128,23 @@ const UserManagement=() => {
                         </button>
                     )}
                     <button
-                        title="Edit User"
+                        title="Edit User" disabled={saving}
                         onClick={()=> handleOpenEdit(user)}
                         className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors">
                         <Pencil size={14} />
                     </button>
-                    <button
-                        title="Delete User"
-                        onClick={() => deleteUser(user.id)}
+                    {canManagePrivilegedRoles && user.id !== currentUser.id && <button
+                        title="Delete User" disabled={saving}
+                        onClick={() => deleteUser(user)}
                         className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
                         <Trash size={14} />
-                    </button>  
+                    </button>}
                 </div>
             )
         }
     ]
 
-    const filteredUsers = useMemo(() =>{
-        return users.filter((user) => {
+    const filteredUsers = users.filter((user) => {
             const query = searchTerm.toLowerCase();
             const matchesSearch = 
             (user.name?.toLowerCase().includes(query)) ||
@@ -151,29 +155,36 @@ const UserManagement=() => {
             const matchesStatus =
                 selectedStatus === 'All Statuses' ||
                 (selectedStatus === 'Active' && user.isActive === true) ||
-                ((selectedStatus === 'Pending' || selectedStatus === 'Inactive') && user.isActive === false);
+                (selectedStatus === 'Pending' && !user.isActive);
             
             return matchesSearch && matchesRole && matchesStatus;
-        })
-    },[users, searchTerm, selectedRole, selectedStatus]);
+    });
 
-    const deleteUser = async (userId) => {
+    async function deleteUser(user) {
+        if (saving || !window.confirm(`Delete "${user.name}"?`)) return;
+        setSaving(true);
+        setActionError('');
         try {
-            await API.users.delete(userId);
-            setUsers((prev) => prev.filter((user) => user.id !== userId));
-        } catch (error) {
-            console.error("Error deleting user:", error);
+            await API.users.delete(user.id);
+            setUsers(previous => previous.filter(item => item.id !== user.id));
+        } catch (err) {
+            setActionError(err.message);
+        } finally {
+            setSaving(false);
         }
     }
-    const approveUser = async (userId) => {
+
+    async function approveUser(id) {
+        if (saving) return;
+        setSaving(true);
+        setActionError('');
         try {
-            await API.users.approve(userId);
-            setUsers((prev) =>
-                prev.map((user) => (user.id === userId ? { ...user, isActive: true } : user))
-            );
-        } catch (error) {
-            console.error("Error approving user:", error);
-            alert(error.message || "Failed to approve user");
+            const approved = await API.users.approve(id);
+            setUsers(previous => previous.map(item => item.id === id ? approved : item));
+        } catch (err) {
+            setActionError(err.message);
+        } finally {
+            setSaving(false);
         }
     }
 
@@ -239,6 +250,7 @@ const UserManagement=() => {
                 }
                 
             </div>
+            {actionError && <p role="alert" className="mb-4 text-sm text-red-700">{actionError}</p>}
             {/* User Management Table */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflaw-hidden">
                 <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -280,9 +292,7 @@ const UserManagement=() => {
                                 >
                                     <option value="All Statuses">All Statuses</option>
                                     <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
                                     <option value="Pending">Pending Approval</option>
-                                    <option value="suspended">Suspended</option>
                             </select>
                             <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={15} />
                         </div>
@@ -299,12 +309,13 @@ const UserManagement=() => {
                     error={error}
                 />
             </div>
-            <AddOrEditUserModal
-                isOpen={modalState.isOpen}
+            {modalState.isOpen && <AddOrEditUserModal
+                canManagePrivilegedRoles={canManagePrivilegedRoles}
+                hubs={hubs}
                 userToEdit={modalState.user}
                 onClose={() => setModalState({ isOpen: false, user: null })}
                 onSuccess={handleSuccess}
-            />
+            />}
         </div>
     )
 }

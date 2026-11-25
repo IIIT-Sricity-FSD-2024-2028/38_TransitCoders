@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChatDots, Envelope, Telephone, PlusLg } from 'react-bootstrap-icons';
+import { PlusLg } from 'react-bootstrap-icons';
 import { fetchMerchantTickets, createMerchantTicket } from '../../services/merchantHelpers';
 
 /**
@@ -17,36 +17,50 @@ export default function MerchantSupport() {
   const [newCategory, setNewCategory] = useState('Delivery');
   const [newDesc, setNewDesc] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [submitError, setSubmitError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   // Fetch real tickets from backend SQLite database on mount
   useEffect(() => {
-    fetchMerchantTickets().then((liveTickets) => {
-      if (Array.isArray(liveTickets)) setTickets(liveTickets);
+    let active = true;
+    fetchMerchantTickets().then(data => {
+      if (active) setTickets(data);
+    }, err => {
+      if (active) setError(err.message);
+    }).finally(() => {
+      if (active) setLoading(false);
     });
+    return () => { active = false; };
   }, []);
 
-  async function handleCreateTicket(e) {
-    e.preventDefault();
-    if (!newSubject.trim()) return;
-
+  async function handleCreateTicket(event) {
+    event.preventDefault();
+    if (isSubmitting || !newSubject.trim()) return;
     setIsSubmitting(true);
+    setSubmitError('');
     try {
       await createMerchantTicket({
         subject: newSubject.trim(),
         category: newCategory,
         description: newDesc.trim(),
+        priority: 'med',
       });
-      // Refresh tickets from backend database
-      const refreshed = await fetchMerchantTickets();
-      setTickets(refreshed);
+      setShowModal(false);
+      setNewSubject('');
+      setNewDesc('');
+      setNewCategory('Delivery');
+      setError('');
+      try {
+        setTickets(await fetchMerchantTickets());
+      } catch (err) {
+        setError(`Ticket saved. Could not refresh the ticket list. ${err.message}`);
+      }
     } catch (err) {
-      console.error('Failed to create ticket in database:', err);
+      setSubmitError(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
-    setShowModal(false);
-    setNewSubject('');
-    setNewDesc('');
   }
 
   return (
@@ -58,7 +72,7 @@ export default function MerchantSupport() {
           <p className="text-xs text-[#6B7280] mt-0.5">Get help with your shipments and account</p>
         </div>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={() => { setSubmitError(''); setShowModal(true); }}
           className="px-4 py-2 bg-[#F97316] hover:bg-[#EA6C0A] text-white text-sm font-semibold rounded-lg shadow-sm transition-all flex items-center gap-1.5"
         >
           <PlusLg size={14} />
@@ -66,59 +80,10 @@ export default function MerchantSupport() {
         </button>
       </div>
 
-      {/* ── 3 Support Cards ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Live Chat */}
-        <div className="bg-white border border-[#E5E7EB] rounded-xl p-5 hover:border-[#F97316] transition-all cursor-pointer shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="w-10 h-10 rounded-lg bg-[#FFF0E6] flex items-center justify-center text-[#F97316] mb-3">
-              <ChatDots size={20} />
-            </div>
-            <h3 className="text-sm font-bold text-[#111827]">Live Chat</h3>
-            <p className="text-xs text-[#6B7280] mt-1">Chat with our support team in real-time. Avg response: 2 mins.</p>
-          </div>
-          <div className="mt-4">
-            <span className="inline-block bg-[#FFF0E6] text-[#F97316] text-[10px] font-bold px-2 py-0.5 rounded-full">
-              ● Online Now
-            </span>
-          </div>
-        </div>
-
-        {/* Email Support */}
-        <div className="bg-white border border-[#E5E7EB] rounded-xl p-5 hover:border-[#F97316] transition-all cursor-pointer shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="w-10 h-10 rounded-lg bg-[#DBEAFE] flex items-center justify-center text-[#2563EB] mb-3">
-              <Envelope size={20} />
-            </div>
-            <h3 className="text-sm font-bold text-[#111827]">Email Support</h3>
-            <p className="text-xs text-[#6B7280] mt-1">Submit a detailed request. We will reply within 24 hours.</p>
-          </div>
-          <div className="mt-4">
-            <span className="inline-block bg-[#DBEAFE] text-[#2563EB] text-[10px] font-bold px-2 py-0.5 rounded-full">
-              support@swifttrack.com
-            </span>
-          </div>
-        </div>
-
-        {/* Phone Support */}
-        <div className="bg-white border border-[#E5E7EB] rounded-xl p-5 hover:border-[#F97316] transition-all cursor-pointer shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="w-10 h-10 rounded-lg bg-[#D1FAE5] flex items-center justify-center text-[#059669] mb-3">
-              <Telephone size={20} />
-            </div>
-            <h3 className="text-sm font-bold text-[#111827]">Phone Support</h3>
-            <p className="text-xs text-[#6B7280] mt-1">Direct merchant helpline available Mon - Sat, 9am - 8pm.</p>
-          </div>
-          <div className="mt-4">
-            <span className="inline-block bg-[#D1FAE5] text-[#059669] text-[10px] font-bold px-2 py-0.5 rounded-full">
-              +91 1800 200 8899
-            </span>
-          </div>
-        </div>
-      </div>
+      {error && <p role="alert" className="text-red-700">{error}</p>}
 
       {/* ── Support Tickets Table ── */}
-      <div className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-[#E5E7EB] rounded-xl overflow-x-auto shadow-sm">
         <div className="p-5 border-b border-[#E5E7EB]">
           <h2 className="text-sm font-bold text-[#111827]">Your Tickets</h2>
         </div>
@@ -136,14 +101,14 @@ export default function MerchantSupport() {
             {tickets.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-5 py-8 text-center text-gray-400">
-                  No support tickets found in database. Click &quot;New Ticket&quot; to create one.
+                  {loading ? 'Loading tickets…' : error ? 'Ticket list unavailable.' : 'No support tickets yet.'}
                 </td>
               </tr>
             ) : (
               tickets.map((t) => (
                 <tr key={t.id} className="hover:bg-[#F9FAFB]">
                   <td className="px-5 py-3.5 font-mono font-semibold text-[#F97316]">{t.id}</td>
-                  <td className="px-5 py-3.5 font-medium text-[#111827]">{t.subject}</td>
+                  <td className="px-5 py-3.5 font-medium text-[#111827]">{t.subject}{t.description && <p className="mt-1 text-gray-600">{t.description}</p>}</td>
                   <td className="px-5 py-3.5 text-[#6B7280]">{t.category}</td>
                   <td className="px-5 py-3.5 text-[#6B7280]">{t.date}</td>
                   <td className="px-5 py-3.5">
@@ -162,14 +127,14 @@ export default function MerchantSupport() {
 
       {/* ── New Ticket Modal ── */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-label="Create support ticket" className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl space-y-4">
             <h3 className="text-base font-bold text-[#111827]">Create Support Ticket</h3>
             <form onSubmit={handleCreateTicket} className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-[#111827] mb-1">Subject *</label>
+                <label htmlFor="ticket-subject" className="block text-xs font-semibold text-[#111827] mb-1">Subject *</label>
                 <input
-                  type="text"
+                  type="text" id="ticket-subject"
                   value={newSubject}
                   onChange={(e) => setNewSubject(e.target.value)}
                   required
@@ -178,8 +143,8 @@ export default function MerchantSupport() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#111827] mb-1">Category</label>
-                <select
+                <label htmlFor="ticket-category" className="block text-xs font-semibold text-[#111827] mb-1">Category</label>
+                <select id="ticket-category"
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
                   className="w-full px-3 py-2 border border-[#E5E7EB] rounded-lg text-sm outline-none bg-white"
@@ -191,8 +156,8 @@ export default function MerchantSupport() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#111827] mb-1">Description</label>
-                <textarea
+                <label htmlFor="ticket-description" className="block text-xs font-semibold text-[#111827] mb-1">Description</label>
+                <textarea id="ticket-description"
                   rows={3}
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
@@ -200,19 +165,20 @@ export default function MerchantSupport() {
                   className="w-full px-3 py-2 border border-[#E5E7EB] rounded-lg text-sm outline-none focus:border-[#F97316]"
                 />
               </div>
+              {submitError && <p role="alert" className="text-sm text-red-700">{submitError}</p>}
               <div className="flex justify-end gap-2 pt-2">
                 <button
-                  type="button"
+                  type="button" disabled={isSubmitting}
                   onClick={() => setShowModal(false)}
                   className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-xs font-semibold text-[#6B7280]"
                 >
                   Cancel
                 </button>
                 <button
-                  type="submit"
+                  type="submit" disabled={isSubmitting}
                   className="px-5 py-2 bg-[#F97316] text-white rounded-lg text-xs font-bold hover:bg-[#EA6C0A]"
                 >
-                  Submit Ticket
+                  {isSubmitting ? 'Submitting…' : 'Submit Ticket'}
                 </button>
               </div>
             </form>

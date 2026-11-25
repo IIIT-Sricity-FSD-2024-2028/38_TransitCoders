@@ -9,20 +9,26 @@ export default function FinancialAnalytics() {
     const [revenueData, setRevenueData] = useState(null);
     const [expense, setExpense] = useState([]);
 
-    const fetchData = async () => {
-        try {
-            const revenueResponse = await API.reports.getRevenue();
-            setRevenueData(revenueResponse);
+    const [error, setError] = useState('');
 
-            const expenseResponse = await API.expenses.getAll();
-            setExpense(expenseResponse);
-        } catch (err) {
-            console.error("Error fetching financial data:", err);
-        }
+    async function refresh() {
+        const [revenue, expenses] = await Promise.all([API.reports.getRevenue(), API.expenses.getAll()]);
+        setRevenueData(revenue);
+        setExpense(expenses);
     }
-    useEffect(()=>{
-        fetchData();
-    }, [])
+
+    useEffect(() => {
+        let active = true;
+        Promise.all([API.reports.getRevenue(), API.expenses.getAll()]).then(([revenue, expenses]) => {
+            if (active) {
+                setRevenueData(revenue);
+                setExpense(expenses);
+            }
+        }, err => {
+            if (active) setError(err.message);
+        });
+        return () => { active = false; };
+    }, []);
 
     return (
         <div className="p-2 bg-gray-50 min-h-screen">
@@ -56,14 +62,15 @@ export default function FinancialAnalytics() {
                     Expense Ledger
                 </button>
             </div>
+            {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
             {/* content */}
-            <div className="animate-reveal mt-6">
+            {!error && <div className="animate-reveal mt-6">
                     {activeTab === 'overview' ? (
                         <AnalyticsView data={revenueData} />
                     ) : (
-                        <ExpensesView data={expense} onRefresh={fetchData} />
+                        <ExpensesView data={expense} onRefresh={refresh} />
                     )}
-            </div>
+            </div>}
         </div>
     )
 }

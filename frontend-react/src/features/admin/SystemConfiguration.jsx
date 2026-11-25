@@ -1,34 +1,36 @@
 import { useState,useEffect } from "react";
 import AddOrEditDeliveryZone from '../../components/admin/AddOrEditDeliveryZone'
 import API from '../../services/api'
+import { getSessionUser } from '../../services/session';
+import PricingConfiguration from '../../components/admin/PricingConfiguration';
 import { Pencil, Trash } from "react-bootstrap-icons";
 
 export default function SystemConfiguration() {
     const [selectedTab, setSelectedTab] = useState("deliveryZones");
 
     const [zones, setZones] = useState([]);
-    const [zonesLoading, setZonesLoading] = useState(false);
+    const [zonesLoading, setZonesLoading] = useState(true);
+    const [error, setError] = useState('');
+    const canManageZones = getSessionUser().role === 'super_user';
     const [isZoneModalOpen, setIsZoneModalOpen] = useState(false);
     const [zoneToEdit, setZoneToEdit] = useState(null);
 
-    const fetchZones = async () => {
-        try {
-        setZonesLoading(true);
-        const data = await API.hubs.getAll();
-        setZones(Array.isArray(data) ? data : []);
-        } catch (err) {
-        console.error("Failed to load hubs:", err);
-        } finally {
-        setZonesLoading(false);
-        }
-    };
-
     useEffect(() => {
-        if (selectedTab === "deliveryZones") {
-            fetchZones();
-        }
-    }, [selectedTab]);
-    
+        let active = true;
+        API.hubs.getAll().then(data => {
+            if (active) setZones(data);
+        }, err => {
+            if (active) setError(err.message);
+        }).finally(() => {
+            if (active) setZonesLoading(false);
+        });
+        return () => { active = false; };
+    }, []);
+
+    function saveZone(zone, action) {
+        setZones(previous => action === 'create' ? [...previous, zone] : previous.map(item => item.id === zone.id ? zone : item));
+    }
+
     const handleOpenAddZone = () => {
         setZoneToEdit(null);
         setIsZoneModalOpen(true);
@@ -42,11 +44,12 @@ export default function SystemConfiguration() {
     const handleDeleteZone = async (zone) => {
         const id = zone.id || zone.hubId;
         if (!window.confirm(`Delete zone "${zone.name}"?`)) return;
+        setError('');
         try {
             await API.hubs.delete(id);
             setZones((prev) => prev.filter((z) => (z.id || z.hubId) !== id));
         } catch (err) {
-            alert(err.message || "Failed to delete zone");
+            setError(err.message || "Failed to delete zone");
         }
     };
 
@@ -62,31 +65,29 @@ export default function SystemConfiguration() {
 
             {/* content */}
             <div className="flex flex-col md:flex-row items-start gap-6">
-                <aside className="w-fit min-w-[200px] flex-shrink-0 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                    <ul className="flex flex-col gap-2">
-                        <li
-                            className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedTab === "deliveryZones" ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
-                            onClick={() => setSelectedTab("deliveryZones")}
-                        >
-                            Delivery Zones
-                        </li>
-                    </ul>
-                </aside>
-                <div className="flex-1 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <nav aria-label="System settings" className="flex gap-2 rounded-xl border border-gray-100 bg-white p-3 md:flex-col">
+                    {[['deliveryZones', 'Delivery Zones'], ['pricing', 'Pricing']].map(([tab, label]) => (
+                        <button key={tab} type="button" aria-pressed={selectedTab === tab} onClick={() => setSelectedTab(tab)}
+                            className={`rounded-lg px-3 py-2 text-left text-sm ${selectedTab === tab ? 'bg-orange-50 text-orange-700' : 'text-gray-600 hover:bg-gray-50'}`}>{label}</button>
+                    ))}
+                </nav>
+                <div className="w-full min-w-0 flex-1 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     
+                    {selectedTab === "pricing" && <PricingConfiguration />}
                     {selectedTab === "deliveryZones" && (
                         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col h-full">
                             {/* header */}
                             <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-4">
                                 <h3 className="text-base font-bold text-gray-900">Operational Delivery Zones</h3>
-                                <button
+                                {canManageZones && <button
                                     type="button"
                                     onClick={handleOpenAddZone}
                                     className="text-xs font-semibold text-orange-500 hover:text-orange-600 transition-colors"
                                 >
                                     + Add new Zone
-                                </button>
+                                </button>}
                             </div>
+                            {error && <p role="alert" className="mb-3 text-sm text-red-700">{error}</p>}
                             {/* content */}
                             <div className="flex flex-col divide-y divide-gray-100">
                                 {zonesLoading && (
@@ -112,7 +113,7 @@ export default function SystemConfiguration() {
                                                     {location} {zone.capacity !== undefined ? `• Capacity: ${zone.capacity}` : ''}
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2">
+                                            {canManageZones && <div className="flex items-center gap-2">
                                                 <button
                                                     type="button"
                                                     onClick={() => handleOpenEditZone(zone)}
@@ -129,7 +130,7 @@ export default function SystemConfiguration() {
                                                 >
                                                     <Trash size={15} />
                                                 </button>
-                                            </div>
+                                            </div>}
                                         </div>
                                     );
                                 })}
@@ -140,12 +141,11 @@ export default function SystemConfiguration() {
             </div>
 
             {/* Modal */}
-            <AddOrEditDeliveryZone
-                isOpen={isZoneModalOpen}
+            {isZoneModalOpen && <AddOrEditDeliveryZone
                 onClose={() => setIsZoneModalOpen(false)}
                 zoneToEdit={zoneToEdit}
-                onSuccess={() => fetchZones()}
-            />
+                onSuccess={saveZone}
+            />}
         </div>
     );
 }

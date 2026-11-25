@@ -1,60 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X } from 'react-bootstrap-icons';
 import { API } from '../../services/api';
 
-export default function AddOrEditUserModal({ 
-  isOpen, 
+export default function AddOrEditDeliveryZone({
   onClose, 
   zoneToEdit = null,
   onSuccess 
 }) {
   const isEdit = Boolean(zoneToEdit);
 
-  const [formData, setFormData] = useState({
-    hubId: '',
-    name: '',
-    city: '',
-    state: '',
-    pincode: '',
-    address: '',
-    capacity: '',
-    phone: '',
-    status: 'active',
-  });
-
+  const [formData, setFormData] = useState(() => ({
+        hubId: zoneToEdit?.hubId || '',
+        name: zoneToEdit?.name || '',
+        city: zoneToEdit?.city || '',
+        state: zoneToEdit?.state || '',
+        pincode: zoneToEdit?.pincode || '',
+        address: zoneToEdit?.address || '',
+        capacity: zoneToEdit?.capacity !== undefined ? String(zoneToEdit.capacity) : '',
+        phone: zoneToEdit?.phone || '',
+        status: zoneToEdit?.status || 'active',
+        }));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (zoneToEdit) {
-      setFormData({
-        hubId: zoneToEdit.hubId || '',
-        name: zoneToEdit.name || '',
-        city: zoneToEdit.city || '',
-        state: zoneToEdit.state || '',
-        pincode: zoneToEdit.pincode || '',
-        address: zoneToEdit.address || '',
-        capacity: zoneToEdit.capacity !== undefined ? String(zoneToEdit.capacity) : '',
-        phone: zoneToEdit.phone || '',
-        status: zoneToEdit.status || 'active',
-      });
-    } else {
-      setFormData({
-        hubId: '',
-        name: '',
-        city: '',
-        state: '',
-        pincode: '',
-        address: '',
-        capacity: '',
-        phone: '',
-        status: 'active',
-      });
-    }
-    setError(null);
-  }, [zoneToEdit, isOpen]);
-
-  if (!isOpen) return null;
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -118,8 +85,8 @@ export default function AddOrEditUserModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
-      <div className="fixed inset-0" onClick={onClose} />
+    <div role="dialog" aria-modal="true" aria-label={isEdit ? 'Edit Delivery Zone' : 'Add Delivery Zone'} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+      <div className="fixed inset-0" onClick={loading ? undefined : onClose} />
 
       <div className="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
@@ -133,7 +100,7 @@ export default function AddOrEditUserModal({
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={onClose} disabled={loading}
             className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <X size={20} />
@@ -143,7 +110,7 @@ export default function AddOrEditUserModal({
         <form onSubmit={handleSubmit} className="flex flex-col">
           <div className="p-6 space-y-4 max-h-[65vh] overflow-y-auto">
             {error && (
-              <div className="p-3 text-xs bg-rose-50 text-rose-600 border border-rose-200 rounded-lg">
+              <div role="alert" className="p-3 text-xs bg-rose-50 text-rose-600 border border-rose-200 rounded-lg">
                 {error}
               </div>
             )}
@@ -277,7 +244,7 @@ export default function AddOrEditUserModal({
           <div className="flex items-center justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-gray-100">
             <button
               type="button"
-              onClick={onClose}
+              onClick={onClose} disabled={loading}
               className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
             >
               Cancel

@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import API from '../../services/api';
 
 export default function ReportsAnalytics() {
+    const [error, setError] = useState('');
     const [roleData, setRoleData] = useState([]);
     const [activeUsers, setActiveUsers] = useState([]);
     const [complaintData, setComplaintData] = useState([]);
@@ -15,9 +16,7 @@ export default function ReportsAnalytics() {
     useEffect(()=>{
         async function fetchData() {
             try {
-                const users = await API.users.getAll();
-                const complaints = await API.complaints.getAll();
-                const feedbacks = await API.feedback.getAll();
+                const [users, complaints, feedbacks] = await Promise.all([API.users.getAll(), API.complaints.getAll(), API.feedback.getAll()]);
 
                 if (Array.isArray(users) && users.length > 0) {
                     const roleCounts = users.reduce((acc, user) => {
@@ -51,7 +50,7 @@ export default function ReportsAnalytics() {
                     setFeedbackRatings(Object.entries(feedbackCounts).map(([name, value]) => ({ name, value })));
                 }
             } catch (error) {
-                console.error('Error fetching data:', error);
+                setError(error.message);
             }
         }
         fetchData();
@@ -68,6 +67,7 @@ export default function ReportsAnalytics() {
                 </div>
             </div>
 
+            {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
             {/* charts */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                 

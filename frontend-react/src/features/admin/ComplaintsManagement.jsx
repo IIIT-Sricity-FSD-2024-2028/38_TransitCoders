@@ -8,6 +8,8 @@ export default function ComplaintsManagement() {
     const [complaints, setComplaints] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [actionError, setActionError] = useState('')
+    const [saving, setSaving] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedPriority, setSelectedPriority] = useState("All Priorities")
     const [selectedStatus, setSelectedStatus] = useState("All Statuses")
@@ -20,8 +22,8 @@ export default function ComplaintsManagement() {
                 setError(null);
                 
                 const [complaintsRes, mishapsRes] = await Promise.all([
-                    API.complaints.getAll().catch(() => []),
-                    API.mishaps.getAll().catch(() => [])
+                    API.complaints.getAll(),
+                    API.mishaps.getAll()
                 ]);
 
                 const formattedMishaps = (Array.isArray(mishapsRes) ? mishapsRes : []).map((m) => ({
@@ -85,13 +87,18 @@ export default function ComplaintsManagement() {
     }, []); 
 
     const handleUpdateStatus = async (id, newStatus) => {
+        if (saving) return;
+        setSaving(true);
+        setActionError('');
         try {
-           await API.complaints.update(id, { status: newStatus });
+           const updated = await API.complaints.update(id, { status: newStatus });
            setComplaints((prev) =>
-               prev.map((c) => (c.id === id ? { ...c, status: newStatus } : c))
+               prev.map((c) => (c.id === id ? updated : c))
            );
         } catch (err) {
-           console.error('Failed to update complaint status:', err);
+           setActionError(err.message);
+        } finally {
+           setSaving(false);
         }
     };
     const complaintColumns = [
@@ -166,7 +173,7 @@ export default function ComplaintsManagement() {
             header: 'Actions',
             headerAlign: 'text-right',
             cellClassName: 'text-right whitespace-nowrap',
-            render: (complaint) => (
+            render: (complaint) => complaint.isMishap ? '—' : (
             <div 
                 className="relative inline-block text-left" 
                 onClick={(e) => e.stopPropagation()}
@@ -177,7 +184,7 @@ export default function ComplaintsManagement() {
                         setActiveMenuId(activeMenuId === complaint.id ? null : complaint.id);
                     }}
                     className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Complaint options"
+                    title="Complaint options" disabled={saving}
                 >
                     <ThreeDotsVertical size={15} />
                 </button>
@@ -230,6 +237,7 @@ export default function ComplaintsManagement() {
             <div className="flex justify-between items-center mb-6">
                 <div className="mb-4 left-full">
                     <h1 className="text-2xl font-bold">Complaints Management</h1>
+                    {actionError && <p role="alert" className="text-sm text-red-700">{actionError}</p>}
                     <p className="text-lg font-light text-gray-500 mb-2">Track, escalate, and resolve customer issues globally.</p>
                 </div>
             </div>

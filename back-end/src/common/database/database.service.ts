@@ -187,6 +187,8 @@ CREATE TABLE IF NOT EXISTS tickets (
   ticketId TEXT NOT NULL UNIQUE,
   merchantId TEXT NOT NULL,
   subject TEXT NOT NULL,
+  category TEXT,
+  description TEXT,
   trackingId TEXT,
   priority TEXT NOT NULL DEFAULT 'med',
   status TEXT NOT NULL DEFAULT 'open',
@@ -323,7 +325,11 @@ export class DatabaseService implements OnModuleDestroy {
       SELECT id, id, name, phone, hubId, createdAt, updatedAt
       FROM users WHERE role = 'delivery_agent' AND isActive = 1
     `);
-
+    this.pool.transaction((connection) => {
+      const columns = connection.prepare('PRAGMA table_info(tickets)').all().map(column => column.name);
+      if (!columns.includes('category')) connection.exec('ALTER TABLE tickets ADD COLUMN category TEXT');
+      if (!columns.includes('description')) connection.exec('ALTER TABLE tickets ADD COLUMN description TEXT');
+    });
   }
 
   getDbPath(): string {

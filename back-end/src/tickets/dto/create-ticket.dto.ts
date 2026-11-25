@@ -8,6 +8,16 @@ export class CreateTicketDto {
   @IsString()
   subject: string;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  category?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  description?: string;
+
   @ApiProperty({ enum: ['low', 'med', 'high'], example: 'med' })
   @IsIn(['low', 'med', 'high'])
   priority: 'low' | 'med' | 'high';

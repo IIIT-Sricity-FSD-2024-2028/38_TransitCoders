@@ -24,7 +24,7 @@
 The project is structured into two main applications: the **NestJS Backend** and the **React (Vite) Frontend**.
 
 ### Runtime Environment
-- **Node.js:** v18.0.0 or higher (v20+ recommended for native `node:sqlite`).
+- **Node.js:** v22.13.0 or higher for Vite and the backend's built-in SQLite driver.
 - **npm:** v9.0.0 or higher.
 
 ### Backend (`back-end/package.json`)
@@ -88,6 +88,7 @@ cd back-end
 npm install
 npm run start:dev
 ```
+- For a fresh development database, set `NODE_ENV=development` and `SEED_DEV_DATA=true` before the first backend start. In PowerShell, use `$env:NODE_ENV = 'development'` and `$env:SEED_DEV_DATA = 'true'`.
 - **Backend API Server:** `http://localhost:3001`
 - **Interactive Swagger Documentation:** `http://localhost:3001/api/docs`
 - *Note:* The SQLite database (`data/swifttrack.db`) is automatically initialized and seeded with sample users, hubs, orders, and pricing configurations on first launch.
@@ -128,7 +129,36 @@ Generate test coverage reports:
 npm run test:cov
 ```
 
-### 2. Interactive API Testing (Swagger UI)
+### 2. Browser End-to-End Tests
+
+Install dependencies in both applications, then run these commands from `frontend-react`.
+
+```bash
+npx playwright install chromium
+npm run test:e2e
+```
+
+The suite builds both apps and runs them against a fresh SQLite database in a temporary directory. Failed browser traces are written to `frontend-react/test-results`. To watch the workflow in an existing Chrome installation on Windows, run the following from `frontend-react`.
+
+```powershell
+$env:SWIFTTRACK_BROWSER = 'chrome'
+npm.cmd run test:e2e -- --headed
+```
+
+### 3. Manual shipment walkthrough
+
+Start both apps as shown above and open the React app at `http://localhost:5173`. For an isolated demo, set `$env:DB_FILE = Join-Path $env:TEMP ("swifttrack-demo-" + [guid]::NewGuid() + ".db")` in the backend terminal before starting it with the development seed flags. Use separate browser profiles for simultaneous logins, or sign out when switching roles. The demo accounts below use `password123`.
+
+1. Sign in as `merchant1@example.com` and open **Book Shipment**. Use `customer2@example.com` as the customer email. For a local delivery, pick Chennai (`H001`) for both hubs. Enter 2.1 kg and verify the quote shows 2.5 kg of billable weight. Book it and copy the tracking ID from the label.
+2. Sign in as `hm_chennai@swifttrack.com`. Open **Warehouse**, choose **Check in**, and scan the label with a keyboard-input barcode reader or enter its tracking ID and press Enter. Verify that the stored count increases by one and the reserved-arrival count decreases by one. Repeating the same scan should leave the counts unchanged.
+3. **Warehouse** automatically assigns the available agent with the fewest active deliveries when you check in at the destination hub. For manual assignment, clear **Auto-assign at the destination hub** before recording the check-in, then search for the tracking ID in **Order Queue** and choose **Assign Agent**. The list shows active deliveries out of eight and disables agents who are full or unavailable. Use **Auto-assign** in the same dialog to retry if no agent was available at check-in. Open **View → Message delivery agent** and send a handoff note.
+4. Sign in as the assigned agent and find the parcel in **My Deliveries**. Reply through **Message hub**. Pickup stays disabled until the hub records **Check out** in **Warehouse**. Refresh the worklist after checkout, then accept the parcel, advance its status, and complete delivery. You can attach a proof photo.
+5. Sign in as `customer2@example.com` and look up the parcel in **Live Tracking**. Open **Message delivery agent** to send a message. The agent can reply through **Message customer**. After delivery, verify the shipment history and choose **Confirm Receipt**.
+6. To check an inter-hub route, book again with Chennai as pickup and Mumbai (`H002`) as destination. Check in and out in Chennai, then choose **Transfer Hub** from the order in the queue. Sign in as `hm_mumbai@swifttrack.com` and check it in there to auto-assign an eligible Mumbai agent. Check it out for final delivery.
+
+Each new booking with a pickup hub reserves one slot per distinct hub. Existing orders keep their original workflow. A check-in converts a reservation to stored inventory, and a check-out frees the slot. Cancelling before arrival releases the reservation. If a cancelled parcel is physically stored, record a check-out when it leaves. The automated suite also covers concurrent bookings for the last slot, competing assignments for an agent's last slot, and a price change between quote and booking.
+
+### 4. Interactive API Testing (Swagger UI)
 1. Open your browser and navigate to: **`http://localhost:3001/api/docs`**
 2. Use the `POST /auth/login` endpoint with any test account (e.g. `customer1@example.com` / `password123`) to obtain an `x-auth-token`.
 3. Click the **Authorize** button at the top right of the Swagger UI and paste the token.
