@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { API } from '../../../services/api';
 import { statusLabel } from '../../../services/orderStatus';
 import { getSessionUser } from '../../../services/session';
+import OrderMessages from '../../../components/OrderMessages';
 import WarehouseNextStep from '../WarehouseNextStep';
 import './OrderDetailsModal.css';
 
@@ -18,6 +19,7 @@ function OrderDetails({ initialOrder, onClose, onSuccess, onAssign, onTransfer }
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const { hubId } = getSessionUser();
+  const canMessageAgent = order.assignedAgentId && order.pickupHubId === hubId;
 
   function view() {
     setMode('view');
@@ -67,6 +69,7 @@ function OrderDetails({ initialOrder, onClose, onSuccess, onAssign, onTransfer }
             {order.paymentStatus && <p><strong>Payment status:</strong> {order.paymentStatus}</p>}
             {order.warehouse && <p><strong>Warehouse:</strong> {order.warehouse.checkedOutAt ? 'Checked out' : order.warehouse.checkedInAt ? 'Checked in' : 'Awaiting check-in'}</p>}
             {hubId && <WarehouseNextStep order={order} hubId={hubId} />}
+            {canMessageAgent && <OrderMessages orderId={order.id} channel="hub" label="Message delivery agent" />}
             <div className="details-actions flex-wrap">
               {onAssign && <button type="button" className="btn-primary" onClick={onAssign}>Assign Agent</button>}
               {onTransfer && <button type="button" className="btn-primary" onClick={onTransfer}>Transfer Hub</button>}

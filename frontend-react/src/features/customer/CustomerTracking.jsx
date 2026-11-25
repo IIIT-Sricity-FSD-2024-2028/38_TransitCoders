@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { customerService } from '../../services/customerService';
 import { statusLabel } from '../../services/orderStatus';
 import StatusBadge from '../../components/customer/StatusBadge';
+import OrderMessages from '../../components/OrderMessages';
 
 export default function CustomerTracking() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -79,6 +80,7 @@ function TrackingView({ id, search }) {
                             <div key={label}><dt className="text-gray-500">{label}</dt><dd>{value}</dd></div>
                         ))}
                     </dl>
+                    {order.assignedAgentId && <OrderMessages orderId={order.backendId} channel="customer" label="Message delivery agent" />}
                     <div>
                         <h3 className="mb-3 font-semibold">Shipment history</h3>
                         {order.statusHistory.length ? (

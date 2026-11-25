@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { GeoAlt, Telephone, Clock, Cash, Truck, CheckCircle, Compass } from 'react-bootstrap-icons';
 import { statusLabel } from '../../services/orderStatus';
 import RouteModal from './RouteModal';
+import OrderMessages from '../OrderMessages';
 
 export default function OrderCard({ order, onAccept, onVerify, onAdvance, busy }) {
     const [showRouteModal, setShowRouteModal] = useState(false);
@@ -165,6 +166,8 @@ export default function OrderCard({ order, onAccept, onVerify, onAdvance, busy }
                     </button>
                 )}
             </div>
+            {order.pickupHubId && <OrderMessages orderId={order.rawId} channel="hub" label="Message hub" />}
+            <OrderMessages orderId={order.rawId} channel="customer" label="Message customer" />
 
             {/* Turn-by-Turn Route Navigation Modal */}
             <RouteModal

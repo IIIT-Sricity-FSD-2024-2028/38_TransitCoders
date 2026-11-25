@@ -151,6 +151,19 @@ SELECT h.*,
     AND o.status NOT IN ('Delivered', 'Cancelled', 'Returned', 'Failed')) AS reservedParcels
 FROM hubs h;
 
+CREATE TABLE IF NOT EXISTS order_messages (
+  id TEXT PRIMARY KEY,
+  orderId TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  channel TEXT NOT NULL,
+  agentId TEXT NOT NULL,
+  senderId TEXT NOT NULL,
+  senderName TEXT NOT NULL,
+  senderRole TEXT NOT NULL,
+  body TEXT NOT NULL,
+  createdAt TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_order_messages_thread ON order_messages (orderId, channel, agentId);
+
 CREATE TABLE IF NOT EXISTS shipments (
   id TEXT PRIMARY KEY,
   shipmentId TEXT NOT NULL UNIQUE,

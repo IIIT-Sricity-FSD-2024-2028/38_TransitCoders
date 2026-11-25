@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, GeoAltFill, BoxSeam, CheckCircleFill, CurrencyRupee, ExclamationCircle, Person } from 'react-bootstrap-icons';
 import { deliveryStage } from '../../services/orderStatus';
 import StatusBadge from './StatusBadge';
+import OrderMessages from '../OrderMessages';
 
 const TIMELINE_STAGES = [
     { key: 'pending', label: 'Order Placed' },
@@ -69,6 +70,7 @@ export default function OrderDetailsDrawer({ order, onClose }) {
 
                 {/* Body Content */}
                 <div className="p-6 space-y-6 flex-1">
+                    {order.assignedAgentId && <OrderMessages key={order.backendId} orderId={order.backendId} channel="customer" label="Message delivery agent" />}
                     {/* Status Stepper Progression */}
                     <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                         <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">

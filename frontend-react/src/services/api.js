@@ -249,6 +249,16 @@ export const API = {
       });
       return res.data;
     },
+    async getMessages(id, channel, signal) {
+      const res = await apiFetch(`/orders/${encodeURIComponent(id)}/messages/${channel}`, { signal });
+      return res.data || [];
+    },
+    async sendMessage(id, channel, body) {
+      const res = await apiFetch(`/orders/${encodeURIComponent(id)}/messages/${channel}`, {
+        method: 'POST', body: JSON.stringify({ body }),
+      });
+      return res.data;
+    },
     async cancel(id) {
       const res = await apiFetch(`/orders/${id}/cancel`, { method: 'PATCH' });
       return res.data;

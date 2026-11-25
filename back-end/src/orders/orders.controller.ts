@@ -29,6 +29,8 @@ import { TransferOrderDto } from './dto/transfer-order.dto';
 import { MishapDto } from './dto/mishap.dto';
 import { SchedulePickupDto } from './dto/schedule-pickup.dto';
 import { WarehouseScanDto } from './dto/warehouse-scan.dto';
+import { OrderMessageDto } from './dto/order-message.dto';
+import { OrderMessagesService, type OrderMessage } from './order-messages.service';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -48,6 +50,7 @@ export class OrdersController {
   constructor(
     private readonly ordersService: OrdersService,
     private readonly barcodeService: BarcodeService,
+    private readonly messages: OrderMessagesService,
   ) {}
 
   @Get()
@@ -74,6 +77,22 @@ export class OrdersController {
   @ApiResponse({ status: 404, description: 'Order not found' })
   findById(@Param('id') id: string, @CurrentUser() user: IUser): IApiResponse<IOrder> {
     return { success: true, data: this.ordersService.getAuthorizedOrder(id, user) };
+  }
+
+  @Get(':id/messages/:channel')
+  @Roles(Role.HUB_MANAGER, Role.DELIVERY_AGENT, Role.CUSTOMER)
+  listMessages(
+    @Param('id') id: string, @Param('channel') channel: string, @CurrentUser() user: IUser,
+  ): IApiResponse<OrderMessage[]> {
+    return { success: true, data: this.messages.list(id, channel, user) };
+  }
+
+  @Post(':id/messages/:channel')
+  @Roles(Role.HUB_MANAGER, Role.DELIVERY_AGENT, Role.CUSTOMER)
+  sendMessage(
+    @Param('id') id: string, @Param('channel') channel: string, @Body() dto: OrderMessageDto, @CurrentUser() user: IUser,
+  ): IApiResponse<OrderMessage> {
+    return { success: true, data: this.messages.send(id, channel, dto.body, user) };
   }
 
   @Patch(':id/warehouse')

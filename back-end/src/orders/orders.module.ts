@@ -4,6 +4,7 @@ import { TrackingController } from './tracking.controller';
 import { OrdersService } from './orders.service';
 import { OrdersRepository } from './orders.repository';
 import { BarcodeService } from './barcode.service';
+import { OrderMessagesService } from './order-messages.service';
 import { UsersModule } from '../users/users.module';
 import { AgentsModule } from '../agents/agents.module';
 import { PricingModule } from '../pricing/pricing.module';
@@ -19,7 +20,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
     NotificationsModule,
   ],
   controllers: [OrdersController, TrackingController],
-  providers: [OrdersService, OrdersRepository, BarcodeService],
+  providers: [OrdersService, OrdersRepository, BarcodeService, OrderMessagesService],
   exports: [OrdersService, OrdersRepository],
 })
 export class OrdersModule {}
