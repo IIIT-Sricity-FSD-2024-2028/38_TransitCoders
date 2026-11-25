@@ -1,40 +1,30 @@
-import {useState, useEffect, useMemo} from "react";
-import { Search,ChevronDown,ThreeDotsVertical,Star,StarFill } from "react-bootstrap-icons";
-import { API } from "../../services/api";
+import { useState, useMemo } from "react";
+import { Search, ChevronDown, ThreeDotsVertical, Star, StarFill } from "react-bootstrap-icons";
+import { useFeedback } from "../../shared/support/supportHooks";
+import { useUpdateFeedback } from "./adminHooks";
 import AdminTable from "../../components/admin/AdminTable";
 import KPICard from "../../components/shared/KPICard";
 
 export default function FeedbackReview() {
-    const [feedbacks, setFeedbacks] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const {
+        data: feedbacks = [],
+        isLoading: loading,
+        error: queryError,
+    } = useFeedback();
+    const [triggerUpdateFeedback, { isLoading: saving }] = useUpdateFeedback();
+
+    const error = queryError?.message || null;
+    const [actionError, setActionError] = useState('');
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedRating, setSelectedRating] = useState("All");
     const [selectedStatus, setSelectedStatus] = useState("All");
-
-    useEffect(() => {
-         async function fetchComplaints() {
-            try {
-                setLoading(true)
-                setError(null)
-                const response = await API.feedback.getAll()
-                setFeedbacks(Array.isArray(response) ? response : (response?.data || []))
-            } catch (err) {
-                console.error("Error fetching complaints:", err)
-                setError(err.message || "An error occurred while fetching complaints.")
-            } finally {
-                setLoading(false)
-            }
-        }
-        fetchComplaints()
-    },[])
 
     const filteredFeedbacks = useMemo(() => {
         return feedbacks.filter((feedback) => {
             const query = searchTerm.toLowerCase()
             const matchesSearchTerm =
-                feedback.reference.toLowerCase().includes(query) ||
-                feedback.customerName.toLowerCase().includes(query) ||
+                feedback.reference?.toLowerCase().includes(query) ||
+                feedback.customerName?.toLowerCase().includes(query) ||
                 (feedback.comment || feedback.comments || '').toLowerCase().includes(query)
             const matchesRating = selectedRating === 'All' || String(feedback.rating) === selectedRating
             const matchesStatus = selectedStatus === 'All' || feedback.status === selectedStatus
@@ -43,13 +33,12 @@ export default function FeedbackReview() {
     }, [feedbacks, searchTerm, selectedRating, selectedStatus])
 
     const handleMarkReviewed = async (id) => {
+        if (saving) return;
+        setActionError('');
         try {
-            await API.feedback.update(id, { status: 'Reviewed' });
-            setFeedbacks((prev) =>
-                prev.map((item) => (item.id === id ? { ...item, status: 'Reviewed' } : item))
-            );
+            await triggerUpdateFeedback({ id, status: 'Reviewed' }).unwrap();
         } catch (err) {
-            console.error('Failed to update feedback status:', err);
+            setActionError(err.message);
         }
     };
 
@@ -143,7 +132,7 @@ export default function FeedbackReview() {
                <div className="flex justify-end">
                    {item.status !== 'Reviewed' ? (
                        <button
-                           onClick={() => handleMarkReviewed(item.id)}
+                           disabled={saving} onClick={() => handleMarkReviewed(item.id)}
                            className="px-3 py-1 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg shadow-sm transition-colors"
                        >
                            Mark Reviewed
@@ -162,6 +151,7 @@ export default function FeedbackReview() {
             <div className="flex justify-between items-center mb-6">
                 <div className="mb-4 left-full">
                     <h1 className="text-2xl font-bold">Feedback Review</h1>
+                    {actionError && <p role="alert" className="text-sm text-red-700">{actionError}</p>}
                     <p className="text-lg font-light text-gray-500 mb-2">Monitor ratings and resolve negative platform reviews.</p>
                 </div>
             </div>

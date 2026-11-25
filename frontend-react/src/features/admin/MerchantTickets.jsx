@@ -1,0 +1,67 @@
+import { useMemo, useState } from 'react';
+import { useTickets } from '../../shared/support/supportHooks';
+import { useUpdateTicket, useUsers } from './adminHooks';
+import AdminTable from '../../components/admin/AdminTable';
+
+const statuses = { open: 'Open', 'in-progress': 'In progress', resolved: 'Resolved', closed: 'Closed' };
+
+export default function MerchantTickets() {
+    const {
+        data: rawTickets = [],
+        isLoading: loadingTickets,
+        error: ticketsError,
+    } = useTickets();
+    const {
+        data: rawUsers = [],
+        isLoading: loadingUsers,
+        error: usersError,
+    } = useUsers();
+    const [triggerUpdateTicket] = useUpdateTicket();
+
+    const [saveError, setSaveError] = useState('');
+    const [saving, setSaving] = useState(null);
+    const [query, setQuery] = useState('');
+
+    const loadError = ticketsError?.message || usersError?.message || '';
+    const isLoading = (loadingTickets || loadingUsers) && !loadError;
+    const names = useMemo(() => new Map(rawUsers.map(user => [user.id, user.name])), [rawUsers]);
+
+    async function update(ticket, status) {
+        if (saving || ticket.status === status) return;
+        setSaving(ticket.id);
+        setSaveError('');
+        try {
+            await triggerUpdateTicket({ id: ticket.id, status }).unwrap();
+        } catch (err) {
+            setSaveError(err.message);
+        } finally {
+            setSaving(null);
+        }
+    }
+
+    const search = query.trim().toLowerCase();
+    const tickets = !isLoading && !loadError
+        ? rawTickets.filter(ticket => [ticket.ticketId, ticket.subject, ticket.category, names.get(ticket.merchantId)].some(value => value?.toLowerCase().includes(search)))
+        : [];
+    const columns = [
+        { header: 'Ticket', render: ticket => <div className="space-y-1"><strong>{ticket.subject}</strong><p className="font-mono text-xs">{ticket.ticketId}</p>{ticket.description && <p>{ticket.description}</p>}</div> },
+        { header: 'Merchant', render: ticket => names.get(ticket.merchantId) || 'Unavailable' },
+        { header: 'Category', render: ticket => ticket.category || '—' },
+        { header: 'Status', render: ticket => (
+            <select aria-label={`Status for ${ticket.subject}`} className="rounded-lg border border-gray-300 bg-white px-2 py-1" value={ticket.status} disabled={Boolean(saving)} onChange={event => update(ticket, event.target.value)}>
+                {Object.entries(statuses).map(([value, label]) => <option value={value} key={value}>{label}</option>)}
+            </select>
+        ) },
+    ];
+
+    return (
+        <div className="space-y-4">
+            <h1 className="text-2xl font-bold">Merchant Tickets</h1>
+            <label className="block max-w-sm space-y-1 text-sm font-medium"><span>Search merchant tickets</span><input className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2" value={query} onChange={event => setQuery(event.target.value)} /></label>
+            {saveError && <p role="alert" className="text-sm text-red-700">{saveError}</p>}
+            <section className="rounded-xl border border-gray-200 bg-white">
+                <AdminTable columns={columns} data={tickets} isLoading={isLoading} error={loadError} emptyMessage="No tickets match your search." />
+            </section>
+        </div>
+    );
+}
