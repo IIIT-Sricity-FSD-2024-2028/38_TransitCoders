@@ -1,33 +1,36 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import vanImage from '../assets/van-image.png';
 import logoImage from '../assets/Container.svg';
-import API from '../services/api';
+import { statusKey, statusLabel } from '../services/orderStatus';
+import { useAppSelector } from '../app/hooks';
+import { useTrackOrder } from '../shared/orders/ordersHooks';
+import { selectTrackingEntry } from '../shared/orders/ordersSlice';
 import './LandingPage.css';
 
 export default function LandingPage() {
     const navigate = useNavigate();
+    const [triggerTrackOrder, { isLoading: loading }] = useTrackOrder();
     const [trackingId, setTrackingId] = useState('');
-    const [trackingData, setTrackingData] = useState(null);
-    const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    // The ID that was last looked up; its result is read back from the orders slice.
+    const [submittedId, setSubmittedId] = useState('');
+    const tracked = useAppSelector((state) => selectTrackingEntry(state, submittedId));
+    // Hide the result while an error is showing or a new lookup is still loading.
+    const trackingData = errorMsg || loading ? null : tracked?.data ?? null;
 
     const handleTrack = async (e) => {
         e?.preventDefault();
         const query = trackingId.trim();
         if (!query) return;
 
-        setLoading(true);
         setErrorMsg('');
-        setTrackingData(null);
+        setSubmittedId(query);
 
         try {
-            const data = await API.tracking.track(query);
-            setTrackingData(data);
+            await triggerTrackOrder(query).unwrap();
         } catch (err) {
             setErrorMsg(err.message || 'Tracking ID not found');
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -38,24 +41,18 @@ export default function LandingPage() {
         return isNaN(d) ? raw : d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
     };
 
-    const isCancelled = trackingData?.status?.toLowerCase() === 'cancelled';
-
-    const getProgressInfo = (status = '') => {
-        const s = status.toLowerCase();
-        if (s.includes('deliver')) return { percent: '100%', step: 4 };
-        if (s.includes('transit') || s.includes('dispatch') || s.includes('out')) return { percent: '66%', step: 3 };
-        if (s.includes('hub') || s.includes('process') || s.includes('staging')) return { percent: '33%', step: 2 };
-        return { percent: '10%', step: 1 };
-    };
-
-    const progress = getProgressInfo(trackingData?.status);
+    const status = statusKey(trackingData?.status);
+    const isException = ['cancelled', 'returned', 'failed'].includes(status);
+    const labels = { pending: 1, assigned: 2, pickedup: 2, intransit: 3, outfordelivery: 3, delivered: 4 };
+    const step = labels[status] || 1;
+    const progress = { step, percent: `${[0, 10, 33, 66, 100][step]}%` };
 
     return (
-        <div className="landing-page">
+        <div className="landing-page" id="top">
             {/* Header */}
             <header>
                 <div className="container header-content">
-                    <a href="#" className="logo">
+                    <a href="#top" className="logo">
                         <div className="logo-icon">
                             <img src={logoImage} className="logo-img" alt="SwiftTrack Logo" />
                         </div>
@@ -129,7 +126,8 @@ export default function LandingPage() {
                     <form className="trk-card" onSubmit={handleTrack}>
                         <input 
                             type="text" 
-                            className="trk-input" 
+                            className="trk-input"
+                            aria-label="Tracking ID" required
                             placeholder="Enter tracking ID (e.g. TRK-QR90ST12)"
                             value={trackingId}
                             onChange={(e) => setTrackingId(e.target.value)}
@@ -145,7 +143,7 @@ export default function LandingPage() {
                     </form>
 
                     {errorMsg && (
-                        <p style={{ color: '#ef4444', marginTop: '16px' }}>{errorMsg}</p>
+                        <p role="alert" style={{ color: '#ef4444', marginTop: '16px' }}>{errorMsg}</p>
                     )}
 
                     {trackingData && (
@@ -162,31 +160,31 @@ export default function LandingPage() {
                                     borderRadius: '100px', 
                                     fontSize: '14px', 
                                     fontWeight: 700, 
-                                    background: isCancelled ? '#fee2e2' : '#ff5c0222', 
-                                    color: isCancelled ? '#ef4444' : '#ff5c02' 
+                                    background: isException ? '#fee2e2' : '#ff5c0222',
+                                    color: isException ? '#ef4444' : '#ff5c02'
                                 }}>
-                                    {trackingData.status || 'Active'}
+                                    {statusLabel(trackingData.status)}
                                 </div>
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px' }}>
                                 <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px' }}>
-                                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>📍 Current Location</div>
-                                    <div style={{ fontSize: '16px', fontWeight: 700, color: isCancelled ? '#94a3b8' : '#1e293b' }}>
-                                        {isCancelled ? '—' : (trackingData.currentHub || trackingData.location || trackingData.destination || 'In Route')}
+                                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>📍 Last Reported Location</div>
+                                    <div style={{ fontSize: '16px', fontWeight: 700, color: isException ? '#94a3b8' : '#1e293b' }}>
+                                        {isException ? '—' : (trackingData.currentLocation || 'No location update')}
                                     </div>
                                 </div>
                                 <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px' }}>
                                     <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>🕒 Estimated Delivery</div>
-                                    <div style={{ fontSize: '16px', fontWeight: 700, color: isCancelled ? '#ef4444' : '#1e293b' }}>
-                                        {isCancelled ? 'Cancelled' : formatEta(trackingData.eta || trackingData.estimatedDelivery)}
+                                    <div style={{ fontSize: '16px', fontWeight: 700, color: isException ? '#ef4444' : '#1e293b' }}>
+                                        {isException ? '—' : formatEta(trackingData.estimatedDelivery)}
                                     </div>
                                 </div>
                             </div>
 
-                            {isCancelled ? (
+                            {isException ? (
                                 <div style={{ padding: '16px', textAlign: 'center', background: '#fef2f2', borderRadius: '12px', color: '#b91c1c', fontSize: '14px', fontWeight: 600 }}>
-                                    This shipment has been cancelled.
+                                    Shipment status is {statusLabel(trackingData.status).toLowerCase()}.
                                 </div>
                             ) : (
                                 <div className="trk-timeline">
@@ -223,7 +221,7 @@ export default function LandingPage() {
             </div>
 
             {/* Why Choose */}
-            <section style={{ padding: '100px 0' }}>
+            <section id="about" style={{ padding: '100px 0' }}>
                 <div className="container">
                     <div className="section-header">
                         <h2>Why Choose SwiftTrack</h2>
@@ -239,7 +237,7 @@ export default function LandingPage() {
                         <div className="feature-card">
                             <div className="feature-icon-box">📦</div>
                             <h3>Smart Dispatch</h3>
-                            <p>Automatically assign delivery agents based on route efficiency.</p>
+                            <p>Assign an available agent based on the hub and current workload.</p>
                         </div>
                         <div className="feature-card">
                             <div className="feature-icon-box">🏭</div>
@@ -375,7 +373,7 @@ export default function LandingPage() {
                         <p className="cta-block-desc">Track shipments, dispatch delivery agents, and manage logistics hubs from one unified logistics platform</p>
                         <div className="cta-actions">
                             <button className="cta-btn-white" onClick={() => navigate('/login')} style={{ border: 'none', cursor: 'pointer' }}>Access SwiftTrack</button>
-                            <button className="cta-btn-white" onClick={() => navigate('/register')} style={{ border: 'none', cursor: 'pointer' }}>Schedule Demo</button>
+                            <button className="cta-btn-white" onClick={() => navigate('/register')} style={{ border: 'none', cursor: 'pointer' }}>Create Account</button>
                         </div>
                     </div>
                 </div>
@@ -386,7 +384,7 @@ export default function LandingPage() {
                 <div className="container">
                     <div className="f-grid">
                         <div className="f-col">
-                            <a href="#" className="logo">
+                            <a href="#top" className="logo">
                                 <div className="logo-icon">🚚</div>
                                 <span>SwiftTrack</span>
                             </a>
@@ -395,28 +393,26 @@ export default function LandingPage() {
                         <div className="f-col">
                             <h4>Company</h4>
                             <ul className="f-links">
-                                <li><a href="#">About SwiftTrack</a></li>
-                                <li><a href="#">Contact</a></li>
-                                <li><a href="#">Careers</a></li>
-                                <li><a href="#">Privacy Policy</a></li>
+                                <li><a href="#about">About SwiftTrack</a></li>
+                                <li><Link to="/register">Create an account</Link></li>
                             </ul>
                         </div>
                         <div className="f-col">
                             <h4>Platform</h4>
                             <ul className="f-links">
-                                <li><a href="#">Merchant Dashboard</a></li>
-                                <li><a href="#">Hub Manager Tools</a></li>
-                                <li><a href="#">Delivery Agent Portal</a></li>
-                                <li><a href="#">Admin Panel</a></li>
+                                <li><Link to="/merchant/dashboard">Merchant Dashboard</Link></li>
+                                <li><Link to="/hub/dashboard">Hub Manager Tools</Link></li>
+                                <li><Link to="/agent/dashboard">Delivery Agent Portal</Link></li>
+                                <li><Link to="/admin/dashboard">Admin Panel</Link></li>
                             </ul>
                         </div>
                         <div className="f-col">
                             <h4>Logistics</h4>
                             <ul className="f-links">
-                                <li><a href="#">Track Shipment</a></li>
-                                <li><a href="#">Dispatch Management</a></li>
-                                <li><a href="#">Hub Monitoring</a></li>
-                                <li><a href="#">Delivery Analytics</a></li>
+                                <li><a href="#tracking">Track Shipment</a></li>
+                                <li><Link to="/hub/dispatch">Dispatch Management</Link></li>
+                                <li><Link to="/hub/reports">Hub Monitoring</Link></li>
+                                <li><Link to="/merchant/analytics">Delivery Analytics</Link></li>
                             </ul>
                         </div>
                     </div>
