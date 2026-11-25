@@ -32,7 +32,7 @@ export default function AdminTable({
                             ) : error ? (
                                 <tr>
                                     <td colSpan={columns.length} className="text-center py-20 text-red-500">
-                                        {error}
+                                        <p role="alert">{error}</p>
                                     </td>
                                 </tr>
                             ) : data.length === 0 ? (

@@ -1,84 +1,97 @@
-import React, { useEffect,useState } from 'react';
+import { useMemo } from 'react';
 import { People, ClockHistory, ExclamationTriangle, ShieldCheck } from 'react-bootstrap-icons';
 import KPICard from '../../components/shared/KPICard';
-import API from '../../services/api';
+import { isActiveOrder } from '../../services/orderStatus';
+import { useUsers } from './adminHooks';
+import { useOrders } from '../../shared/orders/ordersHooks';
+import { useComplaints } from '../../shared/support/supportHooks';
+import { useHubs } from '../../shared/hubs/hubsHooks';
 import RecentActivityCard from '../../components/admin/RecentActivityCard';
 
 const AdminDashboard = () => {
-    const [users, setUsers] =useState(0)
-    const [activeShipments, setActiveShipments] = useState(0);
-    const [openComplaints, setOpenComplaints] = useState(0);
-    const [pendingApprovals, setPendingApprovals] = useState(0);
-    const [dbStatus, setDbStatus] = useState('checking...');
+    const usersQuery = useUsers();
+    const ordersQuery = useOrders();
+    const complaintsQuery = useComplaints();
+    const hubsQuery = useHubs();
 
-    const [recentUsers, setRecentUsers] = useState([]);
-    const [recentComplaints, setRecentComplaints] = useState([]);
+    const error =
+        usersQuery.error?.message ||
+        ordersQuery.error?.message ||
+        complaintsQuery.error?.message ||
+        hubsQuery.error?.message ||
+        '';
 
-    const [apiLatency, setApiLatency] = useState('Measuring...');
-    const [activeHubs, setActiveHubs] = useState(0);
+    const {
+        users,
+        activeShipments,
+        openComplaints,
+        pendingApprovals,
+        dbStatus,
+        recentUsers,
+        recentComplaints,
+        apiLatency,
+        activeHubs,
+    } = useMemo(() => {
+        const usersList = usersQuery.data;
+        const shipmentsList = ordersQuery.data;
+        const complaintsList = complaintsQuery.data;
+        const hubsList = hubsQuery.data;
 
-    useEffect(() => {
-        async function loadData() {
-            try {
-                const startTime = performance.now();
-                const [users, shipments, complaints, hubs] = await Promise.all([
-                    API.users.getAll().catch(() => []),
-                    API.shipments.getAll().catch(() => []),
-                    API.complaints.getAll().catch(() => []),
-                    API.hubs.getAll().catch(() => []),
-                ]);
+        const isChecking =
+            usersQuery.isLoading ||
+            ordersQuery.isLoading ||
+            complaintsQuery.isLoading ||
+            hubsQuery.isLoading;
 
-                const latencyMs = Math.round(performance.now() - startTime);
-                setApiLatency(`${latencyMs} ms`);
+        const hasError = Boolean(
+            usersQuery.error || ordersQuery.error || complaintsQuery.error || hubsQuery.error,
+        );
 
-                if (Array.isArray(users) && users.length > 0) {
-                    setUsers(users.length);
-                    setPendingApprovals(users.filter((u) => !u.isActive).length);
-                    setDbStatus('connected');
-
-                    const sortedUsers = [...users]
-                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                    .slice(0, 5);
-                    setRecentUsers(sortedUsers);
-                } else {
-                    setUsers(0);
-                    setPendingApprovals(0);
-                    setDbStatus('disconnected');
-                }
-
-                setActiveShipments(
-                    Array.isArray(shipments)
-                        ? shipments.filter((s) => s.status === 'processing' || s.status === 'in-transit').length
-                        : 0
-                );
-
-                setOpenComplaints(
-                    Array.isArray(complaints)
-                        ? complaints.filter((c) => c.status === 'Open' || c.status === 'In Progress').length
-                        : 0
-                );
-                if (Array.isArray(complaints) && complaints.length > 0) {
-                    const sortedComplaints = [...complaints]
-                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                    .slice(0, 5);
-                    setRecentComplaints(sortedComplaints);
-                }
-
-                if (Array.isArray(hubs)) {
-                    const activeCount = hubs.filter(h => h.status ? h.status.toLowerCase() === 'active' : true).length;
-                    setActiveHubs(activeCount);
-                }
-
-            } catch (err) {
-                console.error("Error fetching data:", err);
-                setDbStatus('disconnected');
-            }
+        let computedDbStatus = 'checking...';
+        if (hasError) {
+            computedDbStatus = 'disconnected';
+        } else if (!isChecking) {
+            computedDbStatus = Array.isArray(usersList) && usersList.length > 0 ? 'connected' : 'disconnected';
         }
-        loadData();
-    }, []);
+
+        const durations = [usersQuery, ordersQuery, complaintsQuery, hubsQuery]
+            .filter((q) => q.fulfilledTimeStamp && q.startedTimeStamp)
+            .map((q) => q.fulfilledTimeStamp - q.startedTimeStamp);
+
+        const latency = durations.length
+            ? `${Math.max(1, Math.round(Math.max(...durations)))} ms`
+            : 'Measuring...';
+
+        const sortedUsers = Array.isArray(usersList) && usersList.length > 0
+            ? [...usersList].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5)
+            : [];
+
+        const sortedComplaints = Array.isArray(complaintsList) && complaintsList.length > 0
+            ? [...complaintsList].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5)
+            : [];
+
+        return {
+            users: Array.isArray(usersList) ? usersList.length : 0,
+            pendingApprovals: Array.isArray(usersList) ? usersList.filter((u) => !u.isActive).length : 0,
+            dbStatus: computedDbStatus,
+            recentUsers: sortedUsers,
+            activeShipments: Array.isArray(shipmentsList)
+                ? shipmentsList.filter((shipment) => isActiveOrder(shipment.status)).length
+                : 0,
+            openComplaints: Array.isArray(complaintsList)
+                ? complaintsList.filter((c) => c.status === 'Open' || c.status === 'In Progress').length
+                : 0,
+            recentComplaints: sortedComplaints,
+            apiLatency: latency,
+            activeHubs: Array.isArray(hubsList)
+                ? hubsList.filter((h) => (h.status ? h.status.toLowerCase() === 'active' : true)).length
+                : 0,
+        };
+    }, [usersQuery, ordersQuery, complaintsQuery, hubsQuery]);
 
   return (
     <div className="p-2 bg-gray-50 min-h-screen">
+        {error && <p role="alert" className="mb-4 text-sm text-red-700">{error}</p>}
         {/*Header Section*/}
         <div className='flex justify-between items-center mb-6 '>
             <div className="felx mb-4 left-full">

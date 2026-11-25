@@ -1,57 +1,52 @@
-import {useState, useEffect, useMemo} from "react";
-import { Search,ChevronDown,ThreeDotsVertical, ExclamationTriangle } from "react-bootstrap-icons";
-import { API } from "../../services/api";
+import { useState, useEffect, useMemo } from "react";
+import { Search, ChevronDown, ThreeDotsVertical, ExclamationTriangle } from "react-bootstrap-icons";
+import { useComplaints } from "../../shared/support/supportHooks";
+import { useUpdateComplaint } from "./adminHooks";
+import { useMishaps } from "../../shared/orders/ordersHooks";
 import AdminTable from "../../components/admin/AdminTable";
 import KPICard from "../../components/shared/KPICard";
 
 export default function ComplaintsManagement() {
-    const [complaints, setComplaints] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
+    const {
+        data: complaintsRes = [],
+        isLoading: loadingComplaints,
+        error: complaintsError,
+    } = useComplaints();
+    const {
+        data: mishapsRes = [],
+        isLoading: loadingMishaps,
+        error: mishapsError,
+    } = useMishaps();
+    const [triggerUpdateComplaint, { isLoading: saving }] = useUpdateComplaint();
+
+    const loading = loadingComplaints || loadingMishaps;
+    const error = complaintsError?.message || mishapsError?.message || null;
+
+    const complaints = useMemo(() => {
+        const formattedMishaps = (Array.isArray(mishapsRes) ? mishapsRes : []).map((m) => ({
+            id: m.id,
+            reference: m.trackingId || m.orderId?.slice(0, 8) || 'MISHAP',
+            customerName: m.customerName || 'Delivery Incident',
+            type: `Mishap: ${m.type.replace(/_/g, ' ')}`,
+            description: m.description || 'Reported by delivery agent',
+            priority: m.type === 'package_damaged' ? 'Critical' : 'High',
+            status: 'Open',
+            createdAt: m.createdAt,
+            isMishap: true,
+            orderId: m.orderId
+        }));
+
+        return [
+            ...(Array.isArray(complaintsRes) ? complaintsRes : []),
+            ...formattedMishaps
+        ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }, [complaintsRes, mishapsRes]);
+
+    const [actionError, setActionError] = useState('')
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedPriority, setSelectedPriority] = useState("All Priorities")
     const [selectedStatus, setSelectedStatus] = useState("All Statuses")
     const [activeMenuId, setActiveMenuId] = useState(null) //for adding 3dots menu for actions in each row
-
-    useEffect(() => {
-        async function fetchComplaints() {
-            try {
-                setLoading(true);
-                setError(null);
-                
-                const [complaintsRes, mishapsRes] = await Promise.all([
-                    API.complaints.getAll().catch(() => []),
-                    API.mishaps.getAll().catch(() => [])
-                ]);
-
-                const formattedMishaps = (Array.isArray(mishapsRes) ? mishapsRes : []).map((m) => ({
-                    id: m.id,
-                    reference: m.trackingId || m.orderId?.slice(0, 8) || 'MISHAP',
-                    customerName: m.customerName || 'Delivery Incident',
-                    type: `Mishap: ${m.type.replace(/_/g, ' ')}`,
-                    description: m.description || 'Reported by delivery agent',
-                    priority: m.type === 'package_damaged' ? 'Critical' : 'High',
-                    status: 'Open',
-                    createdAt: m.createdAt,
-                    isMishap: true,
-                    orderId: m.orderId
-                }));
-
-                const allIssues = [
-                    ...(Array.isArray(complaintsRes) ? complaintsRes : []),
-                    ...formattedMishaps
-                ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-                setComplaints(allIssues);
-            } catch (err) {
-                console.error("Error fetching complaints & mishaps:", err);
-                setError(err.message || "An error occurred while fetching issues.");
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchComplaints();
-    }, []);
 
     const filteredComplaints = useMemo(() => {
         return complaints.filter((complaint)=>{
@@ -85,13 +80,12 @@ export default function ComplaintsManagement() {
     }, []); 
 
     const handleUpdateStatus = async (id, newStatus) => {
+        if (saving) return;
+        setActionError('');
         try {
-           await API.complaints.update(id, { status: newStatus });
-           setComplaints((prev) =>
-               prev.map((c) => (c.id === id ? { ...c, status: newStatus } : c))
-           );
+           await triggerUpdateComplaint({ id, status: newStatus }).unwrap();
         } catch (err) {
-           console.error('Failed to update complaint status:', err);
+           setActionError(err.message);
         }
     };
     const complaintColumns = [
@@ -166,7 +160,7 @@ export default function ComplaintsManagement() {
             header: 'Actions',
             headerAlign: 'text-right',
             cellClassName: 'text-right whitespace-nowrap',
-            render: (complaint) => (
+            render: (complaint) => complaint.isMishap ? '—' : (
             <div 
                 className="relative inline-block text-left" 
                 onClick={(e) => e.stopPropagation()}
@@ -177,7 +171,7 @@ export default function ComplaintsManagement() {
                         setActiveMenuId(activeMenuId === complaint.id ? null : complaint.id);
                     }}
                     className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Complaint options"
+                    title="Complaint options" disabled={saving}
                 >
                     <ThreeDotsVertical size={15} />
                 </button>
@@ -230,6 +224,7 @@ export default function ComplaintsManagement() {
             <div className="flex justify-between items-center mb-6">
                 <div className="mb-4 left-full">
                     <h1 className="text-2xl font-bold">Complaints Management</h1>
+                    {actionError && <p role="alert" className="text-sm text-red-700">{actionError}</p>}
                     <p className="text-lg font-light text-gray-500 mb-2">Track, escalate, and resolve customer issues globally.</p>
                 </div>
             </div>

@@ -2,60 +2,65 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LabelList 
 } from 'recharts';
-import { useState, useEffect } from 'react';
-import API from '../../services/api';
+import { useMemo } from 'react';
+import { useUsers } from './adminHooks';
+import { useComplaints, useFeedback } from '../../shared/support/supportHooks';
 
 export default function ReportsAnalytics() {
-    const [roleData, setRoleData] = useState([]);
-    const [activeUsers, setActiveUsers] = useState([]);
-    const [complaintData, setComplaintData] = useState([]);
-    const [complaintStatus, setComplaintStatus] = useState([]);
-    const [feedbackRatings, setFeedbackRatings] = useState([]);
+    const { data: users = [], error: usersError } = useUsers();
+    const { data: complaints = [], error: complaintsError } = useComplaints();
+    const { data: feedbacks = [], error: feedbacksError } = useFeedback();
 
-    useEffect(()=>{
-        async function fetchData() {
-            try {
-                const users = await API.users.getAll();
-                const complaints = await API.complaints.getAll();
-                const feedbacks = await API.feedback.getAll();
+    const error = usersError?.message || complaintsError?.message || feedbacksError?.message || '';
 
-                if (Array.isArray(users) && users.length > 0) {
-                    const roleCounts = users.reduce((acc, user) => {
-                        acc[user.role] = (acc[user.role] || 0) + 1;
-                        return acc;
-                    }, {});
-                    setRoleData(Object.entries(roleCounts).map(([name, value]) => ({ name, value })));
-                    const activeUsers = users.filter(user => user.isActive);
-                    setActiveUsers([activeUsers.length, users.length - activeUsers.length].map((value, index) => ({
-                        name: index === 0 ? 'Active' : 'Inactive',
-                        value
-                    })));
-                }
-                if (Array.isArray(complaints) && complaints.length > 0) {
-                    const complaintCounts = complaints.reduce((acc, complaint) => {
-                        acc[complaint.type] = (acc[complaint.type] || 0) + 1;
-                        return acc;
-                    }, {});
-                    setComplaintData(Object.entries(complaintCounts).map(([name, value]) => ({ name, value })));
-                    const complaintStatusCounts = complaints.reduce((acc, complaint)=>{
-                        acc[complaint.status] = (acc[complaint.status]||0)+1
-                        return acc
-                    },{})
-                    setComplaintStatus(Object.entries(complaintStatusCounts).map(([name,value]) => ({name,value})))
-                }
-                if (Array.isArray(feedbacks) && feedbacks.length > 0) {
-                    const feedbackCounts = feedbacks.reduce((acc, feedback) => {
-                        acc[feedback.rating] = (acc[feedback.rating] || 0) + 1;
-                        return acc;
-                    }, {});
-                    setFeedbackRatings(Object.entries(feedbackCounts).map(([name, value]) => ({ name, value })));
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
+    const { roleData, activeUsers, complaintData, complaintStatus, feedbackRatings } = useMemo(() => {
+        let computedRoleData = [];
+        let computedActiveUsers = [];
+        if (Array.isArray(users) && users.length > 0) {
+            const roleCounts = users.reduce((acc, user) => {
+                acc[user.role] = (acc[user.role] || 0) + 1;
+                return acc;
+            }, {});
+            computedRoleData = Object.entries(roleCounts).map(([name, value]) => ({ name, value }));
+            const activeCount = users.filter(user => user.isActive).length;
+            computedActiveUsers = [activeCount, users.length - activeCount].map((value, index) => ({
+                name: index === 0 ? 'Active' : 'Inactive',
+                value
+            }));
         }
-        fetchData();
-    }, [])
+
+        let computedComplaintData = [];
+        let computedComplaintStatus = [];
+        if (Array.isArray(complaints) && complaints.length > 0) {
+            const complaintCounts = complaints.reduce((acc, complaint) => {
+                acc[complaint.type] = (acc[complaint.type] || 0) + 1;
+                return acc;
+            }, {});
+            computedComplaintData = Object.entries(complaintCounts).map(([name, value]) => ({ name, value }));
+            const complaintStatusCounts = complaints.reduce((acc, complaint) => {
+                acc[complaint.status] = (acc[complaint.status] || 0) + 1;
+                return acc;
+            }, {});
+            computedComplaintStatus = Object.entries(complaintStatusCounts).map(([name, value]) => ({ name, value }));
+        }
+
+        let computedFeedbackRatings = [];
+        if (Array.isArray(feedbacks) && feedbacks.length > 0) {
+            const feedbackCounts = feedbacks.reduce((acc, feedback) => {
+                acc[feedback.rating] = (acc[feedback.rating] || 0) + 1;
+                return acc;
+            }, {});
+            computedFeedbackRatings = Object.entries(feedbackCounts).map(([name, value]) => ({ name, value }));
+        }
+
+        return {
+            roleData: computedRoleData,
+            activeUsers: computedActiveUsers,
+            complaintData: computedComplaintData,
+            complaintStatus: computedComplaintStatus,
+            feedbackRatings: computedFeedbackRatings,
+        };
+    }, [users, complaints, feedbacks]);
 
     const COLORS = ['#f97316', '#3b82f6', '#10b981', '#6366f1', '#f43f5e', '#eab308', '#8b5cf6', '#14b8a6'];
     return (
@@ -68,6 +73,7 @@ export default function ReportsAnalytics() {
                 </div>
             </div>
 
+            {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
             {/* charts */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                 

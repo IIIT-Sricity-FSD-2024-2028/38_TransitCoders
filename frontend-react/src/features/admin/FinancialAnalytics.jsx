@@ -1,28 +1,15 @@
-import { useState, useEffect } from 'react';
-import API from '../../services/api';
+import { useState } from 'react';
+import { useExpenses, useRevenueReport } from './adminHooks';
 import AnalyticsView from '../../components/admin/AnalyticsView';
 import ExpensesView from '../../components/admin/ExpenseView';
 
 export default function FinancialAnalytics() {
     const [activeTab, setActiveTab] = useState('overview');
 
-    const [revenueData, setRevenueData] = useState(null);
-    const [expense, setExpense] = useState([]);
+    const { data: revenueData = null, error: revenueError } = useRevenueReport();
+    const { data: expense = [], error: expenseError } = useExpenses();
 
-    const fetchData = async () => {
-        try {
-            const revenueResponse = await API.reports.getRevenue();
-            setRevenueData(revenueResponse);
-
-            const expenseResponse = await API.expenses.getAll();
-            setExpense(expenseResponse);
-        } catch (err) {
-            console.error("Error fetching financial data:", err);
-        }
-    }
-    useEffect(()=>{
-        fetchData();
-    }, [])
+    const error = revenueError?.message || expenseError?.message || '';
 
     return (
         <div className="p-2 bg-gray-50 min-h-screen">
@@ -56,14 +43,15 @@ export default function FinancialAnalytics() {
                     Expense Ledger
                 </button>
             </div>
+            {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
             {/* content */}
-            <div className="animate-reveal mt-6">
+            {!error && <div className="animate-reveal mt-6">
                     {activeTab === 'overview' ? (
                         <AnalyticsView data={revenueData} />
                     ) : (
-                        <ExpensesView data={expense} onRefresh={fetchData} />
+                        <ExpensesView data={expense} />
                     )}
-            </div>
+            </div>}
         </div>
     )
 }
