@@ -3,18 +3,16 @@ import { Link } from 'react-router-dom';
 import { 
   BoxSeam, 
   CheckCircle, 
-  ClockHistory, 
   CurrencyRupee, 
   Plus, 
   ArrowRight,
-  Truck,
-  ArrowUpRight
+  Truck
 } from 'react-bootstrap-icons';
 import KPICard from '../../components/shared/KPICard';
 import AdminTable from '../../components/admin/AdminTable';
 import OrderStatusBadge from '../../components/merchant/OrderStatusBadge';
 import ShippingLabelModal from '../../components/merchant/ShippingLabelModal';
-import { loadOrders, fetchMerchantOrders, setActiveTracking } from '../../services/merchantHelpers';
+import { fetchMerchantOrders } from '../../services/merchantHelpers';
 
 /**
  * MerchantDashboard
@@ -28,22 +26,18 @@ export default function MerchantDashboard() {
   const [orders, setOrders] = useState([]);
   const [selectedLabelOrder, setSelectedLabelOrder] = useState(null);
   const [isBackendConnected, setIsBackendConnected] = useState(false);
+  const [error, setError] = useState('');
 
-  // Load orders on mount (instant local render + live backend API sync)
+  // Load the signed-in merchant's orders.
   useEffect(() => {
-    // 1. Instant render from local cache
-    const savedOrders = loadOrders();
-    setOrders(savedOrders);
-
-    // 2. Fetch live database records from backend API
     let isMounted = true;
     fetchMerchantOrders().then((liveOrders) => {
       if (isMounted && Array.isArray(liveOrders)) {
         setOrders(liveOrders);
         setIsBackendConnected(true);
       }
-    }).catch(() => {
-      if (isMounted) setIsBackendConnected(false);
+    }).catch(err => {
+      if (isMounted) setError(err.message);
     });
 
     return () => { isMounted = false; };
@@ -52,10 +46,11 @@ export default function MerchantDashboard() {
   // Compute overview metrics and status breakdown
   const total = orders.length;
   const delivered = orders.filter((o) => o.status === 'DELIVERED').length;
-  const transit = orders.filter((o) => o.status === 'IN_TRANSIT').length;
-  const pending = orders.filter((o) => o.status === 'PENDING').length;
-  const cancelled = orders.filter((o) => o.status === 'CANCELLED').length;
-  const spend = orders.reduce((acc, o) => acc + (Number(o.price) || 0), 0);
+  const transit = orders.filter((o) => ['PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY'].includes(o.status)).length;
+  const pending = orders.filter((o) => ['PENDING', 'ASSIGNED'].includes(o.status)).length;
+  const cancelled = orders.filter((o) => ['CANCELLED', 'RETURNED', 'FAILED'].includes(o.status)).length;
+  const spend = orders.reduce((acc, o) => acc + (o.paymentStatus === 'paid' ? Number(o.price) || 0 : 0), 0);
+  const activeOrder = orders.find(order => ['PENDING', 'ASSIGNED', 'PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY'].includes(order.status));
 
   // Dynamic chart percentages
   const deliveredPct = total > 0 ? Math.round((delivered / total) * 100) : 0;
@@ -108,6 +103,7 @@ export default function MerchantDashboard() {
 
   return (
     <div className="space-y-6">
+      {error && <p role="alert" className="text-red-700">{error}</p>}
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -119,7 +115,7 @@ export default function MerchantDashboard() {
                 : 'bg-amber-50 text-amber-700 border-amber-200'
             }`}>
               <span className={`w-1.5 h-1.5 rounded-full ${isBackendConnected ? 'bg-emerald-500 animate-ping' : 'bg-amber-400'}`}></span>
-              {isBackendConnected ? 'BACKEND CONNECTED' : 'LOCAL CACHE MODE'}
+              {isBackendConnected ? 'CONNECTED' : error ? 'UNAVAILABLE' : 'LOADING'}
             </span>
           </div>
           <p className="text-sm text-gray-500 mt-1">Real-time dispatch metrics and shipment health</p>
@@ -173,7 +169,7 @@ export default function MerchantDashboard() {
         <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-bold text-gray-900">Live Fleet Distribution</h2>
+              <h2 className="text-sm font-bold text-gray-900">Shipment Status Distribution</h2>
               <p className="text-xs text-gray-400">Current share of active, completed, and pending shipments</p>
             </div>
             <span className="text-xs font-semibold text-gray-500">{total} Total Orders</span>
@@ -199,7 +195,7 @@ export default function MerchantDashboard() {
             <div
               style={{ width: `${cancelledPct}%` }}
               className="bg-rose-500 transition-all duration-500"
-              title={`Cancelled: ${cancelledPct}%`}
+              title={`Exceptions: ${cancelledPct}%`}
             />
           </div>
 
@@ -219,7 +215,7 @@ export default function MerchantDashboard() {
             </div>
             <div className="p-2.5 rounded-lg bg-rose-50/70 border border-rose-100">
               <div className="text-rose-700 font-bold">{cancelled} Orders</div>
-              <div className="text-rose-600 text-[11px]">Cancelled ({cancelledPct}%)</div>
+              <div className="text-rose-600 text-[11px]">Cancelled, Returned, or Failed ({cancelledPct}%)</div>
             </div>
           </div>
         </div>
@@ -228,33 +224,32 @@ export default function MerchantDashboard() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between space-y-4">
           <div>
             <h2 className="text-sm font-bold text-gray-900">Latest Active Shipment</h2>
-            <p className="text-xs text-gray-400">Click to monitor live delivery GPS</p>
+            <p className="text-xs text-gray-400">View the latest shipment updates</p>
           </div>
 
           {/* First active shipment or empty placeholder */}
-          {orders[0] ? (
+          {activeOrder ? (
             <div className="bg-orange-50/60 border border-orange-200/60 rounded-xl p-4 space-y-2">
               <div className="flex justify-between items-center">
-                <span className="font-mono font-bold text-sm text-orange-600">{orders[0].trackingNumber}</span>
-                <OrderStatusBadge status={orders[0].status} />
+                <span className="font-mono font-bold text-sm text-orange-600">{activeOrder.trackingNumber}</span>
+                <OrderStatusBadge status={activeOrder.status} />
               </div>
               <div className="text-xs text-gray-600">
-                <p className="font-medium text-gray-900">{orders[0].recipientName}</p>
-                <p className="truncate">{orders[0].deliveryAddress}</p>
+                <p className="font-medium text-gray-900">{activeOrder.recipientName}</p>
+                <p className="truncate">{activeOrder.deliveryAddress}</p>
               </div>
               <div className="flex gap-2 mt-2">
                 <button
-                  onClick={() => setSelectedLabelOrder(orders[0])}
+                  onClick={() => setSelectedLabelOrder(activeOrder)}
                   className="flex-1 py-1.5 bg-gray-900 hover:bg-black text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
                 >
                   <span>AWB Barcode</span>
                 </button>
                 <Link
-                  to="/merchant/track"
-                  onClick={() => setActiveTracking(orders[0])}
+                  to={`/merchant/track?id=${encodeURIComponent(activeOrder.trackingNumber || activeOrder.id)}`}
                   className="flex-1 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
                 >
-                  <span>Live Map</span>
+                  <span>Track Shipment</span>
                   <ArrowRight size={12} />
                 </Link>
               </div>
@@ -275,7 +270,7 @@ export default function MerchantDashboard() {
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <div>
             <h2 className="text-base font-bold text-gray-900">Recent Shipments</h2>
-            <p className="text-xs text-gray-400">Click any tracking ID to view live route animation</p>
+            <p className="text-xs text-gray-400">Select a tracking ID to view its shipping label</p>
           </div>
           <Link
             to="/merchant/orders"

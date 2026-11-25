@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * OrderStatusBadge component
  * Renders styled status badge pill based on shipment status

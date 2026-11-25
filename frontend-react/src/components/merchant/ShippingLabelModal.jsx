@@ -1,28 +1,64 @@
-import React from 'react';
-import { Printer, X, QrCode, Building, GeoAlt, CheckCircleFill } from 'react-bootstrap-icons';
+import { useEffect, useRef, useState } from 'react';
+import { Printer, X, Building, GeoAlt } from 'react-bootstrap-icons';
 import OrderStatusBadge from './OrderStatusBadge';
+import { API } from '../../services/api';
+import { getAutoDimensions } from '../../services/merchantHelpers';
+import './ShippingLabelModal.css';
 
 /**
  * ShippingLabelModal
- * Displays a realistic printable AWB shipping label with barcode, QR code,
+ * Displays a printable AWB shipping label with barcode,
  * merchant origin, customer destination, and cargo induction details.
  */
 export default function ShippingLabelModal({ order, isOpen, onClose }) {
   if (!isOpen || !order) return null;
+  return <ShippingLabel key={order.backendId} order={order} onClose={onClose} />;
+}
+
+function ShippingLabel({ order, onClose }) {
+  const [barcode, setBarcode] = useState(null);
+  const [error, setError] = useState('');
+  const dialog = useRef(null);
+  const billedWeight = order.billableWeight ?? order.packageWeight;
+  const dimensions = getAutoDimensions(order.packageType, order.packageWeight);
+
+  useEffect(() => {
+    const element = dialog.current;
+    element.showModal();
+    return () => element.close();
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let imageUrl;
+    API.orders.barcode(order.backendId, controller.signal).then(blob => {
+      if (controller.signal.aborted) return;
+      imageUrl = URL.createObjectURL(blob);
+      setBarcode(imageUrl);
+    }, err => {
+      if (!controller.signal.aborted) setError(err.message);
+    });
+    return () => {
+      controller.abort();
+      if (imageUrl) URL.revokeObjectURL(imageUrl);
+    };
+  }, [order.backendId]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
-      <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-5 my-8">
+    <dialog ref={dialog} aria-label="Shipping label" className="shipping-label-dialog"
+      onCancel={event => { event.preventDefault(); onClose(); }}>
+      <div className="p-4 sm:p-6 space-y-5">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap gap-2 items-center justify-between pb-3 border-b border-gray-100">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-bold text-gray-900">Air Waybill (AWB) Label</span>
             <OrderStatusBadge status={order.status} />
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}
+              disabled={!barcode}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 hover:bg-black text-white text-xs font-bold rounded-lg shadow-sm transition-colors"
             >
               <Printer size={14} />
@@ -30,6 +66,7 @@ export default function ShippingLabelModal({ order, isOpen, onClose }) {
             </button>
             <button
               onClick={onClose}
+              aria-label="Close shipping label"
               className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <X size={20} />
@@ -38,7 +75,7 @@ export default function ShippingLabelModal({ order, isOpen, onClose }) {
         </div>
 
         {/* Printable Label Container */}
-        <div className="border-2 border-black p-5 rounded-xl bg-white space-y-4 font-sans text-xs">
+        <div className="shipping-label border-2 border-black p-3 sm:p-5 rounded-xl bg-white space-y-4 font-sans text-xs">
           
           {/* Top Carrier Brand & Service Tier */}
           <div className="flex justify-between items-center border-b-2 border-black pb-3">
@@ -59,27 +96,15 @@ export default function ShippingLabelModal({ order, isOpen, onClose }) {
 
           {/* Realistic Barcode Block */}
           <div className="py-2.5 text-center bg-gray-50 border border-gray-200 rounded-lg p-3 space-y-1">
-            <div className="font-mono text-2xl font-black tracking-widest text-gray-900">
+            <div className="font-mono break-all text-lg sm:text-2xl font-black tracking-widest text-gray-900">
               {order.trackingNumber || order.id}
             </div>
             
-            {/* Dynamic CSS Barcode Lines */}
-            <div className="flex justify-center items-center gap-1 h-12 overflow-hidden opacity-90">
-              {Array.from({ length: 42 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-full ${
-                    i % 4 === 0
-                      ? 'w-1 bg-black'
-                      : i % 3 === 0
-                      ? 'w-1.5 bg-black'
-                      : i % 2 === 0
-                      ? 'w-0.5 bg-black'
-                      : 'w-2 bg-black'
-                  }`}
-                />
-              ))}
-            </div>
+            {barcode ? (
+              <img src={barcode} alt={`Barcode for ${order.trackingNumber}`} className="mx-auto max-h-16 max-w-full" />
+            ) : (
+              <p role={error ? 'alert' : 'status'}>{error || 'Loading barcode…'}</p>
+            )}
             <p className="text-[9px] text-gray-400 font-mono tracking-wider">
               SCAN TO DISPATCH & CONFIRM INDUCTION
             </p>
@@ -92,7 +117,7 @@ export default function ShippingLabelModal({ order, isOpen, onClose }) {
                 <Building size={11} />
                 <span>SHIP FROM (MERCHANT):</span>
               </p>
-              <p className="font-bold text-gray-900">{order.pickupHubName || 'Logistics Origin Hub'}</p>
+              <p className="font-bold text-gray-900">{order.pickupHubId || 'Origin hub unavailable'}</p>
               <p className="text-gray-600 text-[11px]">{order.pickupAddress || 'Origin Logistics Facility'}</p>
               <p className="text-gray-500 font-mono text-[11px]">{order.origin || 'Origin'}</p>
             </div>
@@ -113,25 +138,25 @@ export default function ShippingLabelModal({ order, isOpen, onClose }) {
             <div>
               <span className="text-[10px] text-gray-400 block font-semibold">BILLED WEIGHT</span>
               <span className="font-bold text-sm text-gray-900">
-                {order.packageWeight ? `${order.packageWeight} kg` : '1.0 kg'}
+                {billedWeight == null ? '—' : `${billedWeight} kg`}
               </span>
             </div>
             <div>
               <span className="text-[10px] text-gray-400 block font-semibold">DIMENSIONS</span>
-              <span className="font-bold text-xs text-gray-900 mt-0.5 block truncate" title={order.dimensions || '28x22x16 cm'}>
-                {order.dimensions || (order.length ? `${order.length}x${order.width}x${order.height} cm` : '28x22x16 cm')}
+              <span className="font-bold text-xs text-gray-900 mt-0.5 block truncate" title="Estimated dimensions">
+                {order.packageWeight == null ? '—' : `${dimensions.length} × ${dimensions.width} × ${dimensions.height} cm`}
               </span>
             </div>
             <div>
               <span className="text-[10px] text-gray-400 block font-semibold">DESTINATION HUB</span>
               <span className="font-bold text-sm text-orange-600">
-                {order.destination ? `${order.destination.toUpperCase()}-01` : 'DEST-01'}
+                {order.deliveryHubId || '—'}
               </span>
             </div>
             <div>
               <span className="text-[10px] text-gray-400 block font-semibold">COD / AMOUNT</span>
               <span className="font-bold text-sm text-gray-900">
-                ₹{order.price || 0} ({order.paymentMode || 'PAID'})
+                ₹{order.price ?? '—'} ({order.paymentMode || '—'})
               </span>
             </div>
           </div>
@@ -154,6 +179,6 @@ export default function ShippingLabelModal({ order, isOpen, onClose }) {
         </div>
 
       </div>
-    </div>
+    </dialog>
   );
 }
