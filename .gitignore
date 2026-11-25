@@ -47,3 +47,7 @@ backend/logs/
 # SQLite temporary files
 *.db-shm
 *.db-wal
+
+# Browser test output
+frontend-react/test-results/
+frontend-react/playwright-report/
