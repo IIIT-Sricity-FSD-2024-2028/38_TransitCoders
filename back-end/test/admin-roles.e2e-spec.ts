@@ -2,20 +2,21 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
-import * as fs from 'fs';
-import * as path from 'path';
-
-// Use a distinct database file for testing
-const TEST_DB = path.join(__dirname, 'test-swifttrack.db');
-process.env.DB_FILE = TEST_DB;
+import { randomUUID } from 'node:crypto';
+import { rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 import { AppModule } from './../src/app.module';
 
 describe('Role Boundaries (e2e)', () => {
   let app: INestApplication<App>;
   let tokens: Record<string, string> = {};
+  const previousDatabase = process.env.DB_FILE;
+  const database = join(tmpdir(), `swifttrack-roles-${randomUUID()}.db`);
 
   beforeAll(async () => {
+    process.env.DB_FILE = database;
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -43,10 +44,10 @@ describe('Role Boundaries (e2e)', () => {
   });
 
   afterAll(async () => {
-    await app.close();
-    if (fs.existsSync(TEST_DB)) {
-      fs.unlinkSync(TEST_DB);
-    }
+    await app?.close();
+    if (previousDatabase === undefined) delete process.env.DB_FILE;
+    else process.env.DB_FILE = previousDatabase;
+    rmSync(database, { force: true });
   });
 
   describe('ADMIN role', () => {

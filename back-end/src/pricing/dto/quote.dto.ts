@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNumber, IsOptional, IsIn, Min } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsIn, Min, Max } from 'class-validator';
 
 export class QuoteDto {
   @ApiProperty({ enum: ['standard', 'express', 'same-day'], example: 'express' })
@@ -8,7 +8,8 @@ export class QuoteDto {
 
   @ApiProperty({ example: 2.5, description: 'Package weight in kg' })
   @IsNumber()
-  @Min(0)
+  @Min(0.1)
+  @Max(50)
   weightKg: number;
 
   @ApiProperty({ enum: ['Prepaid', 'COD'], required: false, example: 'Prepaid' })
@@ -51,6 +52,7 @@ export class UpdatePricingConfigDto {
   @ApiProperty({ required: false, example: 0 })
   @IsNumber()
   @Min(0)
+  @Max(100)
   @IsOptional()
   discountPercent?: number;
 

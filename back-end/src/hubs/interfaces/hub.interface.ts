@@ -12,6 +12,8 @@ export interface IHub {
   status: 'active' | 'inactive' | 'maintenance';
   capacity: number;
   currentLoad: number;
+  reservedParcels?: number;
+  remainingCapacity?: number;
   createdAt: Date;
   updatedAt: Date;
 }

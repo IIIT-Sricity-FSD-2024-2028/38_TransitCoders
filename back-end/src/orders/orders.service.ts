@@ -2,14 +2,17 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Inject,
   forwardRef,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+import type { DatabaseSync } from 'node:sqlite';
 import { DatabaseService } from '../common/database/database.service';
 import { OrdersRepository } from './orders.repository';
 import { AgentsRepository } from '../agents/agents.repository';
+import { AGENT_TASK_CAPACITY } from '../agents/interfaces/agent.interface';
 import { UsersService } from '../users/users.service';
 import { PricingService } from '../pricing/pricing.service';
 import { PaymentsService } from '../payments/payments.service';
@@ -36,8 +39,7 @@ import { AppLogger } from '../common/logger/app.logger';
  *     customer → own orders; merchant → own orders; agent → assigned orders;
  *     hub manager → orders touching their hub; super user → everything.
  *   - Status transitions check role + ownership before mutating.
- *   - Assignment is transactional (OrdersRepository.assignAgentTx) so two
- *     concurrent hub managers cannot both claim the same Pending order.
+ *   - The assignment transaction checks both the order and the agent's workload.
  *
  * Pricing authority:
  *   - The final charge (order.amount) is ALWAYS computed by PricingService
@@ -82,7 +84,9 @@ export class OrdersService {
    * to the order (prevents IDOR — one customer reading another's order).
    */
   getAuthorizedOrder(id: string, user: IUser): IOrder {
-    const order = this.ordersRepository.findById(id) ?? this.ordersRepository.findByOrderId(id);
+    const order = this.ordersRepository.findById(id) ??
+      this.ordersRepository.findByOrderId(id) ??
+      this.ordersRepository.findByTrackingId(id);
     if (!order) throw new NotFoundException(`Order ${id} not found`);
 
     switch (user.role) {
@@ -121,17 +125,26 @@ export class OrdersService {
   }
 
   async create(dto: CreateOrderDto, user: IUser): Promise<IOrder> {
-    const customer = this.usersService.findById(dto.customerId);
+    const customer = dto.customerId
+      ? this.usersService.findById(dto.customerId)
+      : this.usersService.findCustomerByEmail(dto.customerEmail ?? '');
+    if (customer.role !== Role.CUSTOMER || !customer.isActive) {
+      throw new BadRequestException('An active customer account is required');
+    }
 
     // ── Authoritative backend pricing ──────────────────────────────────────
     // The client may suggest inputs, but the final charge is computed here.
     const serviceLevel: ServiceLevel = dto.serviceLevel ?? 'standard';
     const paymentMode = dto.paymentMode ?? 'Prepaid';
-    const breakdown = this.pricingService.calculateQuote({
-      serviceLevel,
-      weightKg: dto.weight ?? 0,
-      paymentMode,
-    });
+    const pickupHubId = dto.pickupHubId?.trim() || undefined;
+    const deliveryHubId = dto.deliveryHubId?.trim() || pickupHubId;
+    if (deliveryHubId && !pickupHubId) {
+      throw new BadRequestException('Select a pickup hub before selecting a destination hub');
+    }
+    if (pickupHubId && dto.weight == null) {
+      throw new BadRequestException('Enter a parcel weight between 0.1 and 50 kg');
+    }
+    const routeHubs = pickupHubId ? [...new Set([pickupHubId, deliveryHubId!])] : [];
 
     const orderId = `ORD-${Date.now().toString(36).toUpperCase()}-${Math.random()
       .toString(36)
@@ -155,34 +168,45 @@ export class OrdersService {
       },
     ];
 
-    const order = this.ordersRepository.create({
-      orderId,
-      trackingId,
-      merchantId: user.id,
-      customerId: customer.id,
-      customerName: customer.name,
-      customerPhone: customer.phone,
-      pickupAddress: dto.pickupAddress,
-      deliveryAddress: dto.deliveryAddress,
-      pickupHubId: dto.pickupHubId,
-      deliveryHubId: dto.deliveryHubId,
-      status: OrderStatus.PENDING,
-      packageType: dto.packageType,
-      serviceLevel,
-      weight: dto.weight,
-      // ── THE authoritative charge — never client-supplied ──
-      amount: breakdown.total,
-      pricingBreakdown: breakdown,
-      paymentMode,
-      paymentStatus: paymentMode === 'Prepaid' ? 'paid' : 'pending',
-      priority: dto.priority,
-      estimatedDelivery: dto.estimatedDelivery ? new Date(dto.estimatedDelivery) : undefined,
-      pickupScheduledAt: dto.pickupScheduledAt ? new Date(dto.pickupScheduledAt) : undefined,
-      statusHistory: history,
-    } as Omit<IOrder, 'id' | 'createdAt' | 'updatedAt'>);
-
-    // Financial ledger entry (charge record)
-    this.paymentsService.createChargeForOrder(order);
+    const order = this.db.transaction((conn) => {
+      const breakdown = this.pricingService.calculateQuote({
+        serviceLevel, weightKg: dto.weight ?? 0, paymentMode,
+      });
+      if (dto.quotedTotal !== undefined && dto.quotedTotal !== breakdown.total) {
+        throw new ConflictException('Shipping rates changed. Review the updated quote before booking.');
+      }
+      for (const hubId of routeHubs) this.requireWarehouseSlot(conn, hubId);
+      const created = this.ordersRepository.create({
+        orderId,
+        trackingId,
+        merchantId: user.id,
+        customerId: customer.id,
+        customerName: dto.recipientName?.trim() || customer.name,
+        customerPhone: dto.recipientPhone?.trim() || customer.phone,
+        pickupAddress: dto.pickupAddress,
+        deliveryAddress: dto.deliveryAddress,
+        pickupHubId,
+        deliveryHubId,
+        status: OrderStatus.PENDING,
+        packageType: dto.packageType,
+        serviceLevel,
+        weight: dto.weight,
+        // ── THE authoritative charge — never client-supplied ──
+        amount: breakdown.total,
+        pricingBreakdown: breakdown,
+        paymentMode,
+        paymentStatus: paymentMode === 'Prepaid' ? 'paid' : 'pending',
+        priority: dto.priority,
+        estimatedDelivery: dto.estimatedDelivery ? new Date(dto.estimatedDelivery) : undefined,
+        pickupScheduledAt: dto.pickupScheduledAt ? new Date(dto.pickupScheduledAt) : undefined,
+        statusHistory: history,
+      });
+      for (const hubId of routeHubs) {
+        conn.prepare('INSERT INTO warehouse_visits (orderId, hubId) VALUES (?, ?)').run(created.id, hubId);
+      }
+      this.paymentsService.createChargeForOrder(created);
+      return created;
+    });
 
     // Notify the customer their order was booked
     this.notificationsService.notify(
@@ -199,7 +223,7 @@ export class OrdersService {
       weight: dto.weight,
     });
 
-    return order;
+    return this.ordersRepository.findById(order.id)!;
   }
 
   update(id: string, dto: UpdateOrderDto, user: IUser): IOrder {
@@ -217,6 +241,12 @@ export class OrdersService {
       statusHistory: _sh,
       pickupHubId: _ph,
       deliveryHubId: _dh,
+      quotedTotal: _qt,
+      serviceLevel: _sl,
+      weight: _w,
+      paymentMode: _pm,
+      customerId: _c,
+      trackingId: _t,
       ...safeChanges
     } = dto as any;
     return this.ordersRepository.update(order.id, safeChanges)!;
@@ -225,7 +255,7 @@ export class OrdersService {
   /**
    * Status transition with role + ownership enforcement and history tracking.
    */
-  updateStatus(orderId: string, newStatus: OrderStatus, user: IUser): IOrder {
+  updateStatus(orderId: string, newStatus: OrderStatus, user: IUser, deliveryPhoto?: string): IOrder {
     const order = this.getAuthorizedOrder(orderId, user);
     const validNextStatuses = VALID_TRANSITIONS[order.status as OrderStatus];
 
@@ -233,6 +263,12 @@ export class OrdersService {
       throw new BadRequestException(
         `Cannot transition from ${order.status} to ${newStatus}`,
       );
+    }
+    if ([OrderStatus.ASSIGNED, OrderStatus.CANCELLED, OrderStatus.RETURNED, OrderStatus.FAILED].includes(newStatus)) {
+      throw new BadRequestException('Use the dedicated action for this status change');
+    }
+    if (newStatus === OrderStatus.PICKED_UP && order.warehouse && !order.warehouse.checkedOutAt) {
+      throw new BadRequestException('Ask your hub to check out this parcel before marking it picked up');
     }
 
     // Role rules per transition type
@@ -265,6 +301,7 @@ export class OrdersService {
         timestamp: new Date().toISOString(),
         note: `Status updated to ${newStatus}`,
         by: user.id,
+        ...(deliveryPhoto ? { deliveryPhoto } : {}),
       },
     ];
 
@@ -309,11 +346,7 @@ export class OrdersService {
     return updated;
   }
 
-  /**
-   * Assign a delivery agent (Hub Manager, own hub only).
-   * Transactional — concurrent double-assignment is impossible.
-   */
-  assignAgent(orderId: string, agentId: string, user: IUser): IOrder {
+  private assignmentOrder(orderId: string, user: IUser): IOrder {
     const order = this.getAuthorizedOrder(orderId, user);
     if (order.status !== OrderStatus.PENDING) {
       throw new BadRequestException('Order must be in Pending status to assign an agent');
@@ -325,69 +358,66 @@ export class OrdersService {
         throw new ForbiddenException('You can only assign agents for orders at your hub');
       }
     }
-
-    const agent = this.agentsRepository.findByUserId(agentId);
-    if (!agent) {
-      throw new BadRequestException('Invalid agent');
+    if (order.warehouse && (order.pickupHubId !== order.deliveryHubId ||
+      !order.warehouse.checkedInAt || order.warehouse.checkedOutAt)) {
+      throw new BadRequestException('Check the parcel in at its destination hub before assigning an agent');
     }
-    if (agent.availabilityStatus === 'Offline') {
-      throw new BadRequestException('Agent is currently offline and cannot be assigned');
-    }
-    // Hub-level check: agent must belong to the order's pickup hub.
-    // If the order has no pickup hub yet (merchant did not specify one),
-    // the agent's hub becomes the pickup hub — realistic logistics behavior.
-    if (order.pickupHubId && agent.hubId && agent.hubId !== order.pickupHubId) {
-      throw new BadRequestException(
-        `Agent belongs to hub ${agent.hubId}, order is at hub ${order.pickupHubId}`,
-      );
-    }
+    return order;
+  }
 
-    const assigned = this.ordersRepository.assignAgentTx(
-      order.id,
-      agentId,
-      OrderStatus.ASSIGNED,
-      order.pickupHubId ? undefined : agent.hubId || undefined,
-    );
-    if (!assigned) {
-      throw new BadRequestException('Order is no longer Pending — it may have been assigned by another manager');
-    }
-
-    this.agentsRepository.update(agent.id, {
-      currentTasksCount: this.ordersRepository.countActiveByAgent(agentId),
-    });
-
+  private saveAssignment(order: IOrder, agent: { userId: string; hubId: string }, user: IUser): IOrder {
+    const assigned = this.ordersRepository.update(order.id, {
+      assignedAgentId: agent.userId,
+      status: OrderStatus.ASSIGNED,
+      pickupHubId: order.pickupHubId || agent.hubId || undefined,
+      statusHistory: [...order.statusHistory, {
+        status: OrderStatus.ASSIGNED, timestamp: new Date().toISOString(), by: user.id,
+        note: 'Delivery agent assigned',
+      }],
+    })!;
     this.notificationsService.notify(
-      agentId,
+      agent.userId,
       'assignment',
       `New delivery assigned: ${assigned.orderId} → ${assigned.deliveryAddress}`,
       assigned.id,
     );
-
     return assigned;
   }
 
-  /**
-   * Dispatch automation (SRS: auto-assign by location + workload, with
-   * manual override support). Picks the available agent in the hub with the
-   * lowest active workload.
-   */
+  assignAgent(orderId: string, agentId: string, user: IUser): IOrder {
+    return this.db.transaction(() => {
+      const order = this.assignmentOrder(orderId, user);
+      const agent = this.agentsRepository.findByUserId(agentId);
+      const agentUser = agent && this.usersService.findById(agent.userId);
+      if (!agent || agentUser?.role !== Role.DELIVERY_AGENT || !agentUser.isActive) {
+        throw new BadRequestException('Invalid agent');
+      }
+      const hubId = order.pickupHubId || (user.role === Role.HUB_MANAGER ? user.hubId : undefined);
+      if (hubId && agent.hubId !== hubId) throw new BadRequestException(`Select an agent from hub ${hubId}`);
+      if (agent.availabilityStatus !== 'Available') throw new BadRequestException('This agent is unavailable');
+      if (agent.currentTasksCount >= AGENT_TASK_CAPACITY) {
+        throw new ConflictException(`This agent already has ${agent.currentTasksCount} active deliveries. Choose another agent.`);
+      }
+      return this.saveAssignment(order, agent, user);
+    });
+  }
+
   autoAssign(orderId: string, user: IUser): IOrder {
-    const order = this.getAuthorizedOrder(orderId, user);
-    if (order.status !== OrderStatus.PENDING) {
-      throw new BadRequestException('Order must be Pending for auto-assignment');
-    }
-    const hubId = user.role === Role.HUB_MANAGER ? user.hubId : order.pickupHubId;
-    if (!hubId) throw new BadRequestException('Order has no pickup hub');
+    return this.db.transaction(() => {
+      const order = this.assignmentOrder(orderId, user);
+      const hubId = order.pickupHubId || user.hubId;
+      if (!hubId) throw new BadRequestException('Order has no pickup hub');
 
-    const candidates = this.agentsRepository
-      .findByHub(hubId)
-      .filter((a) => a.availabilityStatus !== 'Offline')
-      .sort((a, b) => a.currentTasksCount - b.currentTasksCount);
+      const agent = this.nextAvailableAgent(hubId);
+      if (!agent) throw new ConflictException(`No available agents with capacity in hub ${hubId}`);
+      return this.saveAssignment(order, agent, user);
+    });
+  }
 
-    if (!candidates.length) {
-      throw new BadRequestException(`No available agents in hub ${hubId}`);
-    }
-    return this.assignAgent(order.id, candidates[0].userId, user);
+  private nextAvailableAgent(hubId: string) {
+    return this.agentsRepository.findByHub(hubId).find(candidate =>
+      candidate.availabilityStatus === 'Available' && candidate.currentTasksCount < AGENT_TASK_CAPACITY,
+    );
   }
 
   /** Cancel (merchant owner or super user) — only before pickup; triggers refund. */
@@ -424,10 +454,14 @@ export class OrdersService {
 
     // Financial: refund the charge (idempotent — throws if already refunded)
     let refund: unknown;
-    try {
-      refund = this.paymentsService.refundOrder(updated, 'cancellation');
-    } catch {
-      refund = undefined; // no charge record (legacy data) — order still cancels
+    if (updated.paymentStatus === 'pending') {
+      this.paymentsService.cancelUncollectedCharge(updated);
+    } else if (updated.paymentStatus === 'paid') {
+      try {
+        refund = this.paymentsService.refundOrder(updated, 'cancellation');
+      } catch (err) {
+        if (!(err instanceof NotFoundException)) throw err;
+      }
     }
 
     this.notificationsService.notify(
@@ -437,7 +471,7 @@ export class OrdersService {
       updated.id,
     );
 
-    return { order: updated, refund };
+    return { order: this.ordersRepository.findById(order.id)!, refund };
   }
 
   /**
@@ -467,10 +501,12 @@ export class OrdersService {
       statusHistory: history,
     })!;
 
-    try {
-      this.paymentsService.refundOrder(updated, reason || 'return');
-    } catch {
-      /* no charge record — still record the return */
+    if (updated.paymentStatus === 'paid') {
+      try {
+        this.paymentsService.refundOrder(updated, reason || 'return');
+      } catch (err) {
+        if (!(err instanceof NotFoundException)) throw err;
+      }
     }
 
     this.notificationsService.notify(
@@ -479,7 +515,7 @@ export class OrdersService {
       `Return authorized for order ${updated.orderId}. Refund initiated.`,
       updated.id,
     );
-    return updated;
+    return this.ordersRepository.findById(order.id)!;
   }
 
   /**
@@ -546,9 +582,76 @@ export class OrdersService {
       [uuidv4(), orderId, reportedBy, type, description ?? null, new Date().toISOString()],
     );
   }
-  getAllMishaps(): Array<{
+
+  private requireWarehouseSlot(conn: DatabaseSync, hubId: string): void {
+    const hub = conn.prepare(
+      'SELECT status, capacity, storedParcels, reservedParcels FROM hub_inventory WHERE hubId = ?',
+    ).get(hubId);
+    if (!hub || hub.status !== 'active') {
+      throw new BadRequestException(`Hub ${hubId} is unavailable. Choose an active hub.`);
+    }
+    if (Number(hub.storedParcels) + Number(hub.reservedParcels) >= Number(hub.capacity)) {
+      throw new ConflictException(`Hub ${hubId} has no warehouse slots left. Choose another hub or try again later.`);
+    }
+  }
+
+  scanWarehouse(reference: string, action: 'check-in' | 'check-out', user: IUser, autoAssign = false): IOrder {
+    const orderId = this.db.transaction(conn => {
+      const order = this.getAuthorizedOrder(reference.trim(), user);
+      const visit = order.warehouse;
+      if (!visit || visit.hubId !== user.hubId) {
+        throw new ForbiddenException('This parcel is not scheduled to be scanned at your hub');
+      }
+
+      const checkingIn = action === 'check-in';
+      if (checkingIn && visit.checkedOutAt) throw new BadRequestException('This parcel has already left this hub');
+      const agent = checkingIn && autoAssign && order.status === OrderStatus.PENDING && order.deliveryHubId === visit.hubId
+        ? this.nextAvailableAgent(visit.hubId)
+        : undefined;
+      if (checkingIn ? visit.checkedInAt : visit.checkedOutAt) {
+        if (agent) this.saveAssignment(order, agent, user);
+        return order.id;
+      }
+      if (checkingIn && order.status !== OrderStatus.PENDING) {
+        throw new BadRequestException('Only incoming pending parcels can be checked in');
+      }
+      if (!checkingIn) {
+        if (!visit.checkedInAt) throw new BadRequestException('Check in the parcel before checking it out');
+        const isTransfer = order.status === OrderStatus.PENDING && order.deliveryHubId !== visit.hubId;
+        const canRelease = [OrderStatus.ASSIGNED, OrderStatus.CANCELLED, OrderStatus.FAILED].includes(order.status as OrderStatus);
+        if (!isTransfer && !canRelease) {
+          throw new BadRequestException('Assign an agent before checking this parcel out');
+        }
+      }
+
+      const timestamp = new Date().toISOString();
+      const column = checkingIn ? 'checkedInAt' : 'checkedOutAt';
+      conn.prepare(`UPDATE warehouse_visits SET ${column} = ? WHERE orderId = ? AND hubId = ?`)
+        .run(timestamp, order.id, visit.hubId);
+      const statusHistory = [...order.statusHistory, {
+        status: order.status,
+        timestamp,
+        location: visit.hubId,
+        note: checkingIn ? 'Warehouse check-in' : 'Warehouse check-out',
+        by: user.id,
+      }];
+      if (agent) {
+        this.saveAssignment({ ...order, statusHistory }, agent, user);
+      } else {
+        this.ordersRepository.update(order.id, { statusHistory });
+      }
+      if (!checkingIn && order.status === OrderStatus.ASSIGNED) {
+        this.notificationsService.notify(order.assignedAgentId!, 'tracking', `Parcel ${order.orderId} is ready for pickup.`, order.id);
+      }
+      return order.id;
+    });
+    return this.ordersRepository.findById(orderId)!;
+  }
+
+  getAllMishaps(user: IUser): Array<{
     id: string;
     orderId: string;
+    orderNumber?: string;
     trackingId?: string;
     customerName?: string;
     reportedBy: string;
@@ -556,12 +659,19 @@ export class OrdersService {
     description?: string;
     createdAt: string;
   }> {
+    const isAgent = user.role === Role.DELIVERY_AGENT;
+    const isHubManager = user.role === Role.HUB_MANAGER;
+    if (isHubManager && !user.hubId) return [];
+    const scope = isAgent ? 'WHERE m.reportedBy = ?' : isHubManager ? 'WHERE o.pickupHubId = ? OR o.deliveryHubId = ?' : '';
+    const parameters = isAgent ? [user.id] : isHubManager ? [user.hubId, user.hubId] : [];
     return this.db.query<any>(
       `SELECT m.id, m.orderId, m.reportedBy, m.type, m.description, m.createdAt,
-              o.trackingId, o.customerName, o.status as orderStatus
+              o.orderId AS orderNumber, o.trackingId, o.customerName, o.status as orderStatus
        FROM mishaps m
        LEFT JOIN orders o ON m.orderId = o.id
-       ORDER BY m.createdAt DESC`
+       ${scope}
+       ORDER BY m.createdAt DESC`,
+      parameters,
     );
   }
 
@@ -570,6 +680,11 @@ export class OrdersService {
    * moves the order's current hub, and appends a timeline entry.
    */
   transferToHub(orderId: string, toHubId: string, reason: string | undefined, user: IUser): IOrder {
+    const updatedId = this.db.transaction(() => this.recordTransfer(orderId, toHubId, reason, user).id);
+    return this.ordersRepository.findById(updatedId)!;
+  }
+
+  private recordTransfer(orderId: string, toHubId: string, reason: string | undefined, user: IUser): IOrder {
     const order = this.getAuthorizedOrder(orderId, user);
     if (user.role === Role.HUB_MANAGER && (!user.hubId || (order.pickupHubId && order.pickupHubId !== user.hubId))) {
       throw new ForbiddenException('You can only transfer orders currently at your hub');
@@ -587,9 +702,17 @@ export class OrdersService {
     if (!toHubId || toHubId === order.pickupHubId) {
       throw new BadRequestException('Destination hub must differ from the current hub');
     }
+    if (order.warehouse) {
+      if (toHubId !== order.deliveryHubId) {
+        throw new BadRequestException('Transfer this parcel to its reserved destination hub');
+      }
+      if (!order.warehouse.checkedOutAt) {
+        throw new BadRequestException('Check the parcel out of the current warehouse before transferring');
+      }
+    }
 
-    const destHub = this.db.queryOne<{ hubId: string; status: string }>(
-      'SELECT hubId, status FROM hubs WHERE hubId = ?',
+    const destHub = this.db.queryOne<{ status: string; address?: string; city?: string }>(
+      'SELECT status, address, city FROM hubs WHERE hubId = ?',
       [toHubId],
     );
     if (!destHub) {
@@ -616,6 +739,7 @@ export class OrdersService {
 
     const updated = this.ordersRepository.update(order.id, {
       pickupHubId: toHubId,
+      pickupAddress: [destHub.address, destHub.city].filter(Boolean).join(', ') || toHubId,
       statusHistory: history,
     })!;
 
@@ -630,7 +754,13 @@ export class OrdersService {
 
   /** Hard delete (Super User) — only for Pending/Cancelled orders. */
   removeOrder(id: string): void {
-    this.ordersRepository.delete(id);
+    this.db.transaction(() => {
+      const order = this.findById(id);
+      if (order.warehouse?.checkedInAt && !order.warehouse.checkedOutAt) {
+        throw new ConflictException('Check the parcel out of the warehouse before deleting the order');
+      }
+      this.ordersRepository.delete(order.id);
+    });
   }
 
   /** Customer confirms receipt (SRS: delivery confirmation). */
@@ -641,6 +771,9 @@ export class OrdersService {
     }
     if (order.status !== OrderStatus.DELIVERED) {
       throw new BadRequestException('Delivery can only be confirmed after the order is Delivered');
+    }
+    if (order.statusHistory?.some(event => event.note === 'Receipt confirmed by customer' && event.by === user.id)) {
+      return order;
     }
     const history: IStatusEvent[] = [
       ...(order.statusHistory ?? []),
@@ -681,14 +814,14 @@ export class OrdersService {
   } {
     const order = this.ordersRepository.findByTrackingId(trackingId);
     if (!order) throw new NotFoundException(`No shipment found for tracking ID ${trackingId}`);
-    const lastEvent = order.statusHistory?.[order.statusHistory.length - 1];
+    const lastLocation = order.statusHistory?.findLast(event => event.location)?.location;
     return {
       trackingId: order.trackingId,
       orderId: order.orderId,
       status: order.status,
-      currentLocation: lastEvent?.location,
+      currentLocation: lastLocation,
       estimatedDelivery: order.estimatedDelivery,
-      timeline: order.statusHistory ?? [],
+      timeline: (order.statusHistory ?? []).map(({ status, timestamp, location }) => ({ status, timestamp, location })),
       createdAt: order.createdAt,
     };
   }

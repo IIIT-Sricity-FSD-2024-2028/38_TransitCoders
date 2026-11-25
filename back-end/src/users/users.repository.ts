@@ -41,7 +41,7 @@ export class UsersRepository {
   }
 
   findByEmail(email: string): IUser | undefined {
-    const row = this.db.queryOne('SELECT * FROM users WHERE email = ?', [email]);
+    const row = this.db.queryOne('SELECT * FROM users WHERE email = ? COLLATE NOCASE', [email]);
     return row ? this.toUser(row) : undefined;
   }
 

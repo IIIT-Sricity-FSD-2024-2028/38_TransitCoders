@@ -40,6 +40,6 @@ export class AgentsService {
     if (user.id !== agent.userId && user.role !== Role.SUPER_USER && user.role !== Role.HUB_MANAGER) {
       throw new ForbiddenException('You can only update your own availability');
     }
-    return this.agentsRepository.update(id, dto)!;
+    return this.agentsRepository.update(agent.id, dto)!;
   }
 }

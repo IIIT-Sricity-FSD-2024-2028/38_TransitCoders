@@ -9,7 +9,8 @@ import { ServiceLevel, IPricingBreakdown } from '../orders/interfaces/order.inte
  * but does NOT define a numerical formula. This model is the project's
  * documented business rule set (see docs/FDFED_READINESS_REPORT.md §4):
  *
- *   subtotal  = baseFee + (weight × perKgRate[serviceLevel]) + (codFee if COD)
+ *   subtotal  = baseFee + (billableWeight × perKgRate[serviceLevel]) + (codFee if COD)
+ *   billableWeight is the parcel weight rounded up to the next half kilogram.
  *   discount  = subtotal × discountPercent / 100
  *   tax       = (subtotal − discount) × taxPercent / 100
  *   total     = max(subtotal − discount + tax, minCharge)
@@ -84,7 +85,7 @@ export class PricingService {
       discountPercent: Number(row.discountPercent),
       taxPercent: Number(row.taxPercent),
       minCharge: Number(row.minCharge),
-      agentPayoutFlat: Number(row.agentPayoutFlat || 50),
+      agentPayoutFlat: Number(row.agentPayoutFlat ?? DEFAULT_PRICING_CONFIG.agentPayoutFlat),
     };
   }
 
@@ -154,6 +155,7 @@ export class PricingService {
       ? input.serviceLevel
       : 'standard';
     const weightKg = Math.max(0, Number(input.weightKg) || 0);
+    const billableWeightKg = Math.ceil(weightKg * 2) / 2;
     const isCod = input.paymentMode === 'COD';
 
     const perKg =
@@ -164,17 +166,21 @@ export class PricingService {
           : cfg.perKgStandard;
 
     const baseFee = this.round2(cfg.baseFee);
-    const weightFee = this.round2(weightKg * perKg);
+    const weightFee = this.round2(billableWeightKg * perKg);
     const codFee = isCod ? this.round2(cfg.codFee) : 0;
 
     const subtotal = this.round2(baseFee + weightFee + codFee);
-    const discount = this.round2((subtotal * cfg.discountPercent) / 100);
+    const discount = this.round2((subtotal * Math.min(cfg.discountPercent, 100)) / 100);
     const taxable = this.round2(subtotal - discount);
     const tax = this.round2((taxable * cfg.taxPercent) / 100);
-    const total = Math.max(this.round2(taxable + tax), cfg.minCharge);
+    const beforeMinimum = this.round2(taxable + tax);
+    const total = Math.max(beforeMinimum, this.round2(cfg.minCharge));
 
     return {
       baseFee,
+      ratePerKg: perKg,
+      billableWeightKg,
+      minimumChargeAdjustment: this.round2(total - beforeMinimum),
       weightFee,
       codFee,
       discount,

@@ -31,7 +31,7 @@ export class PricingController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Calculate an authoritative shipping price quote' })
   @ApiBody({ type: QuoteDto })
-  @ApiResponse({ status: 201, description: 'Quote calculated' })
+  @ApiResponse({ status: 200, description: 'Quote calculated' })
   quote(@Body() dto: QuoteDto): IApiResponse<IPricingBreakdown> {
     return { success: true, data: this.pricingService.calculateQuote(dto) };
   }

@@ -25,18 +25,20 @@ export class HubsRepository {
       managerId: row.managerId ?? null,
       status: row.status ?? 'active',
       capacity: Number(row.capacity) || 0,
-      currentLoad: Number(row.currentLoad) || 0,
+      currentLoad: Number(row.storedParcels) || 0,
+      reservedParcels: Number(row.reservedParcels) || 0,
+      remainingCapacity: Math.max(0, (Number(row.capacity) || 0) - row.storedParcels - row.reservedParcels),
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
     };
   }
 
   findAll(): IHub[] {
-    return this.db.query('SELECT * FROM hubs ORDER BY hubId').map((r) => this.toHub(r));
+    return this.db.query('SELECT * FROM hub_inventory ORDER BY hubId').map((r) => this.toHub(r));
   }
 
   findById(idOrHubId: string): IHub | undefined {
-    const row = this.db.queryOne('SELECT * FROM hubs WHERE id = ? OR hubId = ?', [
+    const row = this.db.queryOne('SELECT * FROM hub_inventory WHERE id = ? OR hubId = ?', [
       idOrHubId,
       idOrHubId,
     ]);
@@ -84,7 +86,7 @@ export class HubsRepository {
     if (!existing) return undefined;
     const merged: IHub = { ...existing, ...changes, updatedAt: new Date() };
     this.db.run(
-      `UPDATE hubs SET hubId = ?, name = ?, address = ?, city = ?, state = ?, pincode = ?, phone = ?, email = ?, managerId = ?, status = ?, capacity = ?, currentLoad = ?, updatedAt = ?
+      `UPDATE hubs SET hubId = ?, name = ?, address = ?, city = ?, state = ?, pincode = ?, phone = ?, email = ?, managerId = ?, status = ?, capacity = ?, updatedAt = ?
        WHERE id = ?`,
       [
         merged.hubId,
@@ -98,12 +100,11 @@ export class HubsRepository {
         merged.managerId ?? null,
         merged.status ?? 'active',
         merged.capacity ?? null,
-        merged.currentLoad ?? null,
         merged.updatedAt.toISOString(),
         existing.id,
       ],
     );
-    return merged;
+    return this.findById(existing.id);
   }
 
   delete(id: string): boolean {

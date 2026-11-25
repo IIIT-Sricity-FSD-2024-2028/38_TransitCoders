@@ -11,7 +11,14 @@ import {
   UseGuards,
   Res,
   NotFoundException,
+  BadRequestException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { randomUUID } from 'node:crypto';
+import { mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { ApiTags, ApiHeader, ApiOperation, ApiResponse, ApiBody, ApiQuery } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { OrdersService } from './orders.service';
@@ -21,6 +28,9 @@ import { AssignAgentDto } from './dto/assign-agent.dto';
 import { TransferOrderDto } from './dto/transfer-order.dto';
 import { MishapDto } from './dto/mishap.dto';
 import { SchedulePickupDto } from './dto/schedule-pickup.dto';
+import { WarehouseScanDto } from './dto/warehouse-scan.dto';
+import { OrderMessageDto } from './dto/order-message.dto';
+import { OrderMessagesService, type OrderMessage } from './order-messages.service';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -40,6 +50,7 @@ export class OrdersController {
   constructor(
     private readonly ordersService: OrdersService,
     private readonly barcodeService: BarcodeService,
+    private readonly messages: OrderMessagesService,
   ) {}
 
   @Get()
@@ -52,11 +63,11 @@ export class OrdersController {
     return { success: true, data: orders };
   }
   @Get('mishaps')
-  @Roles(Role.SUPER_USER, Role.ADMIN, Role.HUB_MANAGER)
-  @ApiOperation({ summary: 'List all delivery mishaps' })
+  @Roles(Role.SUPER_USER, Role.ADMIN, Role.HUB_MANAGER, Role.DELIVERY_AGENT)
+  @ApiOperation({ summary: 'List delivery mishaps visible to the signed-in user' })
   @ApiResponse({ status: 200, description: 'Mishaps returned' })
-  getAllMishaps(): IApiResponse<any[]> {
-    return { success: true, data: this.ordersService.getAllMishaps() };
+  getAllMishaps(@CurrentUser() user: IUser): IApiResponse<any[]> {
+    return { success: true, data: this.ordersService.getAllMishaps(user) };
   }
 
   @Get(':id')
@@ -66,6 +77,31 @@ export class OrdersController {
   @ApiResponse({ status: 404, description: 'Order not found' })
   findById(@Param('id') id: string, @CurrentUser() user: IUser): IApiResponse<IOrder> {
     return { success: true, data: this.ordersService.getAuthorizedOrder(id, user) };
+  }
+
+  @Get(':id/messages/:channel')
+  @Roles(Role.HUB_MANAGER, Role.DELIVERY_AGENT, Role.CUSTOMER)
+  listMessages(
+    @Param('id') id: string, @Param('channel') channel: string, @CurrentUser() user: IUser,
+  ): IApiResponse<OrderMessage[]> {
+    return { success: true, data: this.messages.list(id, channel, user) };
+  }
+
+  @Post(':id/messages/:channel')
+  @Roles(Role.HUB_MANAGER, Role.DELIVERY_AGENT, Role.CUSTOMER)
+  sendMessage(
+    @Param('id') id: string, @Param('channel') channel: string, @Body() dto: OrderMessageDto, @CurrentUser() user: IUser,
+  ): IApiResponse<OrderMessage> {
+    return { success: true, data: this.messages.send(id, channel, dto.body, user) };
+  }
+
+  @Patch(':id/warehouse')
+  @Roles(Role.HUB_MANAGER)
+  @ApiOperation({ summary: 'Check a parcel in or out using its tracking barcode' })
+  scanWarehouse(
+    @Param('id') id: string, @Body() dto: WarehouseScanDto, @CurrentUser() user: IUser,
+  ): IApiResponse<IOrder> {
+    return { success: true, data: this.ordersService.scanWarehouse(id, dto.action, user, dto.autoAssign) };
   }
 
   @Get(':id/barcode')
@@ -110,6 +146,42 @@ export class OrdersController {
     @CurrentUser() user: IUser,
   ): IApiResponse<IOrder> {
     return { success: true, data: this.ordersService.updateStatus(id, status, user) };
+  }
+
+  @Patch(':id/delivery')
+  @Roles(Role.DELIVERY_AGENT)
+  @ApiOperation({ summary: 'Complete an assigned delivery with an optional proof photo' })
+  @UseInterceptors(FileInterceptor('photo', { limits: { fileSize: 5 * 1024 * 1024 } }))
+  completeDelivery(
+    @Param('id') id: string,
+    @CurrentUser() user: IUser,
+    @UploadedFile() photo?: Express.Multer.File,
+  ): IApiResponse<IOrder> {
+    const order = this.ordersService.getAuthorizedOrder(id, user);
+    if (order.status !== OrderStatus.OUT_FOR_DELIVERY) {
+      throw new BadRequestException('The order must be out for delivery before it can be completed');
+    }
+    if (!photo) {
+      return { success: true, data: this.ordersService.updateStatus(id, OrderStatus.DELIVERED, user) };
+    }
+
+    const extension = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }[photo.mimetype];
+    if (!extension || !photo.size) throw new BadRequestException('Select a JPEG, PNG, WebP, or GIF photo');
+    const directory = join(process.cwd(), 'uploads', 'delivery-photos');
+    const filename = `pod-${randomUUID()}.${extension}`;
+    const path = join(directory, filename);
+    mkdirSync(directory, { recursive: true });
+    writeFileSync(path, photo.buffer, { flag: 'wx' });
+    try {
+      const updated = this.ordersService.updateStatus(id, OrderStatus.DELIVERED, user, filename);
+      return { success: true, data: updated };
+    } catch (error) {
+      // Preserve a photo referenced by a committed status if a follow-up operation fails.
+      if (!this.ordersService.findById(order.id).statusHistory.some(event => event.deliveryPhoto === filename)) {
+        unlinkSync(path);
+      }
+      throw error;
+    }
   }
 
   @Patch(':id/assign')

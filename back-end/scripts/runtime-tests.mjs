@@ -1,9 +1,9 @@
 /**
  * Runtime test suite — hits the real running API on :3001.
  * Covers: auth (all roles), pricing, orders, tracking, security (IDOR/roles),
- * revenue report, persistence (restart), middleware logs, file upload.
+ * revenue report, persistence, middleware errors, file upload.
  */
-const BASE = 'http://localhost:3001';
+const BASE = process.env.SWIFTTRACK_RUNTIME_API_URL || 'http://localhost:3001';
 let pass = 0, fail = 0;
 const failures = [];
 
@@ -107,11 +107,22 @@ async function main() {
   const crossHub = await req('PATCH', `/orders/${newOrder.id}/assign`, { token: wrongHub.token, body: { agentId: roles.agent.user.id } });
   check('other-hub manager cannot assign → 403', crossHub.status === 403);
 
-  const transfer = await req('PATCH', `/orders/${newOrder.id}/transfer`, { token: roles.hub.token, body: { toHubId: 'H002', reason: 'runtime test' } });
-  check('inter-hub transfer works', transfer.status === 200 && transfer.json.data.pickupHubId === 'H002');
+  const rejectedTransfer = await req('PATCH', `/orders/${newOrder.id}/transfer`, { token: roles.hub.token, body: { toHubId: 'H002', reason: 'runtime test' } });
+  check('assigned orders cannot be transferred', rejectedTransfer.status === 400);
 
-  // Use super user — the order was transferred to H002 above, so the H001
-  // manager no longer has access (that 403 is itself correct behavior).
+  const pending = await req('POST', '/orders', {
+    token: roles.merchant.token,
+    body: { customerId: roles.customer.user.id, deliveryAddress: '101 Runtime Test Lane, Mumbai', pickupHubId: 'H001', deliveryHubId: 'H002', priority: 'Medium', weight: 2 },
+  });
+  for (const action of ['check-in', 'check-out']) {
+    const scan = await req('PATCH', `/orders/${pending.json.data.trackingId}/warehouse`, {
+      token: roles.hub.token, body: { action },
+    });
+    check(`origin warehouse records ${action}`, scan.status === 200);
+  }
+  const transfer = await req('PATCH', `/orders/${pending.json.data.id}/transfer`, { token: roles.hub.token, body: { toHubId: 'H002', reason: 'runtime test' } });
+  check('inter-hub transfer works for pending orders', transfer.status === 200 && transfer.json.data.pickupHubId === 'H002');
+
   const ret = await req('PATCH', `/orders/${newOrder.id}/return`, { token: roles.super.token, body: { reason: 'runtime test' } });
   check('return on non-delivered rejected → 400', ret.status === 400);
 
@@ -143,7 +154,7 @@ async function main() {
   const confirm = await req('PATCH', `/orders/${newOrder.id}/confirm`, { token: roles.customer.token });
   check('customer confirms delivery', confirm.status === 200);
 
-  const comp = await req('POST', '/complaints', { token: roles.customer.token, body: { orderId: newOrder.orderId, description: 'runtime test complaint' } });
+  const comp = await req('POST', '/complaints', { token: roles.customer.token, body: { orderId: newOrder.orderId, type: 'General Issue', description: 'runtime test complaint' } });
   check('customer files complaint', comp.status === 201 && comp.json.data.id);
 
   const fb = await req('POST', '/feedback', { token: roles.customer.token, body: { orderId: newOrder.orderId, rating: 5, comments: 'runtime test feedback' } });
@@ -203,11 +214,11 @@ async function main() {
   const wrongRole = await req('POST', '/orders', { token: roles.customer.token, body: { customerId: roles.customer.user.id, deliveryAddress: 'x', priority: 'Low' } });
   check('customer cannot create order → 403', wrongRole.status === 403);
 
-  console.log('── PERSISTENCE (restart) ─────────────────────────');
+  console.log('── PERSISTENCE ───────────────────────────────────');
   // Read the DB file directly with a SEPARATE connection — proves data is
   // durably on disk, not just in the running server's memory.
   const { DatabaseSync } = await import('node:sqlite');
-  const dbFile = new DatabaseSync('data/swifttrack.db', { readOnly: true });
+  const dbFile = new DatabaseSync(process.env.DB_FILE || 'data/swifttrack.db', { readOnly: true });
   const ordersN = Number(dbFile.prepare('SELECT COUNT(*) n FROM orders').get().n);
   const paymentsN = Number(dbFile.prepare('SELECT COUNT(*) n FROM payments').get().n);
   const persistedOrder = dbFile.prepare('SELECT status, paymentStatus FROM orders WHERE id = ?').get(newOrder.id);

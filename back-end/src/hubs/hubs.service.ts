@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, Inject, forwardRef } from '@nestjs/common';
+import { DatabaseService } from '../common/database/database.service';
 import { HubsRepository } from './hubs.repository';
 import { AgentsRepository } from '../agents/agents.repository';
 import { CreateHubDto } from './dto/create-hub.dto';
@@ -12,6 +13,7 @@ export class HubsService {
     private readonly hubsRepository: HubsRepository,
     @Inject(forwardRef(() => AgentsRepository))
     private readonly agentsRepository: AgentsRepository,
+    private readonly db: DatabaseService,
   ) {}
 
   findAll(): IHub[] {
@@ -37,16 +39,34 @@ export class HubsService {
   }
 
   update(id: string, dto: UpdateHubDto): IHub {
-    const hub = this.findById(id);
-    const updated = this.hubsRepository.update(hub.id, dto);
-    if (!updated) throw new NotFoundException(`Hub ${id} not found`);
-    return updated;
+    const updatedId = this.db.transaction(() => {
+      const hub = this.findById(id);
+      if (dto.hubId && dto.hubId !== hub.hubId) this.requireNoWarehouseHistory(hub.hubId);
+      const reserved = hub.reservedParcels ?? 0;
+      if (dto.capacity !== undefined && dto.capacity < hub.currentLoad + reserved) {
+        throw new ConflictException('Capacity must accommodate stored parcels and existing reservations');
+      }
+      if (dto.status && dto.status !== 'active' && reserved > 0) {
+        throw new ConflictException('This hub still has parcels scheduled to arrive');
+      }
+      this.hubsRepository.update(hub.id, dto);
+      return hub.id;
+    });
+    return this.findById(updatedId);
   }
 
   delete(id: string): void {
-    const hub = this.findById(id);
-    const deleted = this.hubsRepository.delete(hub.id);
-    if (!deleted) throw new NotFoundException(`Hub ${id} not found`);
+    this.db.transaction(() => {
+      const hub = this.findById(id);
+      this.requireNoWarehouseHistory(hub.hubId);
+      this.hubsRepository.delete(hub.id);
+    });
+  }
+
+  private requireNoWarehouseHistory(hubId: string): void {
+    if (this.db.queryOne('SELECT 1 FROM warehouse_visits WHERE hubId = ? LIMIT 1', [hubId])) {
+      throw new ConflictException('The hub code is linked to warehouse records');
+    }
   }
 
   /**

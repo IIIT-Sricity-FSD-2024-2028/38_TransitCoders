@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DatabaseService } from '../common/database/database.service';
-import { IAgentProfile } from './interfaces/agent.interface';
+import { AGENT_TASK_CAPACITY, IAgentProfile } from './interfaces/agent.interface';
+
+const LIVE_AGENTS = `SELECT a.*,
+  (SELECT COUNT(*) FROM orders o WHERE o.assignedAgentId = a.userId
+   AND o.status NOT IN ('Delivered', 'Cancelled', 'Returned', 'Failed')) AS activeTasks
+  FROM agents a`;
 
 /**
  * AgentsRepository — durable SQLite-backed agent-profile store.
@@ -20,37 +25,32 @@ export class AgentsRepository {
       hubId: row.hubId ?? '',
       availabilityStatus: row.availabilityStatus ?? 'Available',
       vehicleType: row.vehicleType ?? undefined,
-      currentTasksCount: Number(row.currentTasksCount) || 0,
+      currentTasksCount: Number(row.activeTasks) || 0,
+      taskCapacity: AGENT_TASK_CAPACITY,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
     };
   }
 
   findAll(): IAgentProfile[] {
-    return this.db.query('SELECT * FROM agents ORDER BY createdAt').map((r) => this.toAgent(r));
+    return this.db.query(`${LIVE_AGENTS} ORDER BY a.createdAt`).map((r) => this.toAgent(r));
   }
 
   findById(id: string): IAgentProfile | undefined {
-    const row = this.db.queryOne('SELECT * FROM agents WHERE id = ?', [id]);
+    const row = this.db.queryOne(`${LIVE_AGENTS} WHERE a.id = ?`, [id]);
     return row ? this.toAgent(row) : undefined;
   }
 
   findByUserId(userId: string): IAgentProfile | undefined {
-    const row = this.db.queryOne('SELECT * FROM agents WHERE userId = ?', [userId]);
+    const row = this.db.queryOne(`${LIVE_AGENTS} WHERE a.userId = ?`, [userId]);
     return row ? this.toAgent(row) : undefined;
   }
 
   findByHub(hubId: string): IAgentProfile[] {
     return this.db
-      .query('SELECT * FROM agents WHERE hubId = ? ORDER BY createdAt', [hubId])
-      .map((r) => this.toAgent(r));
-  }
-
-  findAvailable(): IAgentProfile[] {
-    return this.db
-      .query(
-        `SELECT * FROM agents WHERE availabilityStatus = 'Available' AND currentTasksCount < 8 ORDER BY currentTasksCount ASC`,
-      )
+      .query(`${LIVE_AGENTS} JOIN users u ON a.userId = u.id
+              WHERE a.hubId = ? AND u.role = 'delivery_agent' AND u.isActive = 1
+              ORDER BY activeTasks, a.createdAt, a.userId`, [hubId])
       .map((r) => this.toAgent(r));
   }
 

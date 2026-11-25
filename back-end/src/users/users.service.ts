@@ -32,6 +32,14 @@ export class UsersService {
     return this.sanitize(user);
   }
 
+  findCustomerByEmail(email: string): ISafeUser {
+    const user = this.usersRepository.findByEmail(email.trim());
+    if (!user || user.role !== Role.CUSTOMER || !user.isActive) {
+      throw new NotFoundException('No active customer account was found for that email');
+    }
+    return this.sanitize(user);
+  }
+
   // ODDT-243 — create with duplicate email check + bcrypt
   // src/users/users.service.ts
 
@@ -73,6 +81,10 @@ async create(dto: CreateUserDto, currentUser?: IUser): Promise<ISafeUser> {
     }
 
     const changes: Partial<IUser> = { ...dto };
+    if (dto.email) {
+      const existing = this.usersRepository.findByEmail(dto.email);
+      if (existing && existing.id !== id) throw new ConflictException('Email is already registered');
+    }
     if (dto.password) {
       changes.password = await bcrypt.hash(dto.password, 10);
     }

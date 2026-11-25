@@ -17,6 +17,8 @@ export class TicketsRepository {
       ticketId: row.ticketId,
       merchantId: row.merchantId,
       subject: row.subject,
+      category: row.category ?? undefined,
+      description: row.description ?? undefined,
       trackingId: row.trackingId ?? undefined,
       priority: row.priority ?? 'med',
       status: row.status ?? 'open',
@@ -43,9 +45,7 @@ export class TicketsRepository {
   create(data: Omit<ITicket, 'id' | 'ticketId' | 'createdAt' | 'updatedAt'>): ITicket {
     const id = uuidv4();
     const now = new Date();
-    // Sequential ticket number based on current row count
-    const countRow = this.db.queryOne<{ n: number }>('SELECT COUNT(*) AS n FROM tickets');
-    const ticketId = `TKT-${1000 + (countRow ? Number(countRow.n) : 0) + 1}`;
+    const ticketId = `TKT-${id.toUpperCase()}`;
     const ticket: ITicket = {
       ...data,
       id,
@@ -54,13 +54,15 @@ export class TicketsRepository {
       updatedAt: now,
     };
     this.db.run(
-      `INSERT INTO tickets (id, ticketId, merchantId, subject, trackingId, priority, status, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO tickets (id, ticketId, merchantId, subject, category, description, trackingId, priority, status, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         ticket.id,
         ticket.ticketId,
         ticket.merchantId,
         ticket.subject,
+        ticket.category ?? null,
+        ticket.description ?? null,
         ticket.trackingId ?? null,
         ticket.priority ?? 'med',
         ticket.status ?? 'open',
