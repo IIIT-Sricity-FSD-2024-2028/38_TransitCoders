@@ -1,29 +1,30 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import StatCard from "../../components/customer/StatCard";
 import LiveTrackingCard from "../../components/customer/LiveTrackingCard";
 import RecentActivity from "../../components/customer/RecentActivity";
-import { customerService } from "../../services/customerService";
+import { useOrders } from "../../shared/orders/ordersHooks";
+import { useComplaints } from "../../shared/support/supportHooks";
+import { buildCustomerDashboardData, normalizeCustomerOrder } from "./customerSelectors";
 
 export default function CustomerDashboard() {
-    const [dashboardData, setDashboardData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const {
+        data: rawOrders,
+        isLoading: ordersLoading,
+        error: ordersError,
+    } = useOrders();
+    const {
+        data: rawComplaints,
+        isLoading: complaintsLoading,
+        error: complaintsError,
+    } = useComplaints();
 
-    useEffect(() => {
-        let isMounted = true;
-        async function fetchDashboard() {
-            try {
-                setLoading(true);
-                const data = await customerService.getDashboardData();
-                if (isMounted) setDashboardData(data);
-            } catch (err) {
-                console.error("Failed to load dashboard data:", err);
-            } finally {
-                if (isMounted) setLoading(false);
-            }
-        }
-        fetchDashboard();
-        return () => { isMounted = false; };
-    }, []);
+    const loading = ordersLoading || complaintsLoading;
+    const error = ordersError?.message || complaintsError?.message || '';
+
+    const dashboardData = useMemo(() => {
+        if (!rawOrders || !rawComplaints) return null;
+        return buildCustomerDashboardData(rawOrders.map(normalizeCustomerOrder), rawComplaints);
+    }, [rawOrders, rawComplaints]);
 
     if (loading) {
         return (
@@ -45,11 +46,9 @@ export default function CustomerDashboard() {
         );
     }
 
-    const { stats, activeOrder, recentOrders } = dashboardData || {
-        stats: { activeShipments: 0, delivered: 0, supportTickets: 0 },
-        activeOrder: null,
-        recentOrders: []
-    };
+    if (error) return <p role="alert">Could not load the dashboard. {error}</p>;
+
+    const { stats, activeOrder, recentOrders } = dashboardData;
 
     return (
         <div className="space-y-6">
