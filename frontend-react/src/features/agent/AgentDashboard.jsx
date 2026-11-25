@@ -1,10 +1,10 @@
-import { useOutletContext } from 'react-router-dom';
 import { BoxSeam, ClockHistory, CheckCircle, Truck } from 'react-bootstrap-icons';
 import KPICard from '../../components/shared/KPICard';
 import OrderCard from '../../components/agent/OrderCard';
+import { useAgentPortal } from './useAgentPortal';
 
 export default function AgentDashboard() {
-    const { orders, setAcceptModalOrder, setConfirmModalOrder } = useOutletContext();
+    const { orders, openAccept, openConfirm, advanceOrder, busyOrderId } = useAgentPortal();
 
     const pendingCount = orders.filter(o => o.status === 'pending').length;
     const transitCount = orders.filter(o => o.status === 'in-transit').length;
@@ -62,8 +62,10 @@ export default function AgentDashboard() {
                         <OrderCard 
                             key={order.id} 
                             order={order} 
-                            onAccept={(clickedOrder) => setAcceptModalOrder(clickedOrder)}
-                            onVerify={(clickedOrder) => setConfirmModalOrder(clickedOrder)}
+                            onAccept={openAccept}
+                            onVerify={openConfirm}
+                            onAdvance={advanceOrder}
+                            busy={Boolean(busyOrderId)}
                         />
                     ))}
                 </div>

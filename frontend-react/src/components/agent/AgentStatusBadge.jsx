@@ -1,11 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronDown, Check2 } from 'react-bootstrap-icons';
 
-export const STATUS_STORAGE_KEY = 'swifttrack_agent_status';
-
-export const STATUS_OPTIONS = [
+const STATUS_OPTIONS = [
     { 
-        key: 'available', 
+        key: 'Available',
         label: 'Available', 
         desc: 'Ready for pickups',
         dotColor: 'bg-emerald-500', 
@@ -13,7 +11,7 @@ export const STATUS_OPTIONS = [
         pulse: 'animate-pulse'
     },
     { 
-        key: 'on-delivery', 
+        key: 'Busy',
         label: 'On Delivery', 
         desc: 'En route with loads',
         dotColor: 'bg-blue-500', 
@@ -21,7 +19,7 @@ export const STATUS_OPTIONS = [
         pulse: 'animate-pulse'
     },
     { 
-        key: 'offline', 
+        key: 'Offline',
         label: 'Offline', 
         desc: 'On break / inactive',
         dotColor: 'bg-gray-400', 
@@ -30,24 +28,9 @@ export const STATUS_OPTIONS = [
     }
 ];
 
-export default function AgentStatusBadge({ onStatusChange }) {
-    const [status, setStatus] = useState(() => {
-        return localStorage.getItem(STATUS_STORAGE_KEY) || 'available';
-    });
+export default function AgentStatusBadge({ status, onStatusChange, saving }) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
-
-    // Sync across tabs and with AgentProfile.jsx
-    useEffect(() => {
-        const handleStatusEvent = (e) => {
-            if (e.detail && e.detail !== status) {
-                setStatus(e.detail);
-            }
-        };
-
-        window.addEventListener('agent-status-changed', handleStatusEvent);
-        return () => window.removeEventListener('agent-status-changed', handleStatusEvent);
-    }, [status]);
 
     // Close on click outside
     useEffect(() => {
@@ -60,12 +43,9 @@ export default function AgentStatusBadge({ onStatusChange }) {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleSelect = (newKey) => {
-        setStatus(newKey);
-        localStorage.setItem(STATUS_STORAGE_KEY, newKey);
-        window.dispatchEvent(new CustomEvent('agent-status-changed', { detail: newKey }));
-        if (onStatusChange) onStatusChange(newKey);
+    const handleSelect = (newStatus) => {
         setIsOpen(false);
+        onStatusChange(newStatus);
     };
 
     const currentConfig = STATUS_OPTIONS.find(o => o.key === status) || STATUS_OPTIONS[0];
@@ -74,6 +54,8 @@ export default function AgentStatusBadge({ onStatusChange }) {
         <div className="relative inline-block text-left" ref={dropdownRef}>
             <button
                 type="button"
+                disabled={saving}
+                aria-expanded={isOpen}
                 onClick={() => setIsOpen(!isOpen)}
                 className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all hover:shadow-sm cursor-pointer ${currentConfig.badgeBg}`}
                 title="Click to toggle availability status"
