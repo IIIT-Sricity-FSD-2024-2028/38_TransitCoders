@@ -1,27 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { API, Token } from '../services/api';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { API } from '../services/api';
+import { dashboards, saveSession } from '../services/session';
 import loginBg from '../assets/login-bg.png';
 import containerIcon from '../assets/Container.svg';
 import './Login.css';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const location = useLocation();
+  const [email, setEmail] = useState(() => localStorage.getItem('swifttrack_remembered_email') || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(() => Boolean(localStorage.getItem('swifttrack_remembered_email')));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  // Check saved remember me email on load
-  useEffect(() => {
-    const savedEmail = localStorage.getItem('swifttrack_remembered_email');
-    if (savedEmail) {
-      setEmail(savedEmail);
-      setRememberMe(true);
-    }
-  }, []);
+  const [showResetHelp, setShowResetHelp] = useState(false);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -29,12 +23,11 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const result = await API.auth.login(email, password);
-      const token = result.data.token;
-      const user = result.data.user;
-
-      Token.set(token);
-      localStorage.setItem('user', JSON.stringify(user));
+      const result = await API.auth.login(email.trim().toLowerCase(), password);
+      const { token, user } = result.data;
+      const destination = dashboards[user.role];
+      if (!destination) throw new Error('No dashboard is configured for this role.');
+      saveSession(token, user);
 
       if (rememberMe) {
         localStorage.setItem('swifttrack_remembered_email', email);
@@ -42,23 +35,10 @@ export default function Login() {
         localStorage.removeItem('swifttrack_remembered_email');
       }
 
-      const routes = {
-        super_user: '/admin/dashboard',
-        admin: '/admin/dashboard',
-        hub_manager: '/hub/dashboard',
-        customer: '/customer/dashboard',
-        merchant: '/merchant/dashboard',
-        delivery_agent: '/agent/dashboard',
-      };
-
-      const destination = routes[user.role];
-      if (destination) {
-        navigate(destination);
-      } else {
-        Token.clear();
-        localStorage.removeItem('user');
-        setError('No dashboard configured for this role');
-      }
+      const from = location.state?.from;
+      const portal = destination.slice(0, destination.lastIndexOf('/'));
+      const canReturn = from?.pathname === portal || from?.pathname.startsWith(`${portal}/`);
+      navigate(canReturn ? { pathname: from.pathname, search: from.search, hash: from.hash } : destination, { replace: true });
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials and try again.');
     } finally {
@@ -177,50 +157,18 @@ export default function Login() {
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                 />
-                <span>Remember me</span>
+                <span>Remember my email</span>
               </label>
-              <a href="#forgot" onClick={(e) => { e.preventDefault(); alert('Please contact your administrator or hub manager to reset your password.'); }} className="forgot-link">
-                Forgot password?
-              </a>
+              <button type="button" className="forgot-link" aria-expanded={showResetHelp} onClick={() => setShowResetHelp(value => !value)}>Forgot password?</button>
             </div>
+            {showResetHelp && <p className="text-sm text-gray-600">Contact your SwiftTrack administrator to reset your password.</p>}
 
             <button type="submit" className="auth-btn" disabled={loading}>
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
 
-            <div className="divider">or</div>
-
-            <button
-              type="button"
-              className="google-btn"
-              onClick={() => alert('Google Single Sign-On is configured for company domain accounts.')}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.87c2.27-2.09 3.67-5.17 3.67-9.15z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.87-3.05c-1.08.72-2.45 1.16-4.06 1.16-3.13 0-5.78-2.11-6.73-4.96H1.28v3.15C3.26 21.36 7.35 24 12 24z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.28C.46 8.23 0 10.06 0 12s.46 3.77 1.28 5.39l3.99-3.15z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.64 1.28 6.61l3.99 3.15c.95-2.85 3.6-4.96 6.73-4.96z"
-                />
-              </svg>
-              <span>Sign in with Google</span>
-            </button>
-
             <div className="auth-footer">
-              Don't have an account?{' '}
-              <a href="#signup" onClick={(e) => { e.preventDefault(); alert('Please reach out to your administrator to create a SwiftTrack account.'); }}>
-                Sign up
-              </a>
+              New to SwiftTrack? <Link to="/register">Create an account</Link>
             </div>
           </form>
         </div>

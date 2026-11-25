@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { AuthGuard } from './guards/auth.guard';
@@ -8,6 +8,7 @@ import type { IUser } from '../users/interfaces/user.interface';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import type { IApiResponse } from '../common/interfaces/api-response.interface';
 
 /**
@@ -62,6 +63,13 @@ export class AuthController {
   me(@CurrentUser() user: IUser): IApiResponse<object> {
     const { password: _pw, authToken: _t, ...safeUser } = user;
     return { success: true, data: safeUser };
+  }
+
+  @Patch('me')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Update your name and phone number' })
+  updateProfile(@CurrentUser() user: IUser, @Body() dto: UpdateProfileDto): IApiResponse<object> {
+    return { success: true, data: this.authService.updateProfile(user, dto) };
   }
 
   // ODDT-235 — Logout: invalidates the current token

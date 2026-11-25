@@ -1,39 +1,33 @@
-/**
- * SwiftTrack API Client
- * Single source of truth for all HTTP calls to the backend.
- * Base URL defaults to http://localhost:3001 but can be overridden by setting
- * window.SWIFTTRACK_API_BASE before this script loads (e.g. for staging/prod).
- *
- * Usage:
- *   const users = await API.users.getAll();
- *   const token = await API.auth.login(email, password);
- */
+import { clearSession, Token } from './session';
 
-// Allow deployment-time override: <script>window.SWIFTTRACK_API_BASE='https://api.example.com'</script>
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001').replace(/\/$/, '');
 
-// ─── Token helpers ──────────────────────────────────────────────────────────
-export const Token = {
-  get: () => localStorage.getItem('x-auth-token'),
-  set: (t) => localStorage.setItem('x-auth-token', t),
-  clear: () => localStorage.removeItem('x-auth-token'),
-};
-
-// ─── Core fetch wrapper ─────────────────────────────────────────────────────
-async function apiFetch(path, options = {}) {
-  const token = Token.get();
-  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
-  if (token) headers['x-auth-token'] = token;
-
-  const fetchOptions = { cache: 'no-store', ...options, headers };
-  const res = await fetch(`${API_BASE}${path}`, fetchOptions);
-  const json = await res.json().catch(() => ({}));
-
-  if (!res.ok) {
-    const msg = json.error || json.message || `Request failed (${res.status})`;
-    throw new Error(msg);
+async function request(path, options = {}, authenticated = true) {
+  const token = authenticated ? Token.get() : null;
+  const headers = new Headers(options.headers);
+  if (typeof options.body === 'string') headers.set('Content-Type', 'application/json');
+  if (token) headers.set('x-auth-token', token);
+  const timeout = AbortSignal.timeout(20_000);
+  const signal = options.signal ? AbortSignal.any([options.signal, timeout]) : timeout;
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, { cache: 'no-store', ...options, headers, signal });
+  } catch (err) {
+    if (options.signal?.aborted) throw err;
+    if (timeout.aborted) throw new Error('SwiftTrack did not respond in time. Try again.', { cause: err });
+    throw new Error('Could not connect to SwiftTrack. Check your connection and try again.', { cause: err });
   }
-  return json; // { success, data, message }
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    if (response.status === 401 && token) clearSession(token);
+    const message = body.error || body.message || `Request failed (${response.status})`;
+    throw Object.assign(new Error(Array.isArray(message) ? message.join(', ') : message), { status: response.status });
+  }
+  return response;
+}
+
+async function apiFetch(path, options, authenticated) {
+  return (await request(path, options, authenticated)).json();
 }
 
 // ─── API Modules ────────────────────────────────────────────────────────────
@@ -46,25 +40,32 @@ export const API = {
       const res = await apiFetch('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
-      });
-      return res; // { token }
+      }, false);
+      return res;
     },
     async register(data) {
       const res = await apiFetch('/auth/register', {
         method: 'POST',
         body: JSON.stringify(data),
-      });
+      }, false);
       return res;
     },
+    async me() {
+      const res = await apiFetch('/auth/me');
+      return res.data;
+    },
+    async updateProfile(profile) {
+      const res = await apiFetch('/auth/me', { method: 'PATCH', body: JSON.stringify(profile) });
+      return res.data;
+    },
     async logout() {
+      const token = Token.get();
+      if (!token) return;
       try {
         await apiFetch('/auth/logout', { method: 'POST' });
-      } catch (_) { /* ignore */ }
-      Token.clear();
-      localStorage.removeItem('user');
-      sessionStorage.removeItem('user');
-      sessionStorage.removeItem('st_session');
-      localStorage.removeItem('userRole');
+      } finally {
+        clearSession(token);
+      }
     },
   },
 
@@ -80,29 +81,10 @@ export const API = {
     },
     async create(data) {
       const res = await apiFetch('/users', { method: 'POST', body: JSON.stringify(data) });
-      if (window.AppState) {
-        const s = window.AppState.getState();
-        s.users.push({
-          ...data,
-          user_id: res.data.id,
-          hub_id: data.hubId || null,
-          active: true
-        });
-        window.AppState.saveState(s);
-      }
       return res.data;
     },
     async update(id, data) {
       const res = await apiFetch(`/users/${id}`, { method: 'PUT', body: JSON.stringify(data) });
-      if (window.AppState) {
-        const s = window.AppState.getState();
-        const u = s.users.find(x => x.user_id === id);
-        if (u) {
-          Object.assign(u, data);
-          if (data.hubId !== undefined) u.hub_id = data.hubId;
-          window.AppState.saveState(s);
-        }
-      }
       return res.data;
     },
     async delete(id) {
@@ -122,20 +104,10 @@ export const API = {
     },
     async create(data) {
       const res = await apiFetch('/tickets', { method: 'POST', body: JSON.stringify(data) });
-      if (window.AppState) {
-        const s = window.AppState.getState();
-        s.tickets.push({ ...data, id: res.data.id });
-        window.AppState.saveState(s);
-      }
       return res.data;
     },
     async update(id, data) {
       const res = await apiFetch(`/tickets/${id}`, { method: 'PUT', body: JSON.stringify(data) });
-      if (window.AppState) {
-        const s = window.AppState.getState();
-        const t = s.tickets.find(x => x.id === id);
-        if (t) { Object.assign(t, data); window.AppState.saveState(s); }
-      }
       return res.data;
     },
     async delete(id) {
@@ -157,20 +129,10 @@ export const API = {
         priority: data.priority || 'Medium',
       };
       const res = await apiFetch('/complaints', { method: 'POST', body: JSON.stringify(payload) });
-      if (window.AppState) {
-        const s = window.AppState.getState();
-        s.complaints.push({ ...data, id: res.data.id });
-        window.AppState.saveState(s);
-      }
       return res.data;
     },
     async update(id, data) {
       const res = await apiFetch(`/complaints/${id}`, { method: 'PUT', body: JSON.stringify(data) });
-      if (window.AppState) {
-        const s = window.AppState.getState();
-        const c = s.complaints.find(x => x.id === id);
-        if (c) { Object.assign(c, data); window.AppState.saveState(s); }
-      }
       return res.data;
     },
   },
@@ -188,20 +150,10 @@ export const API = {
         comments: data.comments || data.comment || data.feedback || '',
       };
       const res = await apiFetch('/feedback', { method: 'POST', body: JSON.stringify(payload) });
-      if (window.AppState) {
-        const s = window.AppState.getState();
-        s.feedback.push({ ...data, id: res.data.id });
-        window.AppState.saveState(s);
-      }
       return res.data;
     },
     async update(id, data) {
       const res = await apiFetch(`/feedback/${id}`, { method: 'PUT', body: JSON.stringify(data) });
-      if (window.AppState) {
-        const s = window.AppState.getState();
-        const f = s.feedback.find(x => x.id === id);
-        if (f) { Object.assign(f, data); window.AppState.saveState(s); }
-      }
       return res.data;
     },
   },
@@ -225,36 +177,11 @@ export const API = {
     },
   },
 
-  // ── Agents ─────────────────────────────────────────────────────────────────
-  agents: {
-    async uploadPhoto(id, file) {
-      const token = Token.get();
-      const formData = new FormData();
-      formData.append('photo', file);
-
-      const res = await fetch(`${API_BASE}/agents/${id}/delivery-photo`, {
-        method: 'POST',
-        headers: { 'x-auth-token': token }, // FormData automatically sets multipart/form-data with boundary
-        body: formData
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(json.error || json.message || 'Upload failed');
-      }
-      return json;
-    }
-  },
-
   // ── Shipments ──────────────────────────────────────────────────────────────
   shipments: {
     async getAll() {
-      try {
-        const res = await apiFetch('/shipments');
-        return res.data || [];
-      } catch (err) {
-        console.error('[API.shipments.getAll] Failed to fetch shipments:', err?.message || err);
-        return null;
-      }
+      const res = await apiFetch('/shipments');
+      return res.data || [];
     },
     async create(data) {
       const res = await apiFetch('/shipments', { method: 'POST', body: JSON.stringify(data) });
@@ -281,16 +208,11 @@ export const API = {
   // ── Orders — the authoritative order lifecycle API ────────────────────────
   orders: {
     async getAll() {
-      try {
-        const res = await apiFetch('/orders');
-        return res.data || [];
-      } catch (err) {
-        console.error('[API.orders.getAll] Failed to fetch orders:', err?.message || err);
-        return null;
-      }
+      const res = await apiFetch('/orders');
+      return res.data || [];
     },
     async getById(id) {
-      const res = await apiFetch(`/orders/${id}`);
+      const res = await apiFetch(`/orders/${encodeURIComponent(id)}`);
       return res.data;
     },
     async create(data) {
@@ -307,12 +229,24 @@ export const API = {
       const res = await apiFetch(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
       return res.data;
     },
+    async completeDelivery(id, photo) {
+      const body = new FormData();
+      if (photo) body.append('photo', photo);
+      const res = await apiFetch(`/orders/${id}/delivery`, { method: 'PATCH', body });
+      return res.data;
+    },
     async assign(id, agentId) {
       const res = await apiFetch(`/orders/${id}/assign`, { method: 'PATCH', body: JSON.stringify({ agentId }) });
       return res.data;
     },
     async autoAssign(id) {
       const res = await apiFetch(`/orders/${id}/auto-assign`, { method: 'PATCH' });
+      return res.data;
+    },
+    async scanWarehouse(reference, action, autoAssign) {
+      const res = await apiFetch(`/orders/${encodeURIComponent(reference)}/warehouse`, {
+        method: 'PATCH', body: JSON.stringify({ action, autoAssign }),
+      });
       return res.data;
     },
     async cancel(id) {
@@ -367,13 +301,20 @@ export const API = {
       const res = await apiFetch(`/orders/${id}`, { method: 'DELETE' });
       return res.data;
     },
-    barcodeUrl(id) {
-      return `${API_BASE}/orders/${id}/barcode`;
+    async barcode(id, signal) {
+      const res = await request(`/orders/${encodeURIComponent(id)}/barcode`, { signal });
+      return res.blob();
     },
   },
 
   // ── Agents ───────────────────────────────────────────────────────────────
   agents: {
+    async uploadPhoto(id, file) {
+      const body = new FormData();
+      body.append('photo', file);
+      const res = await apiFetch(`/agents/${encodeURIComponent(id)}/delivery-photo`, { method: 'POST', body });
+      return res.data;
+    },
     async getProfile(id) {
       const res = await apiFetch(`/agents/${id}`);
       return res.data;
@@ -413,10 +354,8 @@ export const API = {
   // ── Public tracking (no auth) ──────────────────────────────────────────────
   tracking: {
     async track(trackingId) {
-      const res = await fetch(`${API_BASE}/tracking/${encodeURIComponent(trackingId)}`);
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json.error || 'Tracking ID not found');
-      return json.data;
+      const res = await apiFetch(`/tracking/${encodeURIComponent(trackingId.trim().toUpperCase())}`, undefined, false);
+      return res.data;
     },
   },
 
@@ -527,7 +466,4 @@ export const API = {
   },
 };
 
-window.API_BASE = API_BASE;
-window.API = window.API || {};
-window.API.Token = Token;
 export default API;
