@@ -59,6 +59,14 @@ export class PaymentsService {
     return updated;
   }
 
+  cancelUncollectedCharge(order: IOrder): void {
+    const charge = this.paymentsRepository.findChargeForOrder(order.id);
+    if (charge?.status === 'pending') {
+      this.paymentsRepository.update(charge.id, { status: 'cancelled' });
+    }
+    this.ordersRepository.update(order.id, { paymentStatus: 'cancelled' });
+  }
+
   /**
    * Refund flow for cancellation / authorized return.
    * Flips the charge to 'refunded', appends a refund record, and updates
@@ -69,8 +77,8 @@ export class PaymentsService {
     if (!charge) {
       throw new NotFoundException(`No payment record found for order ${order.orderId}`);
     }
-    if (charge.status === 'refunded') {
-      throw new BadRequestException(`Order ${order.orderId} has already been refunded`);
+    if (charge.status !== 'paid') {
+      throw new BadRequestException(`Only paid charges can be refunded for order ${order.orderId}`);
     }
 
     const updatedCharge = this.paymentsRepository.update(charge.id, { status: 'refunded' });

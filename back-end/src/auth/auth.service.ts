@@ -1,5 +1,7 @@
 import {
+  BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -8,8 +10,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { UsersRepository } from '../users/users.repository';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { IUser } from '../users/interfaces/user.interface';
 import { AppLogger } from '../common/logger/app.logger';
+import { Role } from '../common/constants/roles.constant';
 
 /**
  * AuthService — ODDT-233, ODDT-234, ODDT-235
@@ -44,6 +48,9 @@ export class AuthService {
 
   // ODDT-233 — Register: duplicate-check, hash password, persist user
   async register(dto: RegisterDto): Promise<object> {
+    if (dto.role === Role.ADMIN || dto.role === Role.SUPER_USER) {
+      throw new ForbiddenException('An administrator must create privileged accounts');
+    }
     const existing = this.usersRepository.findByEmail(dto.email);
     if (existing)
       throw new ConflictException('An account with this email already exists');
@@ -72,6 +79,15 @@ export class AuthService {
     if (user) {
       this.usersRepository.update(user.id, { authToken: undefined });
     }
+  }
+
+  updateProfile(user: IUser, dto: UpdateProfileDto): object {
+    const name = dto.name.trim();
+    if (!name) throw new BadRequestException('Name is required');
+    const updated = this.usersRepository.update(user.id, { name, phone: dto.phone?.trim() });
+    if (!updated) throw new UnauthorizedException('Account no longer exists');
+    const { password: _pw, authToken: _t, ...safeUser } = updated;
+    return safeUser;
   }
 
   /**

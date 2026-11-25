@@ -6,15 +6,34 @@ import {
   IsNumber,
   IsIn,
   Min,
+  Max,
   IsUUID,
   IsDateString,
+  IsEmail,
+  ValidateIf,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateOrderDto {
-  @ApiProperty({ description: 'Customer UUID receiving the delivery' })
+  @ApiProperty({ required: false, description: 'Customer UUID receiving the delivery' })
+  @ValidateIf((dto) => dto.customerId !== undefined || !dto.customerEmail)
   @IsUUID()
-  customerId: string;
+  customerId?: string;
+
+  @ApiProperty({ required: false, description: 'Account email for the customer receiving the delivery' })
+  @IsEmail()
+  @IsOptional()
+  customerEmail?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  recipientName?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  recipientPhone?: string;
 
   @ApiProperty({ required: false, description: 'Tracking ID (e.g. TRK-AB12CD34)' })
   @IsString()
@@ -52,9 +71,15 @@ export class CreateOrderDto {
 
   @ApiProperty({ required: false, example: 2.5, description: 'Weight in kg (pricing input)' })
   @IsNumber()
-  @Min(0)
+  @Min(0.1)
+  @Max(50)
   @IsOptional()
   weight?: number;
+
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  @IsOptional()
+  quotedTotal?: number;
 
   @ApiProperty({
     enum: ['standard', 'express', 'same-day'],

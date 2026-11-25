@@ -25,7 +25,7 @@
           }
         },
         "responses": {
-          "201": {
+          "200": {
             "description": "Quote calculated"
           }
         },
@@ -218,7 +218,7 @@
             "description": "Mishaps returned"
           }
         },
-        "summary": "List all delivery mishaps",
+        "summary": "List delivery mishaps visible to the signed-in user",
         "tags": [
           "Orders"
         ]
@@ -335,6 +335,134 @@
         ]
       }
     },
+    "/orders/{id}/messages/{channel}": {
+      "get": {
+        "operationId": "OrdersController_listMessages",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "channel",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      },
+      "post": {
+        "operationId": "OrdersController_sendMessage",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "channel",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}/warehouse": {
+      "patch": {
+        "operationId": "OrdersController_scanWarehouse",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WarehouseScanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Check a parcel in or out using its tracking barcode",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
     "/orders/{id}/barcode": {
       "get": {
         "operationId": "OrdersController_getBarcode",
@@ -400,6 +528,38 @@
           }
         },
         "summary": "Update order status (state machine + ownership enforced)",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}/delivery": {
+      "patch": {
+        "operationId": "OrdersController_completeDelivery",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Complete an assigned delivery with an optional proof photo",
         "tags": [
           "Orders"
         ]
@@ -1399,6 +1559,29 @@
           }
         },
         "summary": "Get the currently authenticated user (session check)",
+        "tags": [
+          "Auth"
+        ]
+      },
+      "patch": {
+        "operationId": "AuthController_updateProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update your name and phone number",
         "tags": [
           "Auth"
         ]
@@ -2572,12 +2755,28 @@
           }
         }
       },
+      "OrderMessageDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "WarehouseScanDto": {
+        "type": "object",
+        "properties": {}
+      },
       "CreateOrderDto": {
         "type": "object",
         "properties": {
           "customerId": {
             "type": "string",
             "description": "Customer UUID receiving the delivery"
+          },
+          "customerEmail": {
+            "type": "string",
+            "description": "Account email for the customer receiving the delivery"
+          },
+          "trackingId": {
+            "type": "string",
+            "description": "Tracking ID (e.g. TRK-AB12CD34)"
           },
           "deliveryAddress": {
             "type": "string",
@@ -2644,7 +2843,6 @@
           }
         },
         "required": [
-          "customerId",
           "deliveryAddress",
           "priority"
         ]
@@ -2655,6 +2853,14 @@
           "customerId": {
             "type": "string",
             "description": "Customer UUID receiving the delivery"
+          },
+          "customerEmail": {
+            "type": "string",
+            "description": "Account email for the customer receiving the delivery"
+          },
+          "trackingId": {
+            "type": "string",
+            "description": "Tracking ID (e.g. TRK-AB12CD34)"
           },
           "deliveryAddress": {
             "type": "string",
@@ -2946,6 +3152,10 @@
           "password"
         ]
       },
+      "UpdateProfileDto": {
+        "type": "object",
+        "properties": {}
+      },
       "ForgotPasswordDto": {
         "type": "object",
         "properties": {
@@ -2965,6 +3175,12 @@
           "subject": {
             "type": "string",
             "example": "Order not delivered on time"
+          },
+          "category": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
           },
           "priority": {
             "type": "string",

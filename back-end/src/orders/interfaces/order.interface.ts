@@ -1,6 +1,6 @@
 export type ServiceLevel = 'standard' | 'express' | 'same-day';
 export type PaymentMode = 'Prepaid' | 'COD';
-export type PaymentStatus = 'pending' | 'paid' | 'refunded' | 'failed';
+export type PaymentStatus = 'pending' | 'paid' | 'refunded' | 'failed' | 'cancelled';
 
 export interface IStatusEvent {
   status: string;
@@ -8,10 +8,14 @@ export interface IStatusEvent {
   note?: string;
   location?: string;
   by?: string;
+  deliveryPhoto?: string;
 }
 
 export interface IPricingBreakdown {
   baseFee: number;
+  ratePerKg?: number;
+  billableWeightKg?: number;
+  minimumChargeAdjustment?: number;
   weightFee: number;
   codFee: number;
   discount: number;
@@ -35,6 +39,7 @@ export interface IOrder {
   deliveryAddress: string;
   pickupHubId?: string;
   deliveryHubId?: string;
+  warehouse?: { hubId: string; checkedInAt: string | null; checkedOutAt: string | null };
   status:
     | 'Pending'
     | 'Assigned'

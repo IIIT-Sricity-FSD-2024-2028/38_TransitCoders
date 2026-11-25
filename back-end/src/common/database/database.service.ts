@@ -64,6 +64,15 @@ CREATE TABLE IF NOT EXISTS agents (
 CREATE INDEX IF NOT EXISTS idx_agents_user ON agents (userId);
 CREATE INDEX IF NOT EXISTS idx_agents_hub ON agents (hubId);
 
+CREATE TRIGGER IF NOT EXISTS sync_active_agent_profile
+AFTER UPDATE OF name, phone, hubId, role, isActive ON users
+WHEN NEW.role = 'delivery_agent' AND NEW.isActive = 1
+BEGIN
+  INSERT INTO agents (id, userId, name, phone, hubId, createdAt, updatedAt)
+  VALUES (NEW.id, NEW.id, NEW.name, NEW.phone, NEW.hubId, NEW.createdAt, NEW.updatedAt)
+  ON CONFLICT(userId) DO UPDATE SET name = NEW.name, phone = NEW.phone, hubId = NEW.hubId;
+END;
+
 CREATE TABLE IF NOT EXISTS hubs (
   id TEXT PRIMARY KEY,
   hubId TEXT NOT NULL UNIQUE,
@@ -120,6 +129,41 @@ CREATE INDEX IF NOT EXISTS idx_orders_pickupHub ON orders (pickupHubId);
 CREATE INDEX IF NOT EXISTS idx_orders_deliveryHub ON orders (deliveryHubId);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders (status);
 
+CREATE TABLE IF NOT EXISTS warehouse_visits (
+  orderId TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  hubId TEXT NOT NULL REFERENCES hubs(hubId),
+  checkedInAt TEXT,
+  checkedOutAt TEXT,
+  PRIMARY KEY (orderId, hubId)
+);
+CREATE INDEX IF NOT EXISTS idx_warehouse_visits_hub ON warehouse_visits (hubId, checkedOutAt);
+
+CREATE VIEW IF NOT EXISTS orders_with_warehouse AS
+SELECT o.*, w.hubId AS warehouseHubId, w.checkedInAt, w.checkedOutAt
+FROM orders o LEFT JOIN warehouse_visits w ON w.orderId = o.id AND w.hubId = o.pickupHubId;
+
+CREATE VIEW IF NOT EXISTS hub_inventory AS
+SELECT h.*,
+  COALESCE(h.currentLoad, 0) + (SELECT COUNT(*) FROM warehouse_visits w
+    WHERE w.hubId = h.hubId AND w.checkedInAt IS NOT NULL AND w.checkedOutAt IS NULL) AS storedParcels,
+  (SELECT COUNT(*) FROM warehouse_visits w JOIN orders o ON o.id = w.orderId
+    WHERE w.hubId = h.hubId AND w.checkedInAt IS NULL
+    AND o.status NOT IN ('Delivered', 'Cancelled', 'Returned', 'Failed')) AS reservedParcels
+FROM hubs h;
+
+CREATE TABLE IF NOT EXISTS order_messages (
+  id TEXT PRIMARY KEY,
+  orderId TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  channel TEXT NOT NULL,
+  agentId TEXT NOT NULL,
+  senderId TEXT NOT NULL,
+  senderName TEXT NOT NULL,
+  senderRole TEXT NOT NULL,
+  body TEXT NOT NULL,
+  createdAt TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_order_messages_thread ON order_messages (orderId, channel, agentId);
+
 CREATE TABLE IF NOT EXISTS shipments (
   id TEXT PRIMARY KEY,
   shipmentId TEXT NOT NULL UNIQUE,
@@ -143,6 +187,8 @@ CREATE TABLE IF NOT EXISTS tickets (
   ticketId TEXT NOT NULL UNIQUE,
   merchantId TEXT NOT NULL,
   subject TEXT NOT NULL,
+  category TEXT,
+  description TEXT,
   trackingId TEXT,
   priority TEXT NOT NULL DEFAULT 'med',
   status TEXT NOT NULL DEFAULT 'open',
@@ -272,7 +318,18 @@ export class DatabaseService implements OnModuleDestroy {
     const size = Number(process.env.DB_POOL_SIZE || 4);
     this.dbFile = join(process.env.DB_FILE || join(DATA_DIR, 'swifttrack.db'));
     this.pool = new SqlitePool({ file: this.dbFile, size });
-    this.pool.acquireWriter().exec(SCHEMA);
+    const writer = this.pool.acquireWriter();
+    writer.exec(SCHEMA);
+    writer.exec(`
+      INSERT OR IGNORE INTO agents (id, userId, name, phone, hubId, createdAt, updatedAt)
+      SELECT id, id, name, phone, hubId, createdAt, updatedAt
+      FROM users WHERE role = 'delivery_agent' AND isActive = 1
+    `);
+    this.pool.transaction((connection) => {
+      const columns = connection.prepare('PRAGMA table_info(tickets)').all().map(column => column.name);
+      if (!columns.includes('category')) connection.exec('ALTER TABLE tickets ADD COLUMN category TEXT');
+      if (!columns.includes('description')) connection.exec('ALTER TABLE tickets ADD COLUMN description TEXT');
+    });
   }
 
   getDbPath(): string {

@@ -3,6 +3,8 @@ export interface ITicket {
   ticketId: string;     // e.g. "TKT-1042"
   merchantId: string;
   subject: string;
+  category?: string;
+  description?: string;
   trackingId?: string;
   priority: 'low' | 'med' | 'high';
   status: 'open' | 'in-progress' | 'resolved' | 'closed';
