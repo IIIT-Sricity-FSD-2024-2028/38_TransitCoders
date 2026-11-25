@@ -1,95 +1,65 @@
+import { useEffect, useState } from 'react';
+import { API } from '../../../services/api';
+import './TransferHubModal.css';
 
-import { useEffect, useState } from "react";
-import { API } from "../../../services/api";
-import "./TransferHubModal.css";
+export default function TransferHubModal({ order, isOpen, ...props }) {
+  return isOpen && order ? <Transfer key={order.id} order={order} {...props} /> : null;
+}
 
-export default function TransferHubModal({ order, isOpen, onClose, onSuccess }) {
-  const [hubs, setHubs] = useState([]);
-  const [hubId, setHubId] = useState("");
-  const [error, setError] = useState("");
+function Transfer({ order, onClose, onSuccess }) {
+  const [hubs, setHubs] = useState(null);
+  const [hubId, setHubId] = useState('');
+  const [reason, setReason] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const pickupHub = order.pickupHubId;
+  const reservedDestination = order.warehouse ? order.deliveryHubId : undefined;
 
   useEffect(() => {
-    if (!isOpen) return;
-    setHubId("");
-    setError("");
-    setHubs([]);
+    let active = true;
+    API.hubs.getAll().then(data => {
+      if (active) setHubs(data.filter(hub => hub.hubId !== pickupHub && hub.status === 'active' &&
+        (!reservedDestination || hub.hubId === reservedDestination)));
+    }, err => {
+      if (active) setError(err.message);
+    });
+    return () => { active = false; };
+  }, [pickupHub, reservedDestination]);
 
-    async function loadHubs() {
-      try {
-        const result = await API.hubs.getAll();
-
-        if (Array.isArray(result)) {
-          setHubs(
-            result.filter(
-              hub => hub.hubId !== order?.pickupHubId && (hub.status === "active" || !hub.status)
-            )
-          );
-        }
-      } catch {
-        setError("Could not load hubs.");
-      }
-    }
-
-    loadHubs();
-  }, [isOpen, order]);
-
-  async function handleTransfer() {
-    if (!hubId) {
-      setError("Please select a destination hub.");
-      return;
-    }
-
-    if (order.status !== "Pending" || order.assignedAgentId) {
-      setError("Only unassigned pending orders can be transferred to another hub.");
-      return;
-    }
-
+  async function submit(event) {
+    event.preventDefault();
+    if (busy || !hubId) return;
+    setBusy(true);
+    setError('');
     try {
-      setError("");
-      await API.orders.transfer(
-        order.id,
-        hubId,
-        "Hub transfer via dashboard"
-      );
-
+      await API.orders.transfer(order.id, hubId, reason.trim() || undefined);
       await onSuccess();
       onClose();
     } catch (err) {
-      setError(err.message || "Could not transfer order.");
+      setError(err.message);
+    } finally {
+      setBusy(false);
     }
   }
 
-  if (!isOpen || !order) return null;
-
   return (
-    <div className="transfer-modal-overlay">
-      <div className="transfer-modal">
-        <h2>Transfer Order</h2>
-        <p>Order: {order.orderId}</p>
-        <p>Current Hub: {order.pickupHubId}</p>
-
+    <div role="dialog" aria-modal="true" aria-labelledby="transfer-title" className="transfer-modal-overlay">
+      <form onSubmit={submit} className="transfer-modal">
+        <h2 id="transfer-title">Transfer Order</h2>
+        <p>Order {order.orderId} · Current hub {pickupHub || 'unassigned'}</p>
         <label htmlFor="destination-hub">Destination Hub</label>
-
-        <select
-          id="destination-hub"
-          value={hubId}
-          onChange={e => setHubId(e.target.value)}
-        >
+        <select id="destination-hub" value={hubId} onChange={event => setHubId(event.target.value)} disabled={busy || !hubs?.length} required>
           <option value="">Select a hub</option>
-          {hubs.map(hub => (
-            <option key={hub.hubId} value={hub.hubId}>
-              {hub.name || hub.hubName || hub.hubId} ({hub.hubId})
-            </option>
-          ))}
+          {hubs?.map(hub => <option key={hub.hubId} value={hub.hubId}>{hub.name} ({hub.hubId})</option>)}
         </select>
-
+        <label htmlFor="transfer-reason">Transfer reason (optional)</label>
+        <textarea id="transfer-reason" className="w-full rounded border border-gray-300 p-2" value={reason} onChange={event => setReason(event.target.value)} disabled={busy} />
+        {!error && !hubs && <p role="status">Loading hubs…</p>}
+        {hubs?.length === 0 && <p>No destination hubs are available.</p>}
         {error && <p className="transfer-error" role="alert">{error}</p>}
-
-        <button onClick={onClose}>Cancel</button>
-        <button onClick={handleTransfer} disabled={hubs.length === 0 || !hubId}>
-          Transfer
-        </button>
-      </div>
+        <button type="button" disabled={busy} onClick={onClose}>Cancel</button>
+        <button type="submit" disabled={busy || !hubId}>{busy ? 'Transferring…' : 'Transfer'}</button>
+      </form>
     </div>
   );
 }

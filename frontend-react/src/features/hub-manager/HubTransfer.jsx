@@ -1,60 +1,25 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import HubManagerLayout from "./HubManagerLayout.jsx";
-import { API } from "../../services/api.js";
+import useHubOrders from "./useHubOrders";
 import OrderCard from "./OrderCard";
 import OrderDetailsModal from "./modals/OrderDetailsModal";
 import TransferHubModal from "./modals/TransferHubModal";
+import { canTransfer } from "./warehouseWorkflow";
 import "./OrderQueue.css";
 
-const terminalStatuses = ["Delivered", "Cancelled", "Returned", "Failed"];
-
 export default function HubTransfer() {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const hubId = user.hubId || user.hub_id || "";
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { orders, loading, error, hubId, refreshOrders } = useHubOrders();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  async function loadOrders() {
-    setLoading(true);
-    setError("");
-    try {
-      if (!hubId) {
-        throw new Error("The signed-in Hub Manager has no assigned hub.");
-      }
-
-      const result = await API.orders.getAll();
-      if (!Array.isArray(result)) {
-        throw new Error("Could not load orders. Check the backend and login.");
-      }
-      setOrders(result);
-    } catch (err) {
-      setOrders([]);
-      setError(err.message || "Could not load orders.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadOrders();
-  }, []);
-
-  const transferOrders = orders.filter(
-    (order) =>
-      order.pickupHubId === hubId &&
-      order.status === "Pending" &&
-      !order.assignedAgentId,
-  );
+  const transferOrders = orders.filter(order => canTransfer(order, hubId));
 
   return (
     <HubManagerLayout title="Hub Transfer">
       <div className="order-queue">
         <h1>Hub Transfer</h1>
-        <p>Transfer unassigned pending orders from your hub to another hub.</p>
+        <p>Check parcels out of your warehouse before transferring them to their destination hub.</p>
 
         {loading ? (
           <p>Loading orders...</p>
@@ -84,14 +49,14 @@ export default function HubTransfer() {
         order={selectedOrder}
         isOpen={showTransferModal}
         onClose={() => setShowTransferModal(false)}
-        onSuccess={loadOrders}
+        onSuccess={refreshOrders}
       />
 
       <OrderDetailsModal
         order={selectedOrder}
         isOpen={showDetailsModal}
         onClose={() => setShowDetailsModal(false)}
-        onSuccess={loadOrders}
+        onSuccess={refreshOrders}
       />
     </HubManagerLayout>
   );

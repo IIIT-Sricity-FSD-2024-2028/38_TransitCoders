@@ -1,112 +1,73 @@
+import { useEffect, useState } from 'react';
+import { API } from '../../../services/api';
+import { getSessionUser } from '../../../services/session';
+import './AssignAgentModal.css';
 
-import { useEffect, useState } from "react";
-import { API } from "../../../services/api";
-import "./AssignAgentModal.css";
+const canTakeDelivery = agent => agent.availabilityStatus === 'Available' && agent.currentTasksCount < agent.taskCapacity;
 
-export default function AssignAgentModal({ order, isOpen, onClose, onSuccess }) {
-  const [agents, setAgents] = useState([]);
-  const [agentId, setAgentId] = useState("");
-  const [loadingAgents, setLoadingAgents] = useState(false);
-  const [agentError, setAgentError] = useState("");
-  const [assignmentError, setAssignmentError] = useState("");
+export default function AssignAgentModal({ order, isOpen, ...props }) {
+  return isOpen && order ? <Assignment key={order.id} order={order} {...props} /> : null;
+}
+
+function Assignment({ order, onClose, onSuccess }) {
+  const hubId = getSessionUser().hubId;
+  const [agents, setAgents] = useState(null);
+  const [agentId, setAgentId] = useState('');
+  const [loadError, setLoadError] = useState('');
+  const [error, setError] = useState('');
   const [assigning, setAssigning] = useState(false);
+  const available = agents?.some(canTakeDelivery);
+  const selected = agents?.find(agent => agent.userId === agentId);
 
   useEffect(() => {
-    if (!isOpen || !order) return;
     let active = true;
+    API.hubs.getAgentsForHub(hubId).then(data => {
+      if (active) setAgents(data);
+    }, err => {
+      if (active) setLoadError(err.message);
+    });
+    return () => { active = false; };
+  }, [hubId]);
 
-    setAgents([]);
-    setAgentId("");
-    setAgentError("");
-    setAssignmentError("");
-    setLoadingAgents(true);
-
-    async function loadAgents() {
-      try {
-        const user = JSON.parse(localStorage.getItem("user") || "{}");
-        if (!user.hubId) {
-          throw new Error("The signed-in Hub Manager has no assigned hub.");
-        }
-        const result = await API.hubs.getAgentsForHub(user.hubId);
-
-        if (!Array.isArray(result)) {
-          throw new Error("Could not load agents for this hub.");
-        }
-        if (active) {
-          setAgents(result.filter(a => a.availabilityStatus === "Available"));
-        }
-      } catch (error) {
-        if (active) {
-          setAgentError(error.message || "Could not load agents for this hub.");
-        }
-      } finally {
-        if (active) setLoadingAgents(false);
-      }
-    }
-
-    loadAgents();
-    return () => {
-      active = false;
-    };
-  }, [isOpen, order?.id]);
-
-  async function handleAssign() {
-    if (!agentId) {
-      setAssignmentError("Please select an agent.");
-      return;
-    }
-
-    setAssignmentError("");
+  async function assign(auto) {
+    if (assigning || (auto ? !available : !selected || !canTakeDelivery(selected))) return;
+    setError('');
     setAssigning(true);
     try {
-      await API.orders.assign(order.id, agentId);
+      if (auto) await API.orders.autoAssign(order.id);
+      else await API.orders.assign(order.id, agentId);
       await onSuccess();
       onClose();
-    } catch (error) {
-      setAssignmentError(error.message || "Could not assign agent.");
+    } catch (err) {
+      setError(err.message);
+      if (err.status === 409 || err.status === 400) {
+        API.hubs.getAgentsForHub(hubId).then(setAgents, () => {});
+      }
     } finally {
       setAssigning(false);
     }
   }
 
-  if (!isOpen || !order) return null;
-
   return (
-    <div className="assign-modal-overlay">
+    <div role="dialog" aria-modal="true" aria-labelledby="assign-title" className="assign-modal-overlay">
       <div className="assign-modal">
-        <h2>Assign Agent</h2>
-        <p>Order: {order.orderId}</p>
-
-        {loadingAgents ? (
-          <p>Loading available agents...</p>
-        ) : agentError ? (
-          <p role="alert">{agentError}</p>
-        ) : agents.length === 0 ? (
-          <p>No available agents in your hub.</p>
-        ) : (
-          <select
-            value={agentId}
-            onChange={e => setAgentId(e.target.value)}
-            disabled={assigning}
-          >
-            <option value="">Select an agent</option>
-            {agents.map(a => (
-              <option key={a.id} value={a.userId}>
-                {a.name || a.id}
-              </option>
-            ))}
-          </select>
-        )}
-
-        {assignmentError && <p role="alert">{assignmentError}</p>}
-
-        <button onClick={onClose}>Cancel</button>
-        <button
-          onClick={handleAssign}
-          disabled={loadingAgents || Boolean(agentError) || agents.length === 0 || !agentId || assigning}
-        >
-          {assigning ? "Assigning..." : "Assign"}
-        </button>
+        <h2 id="assign-title">Assign Agent</h2>
+        <p>Order {order.orderId}</p>
+        {loadError && <p role="alert">{loadError}</p>}
+        {!agents && !loadError && <p role="status">Loading available agents…</p>}
+        {agents && !available && <p>No available agents have capacity at your hub.</p>}
+        {agents?.length > 0 && <select aria-label="Delivery agent" value={agentId} onChange={event => setAgentId(event.target.value)} disabled={assigning}>
+          <option value="">Select an agent</option>
+          {agents.map(agent => <option key={agent.userId} value={agent.userId} disabled={!canTakeDelivery(agent)}>
+            {agent.name} ({agent.currentTasksCount}/{agent.taskCapacity} active{agent.availabilityStatus !== 'Available' ? `, ${agent.availabilityStatus}` : ''})
+          </option>)}
+        </select>}
+        {error && <p role="alert">{error}</p>}
+        <div className="flex flex-wrap gap-2">
+          <button type="button" disabled={assigning} onClick={onClose}>Cancel</button>
+          <button type="button" disabled={assigning || !available} onClick={() => assign(true)}>Auto-assign</button>
+          <button type="button" disabled={assigning || !selected || !canTakeDelivery(selected)} onClick={() => assign(false)}>{assigning ? 'Assigning…' : 'Assign'}</button>
+        </div>
       </div>
     </div>
   );

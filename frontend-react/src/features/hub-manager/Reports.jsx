@@ -10,6 +10,7 @@ import {
 } from "recharts";
 
 import HubManagerLayout from "./HubManagerLayout.jsx";
+import { getSessionUser } from "../../services/session";
 import StatsCard from "./StatsCard";
 import { API } from "../../services/api.js";
 import "./Reports.css";
@@ -34,7 +35,7 @@ const activeStatuses = [
 ];
 
 export default function Reports() {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = getSessionUser();
   const hubId = user.hubId;
 
   const [orders, setOrders] = useState([]);
@@ -145,7 +146,7 @@ export default function Reports() {
     { age: "Over 48 hours", orders: 0 },
   ];
 
-  const now = Date.now();
+  const [now] = useState(Date.now);
 
   pendingOrders.forEach(order => {
     const created = new Date(order.createdAt).getTime();

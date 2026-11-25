@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsEnum } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsInt, IsEnum, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateHubDto {
@@ -34,6 +34,6 @@ export class CreateHubDto {
   @IsOptional()
   status?: 'active' | 'inactive' | 'maintenance';
 
-  @ApiProperty({ required: false }) @IsNumber() @IsOptional()
+  @ApiProperty({ required: false }) @IsInt() @Min(0) @IsOptional()
   capacity?: number;
 }

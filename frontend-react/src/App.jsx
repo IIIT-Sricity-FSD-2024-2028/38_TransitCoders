@@ -34,6 +34,7 @@ const ReportIssue = lazy(() => import("./features/agent/ReportIssue"));
 const AgentProfile = lazy(() => import('./features/agent/AgentProfile'));
 const DashBoard = lazy(() => import('./features/hub-manager/DashBoard'));
 const OrderQueue = lazy(() => import("./features/hub-manager/OrderQueue"));
+const Warehouse = lazy(() => import("./features/hub-manager/Warehouse"));
 const Dispatch = lazy(() => import("./features/hub-manager/Dispatch"));
 const HubTransfer = lazy(() => import("./features/hub-manager/HubTransfer"));
 const Reports = lazy(() => import("./features/hub-manager/Reports"));
@@ -75,6 +76,7 @@ export default function App() {
           <Route path="/hub/queue" element={<OrderQueue />} />
           <Route path="/hub/dispatch" element={<Dispatch />} />
           <Route path="/hub/transfer" element={<HubTransfer />} />
+          <Route path="/hub/warehouse" element={<Warehouse />} />
           <Route path="/hub/reports" element={<Reports />} />
           <Route path="/hub/complaints" element={<HubManagerLayout title="Hub Complaints"><ComplaintsManagement /></HubManagerLayout>} />
         </Route>

@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-// import Sidebar from '../../components/layout/Sidebar';
-// import Topbar from '../../components/layout/Topbar';
 import StatsCard from "./StatsCard";
 import AssignAgentModal from "./modals/AssignAgentModal";
 import TransferHubModal from "./modals/TransferHubModal";
@@ -12,14 +10,11 @@ import "./DashBoard.css";
 import OrderCard from "./OrderCard";
 
 import { API } from "../../services/api";
+import useHubOrders from "./useHubOrders";
 
 export default function DashBoard() {
-  const [orders, setOrders] = useState([]);
+  const { orders, loading, error, hubId, refreshOrders } = useHubOrders();
   const [activeFilter, setActiveFilter] = useState("All");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const hubId = currentUser.hubId || currentUser.hub_id || "";
 
   const [availableAgents, setAvailableAgents] = useState(0);
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -35,59 +30,17 @@ export default function DashBoard() {
     return order.status === "Delivered";
   }).length;
 
-  async function loadAvailableAgents() {
-    try {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      const currentHubId = user.hubId || user.hub_id || "";
-
-      if (!currentHubId) {
-        setAvailableAgents(0);
-        return;
-      }
-
-      const agents = await API.hubs.getAgentsForHub(currentHubId);
-
-      if (Array.isArray(agents)) {
-        setAvailableAgents(
-          agents.filter((agent) => agent.availabilityStatus === "Available")
-            .length,
-        );
-      }
-    } catch (err) {
-      console.error("could not load available agents:", err);
-    }
-  }
-
-  async function refreshOrders() {
-    const result = await API.orders.getAll();
-
-    if (Array.isArray(result)) {
-      setOrders(result);
-    }
-  }
-
+  const [agentError, setAgentError] = useState('');
   useEffect(() => {
-    async function loadOrders() {
-      try {
-        const result = await API.orders.getAll();
-
-        if (result == null) {
-          setError("Could not load orders. Check the backend and login.");
-        } else if (!Array.isArray(result)) {
-          setError("the API returned an unexpected order format");
-        } else {
-          setOrders(result);
-        }
-      } catch (err) {
-        setError("an unexpected error occurred while loading orders.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadOrders();
-    loadAvailableAgents();
-  }, []);
+    if (!hubId) return;
+    let active = true;
+    API.hubs.getAgentsForHub(hubId).then(agents => {
+      if (active) setAvailableAgents(agents.filter(agent => agent.availabilityStatus === 'Available').length);
+    }, err => {
+      if (active) setAgentError(err.message);
+    });
+    return () => { active = false; };
+  }, [hubId]);
 
   const filteredOrders =
     activeFilter === "All"
@@ -107,6 +60,7 @@ export default function DashBoard() {
       <div className="dashboard-content">
         <h1>Operations Dashboard</h1>
         <p>Overview of hub operations and orders</p>
+        {agentError && <p role="alert">{agentError}</p>}
 
         {loading === true ? (
           <p className="loading-orders-text">Loading orders...</p>

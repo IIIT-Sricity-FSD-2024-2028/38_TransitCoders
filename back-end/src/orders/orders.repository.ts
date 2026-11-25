@@ -9,9 +9,6 @@ import { IOrder, IStatusEvent, IPricingBreakdown } from './interfaces/order.inte
  *
  * Same method contract as the previous in-memory implementation plus:
  *  - findByTrackingId (public tracking lookups)
- *  - countActiveByAgent (workload queries for dispatch automation)
- *  - assignAgentTx (atomic assignment inside a transaction — prevents
- *    two hub managers assigning the same order concurrently)
  */
 @Injectable()
 export class OrdersRepository {
@@ -30,6 +27,11 @@ export class OrdersRepository {
       deliveryAddress: row.deliveryAddress,
       pickupHubId: row.pickupHubId ?? undefined,
       deliveryHubId: row.deliveryHubId ?? undefined,
+      warehouse: row.warehouseHubId ? {
+        hubId: row.warehouseHubId,
+        checkedInAt: row.checkedInAt,
+        checkedOutAt: row.checkedOutAt,
+      } : undefined,
       status: row.status,
       assignedAgentId: row.assignedAgentId ?? undefined,
       packageType: row.packageType ?? undefined,
@@ -51,40 +53,40 @@ export class OrdersRepository {
   }
 
   findAll(): IOrder[] {
-    return this.db.query('SELECT * FROM orders ORDER BY createdAt DESC').map((r) => this.toOrder(r));
+    return this.db.query('SELECT * FROM orders_with_warehouse ORDER BY createdAt DESC').map((r) => this.toOrder(r));
   }
 
   findById(id: string): IOrder | undefined {
-    const row = this.db.queryOne('SELECT * FROM orders WHERE id = ?', [id]);
+    const row = this.db.queryOne('SELECT * FROM orders_with_warehouse WHERE id = ?', [id]);
     return row ? this.toOrder(row) : undefined;
   }
 
   findByOrderId(orderId: string): IOrder | undefined {
-    const row = this.db.queryOne('SELECT * FROM orders WHERE orderId = ?', [orderId]);
+    const row = this.db.queryOne('SELECT * FROM orders_with_warehouse WHERE orderId = ?', [orderId]);
     return row ? this.toOrder(row) : undefined;
   }
 
   findByTrackingId(trackingId: string): IOrder | undefined {
-    const row = this.db.queryOne('SELECT * FROM orders WHERE trackingId = ?', [trackingId]);
+    const row = this.db.queryOne('SELECT * FROM orders_with_warehouse WHERE trackingId = ?', [trackingId]);
     return row ? this.toOrder(row) : undefined;
   }
 
   findByMerchant(merchantId: string): IOrder[] {
     return this.db
-      .query('SELECT * FROM orders WHERE merchantId = ? ORDER BY createdAt DESC', [merchantId])
+      .query('SELECT * FROM orders_with_warehouse WHERE merchantId = ? ORDER BY createdAt DESC', [merchantId])
       .map((r) => this.toOrder(r));
   }
 
   findByCustomer(customerId: string): IOrder[] {
     return this.db
-      .query('SELECT * FROM orders WHERE customerId = ? ORDER BY createdAt DESC', [customerId])
+      .query('SELECT * FROM orders_with_warehouse WHERE customerId = ? ORDER BY createdAt DESC', [customerId])
       .map((r) => this.toOrder(r));
   }
 
   findByHub(hubId: string): IOrder[] {
     return this.db
       .query(
-        'SELECT * FROM orders WHERE pickupHubId = ? OR deliveryHubId = ? ORDER BY createdAt DESC',
+        'SELECT * FROM orders_with_warehouse WHERE pickupHubId = ? OR deliveryHubId = ? ORDER BY createdAt DESC',
         [hubId, hubId],
       )
       .map((r) => this.toOrder(r));
@@ -92,24 +94,14 @@ export class OrdersRepository {
 
   findByAgent(agentId: string): IOrder[] {
     return this.db
-      .query('SELECT * FROM orders WHERE assignedAgentId = ? ORDER BY createdAt DESC', [agentId])
+      .query('SELECT * FROM orders_with_warehouse WHERE assignedAgentId = ? ORDER BY createdAt DESC', [agentId])
       .map((r) => this.toOrder(r));
   }
 
   findByStatus(status: string): IOrder[] {
     return this.db
-      .query('SELECT * FROM orders WHERE status = ? ORDER BY createdAt', [status])
+      .query('SELECT * FROM orders_with_warehouse WHERE status = ? ORDER BY createdAt', [status])
       .map((r) => this.toOrder(r));
-  }
-
-  /** Active (non-terminal) task count for an agent — used by dispatch automation. */
-  countActiveByAgent(agentId: string): number {
-    const row = this.db.queryOne<{ n: number }>(
-      `SELECT COUNT(*) AS n FROM orders
-       WHERE assignedAgentId = ? AND status NOT IN ('Delivered','Cancelled','Returned','Failed')`,
-      [agentId],
-    );
-    return row ? Number(row.n) : 0;
   }
 
   create(
@@ -205,33 +197,6 @@ export class OrdersRepository {
       ],
     );
     return merged;
-  }
-
-  /**
-   * Atomic agent assignment. Runs inside an IMMEDIATE transaction so two
-   * concurrent hub-manager assignments cannot both succeed (the second sees
-   * the order no longer Pending and fails cleanly).
-   */
-  assignAgentTx(orderId: string, agentId: string, newStatus: string, pickupHubId?: string): IOrder | undefined {
-    return this.db.transaction((conn) => {
-      const row = conn.prepare('SELECT * FROM orders WHERE id = ?').get(orderId) as any;
-      if (!row) return undefined;
-      if (row.status !== 'Pending') return undefined; // already assigned/transitioned
-
-      const history = JSON.parse(row.statusHistory || '[]');
-      history.push({
-        status: newStatus,
-        timestamp: new Date().toISOString(),
-        note: `Assigned to agent ${agentId}`,
-      });
-
-      conn.prepare(
-        `UPDATE orders SET assignedAgentId = ?, status = ?, pickupHubId = COALESCE(?, pickupHubId), statusHistory = ?, updatedAt = ? WHERE id = ?`,
-      ).run(agentId, newStatus, pickupHubId ?? null, JSON.stringify(history), new Date().toISOString(), orderId);
-
-      const updated = conn.prepare('SELECT * FROM orders WHERE id = ?').get(orderId) as any;
-      return this.toOrder(updated);
-    });
   }
 
   delete(id: string): boolean {

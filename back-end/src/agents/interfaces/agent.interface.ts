@@ -1,3 +1,5 @@
+export const AGENT_TASK_CAPACITY = 8;
+
 export interface IAgentProfile {
   id: string;
   userId: string;
@@ -7,6 +9,7 @@ export interface IAgentProfile {
   availabilityStatus: 'Available' | 'Busy' | 'Offline';
   vehicleType?: string;
   currentTasksCount: number;
+  taskCapacity?: number;
   createdAt: Date;
   updatedAt: Date;
 }
