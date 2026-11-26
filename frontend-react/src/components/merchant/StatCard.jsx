@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * StatCard component
  * @param {Object} props

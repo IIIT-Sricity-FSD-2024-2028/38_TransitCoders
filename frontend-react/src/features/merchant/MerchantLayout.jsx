@@ -1,5 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar, { SidebarItem } from '../../components/layout/Sidebar';
+import { useAppSelector } from '../../app/hooks';
+import { selectCurrentUser } from '../../shared/auth/authSlice';
 import Topbar from '../../components/layout/Topbar';
 import { 
   LayoutTextWindow, 
@@ -18,20 +20,8 @@ import {
  * for child route views.
  */
 export default function MerchantLayout() {
-  // Current authenticated merchant profile details from database session
-  const storedUser = (() => {
-    try {
-      const u = localStorage.getItem('user');
-      return u ? JSON.parse(u) : null;
-    } catch (_) {
-      return null;
-    }
-  })();
-
-  const currentMerchant = { 
-    name: storedUser?.name || 'Merchant Portal', 
-    role: storedUser?.role ? storedUser.role.charAt(0).toUpperCase() + storedUser.role.slice(1) : 'Merchant' 
-  };
+  const user = useAppSelector(selectCurrentUser);
+  const currentMerchant = { name: user?.name || '', role: 'Merchant' };
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
@@ -71,7 +61,7 @@ export default function MerchantLayout() {
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Topbar />
+        <Topbar title="Merchant Portal" />
         
         {/* <Outlet /> renders whatever child route matches the current URL */}
         <main className="flex-1 p-6 md:p-8 overflow-y-auto bg-gray-100">
