@@ -2,8 +2,8 @@ import { useNavigate } from "react-router-dom";
 
 function getBadgeStyle(status) {
     const s = (status || "").toLowerCase();
-    if (s.includes("deliver")) return "bg-emerald-50 text-emerald-600";
-    if (s.includes("cancel")) return "bg-red-50 text-red-600";
+    if (s === "delivered") return "bg-emerald-50 text-emerald-600";
+    if (['cancelled', 'failed', 'returned'].includes(s)) return "bg-red-50 text-red-600";
     if (s.includes("transit") || s.includes("out")) return "bg-orange-50 text-orange-600";
     if (s.includes("assign")) return "bg-blue-50 text-blue-600";
     return "bg-amber-50 text-amber-600";

@@ -20,6 +20,7 @@ export default function StarRating({ rating = 5, onRatingChange, readOnly = fals
                         className={`text-xl transition-all ${
                             readOnly ? 'cursor-default' : 'cursor-pointer hover:scale-110'
                         } ${isActive ? 'text-amber-400' : 'text-gray-200'}`}
+                        aria-pressed={rating === starValue}
                         title={`${starValue} Star${starValue > 1 ? 's' : ''}`}
                     >
                         <StarFill size={20} />
