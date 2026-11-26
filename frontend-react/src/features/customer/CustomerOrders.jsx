@@ -1,16 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import {
-  Search,
-  CurrencyRupee,
-  BoxSeam,
-  Calendar3,
-  GeoAlt,
-  ArrowRight,
-} from 'react-bootstrap-icons';
-import { statusKey } from '../../services/orderStatus';
-import { useOrders } from '../../shared/orders/ordersHooks';
-import { normalizeCustomerOrder } from './customerSelectors';
+import { Search, CurrencyRupee, BoxSeam, Calendar3, GeoAlt, ArrowRight } from 'react-bootstrap-icons';
+import { customerService } from '../../services/customerService';
 import StatusBadge from '../../components/customer/StatusBadge';
 import OrderDetailsDrawer from '../../components/customer/OrderDetailsDrawer';
 
@@ -18,37 +9,38 @@ const FILTER_TABS = ['ALL', 'IN TRANSIT', 'DELIVERED', 'PENDING', 'CANCELLED'];
 
 export default function CustomerOrders() {
     const [searchParams] = useSearchParams();
-    const targetId = searchParams.get('id') || '';
-    const {
-        data: rawOrders = [],
-        isLoading: loading,
-        error: queryError,
-    } = useOrders();
-    const error = queryError?.message || '';
-    const orders = useMemo(() => rawOrders.map(normalizeCustomerOrder), [rawOrders]);
-
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('ALL');
-    const [drawerState, setDrawerState] = useState({ param: '', pickedId: null, closed: false });
+    const [selectedOrder, setSelectedOrder] = useState(null);
 
-    const selectedOrder = useMemo(() => {
-        const isSameParam = drawerState.param === targetId;
-        if (isSameParam && drawerState.pickedId) {
-            return orders.find((o) => o.id === drawerState.pickedId || o.trackingId === drawerState.pickedId) || null;
+    // 1. Fetch Orders from Backend on Mount (useEffect Hook)
+    useEffect(() => {
+        let isMounted = true;
+        async function fetchOrders() {
+            try {
+                setLoading(true);
+                const data = await customerService.getOrders();
+                if (isMounted) {
+                    setOrders(data);
+                    
+                    // Auto-open order details drawer if ?id= was passed in the URL (e.g. from Dashboard)
+                    const targetId = searchParams.get('id');
+                    if (targetId) {
+                        const matched = data.find(o => o.id === targetId || o.trackingId === targetId);
+                        if (matched) setSelectedOrder(matched);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch customer orders:", err);
+            } finally {
+                if (isMounted) setLoading(false);
+            }
         }
-        if (targetId && !(isSameParam && drawerState.closed)) {
-            return orders.find((o) => o.id === targetId || o.trackingId === targetId) || null;
-        }
-        return null;
-    }, [orders, drawerState, targetId]);
-
-    const setSelectedOrder = (order) => {
-        if (order) {
-            setDrawerState({ param: targetId, pickedId: order.id || order.trackingId, closed: false });
-        } else {
-            setDrawerState({ param: targetId, pickedId: null, closed: true });
-        }
-    };
+        fetchOrders();
+        return () => { isMounted = false; };
+    }, [searchParams]);
 
     // 2. Filter Orders (Derived State - No extra state needed!)
     const filteredOrders = useMemo(() => {
@@ -61,16 +53,16 @@ export default function CustomerOrders() {
                 (order.deliveryAddress && order.deliveryAddress.toLowerCase().includes(term)) ||
                 (order.packageType && order.packageType.toLowerCase().includes(term));
 
-            const s = statusKey(order.status);
+            const s = (order.status || '').toLowerCase();
             let matchesStatus = true;
             if (selectedStatus === 'IN TRANSIT') {
-                matchesStatus = ['assigned', 'pickedup', 'intransit', 'outfordelivery'].includes(s);
+                matchesStatus = s.includes('transit') || s.includes('out') || s.includes('assign');
             } else if (selectedStatus === 'DELIVERED') {
-                matchesStatus = s === 'delivered';
+                matchesStatus = s.includes('deliver');
             } else if (selectedStatus === 'PENDING') {
-                matchesStatus = s === 'pending';
+                matchesStatus = s.includes('pend');
             } else if (selectedStatus === 'CANCELLED') {
-                matchesStatus = s === 'cancelled';
+                matchesStatus = s.includes('cancel');
             }
 
             return matchesSearch && matchesStatus;
@@ -86,8 +78,6 @@ export default function CustomerOrders() {
                     Live tracking, history, and status updates for all your shipments.
                 </p>
             </div>
-
-            {error && <p role="alert" className="text-red-700">{error}</p>}
 
             {/* Search & Filter Bar (Controlled Components & Event Handling) */}
             <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
