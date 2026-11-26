@@ -1,25 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Search, 
   Plus, 
   XCircle, 
-  CheckCircle, 
-  Truck, 
   UpcScan, 
   ArrowUpRight 
 } from 'react-bootstrap-icons';
 import AdminTable from '../../components/admin/AdminTable';
 import OrderStatusBadge from '../../components/merchant/OrderStatusBadge';
 import ShippingLabelModal from '../../components/merchant/ShippingLabelModal';
-import { 
-  loadOrders, 
-  saveOrders, 
-  fetchMerchantOrders, 
-  cancelMerchantOrder, 
-  updateMerchantOrderStatus, 
-  setActiveTracking 
-} from '../../services/merchantHelpers';
+import { useCancelOrder } from './merchantHooks';
+import { useOrders } from '../../shared/orders/ordersHooks';
+import { normalizeMerchantOrder } from './merchantSelectors';
 
 /**
  * MerchantOrders — Order Management & Actions
@@ -29,28 +22,21 @@ import {
  * dispatch progression, and shipping label modal preview.
  */
 export default function MerchantOrders() {
-  // Component state for orders, search, filter, and modal
-  const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [selectedLabelOrder, setSelectedLabelOrder] = useState(null);
+  const [actionError, setActionError] = useState('');
+  const [cancelling, setCancelling] = useState(null);
 
-  // Load orders on mount (instant local render + live backend API sync)
-  useEffect(() => {
-    // 1. Instant local render
-    const savedOrders = loadOrders();
-    setOrders(savedOrders);
+  const {
+    data: rawOrders = [],
+    isLoading: loading,
+    error: queryError,
+  } = useOrders();
+  const [triggerCancelOrder] = useCancelOrder();
 
-    // 2. Fetch live records from backend API
-    let isMounted = true;
-    fetchMerchantOrders().then((liveOrders) => {
-      if (isMounted && Array.isArray(liveOrders)) {
-        setOrders(liveOrders);
-      }
-    });
-
-    return () => { isMounted = false; };
-  }, []);
+  const orders = useMemo(() => rawOrders.map(normalizeMerchantOrder), [rawOrders]);
+  const error = actionError || queryError?.message || '';
 
   // Filter orders by search keyword and status
   const filteredOrders = orders.filter((order) => {
@@ -68,18 +54,17 @@ export default function MerchantOrders() {
     return matchesSearch && matchesStatus;
   });
 
-  // Cancel an order in backend and record cancellation in timeline
-  async function handleCancelOrder(orderId) {
-    const updatedOrders = await cancelMerchantOrder(orderId);
-    setOrders(updatedOrders);
-  }
-
-  // Advance order status: PENDING -> IN_TRANSIT -> DELIVERED
-  async function handleAdvanceStatus(orderId) {
-    const target = orders.find((o) => o.id === orderId);
-    const nextStatus = target && target.status === 'PENDING' ? 'IN_TRANSIT' : 'DELIVERED';
-    const updatedOrders = await updateMerchantOrderStatus(orderId, nextStatus);
-    setOrders(updatedOrders);
+  async function handleCancelOrder(order) {
+    if (cancelling) return;
+    setCancelling(order.backendId);
+    setActionError('');
+    try {
+      await triggerCancelOrder(order.backendId).unwrap();
+    } catch (err) {
+      setActionError(err.message);
+    } finally {
+      setCancelling(null);
+    }
   }
 
   // AdminTable column definitions
@@ -129,6 +114,10 @@ export default function MerchantOrders() {
       render: (row) => <span className="text-gray-400 text-xs">{row.date || 'Recent'}</span>,
     },
     {
+      header: 'Agent',
+      render: (row) => <span className="text-gray-600 text-xs">{row.assignedAgentName || 'Unassigned'}</span>,
+    },
+    {
       header: 'Status',
       render: (row) => <OrderStatusBadge status={row.status} />,
     },
@@ -143,8 +132,7 @@ export default function MerchantOrders() {
       cellClassName: 'text-right',
       render: (row) => {
         // Status-based actions
-        const isCancellable = row.status === 'PENDING';
-        const canAdvance = row.status === 'PENDING' || row.status === 'IN_TRANSIT';
+        const isCancellable = ['PENDING', 'ASSIGNED'].includes(row.status);
 
         return (
           <div className="flex items-center justify-end gap-2">
@@ -160,8 +148,7 @@ export default function MerchantOrders() {
 
             {/* GPS Track Link */}
             <Link
-              to="/merchant/track"
-              onClick={() => setActiveTracking(row)}
+              to={`/merchant/track?id=${encodeURIComponent(row.trackingNumber || row.id)}`}
               className="px-2 py-1 text-xs font-semibold text-orange-700 bg-orange-50 hover:bg-orange-100 rounded-md transition-colors flex items-center gap-1"
               title="Live GPS Track"
             >
@@ -169,22 +156,11 @@ export default function MerchantOrders() {
               <span>Track</span>
             </Link>
 
-            {/* Advance status action */}
-            {canAdvance && (
-              <button
-                onClick={() => handleAdvanceStatus(row.id)}
-                className="px-2 py-1 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors flex items-center gap-1"
-                title={row.status === 'PENDING' ? 'Dispatch to Hub' : 'Mark as Delivered'}
-              >
-                {row.status === 'PENDING' ? <Truck size={12} /> : <CheckCircle size={12} />}
-                <span>{row.status === 'PENDING' ? 'Dispatch' : 'Deliver'}</span>
-              </button>
-            )}
-
             {/* Cancel order button */}
             {isCancellable && (
               <button
-                onClick={() => handleCancelOrder(row.id)}
+                onClick={() => handleCancelOrder(row)}
+                disabled={Boolean(cancelling)}
                 className="px-2 py-1 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-md transition-colors flex items-center gap-1"
                 title="Cancel Shipment"
               >
@@ -222,6 +198,8 @@ export default function MerchantOrders() {
         </Link>
       </div>
 
+      {error && <p className="text-sm text-red-700" role="alert">{error}</p>}
+
       {/* ── Card with Search, Filter & AdminTable ── */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-4">
         {/* Search and status filter bar */}
@@ -240,7 +218,7 @@ export default function MerchantOrders() {
 
           {/* Status filter pills */}
           <div className="flex flex-wrap gap-1.5">
-            {['ALL', 'PENDING', 'IN_TRANSIT', 'DELIVERED', 'CANCELLED'].map((s) => (
+            {['ALL', 'PENDING', 'ASSIGNED', 'PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED', 'RETURNED', 'FAILED'].map((s) => (
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
@@ -260,7 +238,7 @@ export default function MerchantOrders() {
         <AdminTable
           columns={orderColumns}
           data={filteredOrders}
-          isLoading={false}
+          isLoading={loading}
           emptyMessage="No shipments found matching your filters."
         />
       </div>

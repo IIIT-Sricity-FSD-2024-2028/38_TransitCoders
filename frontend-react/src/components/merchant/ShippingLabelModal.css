@@ -1,0 +1,42 @@
+.shipping-label-dialog {
+  width: min(36rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  overflow: auto;
+  border-radius: 1rem;
+  background: white;
+  color: #111827;
+}
+
+.shipping-label-dialog::backdrop {
+  background: rgb(0 0 0 / 55%);
+}
+
+@media print {
+  .shipping-label-dialog {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .shipping-label-dialog::backdrop {
+    background: transparent;
+  }
+
+  body:has(.shipping-label) * {
+    visibility: hidden;
+  }
+
+  body:has(.shipping-label) .shipping-label,
+  body:has(.shipping-label) .shipping-label * {
+    visibility: visible;
+  }
+
+  .shipping-label {
+    position: fixed;
+    inset: 0 auto auto 0;
+    max-width: 170mm;
+    width: 100%;
+    print-color-adjust: exact;
+  }
+}

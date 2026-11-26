@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
-import { loadOrders, fetchMerchantOrders, fetchMerchantTickets } from '../../services/merchantHelpers';
+import { useMemo, useState } from 'react';
+import { useOrders } from '../../shared/orders/ordersHooks';
+import { useTickets } from '../../shared/support/supportHooks';
+import { normalizeMerchantOrder, normalizeMerchantTicket } from './merchantSelectors';
 
 /**
  * AnalyticsReport
@@ -12,43 +14,34 @@ import { loadOrders, fetchMerchantOrders, fetchMerchantTickets } from '../../ser
  */
 export default function AnalyticsReport() {
   const [timeframe, setTimeframe] = useState('All Time');
-  const [orders, setOrders] = useState([]);
-  const [tickets, setTickets] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [now] = useState(Date.now);
 
-  // Load orders and tickets from backend database on mount
-  useEffect(() => {
-    // 1. Instant local render
-    const cachedOrders = loadOrders();
-    setOrders(cachedOrders);
+  const {
+    data: rawOrders = [],
+    isLoading: ordersLoading,
+    error: ordersError,
+  } = useOrders();
+  const {
+    data: rawTickets = [],
+    isLoading: ticketsLoading,
+    error: ticketsError,
+  } = useTickets();
 
-    // 2. Fetch live database records
-    let isMounted = true;
-    Promise.all([
-      fetchMerchantOrders(),
-      fetchMerchantTickets()
-    ]).then(([liveOrders, liveTickets]) => {
-      if (isMounted) {
-        if (Array.isArray(liveOrders)) setOrders(liveOrders);
-        if (Array.isArray(liveTickets)) setTickets(liveTickets);
-        setIsLoading(false);
-      }
-    }).catch(() => {
-      if (isMounted) setIsLoading(false);
-    });
+  const isLoading = ordersLoading || ticketsLoading;
+  const error = ordersError?.message || ticketsError?.message || '';
+  const orders = useMemo(() => rawOrders.map(normalizeMerchantOrder), [rawOrders]);
+  const tickets = useMemo(() => rawTickets.map(normalizeMerchantTicket), [rawTickets]);
 
-    return () => { isMounted = false; };
-  }, []);
+  if (error) return <p role="alert" className="text-red-700">Could not load analytics. {error}</p>;
 
   // Filter orders by selected timeframe
   const filteredOrders = orders.filter((order) => {
     if (timeframe === 'All Time') return true;
-    if (!order.date) return true;
+    if (!order.createdAt) return false;
 
-    const orderTime = new Date(order.date).getTime();
-    if (isNaN(orderTime)) return true;
+    const orderTime = new Date(order.createdAt).getTime();
+    if (Number.isNaN(orderTime)) return false;
 
-    const now = Date.now();
     if (timeframe === 'Last 30 Days') {
       return now - orderTime <= 30 * 24 * 60 * 60 * 1000;
     }
@@ -56,7 +49,7 @@ export default function AnalyticsReport() {
       return now - orderTime <= 90 * 24 * 60 * 60 * 1000;
     }
     if (timeframe === 'This Year') {
-      return new Date(orderTime).getFullYear() === new Date().getFullYear();
+      return new Date(orderTime).getFullYear() === new Date(now).getFullYear();
     }
     return true;
   });
@@ -64,8 +57,8 @@ export default function AnalyticsReport() {
   // Dynamic KPI computations
   const totalShipments = filteredOrders.length;
   const deliveredCount = filteredOrders.filter((o) => o.status === 'DELIVERED').length;
-  const inTransitCount = filteredOrders.filter((o) => o.status === 'IN_TRANSIT').length;
-  const revenue = filteredOrders.reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+  const inTransitCount = filteredOrders.filter((o) => ['PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY'].includes(o.status)).length;
+  const paidShipping = filteredOrders.reduce((sum, o) => sum + (o.paymentStatus === 'paid' ? Number(o.price) || 0 : 0), 0);
 
   // Group top routes dynamically from filtered orders
   const routeCounts = {};
@@ -177,9 +170,9 @@ export default function AnalyticsReport() {
 
         <div className="bg-white border border-[#E5E7EB] rounded-xl p-5 text-center shadow-sm">
           <div className="text-3xl font-bold text-[#F97316] font-condensed">
-            ₹{revenue.toLocaleString()}
+            ₹{paidShipping.toLocaleString()}
           </div>
-          <div className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mt-1">Revenue</div>
+          <div className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mt-1">Paid shipping charges</div>
         </div>
       </div>
 
